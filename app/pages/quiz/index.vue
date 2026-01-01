@@ -1,17 +1,9 @@
 <script setup>
-definePageMeta({
-  middleware: 'noindex'
-})
+import { navigateTo } from '#app'
 
-const { startOrResumeQuiz } = useQuizNavigation()
-
-onMounted(async () => {
-  await startOrResumeQuiz()
-})
+navigateTo('/quiz/overview')
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center">
-    <p class="text-gray-600">Preparing your quiz…</p>
-  </div>
+  <!-- Intentionally empty: redirect-only page -->
 </template>
