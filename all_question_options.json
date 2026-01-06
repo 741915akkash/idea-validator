@@ -1,0 +1,662 @@
+[
+    {
+        "id": 1,
+        "options": {
+            "RARE": {
+                "label": "Rare",
+                "market": 1
+            },
+            "DAILY": {
+                "label": "Daily",
+                "market": 6
+            },
+            "UNSURE": {
+                "label": "Unsure",
+                "market": 0
+            },
+            "WEEKLY": {
+                "label": "Weekly",
+                "market": 5
+            },
+            "MONTHLY": {
+                "label": "Monthly",
+                "market": 3
+            }
+        },
+        "checkpoint": 1,
+        "question_text": "How often does this problem occur?",
+        "question_order": 1
+    },
+    {
+        "id": 2,
+        "options": {
+            "MILD": {
+                "label": "Mild inconvenience",
+                "market": 1
+            },
+            "NONE": {
+                "label": "No real impact",
+                "market": 0
+            },
+            "STRESS": {
+                "label": "Reputation or stress impact",
+                "market": 3
+            },
+            "REVENUE": {
+                "label": "Loses revenue / customers",
+                "market": 6
+            },
+            "PRODUCTIVITY": {
+                "label": "Misses deadlines / productivity loss",
+                "market": 4
+            }
+        },
+        "checkpoint": 1,
+        "question_text": "What happens if this problem is not solved?",
+        "question_order": 2
+    },
+    {
+        "id": 3,
+        "options": {
+            "HEARD": {
+                "label": "Heard about it",
+                "market": 1
+            },
+            "OBSERVED": {
+                "label": "Observed others with example",
+                "market": 3
+            },
+            "PERSONAL": {
+                "label": "Personally experienced with example",
+                "market": 4
+            },
+            "ASSUMPTION": {
+                "label": "Just an assumption",
+                "market": 0
+            }
+        },
+        "checkpoint": 1,
+        "question_text": "How do you know this problem exists?",
+        "question_order": 3
+    },
+    {
+        "id": 4,
+        "options": {
+            "NONE": {
+                "label": "None",
+                "market": 0
+            },
+            "RARE": {
+                "label": "Rare mention",
+                "market": 1
+            },
+            "SOME": {
+                "label": "Some discussion",
+                "market": 2
+            },
+            "FREQUENT": {
+                "label": "Frequent discussion",
+                "market": 4
+            }
+        },
+        "checkpoint": 1,
+        "question_text": "How often do people discuss this problem publicly?",
+        "question_order": 4
+    },
+    {
+        "id": 5,
+        "options": {
+            "NONE": {
+                "label": "No trigger",
+                "market": 0
+            },
+            "MONEY": {
+                "label": "Money loss",
+                "market": 5
+            },
+            "DEADLINE": {
+                "label": "Deadline / compliance",
+                "market": 6
+            },
+            "REPUTATION": {
+                "label": "Reputation risk",
+                "market": 4
+            },
+            "CONVENIENCE": {
+                "label": "Convenience",
+                "market": 2
+            }
+        },
+        "checkpoint": 2,
+        "question_text": "What triggers someone to act?",
+        "question_order": 1
+    },
+    {
+        "id": 6,
+        "options": {
+            "RARE": {
+                "label": "Rarely",
+                "market": 1
+            },
+            "CLEAR": {
+                "label": "Yes, clearly",
+                "market": 4
+            },
+            "NEVER": {
+                "label": "Never",
+                "market": 0
+            },
+            "SOMETIMES": {
+                "label": "Sometimes",
+                "market": 2
+            }
+        },
+        "checkpoint": 2,
+        "question_text": "Is there a panic moment?",
+        "question_order": 2
+    },
+    {
+        "id": 7,
+        "options": {
+            "NONE": {
+                "label": "None",
+                "market": 0
+            },
+            "MINOR": {
+                "label": "Minor",
+                "market": 1
+            },
+            "MODERATE": {
+                "label": "Moderate impact",
+                "market": 3
+            },
+            "COMPOUNDS": {
+                "label": "Compounds fast",
+                "market": 5
+            }
+        },
+        "checkpoint": 2,
+        "question_text": "What happens if they delay solving it?",
+        "question_order": 3
+    },
+    {
+        "id": 8,
+        "options": {
+            "FREE": {
+                "label": "Used free tools only",
+                "market": 2
+            },
+            "NEVER": {
+                "label": "Never paid",
+                "market": 0
+            },
+            "DIRECT": {
+                "label": "Paid directly",
+                "market": 8
+            },
+            "INDIRECT": {
+                "label": "Paid via agency or labor",
+                "market": 5
+            }
+        },
+        "checkpoint": 3,
+        "question_text": "Have people paid for similar solutions before?",
+        "question_order": 1
+    },
+    {
+        "id": 9,
+        "options": {
+            "NONE": {
+                "label": "No buyer",
+                "market": 0
+            },
+            "DECIDER": {
+                "label": "Buyer decides",
+                "market": 6
+            },
+            "UNCLEAR": {
+                "label": "Unclear",
+                "market": 1
+            },
+            "APPROVAL": {
+                "label": "Needs approval",
+                "market": 3
+            }
+        },
+        "checkpoint": 3,
+        "question_text": "Who controls the budget?",
+        "question_order": 2
+    },
+    {
+        "id": 10,
+        "options": {
+            "LOW": {
+                "label": "Low cost",
+                "market": 2
+            },
+            "HIGH": {
+                "label": "High time or money cost",
+                "market": 6
+            },
+            "NONE": {
+                "label": "No workaround",
+                "market": 0
+            },
+            "MEDIUM": {
+                "label": "Medium cost",
+                "market": 4
+            }
+        },
+        "checkpoint": 3,
+        "question_text": "What is the cost of current workaround?",
+        "question_order": 3
+    },
+    {
+        "id": 11,
+        "options": {
+            "BROAD": {
+                "label": "Broad segment",
+                "market": 2
+            },
+            "CLEAR": {
+                "label": "One clear role and context",
+                "market": 6
+            },
+            "NARROW": {
+                "label": "Narrow but fuzzy",
+                "market": 4
+            },
+            "EVERYONE": {
+                "label": "Everyone",
+                "market": 0
+            }
+        },
+        "checkpoint": 4,
+        "question_text": "How clearly defined is the ideal customer?",
+        "question_order": 1
+    },
+    {
+        "id": 12,
+        "options": {
+            "SAME": {
+                "label": "Same pain across ICP",
+                "market": 5
+            },
+            "MOSTLY": {
+                "label": "Mostly similar",
+                "market": 3
+            },
+            "VARIES": {
+                "label": "Varies widely",
+                "market": 1
+            },
+            "UNCLEAR": {
+                "label": "Unclear",
+                "market": 0
+            }
+        },
+        "checkpoint": 4,
+        "question_text": "How similar is the pain across this customer group?",
+        "question_order": 2
+    },
+    {
+        "id": 13,
+        "options": {
+            "EASY": {
+                "label": "Easy to find",
+                "market": 4
+            },
+            "HARD": {
+                "label": "Hard to find",
+                "market": 1
+            },
+            "SOME": {
+                "label": "Some effort required",
+                "market": 2
+            },
+            "UNKNOWN": {
+                "label": "Unknown",
+                "market": 0
+            }
+        },
+        "checkpoint": 4,
+        "question_text": "How easy is it to find 10+ such people?",
+        "question_order": 3
+    },
+    {
+        "id": 14,
+        "options": {
+            "NONE": {
+                "label": "None",
+                "market": 0
+            },
+            "PARITY": {
+                "label": "Feature parity",
+                "market": 2
+            },
+            "NEGLECTED": {
+                "label": "Clear neglected angle",
+                "market": 6
+            },
+            "POSITIONING": {
+                "label": "Positioning gap",
+                "market": 4
+            }
+        },
+        "checkpoint": 5,
+        "question_text": "Is there a clear differentiation wedge?",
+        "question_order": 1
+    },
+    {
+        "id": 15,
+        "options": {
+            "NONE": {
+                "label": "None",
+                "market": 0
+            },
+            "SOME": {
+                "label": "Some complaints",
+                "market": 3
+            },
+            "MINOR": {
+                "label": "Minor issues",
+                "market": 1
+            },
+            "STRONG": {
+                "label": "Repeated strong complaints",
+                "market": 5
+            }
+        },
+        "checkpoint": 5,
+        "question_text": "Do users complain about existing solutions?",
+        "question_order": 2
+    },
+    {
+        "id": 16,
+        "options": {
+            "FEW": {
+                "label": "Few players",
+                "market": 2
+            },
+            "DOMINATED": {
+                "label": "Dominated by incumbents",
+                "market": 0
+            },
+            "FRAGMENTED": {
+                "label": "Fragmented market",
+                "market": 4
+            }
+        },
+        "checkpoint": 5,
+        "question_text": "How is the competitive landscape structured?",
+        "question_order": 3
+    },
+    {
+        "id": 17,
+        "options": {
+            "NONE": {
+                "label": "No known channel",
+                "market": 0
+            },
+            "PROVEN": {
+                "label": "One proven channel",
+                "market": 6
+            },
+            "MULTIPLE": {
+                "label": "Multiple possible channels",
+                "market": 4
+            },
+            "EXPERIMENTAL": {
+                "label": "Experimental",
+                "market": 2
+            }
+        },
+        "checkpoint": 6,
+        "question_text": "Do you know at least one proven distribution channel?",
+        "question_order": 1
+    },
+    {
+        "id": 18,
+        "options": {
+            "LOW": {
+                "label": "Low / organic",
+                "market": 5
+            },
+            "HIGH": {
+                "label": "High cost",
+                "market": 1
+            },
+            "MEDIUM": {
+                "label": "Medium cost",
+                "market": 3
+            },
+            "UNKNOWN": {
+                "label": "Unknown",
+                "market": 0
+            }
+        },
+        "checkpoint": 6,
+        "question_text": "What is the cost of reaching customers?",
+        "question_order": 2
+    },
+    {
+        "id": 19,
+        "options": {
+            "NONE": {
+                "label": "No control",
+                "market": 0
+            },
+            "DIRECT": {
+                "label": "Direct access",
+                "market": 4
+            },
+            "PARTIAL": {
+                "label": "Partial control",
+                "market": 2
+            },
+            "PLATFORM": {
+                "label": "Platform-dependent",
+                "market": 1
+            }
+        },
+        "checkpoint": 6,
+        "question_text": "How much control do you have over the channel?",
+        "question_order": 3
+    },
+    {
+        "id": 20,
+        "options": {
+            "DEEP": {
+                "label": "Deep domain experience",
+                "confidence": 8
+            },
+            "NONE": {
+                "label": "No experience",
+                "confidence": 0
+            },
+            "LEARN": {
+                "label": "Can learn",
+                "confidence": 2
+            },
+            "ADJACENT": {
+                "label": "Adjacent experience",
+                "confidence": 5
+            }
+        },
+        "checkpoint": 7,
+        "question_text": "What is your experience level in this domain?",
+        "question_order": 1
+    },
+    {
+        "id": 21,
+        "options": {
+            "NONE": {
+                "label": "None",
+                "confidence": 0
+            },
+            "SOME": {
+                "label": "Some proof",
+                "confidence": 4
+            },
+            "WEAK": {
+                "label": "Weak proof",
+                "confidence": 2
+            },
+            "PROVEN": {
+                "label": "Proven results / portfolio",
+                "confidence": 7
+            }
+        },
+        "checkpoint": 7,
+        "question_text": "What credibility or proof do you have?",
+        "question_order": 2
+    },
+    {
+        "id": 22,
+        "options": {
+            "FAST": {
+                "label": "Can build/deliver fast",
+                "confidence": 5
+            },
+            "SLOW": {
+                "label": "Slow",
+                "confidence": 1
+            },
+            "MODERATE": {
+                "label": "Moderate",
+                "confidence": 3
+            },
+            "VERY_SLOW": {
+                "label": "Very slow",
+                "confidence": 0
+            }
+        },
+        "checkpoint": 7,
+        "question_text": "How fast can you build and deliver this?",
+        "question_order": 3
+    },
+    {
+        "id": 23,
+        "options": {
+            "NONE": {
+                "label": "None",
+                "confidence": 0
+            },
+            "TEMP": {
+                "label": "Temporary",
+                "confidence": 3
+            },
+            "WEAK": {
+                "label": "Weak",
+                "confidence": 1
+            },
+            "CLEAR": {
+                "label": "Clear and defensible",
+                "confidence": 5
+            }
+        },
+        "checkpoint": 7,
+        "question_text": "Do you have an unfair advantage here?",
+        "question_order": 4
+    },
+    {
+        "id": 24,
+        "options": {
+            "NONE": {
+                "label": "None",
+                "confidence": 0
+            },
+            "LIMITED": {
+                "label": "Limited",
+                "confidence": 3
+            },
+            "COMFORTABLE": {
+                "label": "Can invest comfortably",
+                "confidence": 5
+            }
+        },
+        "checkpoint": 8,
+        "question_text": "How financially ready are you to pursue this?",
+        "question_order": 1
+    },
+    {
+        "id": 25,
+        "options": {
+            "MID": {
+                "label": "3–6 months",
+                "confidence": 3
+            },
+            "LONG": {
+                "label": "6–12 months runway",
+                "confidence": 5
+            },
+            "SHORT": {
+                "label": "<3 months",
+                "confidence": 0
+            }
+        },
+        "checkpoint": 8,
+        "question_text": "What is your realistic time runway?",
+        "question_order": 2
+    },
+    {
+        "id": 26,
+        "options": {
+            "NEUTRAL": {
+                "label": "Neutral",
+                "confidence": 3
+            },
+            "PRODUCT": {
+                "label": "Loves systems/products",
+                "confidence": 5
+            },
+            "SERVICE": {
+                "label": "Prefers services",
+                "confidence": 0
+            }
+        },
+        "checkpoint": 8,
+        "question_text": "Which execution mode do you naturally prefer?",
+        "question_order": 3
+    },
+    {
+        "id": 27,
+        "options": {
+            "ACCEPTS": {
+                "label": "Accepts any outcome",
+                "confidence": 10
+            },
+            "REJECTS": {
+                "label": "Rejects negative outcome",
+                "confidence": 0
+            },
+            "HESITATES": {
+                "label": "Accepts with hesitation",
+                "confidence": 5
+            }
+        },
+        "checkpoint": 9,
+        "question_text": "Will you accept the result even if it says NOT TO BUILD?",
+        "question_order": 1
+    },
+    {
+        "id": 28,
+        "options": {
+            "UNSURE": {
+                "label": "Interested but unsure",
+                "confidence": 5
+            },
+            "EXCITED": {
+                "label": "Excited + realistic",
+                "confidence": 10
+            },
+            "FEARFUL": {
+                "label": "Fearful / conflicted",
+                "confidence": 0
+            }
+        },
+        "checkpoint": 9,
+        "question_text": "How do you emotionally feel about pursuing this?",
+        "question_order": 2
+    }
+]

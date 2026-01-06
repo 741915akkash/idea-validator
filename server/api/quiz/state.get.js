@@ -39,7 +39,7 @@ export default eventHandler(async (event) => {
     if (!checkpoint) {
       const cpRes = await client.query(
         `
-        SELECT checkpoint
+        SELECT current_checkpoint
         FROM quiz_state
         WHERE quiz_id = $1
         `,
@@ -48,7 +48,7 @@ export default eventHandler(async (event) => {
 
       return {
         status: quizStatus,
-        current_checkpoint: cpRes.rows[0]?.checkpoint ?? 1
+        current_checkpoint: cpRes.rows[0]?.current_checkpoint ?? 1
       }
     }
 

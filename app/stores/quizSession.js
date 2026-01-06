@@ -29,6 +29,9 @@ export const useQuizSessionStore = defineStore('quizSession', {
   actions: {
     setQuizId(id) {
       this.quizId = id
+      if (import.meta.client) {
+        localStorage.setItem('quiz_id', id)
+      }
     },
 
     async loadOverview(quizId) {
@@ -69,11 +72,21 @@ export const useQuizSessionStore = defineStore('quizSession', {
       this.isCompleted = true
     },
 
+    hydrate() {
+      if (import.meta.client && !this.quizId) {
+        const saved = localStorage.getItem('quiz_id')
+        if (saved) this.quizId = saved
+      }
+    },
+
     reset() {
       this.quizId = null
       this.isCompleted = false
       this.checkpoints = []
       this.loaded = false
+       if (import.meta.client) {
+         localStorage.removeItem('quiz_id')
+       }
     }
   }
 })

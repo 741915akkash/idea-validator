@@ -1,0 +1,29 @@
+checkpoint,id,question_text
+1,1,How often does this problem occur?
+1,2,What happens if this problem is not solved?
+1,3,How do you know this problem exists?
+1,4,How often do people discuss this problem publicly?
+2,5,What triggers someone to act?
+2,6,Is there a panic moment?
+2,7,What happens if they delay solving it?
+3,8,Have people paid for similar solutions before?
+3,9,Who controls the budget?
+3,10,What is the cost of current workaround?
+4,11,How clearly defined is the ideal customer?
+4,12,How similar is the pain across this customer group?
+4,13,How easy is it to find 10+ such people?
+5,14,Is there a clear differentiation wedge?
+5,15,Do users complain about existing solutions?
+5,16,How is the competitive landscape structured?
+6,17,Do you know at least one proven distribution channel?
+6,18,What is the cost of reaching customers?
+6,19,How much control do you have over the channel?
+7,20,What is your experience level in this domain?
+7,21,What credibility or proof do you have?
+7,22,How fast can you build and deliver this?
+7,23,Do you have an unfair advantage here?
+8,24,How financially ready are you to pursue this?
+8,25,What is your realistic time runway?
+8,26,Which execution mode do you naturally prefer?
+9,27,Will you accept the result even if it says NOT TO BUILD?
+9,28,How do you emotionally feel about pursuing this?
