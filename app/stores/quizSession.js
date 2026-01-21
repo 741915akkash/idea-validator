@@ -27,14 +27,35 @@ export const useQuizSessionStore = defineStore('quizSession', {
   },
 
   actions: {
+    /**
+     * Used ONLY when resuming or hydrating an existing quiz
+     */
     setQuizId(id) {
       this.quizId = id
+
+      if (import.meta.client) {
+        localStorage.setItem('quiz_id', id)
+      }
+    },
+
+    /**
+     * 🔑 IMPORTANT
+     * Used when user explicitly starts a NEW quiz.
+     * This clears all old client-side state.
+     */
+    startFreshQuiz(id) {
+      this.quizId = id
+      this.isCompleted = false
+      this.checkpoints = []
+      this.loaded = false
+
       if (import.meta.client) {
         localStorage.setItem('quiz_id', id)
       }
     },
 
     async loadOverview(quizId) {
+      // prevent unnecessary reloads
       if (this.loaded && this.quizId === quizId) return
 
       const res = await $fetch('/api/quiz/overview', {
@@ -51,6 +72,19 @@ export const useQuizSessionStore = defineStore('quizSession', {
       }))
 
       this.loaded = true
+    },
+
+    async startRevision(completedQuizId) {
+      const { quiz_id } = await $fetch('/api/quiz/create-revision', {
+        method: 'POST',
+        body: { quiz_id: completedQuizId }
+      })
+
+      // hard reset (important)
+      this.startFreshQuiz(quiz_id)
+
+      // let /quiz page handle loading
+      navigateTo('/quiz')
     },
 
     // Called after an answer is saved successfully
@@ -72,21 +106,31 @@ export const useQuizSessionStore = defineStore('quizSession', {
       this.isCompleted = true
     },
 
+    /**
+     * Hydrate quiz from localStorage on page reload
+     * ONLY if we don't already have one in memory
+     */
     hydrate() {
       if (import.meta.client && !this.quizId) {
         const saved = localStorage.getItem('quiz_id')
-        if (saved) this.quizId = saved
+        if (saved) {
+          this.quizId = saved
+        }
       }
     },
 
+    /**
+     * Hard reset (logout, debug, full wipe)
+     */
     reset() {
       this.quizId = null
       this.isCompleted = false
       this.checkpoints = []
       this.loaded = false
-       if (import.meta.client) {
-         localStorage.removeItem('quiz_id')
-       }
+
+      if (import.meta.client) {
+        localStorage.removeItem('quiz_id')
+      }
     }
   }
 })
