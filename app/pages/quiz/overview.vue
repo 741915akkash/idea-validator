@@ -11,6 +11,11 @@
   const renaming = ref(false)
   const nameDraft = ref('')
   const isClientReady = ref(false)
+  const interviewSummary = ref({
+    total: 0,
+    completed: 0,
+    inProgress: 0
+  })
 
   const currentQuiz = computed(() => quizzes.value.find((q) => q.id === quizStore.quizId))
 
@@ -21,7 +26,7 @@
 
   async function handleScoreClick() {
     try {
-      await $fetch('/api/quiz/score', {
+      await $fetch('/api/quiz/score/score', {
         method: 'POST',
         body: { quiz_id: quizStore.quizId }
       })
@@ -36,6 +41,14 @@
     return q.revision_number === 0 ? q.name : `${q.name} — Revision ${q.revision_number}`
   }
 
+  function goToInterviews() {
+    router.push(`/quiz/interviews?quiz_id=${quizStore.quizId}`)
+  }
+
+  function startNewInterview() {
+    router.push(`/quiz/interview/new?quiz_id=${quizStore.quizId}`)
+  }
+
   onMounted(async () => {
     isClientReady.value = true
 
@@ -47,7 +60,7 @@
 
     // 1️⃣ Ensure quiz exists
     if (!quizStore.quizId) {
-      const res = await $fetch('/api/quiz/start', { method: 'POST' })
+      const res = await $fetch('/api/quiz/lifecycle/start', { method: 'POST' })
       quizStore.setQuizId(res.quiz_id)
     }
 
@@ -59,6 +72,13 @@
     const notesRes = await $fetch('/api/quiz/notes/summary', {
       query: { quiz_id: quizStore.quizId }
     })
+
+    // Fetch interview summary
+    const interviewRes = await $fetch('/api/interview/summary', {
+      query: { quiz_id: quizStore.quizId }
+    })
+
+    interviewSummary.value = interviewRes
 
     /*
     notesRes.checkpoints = [1, 3, 7]
@@ -72,7 +92,7 @@
   })
 
   async function goToCheckpoint(checkpointNumber) {
-    await $fetch('/api/quiz/set-current-checkpoint', {
+    await $fetch('/api/quiz/checkpoints/set-current-checkpoint', {
       method: 'POST',
       body: {
         quiz_id: quizStore.quizId,
@@ -167,11 +187,11 @@
           <div v-else class="flex items-center gap-2">
             <input
               v-model="nameDraft"
-              class="rounded border px-2 py-1 text-sm"
+              class="rounded border px-2 py-1 text-base"
               placeholder="Quiz name"
             />
-            <button @click="saveRename" class="text-sm text-emerald-700">Save</button>
-            <button @click="renaming = false" class="text-sm text-gray-500">Cancel</button>
+            <button @click="saveRename" class="text-base text-emerald-700">Save</button>
+            <button @click="renaming = false" class="text-base text-gray-500">Cancel</button>
           </div>
         </div>
 
@@ -189,6 +209,37 @@
         </div>
       </div>
 
+      <!-- Interview Section -->
+      <section v-if="quizStore.quizId" class="mb-8 rounded border bg-gray-50 p-4">
+        <div class="mb-3">
+          <h2 class="text-base font-semibold text-gray-800">Improve this idea</h2>
+
+          <!-- If interviews exist -->
+          <div v-if="interviewSummary.total > 0" class="space-y-1 text-xs text-gray-600">
+            <div>Interviews: {{ interviewSummary.total }} total</div>
+            <div>• {{ interviewSummary.completed }} completed</div>
+            <div>• {{ interviewSummary.inProgress }} in progress</div>
+          </div>
+
+          <!-- If none -->
+          <div v-else class="text-xs text-gray-600">
+            No interviews yet. Run one to improve clarity and score.
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <Button @click="startNewInterview"> Start Interview </Button>
+
+          <button
+            v-if="interviewSummary.total > 0"
+            class="text-base text-emerald-700 hover:underline"
+            @click="goToInterviews"
+          >
+            View Interviews
+          </button>
+        </div>
+      </section>
+
       <!-- Checkpoints list -->
       <section v-if="quizStore.checkpoints.length" class="space-y-4">
         <div
@@ -197,7 +248,7 @@
           class="flex items-center justify-between rounded border px-4 py-3"
         >
           <div>
-            <div class="flex items-center gap-2 text-sm font-medium">
+            <div class="flex items-center gap-2 text-base font-medium">
               <span>Checkpoint {{ cp.checkpoint }}</span>
 
               <!-- 📝 Notes indicator -->
@@ -217,7 +268,7 @@
           </div>
 
           <button
-            class="text-sm text-emerald-700 hover:underline"
+            class="text-base text-emerald-700 hover:underline"
             @click="goToCheckpoint(cp.checkpoint)"
           >
             Review
@@ -230,7 +281,7 @@
         <!-- Error message -->
         <div
           v-if="scoreError"
-          class="mb-4 rounded border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-700"
+          class="mb-4 rounded border border-amber-300 bg-amber-50 px-4 py-3 text-base text-amber-700"
         >
           {{ scoreError }}
         </div>
@@ -253,7 +304,7 @@
             View Score
           </NuxtLink>
 
-          <NuxtLink to="/" class="text-sm text-gray-600 hover:underline"> Exit </NuxtLink>
+          <NuxtLink to="/" class="text-base text-gray-600 hover:underline"> Exit </NuxtLink>
         </div>
       </div>
     </div>

@@ -3,17 +3,37 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import ScoreCircle from '~/components/ui/ScoreCircle.vue'
+  import InsightBlock from '~/components/score/InsightBlock.vue'
 
   const route = useRoute()
   const router = useRouter()
   const quizStore = useQuizSessionStore()
-  const revisionDiff = ref([])
 
   const quizId = route.query.quiz_id || route.params.quiz_id || null
 
+  // --------------------
+  // Core score state
+  // --------------------
   const loading = ref(true)
   const result = ref(null)
   const error = ref(null)
+
+  // --------------------
+  // Revision diff
+  // --------------------
+  const revisionDiff = ref([])
+
+  // --------------------
+  // 🔹 NEW: Insights state
+  // --------------------
+  const loadingInsights = ref(true)
+  const insightsError = ref(null)
+
+  const insights = ref({
+    working: [],
+    risky: [],
+    proceed: []
+  })
 
   onMounted(async () => {
     try {
@@ -22,34 +42,54 @@
         return
       }
 
-      // ✅ ONLY read existing result
-      const existing = await $fetch('/api/quiz/result', {
+      // ✅ 1️⃣ Fetch immutable score result
+      const existing = await $fetch('/api/quiz/lifecycle/result', {
         query: { quiz_id: quizId }
       })
 
       if (!existing) {
-        // 🔒 No score yet → overview decides what to do
         router.replace('/quiz/overview')
         return
       }
 
-      // fetch revision diff (safe even for revision_number = 0)
-      const res = await $fetch('/api/quiz/revision-diff', {
+      result.value = existing
+
+      // ✅ 2️⃣ Fetch revision diff (safe even for original quiz)
+      const diffRes = await $fetch('/api/quiz/revision/revision-diff', {
         query: { quiz_id: quizId }
       })
 
-      revisionDiff.value = res.changes || []
+      revisionDiff.value = diffRes.changes || []
 
-      result.value = existing
+      // ✅ 3️⃣ Fetch insights (STEP 4)
+      try {
+        const insightsRes = await $fetch('/api/quiz/test-insights', {
+          query: { quiz_id: quizId }
+        })
+
+        insights.value = insightsRes.insights
+        console.log('Loaded insights:', insights.value)
+      } catch (e) {
+        // Insights failure should NOT break score page
+        insightsError.value = 'Failed to load insights'
+        console.error(e)
+      }
     } catch (e) {
       error.value = e
     } finally {
       loading.value = false
+      loadingInsights.value = false
     }
   })
 
+  // --------------------
+  // Computed helpers
+  // --------------------
   const ready = computed(() => result.value && result.value.summary)
 
+  // --------------------
+  // Actions
+  // --------------------
   async function startNewRevision() {
     if (!quizId) return
     await quizStore.startRevision(quizId)
@@ -60,10 +100,10 @@
   <main class="px-6 py-12">
     <div class="mx-auto max-w-2xl">
       <!-- Loading -->
-      <p v-if="loading" class="text-sm text-gray-600">Loading your results…</p>
+      <p v-if="loading" class="text-base text-gray-600">Loading your results…</p>
 
       <!-- Error -->
-      <div v-else-if="error" class="text-sm text-red-600">
+      <div v-else-if="error" class="text-base text-red-600">
         Something went wrong while loading the score.
       </div>
 
@@ -89,13 +129,13 @@
           Decision: {{ result.decision.replaceAll('_', ' ') }}
         </h1>
 
-        <p class="mb-8 text-sm text-gray-600">Based on your answers across all checkpoints.</p>
+        <p class="mb-8 text-base text-gray-600">Based on your answers across all checkpoints.</p>
 
         <!-- Market Breakdown -->
         <section class="mb-10">
-          <h2 class="mb-3 text-sm font-medium">Market breakdown</h2>
+          <h2 class="mb-3 text-base font-medium">Market breakdown</h2>
 
-          <ul class="space-y-2 text-sm">
+          <ul class="space-y-2 text-base">
             <li
               v-for="(value, checkpoint) in result.summary.market_breakdown"
               :key="checkpoint"
@@ -109,9 +149,9 @@
 
         <!-- Confidence Breakdown -->
         <section class="mb-10">
-          <h2 class="mb-3 text-sm font-medium">Confidence breakdown</h2>
+          <h2 class="mb-3 text-base font-medium">Confidence breakdown</h2>
 
-          <ul class="space-y-2 text-sm">
+          <ul class="space-y-2 text-base">
             <li
               v-for="(value, key) in result.summary.confidence_breakdown"
               :key="key"
@@ -127,7 +167,7 @@
 
         <!-- 🔍 Revision changes -->
         <section v-if="revisionDiff.length" class="mt-12 border-t pt-8">
-          <h2 class="mb-4 text-sm font-semibold">What changed in this revision</h2>
+          <h2 class="mb-4 text-base font-semibold">What changed in this revision</h2>
 
           <div
             v-for="change in revisionDiff"
@@ -138,7 +178,7 @@
             <p class="mb-1 text-xs text-gray-500">Checkpoint {{ change.checkpoint }}</p>
 
             <!-- Question -->
-            <p class="mb-3 text-sm font-medium">
+            <p class="mb-3 text-base font-medium">
               {{ change.question_text }}
             </p>
 
@@ -146,7 +186,7 @@
             <div v-if="change.main_option.previous !== change.main_option.current" class="mb-3">
               <p class="mb-1 text-xs font-medium text-gray-600">Option</p>
 
-              <div class="grid grid-cols-2 gap-6 text-sm">
+              <div class="grid grid-cols-2 gap-6 text-base">
                 <!-- Previous -->
                 <div class="text-gray-400">
                   {{ change.main_option.previous ?? '—' }}
@@ -220,19 +260,36 @@
           </div>
         </section>
 
+        <section v-if="!loadingInsights && !insightsError" class="mt-10 space-y-10">
+          <!-- WHAT'S WORKING -->
+          <InsightBlock title="What’s working" tone="positive" :items="insights.working" />
+
+          <!-- WHAT'S RISKY -->
+          <InsightBlock title="What’s risky" tone="negative" :items="insights.risky" />
+
+          <!-- HOW TO PROCEED -->
+          <InsightBlock title="How to proceed" tone="neutral" :items="insights.proceed" />
+        </section>
+
+        <div v-if="loadingInsights" class="mt-6 text-base text-gray-500">Loading insights…</div>
+
+        <div v-if="insightsError" class="mt-6 text-base text-red-600">
+          {{ insightsError }}
+        </div>
+
         <!-- Footer -->
         <p class="mb-8 text-xs text-gray-500">Results are locked to preserve objectivity.</p>
 
         <!-- Actions -->
         <div class="flex items-center gap-6">
           <button
-            class="text-sm font-medium text-indigo-600 hover:underline"
+            class="text-base font-medium text-indigo-600 hover:underline"
             @click="startNewRevision"
           >
             Start new revision
           </button>
 
-          <NuxtLink to="/quiz/overview" class="text-sm text-gray-600 hover:underline">
+          <NuxtLink to="/quiz/overview" class="text-base text-gray-600 hover:underline">
             Back to overview
           </NuxtLink>
         </div>

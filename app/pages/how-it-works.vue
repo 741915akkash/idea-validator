@@ -1,32 +1,24 @@
 <script setup>
-import Button from '~/components/ui/Button.vue'
-import { navigateTo } from '#app'
+  import Button from '~/components/ui/Button.vue'
+  import { navigateTo } from '#app'
 
-const beginValidation = () => {
-  navigateTo('/quiz/overview')
-}
+  const beginValidation = () => {
+    navigateTo('/quiz/overview')
+  }
 </script>
 
 <template>
   <main class="px-6 py-16">
-    <div class="max-w-2xl mx-auto">
-      <h1 class="text-2xl font-semibold mb-2">
-        How this validation works
-      </h1>
+    <div class="mx-auto max-w-2xl">
+      <h1 class="mb-2 text-2xl font-semibold">How this validation works</h1>
 
-      <div class="h-1 w-16 bg-emerald-500 mb-8"></div>
+      <div class="mb-8 h-1 w-16 bg-emerald-500"></div>
 
       <!-- Section: What this does -->
-      <section class="mb-8 text-sm text-gray-700 space-y-3">
-        <p>
-          This tool evaluates your idea using a fixed set of criteria
-          across 9 checkpoints.
-        </p>
+      <section class="mb-8 space-y-3 text-base text-gray-700">
+        <p>This tool evaluates your idea using a fixed set of criteria across 9 checkpoints.</p>
 
-        <p>
-          Your answers are mapped to numeric scores.
-          Those scores produce:
-        </p>
+        <p>Your answers are mapped to numeric scores. Those scores produce:</p>
 
         <ul class="list-disc pl-5">
           <li>Market Score (idea viability)</li>
@@ -35,26 +27,20 @@ const beginValidation = () => {
       </section>
 
       <!-- Section: How scoring works -->
-      <section class="mb-8 text-sm text-gray-700 space-y-3">
-        <p class="font-medium text-gray-900">
-          How scoring works
-        </p>
+      <section class="mb-8 space-y-3 text-base text-gray-700">
+        <p class="font-medium text-gray-900">How scoring works</p>
 
         <p>
-          Every question has predefined scoring.
-          There is no interpretation, no AI, and no advice layer.
+          Every question has predefined scoring. There is no interpretation, no AI, and no advice
+          layer.
         </p>
 
-        <p>
-          Same answers → same result.
-        </p>
+        <p>Same answers → same result.</p>
       </section>
 
       <!-- Section: What this does not do -->
-      <section class="mb-8 text-sm text-gray-700 space-y-3">
-        <p class="font-medium text-gray-900">
-          What this does not do
-        </p>
+      <section class="mb-8 space-y-3 text-base text-gray-700">
+        <p class="font-medium text-gray-900">What this does not do</p>
 
         <ul class="list-disc pl-5">
           <li>Predict success</li>
@@ -65,30 +51,22 @@ const beginValidation = () => {
       </section>
 
       <!-- Section: Control & safety -->
-      <section class="mb-10 text-sm text-gray-700 space-y-3">
-        <p class="font-medium text-gray-900">
-          Your control & safety
-        </p>
+      <section class="mb-10 space-y-3 text-base text-gray-700">
+        <p class="font-medium text-gray-900">Your control & safety</p>
+
+        <p>You can pause and resume at any time.</p>
 
         <p>
-          You can pause and resume at any time.
-        </p>
-
-        <p>
-          Once results are generated, they are locked to preserve objectivity.
-          You can always run a new validation with different assumptions.
+          Once results are generated, they are locked to preserve objectivity. You can always run a
+          new validation with different assumptions.
         </p>
       </section>
 
       <!-- Actions -->
       <div class="flex items-center gap-4">
-        <Button @click="beginValidation">
-          Begin validation
-        </Button>
+        <Button @click="beginValidation"> Begin validation </Button>
 
-        <NuxtLink to="/" class="text-sm text-gray-600 hover:underline">
-          Go back
-        </NuxtLink>
+        <NuxtLink to="/" class="text-base text-gray-600 hover:underline"> Go back </NuxtLink>
       </div>
     </div>
   </main>

@@ -1,18 +1,18 @@
 <script setup>
-defineProps({
-  value: {
-    type: Number,
-    required: true
-  },
-  label: {
-    type: String,
-    required: true
-  },
-  colorClass: {
-    type: String,
-    required: true
-  }
-})
+  defineProps({
+    value: {
+      type: Number,
+      required: true
+    },
+    label: {
+      type: String,
+      required: true
+    },
+    colorClass: {
+      type: String,
+      required: true
+    }
+  })
 </script>
 
 <template>
@@ -44,6 +44,6 @@ defineProps({
     </svg>
 
     <div class="text-xl font-medium">{{ value }}</div>
-    <div class="text-sm text-gray-500">{{ label }}</div>
+    <div class="text-base text-gray-500">{{ label }}</div>
   </div>
 </template>

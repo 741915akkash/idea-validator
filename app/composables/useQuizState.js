@@ -4,13 +4,13 @@ export function useQuizState(checkpoint) {
 
   async function load() {
     if (!checkpoint) return // guard
-    const res = await $fetch(`/api/quiz/state?checkpoint=${checkpoint}`)
+    const res = await $fetch(`/api/quiz/lifecycle/state?checkpoint=${checkpoint}`)
     quiz.value = res.quiz
     questions.value = res.questions
   }
 
   async function saveAnswer({ questionId, value }) {
-    await $fetch('/api/quiz/answer', {
+    await $fetch('/api/quiz/answers/answer', {
       method: 'POST',
       body: { questionId, value }
     })

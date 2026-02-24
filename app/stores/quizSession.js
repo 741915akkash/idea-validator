@@ -58,7 +58,7 @@ export const useQuizSessionStore = defineStore('quizSession', {
       // prevent unnecessary reloads
       if (this.loaded && this.quizId === quizId) return
 
-      const res = await $fetch('/api/quiz/overview', {
+      const res = await $fetch('/api/quiz/lifecycle/overview', {
         query: { quiz_id: quizId }
       })
 
@@ -75,7 +75,7 @@ export const useQuizSessionStore = defineStore('quizSession', {
     },
 
     async startRevision(completedQuizId) {
-      const { quiz_id } = await $fetch('/api/quiz/create-revision', {
+      const { quiz_id } = await $fetch('/api/quiz/revision/create-revision', {
         method: 'POST',
         body: { quiz_id: completedQuizId }
       })

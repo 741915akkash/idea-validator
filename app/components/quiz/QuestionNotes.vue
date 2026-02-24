@@ -11,7 +11,7 @@
   const saved = ref(false)
 
   onMounted(async () => {
-    const res = await $fetch('/api/quiz/note', {
+    const res = await $fetch('/api/quiz/notes/note', {
       params: {
         quiz_id: props.quizId,
         question_id: props.questionId
@@ -26,7 +26,7 @@
       if (props.readOnly) return
       saved.value = false
 
-      await $fetch('/api/quiz/note', {
+      await $fetch('/api/quiz/notes/note', {
         method: 'POST',
         body: {
           quiz_id: props.quizId,
@@ -48,7 +48,7 @@
     <textarea
       v-model="noteText"
       :readonly="readOnly"
-      class="box-border min-h-[270px] border-2 border-gray-500 w-full resize-y rounded border p-3 text-sm focus:border-emerald-500 focus:outline-none focus:ring-0"
+      class="box-border min-h-[270px] w-full resize-y rounded border border-2 border-gray-500 p-3 text-base focus:border-emerald-500 focus:outline-none focus:ring-0"
     />
 
     <span v-if="saved" class="text-xs text-green-600">Saved ✓</span>

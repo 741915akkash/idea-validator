@@ -24,7 +24,7 @@
     data: state,
     pending,
     refresh
-  } = await useFetch('/api/quiz/state', {
+  } = await useFetch('/api/quiz/lifecycle/state', {
     query: {
       quiz_id: quizId,
       checkpoint
@@ -96,7 +96,7 @@
       nextValue = optionKey
     }
 
-    await $fetch('/api/quiz/answer', {
+    await $fetch('/api/quiz/answers/answer', {
       method: 'POST',
       body: {
         quiz_id: quizId,
@@ -117,7 +117,7 @@
 
   // Complete checkpoint
   const completeCheckpoint = async () => {
-    await $fetch('/api/quiz/complete-checkpoint', {
+    await $fetch('/api/quiz/checkpoints/complete-checkpoint', {
       method: 'POST',
       body: {
         quiz_id: quizId,
@@ -126,12 +126,12 @@
     })
 
     // Ask backend for lifecycle state
-    const lifecycle = await $fetch('/api/quiz/state', {
+    const lifecycle = await $fetch('/api/quiz/lifecycle/state', {
       query: { quiz_id: quizId }
     })
 
     if (lifecycle.status === 'READY_TO_SCORE') {
-      await $fetch('/api/quiz/score', {
+      await $fetch('/api/quiz/score/score', {
         method: 'POST',
         body: { quiz_id: quizId }
       })
@@ -149,21 +149,21 @@
     <header class="mb-6 flex items-center justify-between">
       <div>
         <h1 class="text-xl font-semibold">Checkpoint {{ checkpoint }}</h1>
-        <p class="text-sm text-gray-600">{{ unansweredCount }} unanswered</p>
+        <p class="text-base text-gray-600">{{ unansweredCount }} unanswered</p>
       </div>
 
       <NuxtLink
         to="/quiz/overview"
         active-class=""
         exact-active-class=""
-        class="text-sm text-emerald-700 hover:underline"
+        class="text-base text-emerald-700 hover:underline"
       >
         Back to overview
       </NuxtLink>
     </header>
 
     <!-- Loading -->
-    <p v-show="pending" class="text-sm text-gray-500">Loading questions…</p>
+    <p v-show="pending" class="text-base text-gray-500">Loading questions…</p>
 
     <!-- Questions -->
     <section v-show="!pending" class="space-y-6">
@@ -190,7 +190,7 @@
             </div>
 
             <!-- Action buttons -->
-            <div class="mt-3 flex gap-4 text-sm text-gray-500">
+            <div class="mt-3 flex gap-4 text-base text-gray-500">
               <button @click="toggleAsq(q.id)">ASQs</button>
               <button @click="toggleNotes(q.id)">Notes</button>
             </div>
