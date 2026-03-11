@@ -2,9 +2,9 @@ import { pool } from '../../db'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { quiz_id, goal, structured } = body
+  const { sub_uncertainty_id, quiz_id } = body
 
-  if (!quiz_id || !goal || !structured) {
+  if (!sub_uncertainty_id || !quiz_id) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid payload' })
   }
 
@@ -13,49 +13,52 @@ export default defineEventHandler(async (event) => {
   try {
     await client.query('BEGIN')
 
+    // 1️⃣ Create interview execution row
     const interviewRes = await client.query(
       `
-      INSERT INTO interviews (quiz_id)
-      VALUES ($1)
+      INSERT INTO interviews (quiz_id, sub_uncertainty_id, status)
+      VALUES ($1, $2, 'active')
       RETURNING id
       `,
-      [quiz_id]
+      [quiz_id, sub_uncertainty_id]
     )
 
     const interviewId = interviewRes.rows[0].id
 
+    // 2️⃣ Get goal for sub
     const goalRes = await client.query(
       `
-      INSERT INTO interview_goals (interview_id, text)
-      VALUES ($1, $2)
-      RETURNING id
+      SELECT id FROM goals
+      WHERE sub_uncertainty_id = $1
       `,
-      [interviewId, goal]
+      [sub_uncertainty_id]
     )
+
+    if (goalRes.rows.length === 0) {
+      throw createError({ statusCode: 400, statusMessage: 'Goal not found for sub' })
+    }
 
     const goalId = goalRes.rows[0].id
 
-    for (const cond of structured.conditions) {
-      const condRes = await client.query(
+    // 3️⃣ Get all conditions (template)
+    const conditionsRes = await client.query(
+      `
+      SELECT id FROM conditions
+      WHERE goal_id = $1
+      ORDER BY order_index ASC
+      `,
+      [goalId]
+    )
+
+    // 4️⃣ Create condition_results (runtime state)
+    for (const row of conditionsRes.rows) {
+      await client.query(
         `
-        INSERT INTO interview_conditions (goal_id, text)
-        VALUES ($1, $2)
-        RETURNING id
+        INSERT INTO condition_results (interview_id, condition_id, status)
+        VALUES ($1, $2, 'pending')
         `,
-        [goalId, cond.text]
+        [interviewId, row.id]
       )
-
-      const conditionId = condRes.rows[0].id
-
-      for (const q of cond.questions) {
-        await client.query(
-          `
-          INSERT INTO interview_questions (goal_id, text)
-          VALUES ($1, $2)
-          `,
-          [goalId, q]
-        )
-      }
     }
 
     await client.query('COMMIT')

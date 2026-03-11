@@ -1,5 +1,8 @@
 import { pool } from '../../../db'
 import OpenAI from 'openai'
+import { scoreDecomposition } from '../../../services/interviewEngine/scoreStructure'
+import { storeCache, incrementHit, toVectorLiteral } from '../../../services/interviewEngine/cache'
+import { extractJSON } from '../../../services/interviewEngine/extractJSON'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
@@ -16,42 +19,24 @@ async function getEmbedding(text) {
 }
 
 async function findSimilar(embedding) {
+  const vector = toVectorLiteral(embedding)
+
   const result = await pool.query(
     `
     SELECT id,
            structured_json,
-           1 - (embedding <=> $1) AS similarity
+           confidence_score,
+           1 - (embedding <=> $1::vector) AS similarity
     FROM interview_cache
-    WHERE level = 'decomposition'
-    ORDER BY embedding <=> $1
+    WHERE level = 'uncertainty_decomposition'
+      AND confidence_score >= 75
+    ORDER BY embedding <=> $1::vector
     LIMIT 1
     `,
-    [embedding]
+    [vector]
   )
 
   return result.rows[0] || null
-}
-
-async function storeCache({ input_text, normalized_text, structured_json, embedding }) {
-  await pool.query(
-    `
-    INSERT INTO interview_cache
-    (level, input_text, normalized_text, structured_json, embedding)
-    VALUES ('decomposition', $1, $2, $3, $4)
-    `,
-    [input_text, normalized_text, structured_json, embedding]
-  )
-}
-
-async function incrementHit(id) {
-  await pool.query(
-    `
-    UPDATE interview_cache
-    SET hit_count = hit_count + 1
-    WHERE id = $1
-    `,
-    [id]
-  )
 }
 
 export default defineEventHandler(async (event) => {
@@ -65,10 +50,11 @@ export default defineEventHandler(async (event) => {
   const normalized = normalize(uncertainty)
   const embedding = await getEmbedding(normalized)
 
-  // 🔍 Check semantic cache
   const cached = await findSimilar(embedding)
 
-  if (cached && cached.similarity > 0.85) {
+  const threshold = 0.85
+
+  if (cached && cached.similarity > threshold && cached.confidence_score >= 75) {
     await incrementHit(cached.id)
 
     return {
@@ -78,7 +64,6 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // 🤖 Call LLM if no good match
   const prompt = `
 Break down the following startup uncertainty into 4-6
 narrow, testable sub-uncertainties.
@@ -108,18 +93,22 @@ Uncertainty:
     temperature: 0.2
   })
 
-  const structured = JSON.parse(response.choices[0].message.content)
+  const structured = extractJSON(response.choices[0].message.content)
+  const confidence = scoreDecomposition(structured)
 
   await storeCache({
+    level: 'uncertainty_decomposition',
     input_text: uncertainty,
     normalized_text: normalized,
     structured_json: structured,
-    embedding
+    embedding: embedding,
+    confidence_score: confidence
   })
 
   return {
     source: 'llm',
     similarity: null,
-    data: structured
+    data: structured,
+    confidence: confidence
   }
 })

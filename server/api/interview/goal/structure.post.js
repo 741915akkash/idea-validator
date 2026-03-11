@@ -1,5 +1,8 @@
 import { pool } from '../../../db'
 import OpenAI from 'openai'
+import { scoreGoalStructure } from '../../../services/interviewEngine/scoreStructure'
+import { storeCache, incrementHit, toVectorLiteral } from '../../../services/interviewEngine/cache'
+import { extractJSON } from '../../../services/interviewEngine/extractJSON'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
@@ -16,42 +19,24 @@ async function getEmbedding(text) {
 }
 
 async function findSimilar(embedding) {
+  const vector = toVectorLiteral(embedding)
+
   const result = await pool.query(
     `
     SELECT id,
            structured_json,
-           1 - (embedding <=> $1) AS similarity
+           confidence_score,
+           1 - (embedding <=> $1::vector) AS similarity
     FROM interview_cache
     WHERE level = 'goal_structure'
-    ORDER BY embedding <=> $1
+      AND confidence_score >= 75
+    ORDER BY embedding <=> $1::vector
     LIMIT 1
     `,
-    [embedding]
+    [vector]
   )
 
   return result.rows[0] || null
-}
-
-async function storeCache({ goal, normalized, structured, embedding }) {
-  await pool.query(
-    `
-    INSERT INTO interview_cache
-    (level, input_text, normalized_text, structured_json, embedding)
-    VALUES ('goal_structure', $1, $2, $3, $4)
-    `,
-    [goal, normalized, structured, embedding]
-  )
-}
-
-async function incrementHit(id) {
-  await pool.query(
-    `
-    UPDATE interview_cache
-    SET hit_count = hit_count + 1
-    WHERE id = $1
-    `,
-    [id]
-  )
 }
 
 export default defineEventHandler(async (event) => {
@@ -65,10 +50,11 @@ export default defineEventHandler(async (event) => {
   const normalized = normalize(goal)
   const embedding = await getEmbedding(normalized)
 
-  // 🔍 Check similarity cache
   const cached = await findSimilar(embedding)
 
-  if (cached && cached.similarity > 0.88) {
+  const threshold = 0.88
+
+  if (cached && cached.similarity > threshold && cached.confidence_score >= 75) {
     await incrementHit(cached.id)
 
     return {
@@ -78,7 +64,6 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // 🤖 Call LLM only if no strong match
   const prompt = `
 Given this interview goal:
 
@@ -87,14 +72,6 @@ Given this interview goal:
 Generate:
 1. 5-7 binary observable CONDITIONS.
 2. For each condition, 1-2 concrete sub-questions.
-
-Rules:
-- Conditions must be binary
-- Must be satisfied by a single answer
-- Must avoid hypotheticals
-- Must be past-focused
-- No opinions
-- No "why", "feel", "would"
 
 Return JSON:
 {
@@ -113,18 +90,22 @@ Return JSON:
     temperature: 0.3
   })
 
-  const structured = JSON.parse(response.choices[0].message.content)
+  const structured = extractJSON(response.choices[0].message.content)
+  const confidence = scoreGoalStructure(structured)
 
   await storeCache({
-    goal,
-    normalized,
-    structured,
-    embedding
+    level: 'goal_structure',
+    input_text: goal,
+    normalized_text: normalized,
+    structured_json: structured,
+    embedding: embedding,
+    confidence_score: confidence
   })
 
   return {
     source: 'llm',
     similarity: null,
-    data: structured
+    data: structured,
+    confidence: confidence
   }
 })

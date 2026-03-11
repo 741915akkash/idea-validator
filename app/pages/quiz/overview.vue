@@ -49,6 +49,10 @@
     router.push(`/quiz/interview/new?quiz_id=${quizStore.quizId}`)
   }
 
+  function goToMasterDetail() {
+    router.push(`/quiz/master-detail?quiz_id=${quizStore.quizId}`)
+  }
+
   onMounted(async () => {
     isClientReady.value = true
 
@@ -142,10 +146,10 @@
 
       <div class="mb-8 h-1 w-16 bg-emerald-500"></div>
 
-      <div class="mb-6 flex items-center justify-between">
+      <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <!-- Quiz title + rename -->
         <div v-if="currentQuiz" class="group flex items-center gap-2">
-          <!-- Normal (view mode) -->
+          <!-- View mode -->
           <div
             v-if="!renaming"
             class="flex cursor-pointer items-center gap-2"
@@ -156,7 +160,7 @@
               }
             "
           >
-            <h1 class="text-2xl font-semibold">
+            <h1 class="text-xl font-semibold md:text-2xl">
               {{ currentQuiz.name || 'Untitled quiz' }}
               {{
                 currentQuiz && currentQuiz.revision_number > 0
@@ -165,8 +169,11 @@
               }}
             </h1>
 
-            <!-- Pencil icon (hover only) -->
-            <span class="opacity-0 transition-opacity group-hover:opacity-100" title="Rename">
+            <!-- Pencil icon -->
+            <span
+              class="opacity-60 transition-opacity md:opacity-0 md:group-hover:opacity-100"
+              title="Rename"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="h-4 w-4 text-emerald-600"
@@ -174,8 +181,6 @@
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
               >
                 <path d="M12 20h9" />
                 <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
@@ -184,21 +189,34 @@
           </div>
 
           <!-- Rename mode -->
-          <div v-else class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2" v-else>
             <input
               v-model="nameDraft"
-              class="rounded border px-2 py-1 text-base"
+              class="w-full rounded border px-2 py-2 text-sm md:w-auto"
               placeholder="Quiz name"
             />
-            <button @click="saveRename" class="text-base text-emerald-700">Save</button>
-            <button @click="renaming = false" class="text-base text-gray-500">Cancel</button>
+
+            <button
+              @click="saveRename"
+              class="rounded bg-emerald-600 px-3 py-1 text-sm text-white hover:bg-emerald-700"
+            >
+              Save
+            </button>
+
+            <button @click="renaming = false" class="text-sm text-gray-500">Cancel</button>
           </div>
         </div>
 
         <!-- Quiz selector -->
-        <div class="mb-4" v-if="isClientReady">
+        <div v-if="isClientReady" class="w-full md:w-auto">
+          <label
+            class="mb-1 block text-xs font-medium uppercase tracking-wide text-neutral-500 md:hidden"
+          >
+            Quiz
+          </label>
+
           <select
-            class="rounded border px-3 py-2"
+            class="w-full rounded-md border border-neutral-300 bg-white px-3 py-3 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 md:w-auto"
             :value="quizStore.quizId"
             @change="switchQuiz($event.target.value)"
           >
@@ -209,34 +227,43 @@
         </div>
       </div>
 
-      <!-- Interview Section -->
-      <section v-if="quizStore.quizId" class="mb-8 rounded border bg-gray-50 p-4">
-        <div class="mb-3">
-          <h2 class="text-base font-semibold text-gray-800">Improve this idea</h2>
+      <!-- Deterministic Interview Section -->
+      <section
+        v-if="quizStore.quizId"
+        class="mb-10 rounded-lg border border-neutral-200 bg-gray-50 p-6"
+      >
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="text-xs font-medium uppercase tracking-wide text-neutral-500">
+              Deterministic Validation
+            </div>
 
-          <!-- If interviews exist -->
-          <div v-if="interviewSummary.total > 0" class="space-y-1 text-xs text-gray-600">
-            <div>Interviews: {{ interviewSummary.total }} total</div>
-            <div>• {{ interviewSummary.completed }} completed</div>
-            <div>• {{ interviewSummary.inProgress }} in progress</div>
+            <h2 class="mt-2 text-lg font-semibold text-neutral-900">Resolve Uncertainties</h2>
+
+            <div class="mt-3 max-w-md text-sm text-neutral-600">
+              Reduce risk by systematically resolving specific unknowns.
+            </div>
+
+            <!-- Interview Summary -->
+            <div v-if="interviewSummary.total > 0" class="mt-4 space-y-1 text-sm text-neutral-700">
+              <div class="font-medium">Interviews</div>
+              <div>{{ interviewSummary.total }} total</div>
+              <div>• {{ interviewSummary.completed }} completed</div>
+              <div>• {{ interviewSummary.inProgress }} in progress</div>
+            </div>
+
+            <div v-else class="mt-4 text-sm text-neutral-600">No uncertainties resolved yet.</div>
           </div>
 
-          <!-- If none -->
-          <div v-else class="text-xs text-gray-600">
-            No interviews yet. Run one to improve clarity and score.
+          <div class="flex flex-col items-end gap-3">
+            <Button @click="startNewInterview"> Resolve an Uncertainty </Button>
+
+            <Button variant="secondary" v-if="interviewSummary.total > 0" @click="goToInterviews">
+              View All Interviews
+            </Button>
+
+            <Button variant="secondary" @click="goToMasterDetail"> Open Master Detail </Button>
           </div>
-        </div>
-
-        <div class="flex items-center gap-4">
-          <Button @click="startNewInterview"> Start Interview </Button>
-
-          <button
-            v-if="interviewSummary.total > 0"
-            class="text-base text-emerald-700 hover:underline"
-            @click="goToInterviews"
-          >
-            View Interviews
-          </button>
         </div>
       </section>
 

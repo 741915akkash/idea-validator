@@ -3,33 +3,114 @@ import { pool } from '../../db'
 export default defineEventHandler(async (event) => {
   const { interview_id } = getQuery(event)
 
-  const goalsRes = await pool.query(`SELECT * FROM interview_goals WHERE interview_id = $1`, [
-    interview_id
-  ])
+  if (!interview_id) {
+    throw createError({ statusCode: 400, statusMessage: 'interview_id required' })
+  }
 
-  const conditionsRes = await pool.query(
-    `
-    SELECT c.*
-    FROM interview_conditions c
-    JOIN interview_goals g ON g.id = c.goal_id
-    WHERE g.interview_id = $1
-    `,
-    [interview_id]
-  )
+  const client = await pool.connect()
 
-  const questionsRes = await pool.query(
-    `
-    SELECT q.*
-    FROM interview_questions q
-    JOIN interview_goals g ON g.id = q.goal_id
-    WHERE g.interview_id = $1
-    `,
-    [interview_id]
-  )
+  try {
+    // 1️⃣ Get interview execution row
+    const interviewRes = await client.query(
+      `
+      SELECT *
+      FROM interviews
+      WHERE id = $1
+      `,
+      [interview_id]
+    )
 
-  return {
-    goals: goalsRes.rows,
-    conditions: conditionsRes.rows,
-    questions: questionsRes.rows
+    if (interviewRes.rows.length === 0) {
+      throw createError({ statusCode: 404, statusMessage: 'Interview not found' })
+    }
+
+    const interview = interviewRes.rows[0]
+
+    // 2️⃣ Get sub_uncertainty
+    const subRes = await client.query(
+      `
+      SELECT *
+      FROM sub_uncertainties
+      WHERE id = $1
+      `,
+      [interview.sub_uncertainty_id]
+    )
+
+    const sub = subRes.rows[0]
+
+    // 3️⃣ Get goal template
+    const goalRes = await client.query(
+      `
+      SELECT *
+      FROM goals
+      WHERE sub_uncertainty_id = $1
+      `,
+      [sub.id]
+    )
+
+    const goal = goalRes.rows[0]
+
+    // 4️⃣ Get conditions (template)
+    const conditionsRes = await client.query(
+      `
+      SELECT *
+      FROM conditions
+      WHERE goal_id = $1
+      ORDER BY order_index ASC
+      `,
+      [goal.id]
+    )
+
+    const conditions = conditionsRes.rows
+
+    // 5️⃣ Get questions (template)
+    const questionsRes = await client.query(
+      `
+      SELECT *
+      FROM interview_questions
+      WHERE goal_id = $1
+      ORDER BY order_index ASC
+      `,
+      [goal.id]
+    )
+
+    const questions = questionsRes.rows
+
+    // 6️⃣ Get condition runtime state
+    const resultsRes = await client.query(
+      `
+      SELECT *
+      FROM condition_results
+      WHERE interview_id = $1
+      `,
+      [interview_id]
+    )
+
+    const conditionResults = resultsRes.rows
+
+    // 7️⃣ Get evidence entries
+    const evidenceRes = await client.query(
+      `
+      SELECT *
+      FROM evidence_entries
+      WHERE interview_id = $1
+      ORDER BY created_at ASC
+      `,
+      [interview_id]
+    )
+
+    const evidenceEntries = evidenceRes.rows
+
+    return {
+      interview,
+      sub_uncertainty: sub,
+      goal,
+      conditions,
+      questions,
+      condition_results: conditionResults,
+      evidence_entries: evidenceEntries
+    }
+  } finally {
+    client.release()
   }
 })

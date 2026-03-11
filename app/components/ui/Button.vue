@@ -1,25 +1,31 @@
 <script setup>
-  defineProps({
+  const props = defineProps({
     to: {
       type: String,
       default: null
+    },
+    variant: {
+      type: String,
+      default: 'primary' // primary | secondary
     }
   })
+
+  const base = 'inline-block rounded px-6 py-3 text-base font-medium transition'
+
+  const styles = {
+    primary: 'bg-emerald-600 text-white hover:bg-emerald-700',
+    secondary: 'border border-emerald-600 text-emerald-700 hover:bg-emerald-50'
+  }
+
+  const classes = `${base} ${styles[props.variant]}`
 </script>
 
 <template>
-  <NuxtLink
-    v-if="to"
-    :to="to"
-    class="inline-block rounded bg-emerald-600 px-6 py-3 text-base font-medium text-white transition hover:bg-emerald-700"
-  >
+  <NuxtLink v-if="to" :to="to" :class="classes">
     <slot />
   </NuxtLink>
 
-  <button
-    v-else
-    class="inline-block rounded bg-emerald-600 px-6 py-3 text-base font-medium text-white transition hover:bg-emerald-700"
-  >
+  <button v-else :class="classes">
     <slot />
   </button>
 </template>

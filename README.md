@@ -1,3 +1,5 @@
+docker exec -it idea_validator_db psql -U postgres -d idea_validator
+
 # Nuxt Minimal Starter
 
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
@@ -75,4 +77,3 @@ bun run preview
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
 
 login to postgres container IN development
-docker exec -it idea_validator_db psql -U postgres -d idea_validator
