@@ -1,5 +1,5 @@
 <script setup>
-import Navbar from '~/components/landing2/Navbar.vue'
+import Sidebar from '~/components/landing2/Sidebar.vue'
 import Hero from '~/components/landing2/Hero.vue'
 import Problem from '~/components/landing2/Problem.vue'
 import Features from '~/components/landing2/Features.vue'
@@ -13,7 +13,7 @@ import Footer from '~/components/landing2/Footer.vue'
 
 <template>
   <div>
-    <Navbar />
+    <Sidebar />
     <Hero />
     <Problem />
     <Features />

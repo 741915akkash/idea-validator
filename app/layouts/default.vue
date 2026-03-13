@@ -1,6 +1,6 @@
 <script setup>
   import { ref } from 'vue'
-  import Navbar from '~/components/landing2/Navbar.vue'
+  import Sidebar from '~/components/landing2/Sidebar.vue'
   import { Menu } from 'lucide-vue-next'
 
   const sidebarOpen = ref(false)
@@ -10,7 +10,7 @@
   <div class="flex min-h-screen bg-white font-sans">
     <!-- Desktop Sidebar -->
     <div class="hidden md:block">
-      <Navbar />
+      <Sidebar />
     </div>
 
     <!-- Mobile Sidebar -->
@@ -20,7 +20,7 @@
 
       <!-- Drawer -->
       <div class="relative z-50">
-        <Navbar @close="sidebarOpen = false" />
+        <Sidebar />
       </div>
     </div>
 
