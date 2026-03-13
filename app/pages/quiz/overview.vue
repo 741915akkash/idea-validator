@@ -269,14 +269,18 @@
             <div v-else class="mt-4 text-sm text-neutral-600">No uncertainties resolved yet.</div>
           </div>
 
-          <div class="flex flex-col items-end gap-3">
-            <Button @click="startNewInterview"> Resolve an Uncertainty </Button>
+          <div class="flex w-56 flex-col gap-3">
+            <Button class="w-full text-center" @click="startNewInterview">
+              Resolve an Uncertainty
+            </Button>
 
-            <Button variant="secondary" @click="goToInterviews">
+            <Button class="w-full text-center" variant="secondary" @click="goToInterviews">
               View All Interviews
             </Button>
 
-            <Button variant="secondary" @click="goToMasterDetail"> Open Master Detail </Button>
+            <Button class="w-full text-center" variant="secondary" @click="goToMasterDetail">
+              Open Master Detail
+            </Button>
           </div>
         </div>
       </section>
