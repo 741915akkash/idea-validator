@@ -49,6 +49,28 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Ensure runtime condition row exists so analytics/status mapping is consistent.
+    const conditionResultExistsRes = await client.query(
+      `
+      SELECT 1
+      FROM condition_results
+      WHERE interview_id = $1
+        AND condition_id = $2
+      LIMIT 1
+      `,
+      [interview_id, condition_id]
+    )
+
+    if (!conditionResultExistsRes.rows.length) {
+      await client.query(
+        `
+        INSERT INTO condition_results (interview_id, condition_id, status)
+        VALUES ($1, $2, 'pending')
+        `,
+        [interview_id, condition_id]
+      )
+    }
+
     const existingRes = await client.query(
       `
       SELECT id

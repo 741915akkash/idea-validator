@@ -69,22 +69,27 @@ export default defineEventHandler(async (event) => {
   if (interviewIds.length) {
     const responsesRes = await pool.query(
       `
+      WITH latest_evidence AS (
+        SELECT DISTINCT ON (e.interview_id, e.condition_id)
+          e.interview_id,
+          e.condition_id,
+          e.notes,
+          e.evidence_log
+        FROM evidence_entries e
+        WHERE e.interview_id = ANY($1::uuid[])
+        ORDER BY e.interview_id, e.condition_id, e.created_at DESC, e.id DESC
+      )
       SELECT
-        cr.interview_id,
-        cr.condition_id,
+        COALESCE(cr.interview_id, ev.interview_id) AS interview_id,
+        COALESCE(cr.condition_id, ev.condition_id) AS condition_id,
         cr.status,
         ev.notes,
         ev.evidence_log
       FROM condition_results cr
-      LEFT JOIN LATERAL (
-        SELECT e.notes, e.evidence_log
-        FROM evidence_entries e
-        WHERE e.interview_id = cr.interview_id
-          AND e.condition_id = cr.condition_id
-        ORDER BY e.created_at DESC, e.id DESC
-        LIMIT 1
-      ) ev ON TRUE
-      WHERE cr.interview_id = ANY($1::uuid[])
+      FULL OUTER JOIN latest_evidence ev
+        ON ev.interview_id = cr.interview_id
+       AND ev.condition_id = cr.condition_id
+      WHERE COALESCE(cr.interview_id, ev.interview_id) = ANY($1::uuid[])
       `,
       [interviewIds]
     )
