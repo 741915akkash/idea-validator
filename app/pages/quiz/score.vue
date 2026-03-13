@@ -291,7 +291,7 @@
 
           <NuxtLink
             to="/quiz/overview"
-            class="rounded-md bg-neutral-700 px-4 py-2 text-base font-medium text-white hover:bg-neutral-800"
+            class="rounded-md bg-white px-4 py-2 text-base font-medium text-black hover:bg-neutral-100"
           >
             Back to overview
           </NuxtLink>
