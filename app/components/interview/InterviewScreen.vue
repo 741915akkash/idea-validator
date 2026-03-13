@@ -172,6 +172,11 @@
   async function resolve(status) {
     if (!current.value || loading.value) return
 
+    const wasLastPendingCondition =
+      interview.phase === 'resolve' &&
+      current.value.status === 'pending' &&
+      interview.conditions.filter((c) => c.status === 'pending').length === 1
+
     loading.value = true
     error.value = null
 
@@ -193,6 +198,10 @@
         conditionId: current.value.id,
         status
       })
+
+      if (wasLastPendingCondition) {
+        interview.goToNextPhase()
+      }
     } catch {
       error.value = 'Unable to record result.'
     } finally {
