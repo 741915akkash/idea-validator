@@ -283,13 +283,16 @@
         <!-- Actions -->
         <div class="flex items-center gap-6">
           <button
-            class="text-base font-medium text-indigo-600 hover:underline"
+            class="rounded-md bg-indigo-600 px-4 py-2 text-base font-medium text-white hover:bg-indigo-700"
             @click="startNewRevision"
           >
             Start new revision
           </button>
 
-          <NuxtLink to="/quiz/overview" class="text-base text-gray-600 hover:underline">
+          <NuxtLink
+            to="/quiz/overview"
+            class="rounded-md bg-neutral-700 px-4 py-2 text-base font-medium text-white hover:bg-neutral-800"
+          >
             Back to overview
           </NuxtLink>
         </div>
