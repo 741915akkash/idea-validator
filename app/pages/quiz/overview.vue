@@ -246,8 +246,9 @@
         v-if="quizStore.quizId"
         class="mb-10 rounded-lg border border-neutral-200 bg-gray-50 p-6"
       >
-        <div class="flex items-start justify-between">
-          <div>
+        <div class="flex flex-wrap items-start justify-between gap-8">
+          <!-- Left Content -->
+          <div class="min-w-[260px] flex-1">
             <div class="text-xs font-medium uppercase tracking-wide text-neutral-500">
               Deterministic Validation
             </div>
@@ -269,7 +270,8 @@
             <div v-else class="mt-4 text-sm text-neutral-600">No uncertainties resolved yet.</div>
           </div>
 
-          <div class="flex w-56 flex-col gap-3">
+          <!-- Buttons -->
+          <div class="flex w-56 flex-shrink-0 flex-col gap-3">
             <Button class="w-full text-center" @click="startNewInterview">
               Resolve an Uncertainty
             </Button>
