@@ -16,9 +16,6 @@ export default defineEventHandler(async (event) => {
   try {
     await client.query('BEGIN')
 
-    // Ensure column exists for separate evidence log autosave.
-    await client.query(`ALTER TABLE evidence_entries ADD COLUMN IF NOT EXISTS evidence_log text`)
-
     const interviewRes = await client.query(
       `
       SELECT id, sub_uncertainty_id
@@ -66,27 +63,29 @@ export default defineEventHandler(async (event) => {
 
     let evidence
 
-    if (existingRes.rows.length) {
-      const updateRes = await client.query(
-        `
-        UPDATE evidence_entries
-        SET respondent_name = $1,
-            notes = $2,
-            evidence_log = $3,
-            structured_responses = $4
-        WHERE id = $5
-        RETURNING *
-        `,
-        [
-          respondent_name || null,
-          notes || null,
-          evidence_log || null,
-          structured_responses || null,
-          existingRes.rows[0].id
-        ]
-      )
-      evidence = updateRes.rows[0]
-    } else {
+    const saveWithEvidenceLog = async () => {
+      if (existingRes.rows.length) {
+        const updateRes = await client.query(
+          `
+          UPDATE evidence_entries
+          SET respondent_name = $1,
+              notes = $2,
+              evidence_log = $3,
+              structured_responses = $4
+          WHERE id = $5
+          RETURNING *
+          `,
+          [
+            respondent_name || null,
+            notes || null,
+            evidence_log || null,
+            structured_responses || null,
+            existingRes.rows[0].id
+          ]
+        )
+        return updateRes.rows[0]
+      }
+
       const insertRes = await client.query(
         `
         INSERT INTO evidence_entries
@@ -103,7 +102,56 @@ export default defineEventHandler(async (event) => {
           structured_responses || null
         ]
       )
-      evidence = insertRes.rows[0]
+      return insertRes.rows[0]
+    }
+
+    const saveWithoutEvidenceLog = async () => {
+      if (existingRes.rows.length) {
+        const updateRes = await client.query(
+          `
+          UPDATE evidence_entries
+          SET respondent_name = $1,
+              notes = $2,
+              structured_responses = $3
+          WHERE id = $4
+          RETURNING *
+          `,
+          [
+            respondent_name || null,
+            notes || null,
+            structured_responses || null,
+            existingRes.rows[0].id
+          ]
+        )
+        return updateRes.rows[0]
+      }
+
+      const insertRes = await client.query(
+        `
+        INSERT INTO evidence_entries
+        (interview_id, condition_id, respondent_name, notes, structured_responses)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING *
+        `,
+        [
+          interview_id,
+          condition_id,
+          respondent_name || null,
+          notes || null,
+          structured_responses || null
+        ]
+      )
+      return insertRes.rows[0]
+    }
+
+    try {
+      evidence = await saveWithEvidenceLog()
+    } catch (saveErr) {
+      // Backward compatibility for DBs that don't yet have evidence_log.
+      if (saveErr?.code !== '42703') {
+        throw saveErr
+      }
+      evidence = await saveWithoutEvidenceLog()
     }
 
     await client.query('COMMIT')
