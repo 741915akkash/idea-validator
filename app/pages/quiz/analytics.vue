@@ -97,7 +97,16 @@
 
   function goBackToMasterDetail() {
     const quizId = route.query.quiz_id || quizStore.quizId
-    router.push(quizId ? `/quiz/master-detail?quiz_id=${quizId}` : '/quiz/master-detail')
+    const uncertaintyId = subUncertainty.value?.uncertainty_id || route.query.uncertainty_id
+    const subUncertaintyId = subUncertainty.value?.id || route.query.sub_uncertainty_id
+
+    const query = new URLSearchParams()
+    if (quizId) query.set('quiz_id', String(quizId))
+    if (uncertaintyId) query.set('uncertainty_id', String(uncertaintyId))
+    if (subUncertaintyId) query.set('sub_uncertainty_id', String(subUncertaintyId))
+
+    const queryString = query.toString()
+    router.push(queryString ? `/quiz/master-detail?${queryString}` : '/quiz/master-detail')
   }
 
   const conditionStats = computed(() => {
