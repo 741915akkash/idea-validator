@@ -1,7 +1,7 @@
 <!-- app/components/interview/CompletionSummary.vue -->
 
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch, onBeforeUnmount } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { useInterviewSession } from '@/stores/interviewSession'
   import { useInterviewApi } from '@/composables/useInterviewApi'
@@ -13,8 +13,44 @@
 
   const loading = ref(false)
   const error = ref(null)
+  const respondentSaved = ref(false)
+  const lastSavedRespondent = ref(interview.respondentName || '')
+  let respondentSaveTimer = null
 
   const isMet = computed(() => interview.completionStatus === 'met')
+  const respondentName = computed({
+    get: () => interview.respondentName,
+    set: (v) => (interview.respondentName = v)
+  })
+
+  watch(
+    () => interview.respondentName,
+    () => {
+      respondentSaved.value = false
+
+      if (respondentSaveTimer) clearTimeout(respondentSaveTimer)
+
+      respondentSaveTimer = setTimeout(() => {
+        if (interview.respondentName === lastSavedRespondent.value) return
+        interview
+          .saveRespondent()
+          .then(() => {
+            lastSavedRespondent.value = interview.respondentName
+            respondentSaved.value = true
+          })
+          .catch(() => {})
+      }, 1500)
+    }
+  )
+
+  onBeforeUnmount(() => {
+    if (!respondentSaveTimer) return
+    clearTimeout(respondentSaveTimer)
+    respondentSaveTimer = null
+    if (interview.respondentName !== lastSavedRespondent.value) {
+      interview.saveRespondent().catch(() => {})
+    }
+  })
 
   async function interviewAgain() {
     if (loading.value) return
@@ -98,10 +134,16 @@
     <div>
       <h2 class="text-xl font-semibold text-neutral-900">Resolution Complete</h2>
 
-      <div
-        class="mt-5 rounded-md border border-neutral-900 px-3 py-2 text-lg text-neutral-700"
-      >
-        Respondent: {{ interview.respondentName || 'Not provided' }}
+      <div class="mt-5">
+        <div class="text-xs font-medium uppercase tracking-wide text-neutral-500">Respondent</div>
+
+        <textarea
+          v-model="respondentName"
+          rows="2"
+          class="mt-2 w-full resize-none rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        />
+
+        <span v-if="respondentSaved" class="mt-1 inline-block text-xs text-green-600">Saved ✓</span>
       </div>
     </div>
 
