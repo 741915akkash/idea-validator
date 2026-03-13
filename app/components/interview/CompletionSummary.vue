@@ -73,8 +73,9 @@
     router.push('/quiz/interviews')
   }
 
-  function goToOverview() {
-    router.push('/quiz/overview')
+  function goToMasterDetail() {
+    const quizId = interview.quizId || route.query.quiz_id
+    router.push(quizId ? `/quiz/master-detail?quiz_id=${quizId}` : '/quiz/master-detail')
   }
 
   function goToPrevious() {
@@ -140,11 +141,11 @@
       </button>
 
       <button
-        @click="goToOverview"
+        @click="goToMasterDetail"
         :disabled="loading"
         class="rounded-md border border-neutral-900 px-6 py-2 text-sm font-medium text-neutral-900"
       >
-        Return to Overview
+        Return to Master Detail
       </button>
     </div>
 

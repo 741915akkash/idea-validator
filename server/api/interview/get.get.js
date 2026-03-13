@@ -86,7 +86,37 @@ export default defineEventHandler(async (event) => {
       [interview_id]
     )
 
-    const conditionResults = resultsRes.rows
+    let conditionResults = resultsRes.rows
+
+    // Backfill runtime rows when template conditions changed after interview creation.
+    // This keeps old interviews compatible with newly added/replaced conditions.
+    const existingResultConditionIds = new Set(conditionResults.map((row) => String(row.condition_id)))
+    const missingConditionIds = conditions
+      .map((row) => row.id)
+      .filter((conditionId) => !existingResultConditionIds.has(String(conditionId)))
+
+    if (missingConditionIds.length) {
+      for (const conditionId of missingConditionIds) {
+        await client.query(
+          `
+          INSERT INTO condition_results (interview_id, condition_id, status)
+          VALUES ($1, $2, 'pending')
+          `,
+          [interview_id, conditionId]
+        )
+      }
+
+      const refreshedResultsRes = await client.query(
+        `
+        SELECT *
+        FROM condition_results
+        WHERE interview_id = $1
+        `,
+        [interview_id]
+      )
+
+      conditionResults = refreshedResultsRes.rows
+    }
 
     // 7️⃣ Get evidence entries
     const evidenceRes = await client.query(

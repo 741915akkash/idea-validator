@@ -27,6 +27,7 @@
   const notes = ref('')
   const evidence = ref('')
   const structuredResponses = ref({})
+  const savedDraft = ref(false)
 
   const lastSavedRespondent = ref(interview.respondentName || '')
   const lastSavedDraftByCondition = ref({})
@@ -92,6 +93,7 @@
     () => current.value?.id,
     (conditionId) => {
       isHydratingDraft.value = true
+      savedDraft.value = false
 
       notes.value = evidenceForCurrent.value?.notes || ''
       evidence.value = evidenceForCurrent.value?.evidence_log || ''
@@ -142,12 +144,16 @@
         notes: notes.value,
         evidence_log: evidence.value
       }
+
+      savedDraft.value = true
     } catch (_) {}
   }
 
   watch([notes, evidence, () => current.value?.id], () => {
     if (isHydratingDraft.value) return
     if (!current.value) return
+
+    savedDraft.value = false
 
     if (evidenceSaveTimer) clearTimeout(evidenceSaveTimer)
 
@@ -276,6 +282,8 @@
             isFullscreen ? 'flex-1' : 'h-56 md:h-64'
           ]"
         />
+
+        <span v-if="savedDraft" class="text-xs text-green-600">Saved ✓</span>
       </div>
 
       <!-- EVIDENCE -->
@@ -291,6 +299,8 @@
             isFullscreen ? 'flex-1' : 'h-56 md:h-64'
           ]"
         />
+
+        <span v-if="savedDraft" class="text-xs text-green-600">Saved ✓</span>
       </div>
     </div>
 

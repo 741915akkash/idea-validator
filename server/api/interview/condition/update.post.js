@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     await client.query('BEGIN')
 
     // 1️⃣ Update runtime condition result
-    await client.query(
+    const updateRes = await client.query(
       `
       UPDATE condition_results
       SET status = $1,
@@ -24,6 +24,16 @@ export default defineEventHandler(async (event) => {
       `,
       [status, interview_id, condition_id]
     )
+
+    if (updateRes.rowCount === 0) {
+      await client.query(
+        `
+        INSERT INTO condition_results (interview_id, condition_id, status, resolved_at)
+        VALUES ($1, $2, $3, CASE WHEN $3 != 'pending' THEN now() ELSE NULL END)
+        `,
+        [interview_id, condition_id, status]
+      )
+    }
 
     // 2️⃣ Check if any pending remain
     const pendingRes = await client.query(
