@@ -1,9 +1,10 @@
 <script setup>
   import { ref, onMounted } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { useRouter, useRoute } from 'vue-router'
   import { useQuizSessionStore } from '~/stores/quizSession'
 
   const router = useRouter()
+  const route = useRoute()
   const quizStore = useQuizSessionStore()
 
   const loading = ref(true)
@@ -40,6 +41,28 @@
       uncertainties.value = await $fetch('/api/uncertainty/list', {
         query: { quiz_id: quizStore.quizId }
       })
+
+      const queryUncertaintyId = route.query.uncertainty_id
+      const querySubUncertaintyId = route.query.sub_uncertainty_id
+
+      if (queryUncertaintyId) {
+        const matchedUncertainty = uncertainties.value.find(
+          (u) => String(u.id) === String(queryUncertaintyId)
+        )
+
+        if (matchedUncertainty) {
+          await selectUncertainty(matchedUncertainty)
+
+          if (querySubUncertaintyId) {
+            const matchedSub = subUncertainties.value.find(
+              (sub) => String(sub.id) === String(querySubUncertaintyId)
+            )
+            if (matchedSub) {
+              await selectSub(matchedSub)
+            }
+          }
+        }
+      }
     } catch (e) {
       error.value = 'Unable to load uncertainties.'
     } finally {

@@ -75,7 +75,16 @@
 
   function goToMasterDetail() {
     const quizId = interview.quizId || route.query.quiz_id
-    router.push(quizId ? `/quiz/master-detail?quiz_id=${quizId}` : '/quiz/master-detail')
+    const uncertaintyId = interview.selectedSub?.uncertainty_id
+    const subUncertaintyId = interview.selectedSub?.id
+
+    const query = new URLSearchParams()
+    if (quizId) query.set('quiz_id', String(quizId))
+    if (uncertaintyId) query.set('uncertainty_id', String(uncertaintyId))
+    if (subUncertaintyId) query.set('sub_uncertainty_id', String(subUncertaintyId))
+
+    const queryString = query.toString()
+    router.push(queryString ? `/quiz/master-detail?${queryString}` : '/quiz/master-detail')
   }
 
   function goToPrevious() {
