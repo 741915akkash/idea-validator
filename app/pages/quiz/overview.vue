@@ -246,9 +246,9 @@
         v-if="quizStore.quizId"
         class="mb-10 rounded-lg border border-neutral-200 bg-gray-50 p-6"
       >
-        <div class="flex flex-wrap items-start justify-between gap-8">
+        <div class="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <!-- Left Content -->
-          <div class="min-w-[260px] flex-1">
+          <div class="flex-1">
             <div class="text-xs font-medium uppercase tracking-wide text-neutral-500">
               Deterministic Validation
             </div>
@@ -259,7 +259,6 @@
               Reduce risk by systematically resolving specific unknowns.
             </div>
 
-            <!-- Interview Summary -->
             <div v-if="interviewSummary.total > 0" class="mt-4 space-y-1 text-sm text-neutral-700">
               <div class="font-medium">Interviews</div>
               <div>{{ interviewSummary.total }} total</div>
@@ -271,16 +270,24 @@
           </div>
 
           <!-- Buttons -->
-          <div class="flex w-56 flex-shrink-0 flex-col gap-3">
-            <Button class="w-full text-center" @click="startNewInterview">
+          <div class="flex w-full flex-col items-center gap-3 md:w-56 md:items-stretch">
+            <Button class="w-full text-center md:w-full" @click="startNewInterview">
               Resolve an Uncertainty
             </Button>
 
-            <Button class="w-full text-center" variant="secondary" @click="goToInterviews">
+            <Button
+              class="w-full text-center md:w-full"
+              variant="secondary"
+              @click="goToInterviews"
+            >
               View All Interviews
             </Button>
 
-            <Button class="w-full text-center" variant="secondary" @click="goToMasterDetail">
+            <Button
+              class="w-full text-center md:w-full"
+              variant="secondary"
+              @click="goToMasterDetail"
+            >
               Open Master Detail
             </Button>
           </div>
