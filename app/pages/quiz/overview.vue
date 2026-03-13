@@ -272,7 +272,7 @@
           <div class="flex flex-col items-end gap-3">
             <Button @click="startNewInterview"> Resolve an Uncertainty </Button>
 
-            <Button variant="secondary" v-if="interviewSummary.total > 0" @click="goToInterviews">
+            <Button variant="secondary" @click="goToInterviews">
               View All Interviews
             </Button>
 
