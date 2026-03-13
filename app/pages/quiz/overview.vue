@@ -4,6 +4,9 @@
   import { useQuizSessionStore } from '~/stores/quizSession'
   import Button from '~/components/ui/Button.vue'
 
+  // Lightweight per-session cache for overview side-panels by quiz.
+  const overviewCache = new Map()
+
   const route = useRoute()
   const router = useRouter()
   const quizStore = useQuizSessionStore()
@@ -23,6 +26,39 @@
   const checkpointHasNotes = ref({})
 
   const scoreError = ref('')
+
+  async function loadOverviewSideData(quizId, { force = false } = {}) {
+    if (!quizId) return
+
+    const cached = overviewCache.get(String(quizId))
+    if (cached && !force) {
+      checkpointHasNotes.value = { ...cached.checkpointHasNotes }
+      interviewSummary.value = { ...cached.interviewSummary }
+      return
+    }
+
+    const [notesRes, interviewRes] = await Promise.all([
+      $fetch('/api/quiz/notes/summary', {
+        query: { quiz_id: quizId }
+      }),
+      $fetch('/api/interview/summary', {
+        query: { quiz_id: quizId }
+      })
+    ])
+
+    const nextCheckpointHasNotes = {}
+    for (const cp of notesRes.checkpoints || []) {
+      nextCheckpointHasNotes[cp] = true
+    }
+
+    checkpointHasNotes.value = nextCheckpointHasNotes
+    interviewSummary.value = interviewRes
+
+    overviewCache.set(String(quizId), {
+      checkpointHasNotes: nextCheckpointHasNotes,
+      interviewSummary: interviewRes
+    })
+  }
 
   async function handleScoreClick() {
     try {
@@ -68,31 +104,8 @@
       quizStore.setQuizId(res.quiz_id)
     }
 
-    // 2️⃣ Force refresh overview every time
-    quizStore.loaded = false
     await quizStore.loadOverview(quizStore.quizId)
-
-    // 4️⃣ Fetch notes summary (checkpoint-level)
-    const notesRes = await $fetch('/api/quiz/notes/summary', {
-      query: { quiz_id: quizStore.quizId }
-    })
-
-    // Fetch interview summary
-    const interviewRes = await $fetch('/api/interview/summary', {
-      query: { quiz_id: quizStore.quizId }
-    })
-
-    interviewSummary.value = interviewRes
-
-    /*
-    notesRes.checkpoints = [1, 3, 7]
-  */
-
-    checkpointHasNotes.value = {}
-
-    for (const cp of notesRes.checkpoints) {
-      checkpointHasNotes.value[cp] = true
-    }
+    await loadOverviewSideData(quizStore.quizId)
   })
 
   async function goToCheckpoint(checkpointNumber) {
@@ -121,6 +134,7 @@
 
     // Force reload overview for new quiz
     await quizStore.loadOverview(id)
+    await loadOverviewSideData(id)
   }
 
   async function saveRename() {
