@@ -1,19 +1,17 @@
 <script setup>
   import { ref, onMounted, computed } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
+  import { useRouter } from 'vue-router'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import Button from '~/components/ui/Button.vue'
 
   // Lightweight per-session cache for overview side-panels by quiz.
   const overviewCache = new Map()
 
-  const route = useRoute()
   const router = useRouter()
   const quizStore = useQuizSessionStore()
   const quizzes = ref([])
   const renaming = ref(false)
   const nameDraft = ref('')
-  const isClientReady = ref(false)
   const interviewSummary = ref({
     total: 0,
     completed: 0,
@@ -73,25 +71,7 @@
     }
   }
 
-  function quizLabel(q) {
-    return q.revision_number === 0 ? q.name : `${q.name} — Revision ${q.revision_number}`
-  }
-
-  function goToInterviews() {
-    router.push(`/quiz/interviews?quiz_id=${quizStore.quizId}`)
-  }
-
-  function startNewInterview() {
-    router.push(`/quiz/interview/new?quiz_id=${quizStore.quizId}`)
-  }
-
-  function goToMasterDetail() {
-    router.push(`/quiz/master-detail?quiz_id=${quizStore.quizId}`)
-  }
-
   onMounted(async () => {
-    isClientReady.value = true
-
     await loadQuizzes()
 
     if (quizStore.quizId) {
@@ -124,19 +104,6 @@
     quizzes.value = await $fetch('/api/quiz/quizzes')
   }
 
-  async function switchQuiz(id) {
-    if (id === quizStore.quizId) return
-
-    // IMPORTANT: clear old overview state
-    quizStore.loaded = false
-
-    quizStore.setQuizId(id)
-
-    // Force reload overview for new quiz
-    await quizStore.loadOverview(id)
-    await loadOverviewSideData(id)
-  }
-
   async function saveRename() {
     if (!currentQuiz.value) return
 
@@ -154,7 +121,7 @@
 </script>
 
 <template>
-  <main class="px-6 py-12">
+  <main class="px-6 py-6">
     <div class="mx-auto max-w-2xl">
       <h1 class="mb-2 text-2xl font-semibold">Quiz overview</h1>
 
@@ -221,24 +188,6 @@
           </div>
         </div>
 
-        <!-- Quiz selector -->
-        <div v-if="isClientReady" class="w-full md:w-auto">
-          <label
-            class="mb-1 block text-xs font-medium uppercase tracking-wide text-neutral-500 md:hidden"
-          >
-            Quiz
-          </label>
-
-          <select
-            class="w-full rounded-md border border-neutral-300 bg-white px-3 py-3 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 md:w-auto"
-            :value="quizStore.quizId"
-            @change="switchQuiz($event.target.value)"
-          >
-            <option v-for="q in quizzes" :key="q.id" :value="q.id">
-              {{ quizLabel(q) || 'Untitled quiz' }}
-            </option>
-          </select>
-        </div>
       </div>
 
       <!-- Deterministic Interview Section -->
@@ -269,28 +218,6 @@
             <div v-else class="mt-4 text-sm text-neutral-600">No uncertainties resolved yet.</div>
           </div>
 
-          <!-- Buttons -->
-          <div class="flex w-full flex-col items-center gap-3 md:w-56 md:items-stretch">
-            <Button class="w-full text-center md:w-full" @click="startNewInterview">
-              Resolve an Uncertainty
-            </Button>
-
-            <Button
-              class="w-full text-center md:w-full"
-              variant="secondary"
-              @click="goToInterviews"
-            >
-              View All Interviews
-            </Button>
-
-            <Button
-              class="w-full text-center md:w-full"
-              variant="secondary"
-              @click="goToMasterDetail"
-            >
-              Open Master Detail
-            </Button>
-          </div>
         </div>
       </section>
 

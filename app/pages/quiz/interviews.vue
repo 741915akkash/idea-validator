@@ -154,20 +154,72 @@
       interviews: group.interviews.sort((a, b) => new Date(b.started_at) - new Date(a.started_at))
     }))
   })
+
+  const interviewSummary = computed(() => {
+    const total = interviews.value.length
+    const completed = interviews.value.filter((i) => i.finished_at).length
+    const inProgress = total - completed
+
+    return {
+      total,
+      completed,
+      inProgress
+    }
+  })
 </script>
 
 <template>
   <main class="px-6 py-12">
     <div class="mx-auto max-w-2xl">
-      <!-- Page Heading -->
-      <h1 class="mb-2 text-2xl font-semibold">Interviews</h1>
-      <div class="mb-8 h-1 w-16 bg-emerald-500"></div>
+      <div class="mb-8 space-y-6">
+        <!-- Page header -->
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-semibold">Interviews</h1>
+            <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+          </div>
+
+          <NuxtLink
+            to="/quiz/overview"
+            class="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-white transition hover:bg-emerald-700"
+          >
+            Back to Overview
+          </NuxtLink>
+        </div>
+
+        <!-- Full-width stats bar -->
+        <div
+          v-if="interviewSummary.total > 0"
+          class="grid grid-cols-1 gap-4 rounded-lg border border-neutral-200 bg-gray-50 p-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          <div class="flex flex-col">
+            <span class="text-xs uppercase tracking-wide text-neutral-500"> Total Interviews </span>
+            <span class="mt-1 text-xl font-semibold text-neutral-900">
+              {{ interviewSummary.total }}
+            </span>
+          </div>
+
+          <div class="flex flex-col sm:border-l sm:border-neutral-200 sm:pl-6">
+            <span class="text-xs uppercase tracking-wide text-neutral-500"> Completed </span>
+            <span class="mt-1 text-xl font-semibold text-neutral-900">
+              {{ interviewSummary.completed }}
+            </span>
+          </div>
+
+          <div class="flex flex-col sm:border-l sm:border-neutral-200 sm:pl-6">
+            <span class="text-xs uppercase tracking-wide text-neutral-500"> In Progress </span>
+            <span class="mt-1 text-xl font-semibold text-neutral-900">
+              {{ interviewSummary.inProgress }}
+            </span>
+          </div>
+        </div>
+      </div>
 
       <!-- Filter -->
       <div class="mb-6">
         <select
           v-model="selectedFilter"
-          class="rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          class="w-full rounded border border-gray-300 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 md:w-auto md:min-w-64 md:px-5 md:py-3 md:text-lg"
         >
           <option value="all">All</option>
           <option value="in_progress">In Progress</option>
@@ -194,22 +246,24 @@
         <!-- Interview List -->
         <div v-for="group in groupedInterviews" :key="group.subUncertaintyId" class="mb-10">
           <!-- GROUP HEADER -->
-          <div class="flex items-center justify-between border-l-4 border-emerald-500 pl-4">
-            <div>
-              <h2 class="text-lg font-semibold text-gray-900">
-                {{ group.subUncertainty }}
-              </h2>
+          <div class="border-l-4 border-emerald-500 pl-4">
+            <div class="space-y-3">
+              <div>
+                <h2 class="text-lg font-semibold text-gray-900">
+                  {{ group.subUncertainty }}
+                </h2>
 
-              <div class="text-xs text-gray-500">{{ group.interviews.length }} interviews</div>
+                <div class="text-xs text-gray-500">{{ group.interviews.length }} interviews</div>
+              </div>
+
+              <button
+                class="inline-flex w-fit rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+                :disabled="!!cloningInterviewId"
+                @click="interviewAgainFromCard(group.interviews[0].id)"
+              >
+                Interview Another Person
+              </button>
             </div>
-
-            <button
-              class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
-              :disabled="!!cloningInterviewId"
-              @click="interviewAgainFromCard(group.interviews[0].id)"
-            >
-              Interview Another Person
-            </button>
           </div>
 
           <!-- DIVIDER -->
@@ -279,16 +333,6 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Back -->
-        <div class="mt-8">
-          <NuxtLink
-            to="/quiz/overview"
-            class="inline-flex items-center rounded bg-emerald-600 px-4 py-2 text-white transition hover:bg-emerald-700"
-          >
-            Back to Overview
-          </NuxtLink>
         </div>
       </div>
     </div>

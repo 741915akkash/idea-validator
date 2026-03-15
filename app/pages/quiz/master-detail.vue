@@ -199,91 +199,218 @@
       `/quiz/analytics?quiz_id=${quizStore.quizId}&sub_uncertainty_id=${selectedSub.value.id}`
     )
   }
+
+  function startNewInterview() {
+    if (!quizStore.quizId) return
+    router.push(`/quiz/interview/new?quiz_id=${quizStore.quizId}`)
+  }
 </script>
 
 <template>
   <div class="flex h-screen justify-center bg-neutral-50">
     <div class="flex h-full w-full max-w-7xl flex-col bg-white shadow-sm">
       <div class="flex min-h-0 flex-1">
+        <!-- ================= DESKTOP LAYOUT ================= -->
 
-      <!-- ================= DESKTOP LAYOUT ================= -->
+        <!-- UNCERTAINTIES -->
+        <div class="hidden w-80 flex-col border-r md:flex">
+          <div class="flex items-center justify-between border-b px-4 py-3">
+            <span class="font-semibold">Uncertainties</span>
+            <button
+              @click="startNewInterview"
+              class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+            >
+              Resolve New Uncertainties
+            </button>
+          </div>
 
-      <!-- UNCERTAINTIES -->
-      <div class="hidden w-80 flex-col border-r md:flex">
-        <div class="border-b px-4 py-3 font-semibold">Uncertainties</div>
-
-        <div class="flex-1 overflow-y-auto">
-          <div
-            v-for="u in uncertainties"
-            :key="u.id"
-            @click="selectUncertainty(u)"
-            class="cursor-pointer border-b px-4 py-3 hover:bg-gray-50"
-            :class="{ 'bg-emerald-50': selectedUncertainty?.id === u.id }"
-          >
-            <div class="font-medium">{{ u.text }}</div>
-            <div class="mt-1 text-xs text-gray-500">
-              {{ u.created_at ? new Date(u.created_at).toLocaleDateString() : '' }}
+          <div class="flex-1 overflow-y-auto">
+            <div
+              v-for="u in uncertainties"
+              :key="u.id"
+              @click="selectUncertainty(u)"
+              class="cursor-pointer border-b px-4 py-3 hover:bg-gray-50"
+              :class="{ 'bg-emerald-50': selectedUncertainty?.id === u.id }"
+            >
+              <div class="font-medium">{{ u.text }}</div>
+              <div class="mt-1 text-xs text-gray-500">
+                {{ u.created_at ? new Date(u.created_at).toLocaleDateString() : '' }}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- SUB UNCERTAINTIES -->
-      <div class="hidden w-96 flex-col border-r md:flex">
-        <div class="border-b px-4 py-3 font-semibold">Sub-uncertainties</div>
+        <!-- SUB UNCERTAINTIES -->
+        <div class="hidden w-96 flex-col border-r md:flex">
+          <div class="border-b px-4 py-3 font-semibold">Sub-uncertainties</div>
 
-        <div class="flex-1 overflow-y-auto">
-          <div v-if="!selectedUncertainty" class="p-4 text-sm text-gray-500">
-            Select an uncertainty
-          </div>
+          <div class="flex-1 overflow-y-auto">
+            <div v-if="!selectedUncertainty" class="p-4 text-sm text-gray-500">
+              Select an uncertainty
+            </div>
 
-          <div v-else-if="loadingSubs" class="p-4 text-sm text-gray-500">
-            Loading sub-uncertainties...
-          </div>
+            <div v-else-if="loadingSubs" class="p-4 text-sm text-gray-500">
+              Loading sub-uncertainties...
+            </div>
 
-          <div
-            v-for="sub in subUncertainties"
-            :key="sub.id"
-            @click="selectSub(sub)"
-            class="cursor-pointer border-b px-4 py-3 hover:bg-gray-50"
-            :class="{ 'bg-emerald-50': selectedSub?.id === sub.id }"
-          >
-            <div class="font-medium">{{ sub.title }}</div>
-            <div class="mt-1 text-xs text-gray-500">{{ sub.interview_count || 0 }} interviews</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- INTERVIEWS -->
-      <div class="hidden flex-1 flex-col md:flex">
-        <div class="flex items-center justify-between border-b px-4 py-3 font-semibold">
-          <span>Interviews</span>
-
-          <div v-if="selectedSub" class="flex items-center gap-2">
-            <button
-              @click="openAnalytics"
-              class="rounded-md border border-emerald-300 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
+            <div
+              v-for="sub in subUncertainties"
+              :key="sub.id"
+              @click="selectSub(sub)"
+              class="cursor-pointer border-b px-4 py-3 hover:bg-gray-50"
+              :class="{ 'bg-emerald-50': selectedSub?.id === sub.id }"
             >
-              Analytics
-            </button>
-
-            <button
-              @click="interviewAnotherPerson"
-              :disabled="startingAnother"
-              class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
-            >
-              {{ startingAnother ? 'Starting...' : 'Interview Another Person' }}
-            </button>
+              <div class="font-medium">{{ sub.title }}</div>
+              <div class="mt-1 text-xs text-gray-500">
+                {{ sub.interview_count || 0 }} interviews
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="flex-1 overflow-y-auto">
-          <div
-            v-for="interview in interviews"
-            :key="interview.id"
-            class="flex items-center justify-between border-b px-4 py-3"
-          >
-            <div>
+        <!-- INTERVIEWS -->
+        <div class="hidden flex-1 flex-col md:flex">
+          <div class="flex items-center justify-between border-b px-4 py-3 font-semibold">
+            <span>Interviews</span>
+
+            <div v-if="selectedSub" class="flex items-center gap-2">
+              <button
+                @click="openAnalytics"
+                class="rounded-md border border-emerald-300 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
+              >
+                Analytics
+              </button>
+
+              <button
+                @click="interviewAnotherPerson"
+                :disabled="startingAnother"
+                class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+              >
+                {{ startingAnother ? 'Starting...' : 'Interview Another Person' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="flex-1 overflow-y-auto">
+            <div
+              v-for="interview in interviews"
+              :key="interview.id"
+              class="flex items-center justify-between border-b px-4 py-3"
+            >
+              <div>
+                <div class="font-medium text-gray-900">
+                  {{ interview.respondent_info || 'Interview' }}
+                </div>
+
+                <div class="mt-1 text-xs text-gray-500">
+                  {{ new Date(interview.started_at).toLocaleDateString() }}
+                </div>
+
+                <div class="mt-1 text-xs">
+                  <span v-if="interview.finished_at" class="font-medium text-emerald-700">
+                    Completed
+                  </span>
+                  <span v-else class="font-medium text-amber-600"> In Progress </span>
+                </div>
+              </div>
+
+              <button
+                class="text-sm text-emerald-600 hover:underline"
+                @click="openInterview(interview.id)"
+              >
+                {{ interview.finished_at ? 'View' : 'Resume' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= MOBILE LAYOUT ================= -->
+
+        <div class="flex w-full flex-col md:hidden">
+          <!-- UNCERTAINTIES -->
+          <div v-if="mobileView === 'uncertainties'">
+            <div class="flex items-center justify-between border-b px-4 py-3">
+              <span class="font-semibold">Uncertainties</span>
+              <button
+                @click="startNewInterview"
+                class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+              >
+                Resolve New Uncertainties
+              </button>
+            </div>
+
+            <div
+              v-for="u in uncertainties"
+              :key="u.id"
+              @click="selectUncertainty(u)"
+              class="border-b px-4 py-3"
+            >
+              <div class="font-medium">
+                {{ u.text }}
+              </div>
+
+              <div class="mt-1 text-xs text-gray-500">
+                {{ u.created_at ? new Date(u.created_at).toLocaleDateString() : '' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB UNCERTAINTIES -->
+          <div v-if="mobileView === 'subs'">
+            <div class="flex items-center border-b px-4 py-3">
+              <button class="mr-3 text-sm text-emerald-600" @click="mobileView = 'uncertainties'">
+                ← Back
+              </button>
+
+              <span class="font-semibold">Sub-uncertainties</span>
+            </div>
+
+            <div
+              v-for="sub in subUncertainties"
+              :key="sub.id"
+              @click="selectSub(sub)"
+              class="border-b px-4 py-3"
+            >
+              <div class="font-medium">
+                {{ sub.title }}
+              </div>
+
+              <div class="mt-1 text-xs text-gray-500">
+                {{ sub.interview_count || 0 }} interviews
+              </div>
+            </div>
+          </div>
+
+          <!-- INTERVIEWS -->
+          <div v-if="mobileView === 'interviews'">
+            <div class="border-b px-4 py-3">
+              <div class="flex items-center">
+                <button class="mr-3 text-sm text-emerald-600" @click="mobileView = 'subs'">
+                  ← Back
+                </button>
+
+                <span class="font-semibold">Interviews</span>
+              </div>
+
+              <div v-if="selectedSub" class="mt-3 flex items-center gap-2">
+                <button
+                  @click="openAnalytics"
+                  class="rounded-md border border-emerald-300 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
+                >
+                  Analytics
+                </button>
+
+                <button
+                  @click="interviewAnotherPerson"
+                  :disabled="startingAnother"
+                  class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:bg-neutral-300"
+                >
+                  {{ startingAnother ? 'Starting...' : 'Interview Another Person' }}
+                </button>
+              </div>
+            </div>
+
+            <div v-for="interview in interviews" :key="interview.id" class="border-b px-4 py-3">
               <div class="font-medium text-gray-900">
                 {{ interview.respondent_info || 'Interview' }}
               </div>
@@ -296,122 +423,19 @@
                 <span v-if="interview.finished_at" class="font-medium text-emerald-700">
                   Completed
                 </span>
+
                 <span v-else class="font-medium text-amber-600"> In Progress </span>
               </div>
-            </div>
-
-            <button
-              class="text-sm text-emerald-600 hover:underline"
-              @click="openInterview(interview.id)"
-            >
-              {{ interview.finished_at ? 'View' : 'Resume' }}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ================= MOBILE LAYOUT ================= -->
-
-      <div class="flex w-full flex-col md:hidden">
-        <!-- UNCERTAINTIES -->
-        <div v-if="mobileView === 'uncertainties'">
-          <div class="border-b px-4 py-3 font-semibold">Uncertainties</div>
-
-          <div
-            v-for="u in uncertainties"
-            :key="u.id"
-            @click="selectUncertainty(u)"
-            class="border-b px-4 py-3"
-          >
-            <div class="font-medium">
-              {{ u.text }}
-            </div>
-
-            <div class="mt-1 text-xs text-gray-500">
-              {{ u.created_at ? new Date(u.created_at).toLocaleDateString() : '' }}
-            </div>
-          </div>
-        </div>
-
-        <!-- SUB UNCERTAINTIES -->
-        <div v-if="mobileView === 'subs'">
-          <div class="flex items-center border-b px-4 py-3">
-            <button class="mr-3 text-sm text-emerald-600" @click="mobileView = 'uncertainties'">
-              ← Back
-            </button>
-
-            <span class="font-semibold">Sub-uncertainties</span>
-          </div>
-
-          <div
-            v-for="sub in subUncertainties"
-            :key="sub.id"
-            @click="selectSub(sub)"
-            class="border-b px-4 py-3"
-          >
-            <div class="font-medium">
-              {{ sub.title }}
-            </div>
-
-            <div class="mt-1 text-xs text-gray-500">{{ sub.interview_count || 0 }} interviews</div>
-          </div>
-        </div>
-
-        <!-- INTERVIEWS -->
-        <div v-if="mobileView === 'interviews'">
-          <div class="border-b px-4 py-3">
-            <div class="flex items-center">
-              <button class="mr-3 text-sm text-emerald-600" @click="mobileView = 'subs'">
-                ← Back
-              </button>
-
-              <span class="font-semibold">Interviews</span>
-            </div>
-
-            <div v-if="selectedSub" class="mt-3 flex items-center gap-2">
-              <button
-                @click="openAnalytics"
-                class="rounded-md border border-emerald-300 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
-              >
-                Analytics
-              </button>
 
               <button
-                @click="interviewAnotherPerson"
-                :disabled="startingAnother"
-                class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:bg-neutral-300"
+                class="mt-2 text-sm text-emerald-600 hover:underline"
+                @click="openInterview(interview.id)"
               >
-                {{ startingAnother ? 'Starting...' : 'Interview Another Person' }}
+                {{ interview.finished_at ? 'View' : 'Resume' }}
               </button>
             </div>
           </div>
-
-          <div v-for="interview in interviews" :key="interview.id" class="border-b px-4 py-3">
-            <div class="font-medium text-gray-900">
-              {{ interview.respondent_info || 'Interview' }}
-            </div>
-
-            <div class="mt-1 text-xs text-gray-500">
-              {{ new Date(interview.started_at).toLocaleDateString() }}
-            </div>
-
-            <div class="mt-1 text-xs">
-              <span v-if="interview.finished_at" class="font-medium text-emerald-700">
-                Completed
-              </span>
-
-              <span v-else class="font-medium text-amber-600"> In Progress </span>
-            </div>
-
-            <button
-              class="mt-2 text-sm text-emerald-600 hover:underline"
-              @click="openInterview(interview.id)"
-            >
-              {{ interview.finished_at ? 'View' : 'Resume' }}
-            </button>
-          </div>
         </div>
-      </div>
       </div>
     </div>
   </div>
