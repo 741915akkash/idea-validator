@@ -1,4 +1,5 @@
 import { pool } from '../../db'
+import { requireQuizAccess } from '../../utils/quizAccess'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -12,6 +13,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     await client.query('BEGIN')
+    await requireQuizAccess(client, event, quiz_id)
 
     // 1️⃣ Create interview execution row
     const interviewRes = await client.query(

@@ -1,5 +1,6 @@
 import { getQuery, createError, eventHandler } from 'h3'
 import { pool } from '../../../db'
+import { requireQuizAccess } from '../../../utils/quizAccess'
 
 export default eventHandler(async (event) => {
   const { quiz_id, checkpoint } = getQuery(event)
@@ -15,23 +16,10 @@ export default eventHandler(async (event) => {
 
   try {
     // 1️⃣ Always fetch quiz lifecycle state
-    const quizRes = await client.query(
-      `
-      SELECT status
-      FROM quizzes
-      WHERE id = $1
-      `,
-      [quiz_id]
-    )
-
-    if (quizRes.rowCount === 0) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Quiz not found'
-      })
-    }
-
-    const quizStatus = quizRes.rows[0].status
+    const quiz = await requireQuizAccess(client, event, quiz_id, {
+      select: 'status'
+    })
+    const quizStatus = quiz.status
 
     // ─────────────────────────────────────────────
     // MODE 1 — lifecycle only (no checkpoint)

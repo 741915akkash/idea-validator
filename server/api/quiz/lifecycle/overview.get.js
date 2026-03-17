@@ -1,5 +1,6 @@
 import { getQuery, createError, eventHandler } from 'h3'
 import { pool } from '../../../db' // adjust if your db import differs
+import { requireQuizAccess } from '../../../utils/quizAccess'
 
 export default eventHandler(async (event) => {
   const { quiz_id } = getQuery(event)
@@ -15,23 +16,9 @@ export default eventHandler(async (event) => {
 
   try {
     // 1️⃣ Fetch quiz status
-    const quizRes = await client.query(
-      `
-      SELECT id, status
-      FROM quizzes
-      WHERE id = $1
-      `,
-      [quiz_id]
-    )
-
-    if (quizRes.rowCount === 0) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Quiz not found'
-      })
-    }
-
-    const quiz = quizRes.rows[0]
+    const quiz = await requireQuizAccess(client, event, quiz_id, {
+      select: 'id, status'
+    })
 
     // 2️⃣ Aggregate checkpoint overview
     const checkpointsRes = await client.query(

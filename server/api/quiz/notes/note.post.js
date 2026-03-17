@@ -1,5 +1,6 @@
 import { readBody, createError, eventHandler } from 'h3'
 import { pool } from '../../../db'
+import { requireQuizAccess } from '../../../utils/quizAccess'
 
 export default eventHandler(async (event) => {
   const body = await readBody(event)
@@ -15,6 +16,8 @@ export default eventHandler(async (event) => {
   const client = await pool.connect()
 
   try {
+    await requireQuizAccess(client, event, quiz_id)
+
     await client.query(
       `
       INSERT INTO quiz_question_notes (quiz_id, question_id, note_text)

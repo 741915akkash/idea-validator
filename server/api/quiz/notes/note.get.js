@@ -1,5 +1,6 @@
 import { getQuery, createError, eventHandler } from 'h3'
 import { pool } from '../../../db'
+import { requireQuizAccess } from '../../../utils/quizAccess'
 
 export default eventHandler(async (event) => {
   const { quiz_id, question_id } = getQuery(event)
@@ -14,6 +15,8 @@ export default eventHandler(async (event) => {
   const client = await pool.connect()
 
   try {
+    await requireQuizAccess(client, event, quiz_id)
+
     const res = await client.query(
       `
       SELECT note_text

@@ -9,6 +9,11 @@
   import InterviewScreen from '~/components/interview/InterviewScreen.vue'
   import CompletionSummary from '~/components/interview/CompletionSummary.vue'
 
+  definePageMeta({
+    layout: 'app',
+    middleware: 'auth'
+  })
+
   const route = useRoute()
   const interview = useInterviewSession()
 

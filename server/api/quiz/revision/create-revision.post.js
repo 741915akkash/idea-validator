@@ -1,5 +1,6 @@
 import { pool } from '../../../db'
 import { createError } from 'h3'
+import { requireQuizAccess } from '../../../utils/quizAccess'
 
 export default defineEventHandler(async (event) => {
   const { quiz_id } = await readBody(event)
@@ -17,16 +18,7 @@ export default defineEventHandler(async (event) => {
     await client.query('BEGIN')
 
     // 1️⃣ Fetch quiz
-    const quizRes = await client.query(`SELECT * FROM quizzes WHERE id = $1`, [quiz_id])
-
-    const quiz = quizRes.rows[0]
-
-    if (!quiz) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Quiz not found'
-      })
-    }
+    const quiz = await requireQuizAccess(client, event, quiz_id, { select: '*' })
 
     if (quiz.status !== 'COMPLETED') {
       throw createError({

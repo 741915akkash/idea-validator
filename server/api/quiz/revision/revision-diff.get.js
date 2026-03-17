@@ -1,5 +1,6 @@
 import { pool } from '../../../db'
 import { getQuery, createError } from 'h3'
+import { requireQuizAccess } from '../../../utils/quizAccess'
 
 export default defineEventHandler(async (event) => {
   const { quiz_id } = getQuery(event)
@@ -11,35 +12,36 @@ export default defineEventHandler(async (event) => {
 
   try {
     // 1️⃣ Fetch quiz + revision info
-    const quizRes = await client.query(
-      `
-      SELECT id, parent_quiz_id, revision_number
-      FROM quizzes
-      WHERE id = $1
-      `,
-      [quiz_id]
-    )
-
-    if (!quizRes.rows.length) {
-      throw createError({ statusCode: 404, statusMessage: 'Quiz not found' })
-    }
-
-    const quiz = quizRes.rows[0]
+    const quiz = await requireQuizAccess(client, event, quiz_id, {
+      select: 'id, parent_quiz_id, revision_number, user_id, visitor_id'
+    })
 
     if (quiz.revision_number === 0) {
       return { changes: [] }
     }
 
     // 2️⃣ Get previous revision
-    const prevRes = await client.query(
-      `
-      SELECT id
-      FROM quizzes
-      WHERE parent_quiz_id = $1
-        AND revision_number = $2
-      `,
-      [quiz.parent_quiz_id, quiz.revision_number - 1]
-    )
+    const prevRes = quiz.user_id
+      ? await client.query(
+          `
+          SELECT id
+          FROM quizzes
+          WHERE parent_quiz_id = $1
+            AND revision_number = $2
+            AND user_id = $3
+          `,
+          [quiz.parent_quiz_id, quiz.revision_number - 1, quiz.user_id]
+        )
+      : await client.query(
+          `
+          SELECT id
+          FROM quizzes
+          WHERE parent_quiz_id = $1
+            AND revision_number = $2
+            AND visitor_id = $3
+          `,
+          [quiz.parent_quiz_id, quiz.revision_number - 1, quiz.visitor_id]
+        )
 
     const prevQuizId = prevRes.rows[0]?.id
     if (!prevQuizId) {

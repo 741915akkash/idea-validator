@@ -1,4 +1,5 @@
 import { pool } from '../../../db'
+import { requireInterviewAccess } from '../../../utils/interviewAccess'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -12,6 +13,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     await client.query('BEGIN')
+    await requireInterviewAccess(client, event, interview_id)
 
     // 1️⃣ Update runtime condition result
     const updateRes = await client.query(

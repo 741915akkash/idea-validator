@@ -5,6 +5,11 @@
   import ScoreCircle from '~/components/ui/ScoreCircle.vue'
   import InsightBlock from '~/components/score/InsightBlock.vue'
 
+  definePageMeta({
+    layout: 'app',
+    middleware: 'auth'
+  })
+
   const route = useRoute()
   const router = useRouter()
   const quizStore = useQuizSessionStore()
@@ -28,6 +33,7 @@
   // --------------------
   const loadingInsights = ref(true)
   const insightsError = ref(null)
+  const insightsLocked = ref(false)
 
   const insights = ref({
     working: [],
@@ -67,7 +73,12 @@
           query: { quiz_id: quizId }
         })
 
-        insights.value = insightsRes.insights
+        insightsLocked.value = Boolean(insightsRes.locked)
+        insights.value = insightsRes.insights || {
+          working: [],
+          risky: [],
+          proceed: []
+        }
         console.log('Loaded insights:', insights.value)
       } catch (e) {
         // Insights failure should NOT break score page
@@ -260,7 +271,7 @@
           </div>
         </section>
 
-        <section v-if="!loadingInsights && !insightsError" class="mt-10 space-y-10">
+        <section v-if="!loadingInsights && !insightsError && !insightsLocked" class="mt-10 space-y-10">
           <!-- WHAT'S WORKING -->
           <InsightBlock title="What’s working" tone="positive" :items="insights.working" />
 
@@ -269,6 +280,25 @@
 
           <!-- HOW TO PROCEED -->
           <InsightBlock title="How to proceed" tone="neutral" :items="insights.proceed" />
+        </section>
+
+        <section v-if="!loadingInsights && !insightsError && insightsLocked" class="mt-10 rounded-xl border p-6">
+          <h2 class="text-lg font-semibold">Insights are locked</h2>
+          <p class="mt-2 text-sm text-gray-600">
+            Create an account to unlock your full What’s working, What’s risky, and How to proceed insights.
+          </p>
+          <NuxtLink
+            :to="{
+              path: '/signup-login',
+              query: {
+                signup_source: 'score_wall',
+                quiz_id: quizId
+              }
+            }"
+            class="mt-4 inline-flex rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+          >
+            Sign up to unlock insights
+          </NuxtLink>
         </section>
 
         <div v-if="loadingInsights" class="mt-6 text-base text-gray-500">Loading insights…</div>

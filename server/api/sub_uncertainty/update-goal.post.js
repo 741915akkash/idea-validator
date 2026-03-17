@@ -1,4 +1,5 @@
 import { pool } from '../../db'
+import { requireGoalAccess } from '../../utils/subUncertaintyAccess'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -15,6 +16,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     await client.query('BEGIN')
+    await requireGoalAccess(client, event, goal_id)
 
     const res = await client.query(
       `

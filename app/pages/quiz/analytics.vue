@@ -3,6 +3,11 @@
   import { useRoute, useRouter } from 'vue-router'
   import { useQuizSessionStore } from '~/stores/quizSession'
 
+  definePageMeta({
+    layout: 'app',
+    middleware: 'auth'
+  })
+
   const interviews = ref([])
   const conditions = ref([])
   const responses = ref([])

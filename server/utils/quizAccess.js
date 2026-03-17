@@ -1,0 +1,79 @@
+import { createError } from 'h3'
+
+export function getIdentity(event) {
+  const userId = event.context?.user?.id || event.context?.auth?.userId || null
+  const visitorId = event.context?.visitorId || null
+  return { userId, visitorId }
+}
+
+export function requireIdentity(event) {
+  const identity = getIdentity(event)
+
+  if (!identity.userId && !identity.visitorId) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Authentication required'
+    })
+  }
+
+  return identity
+}
+
+export function requireUserIdentity(event) {
+  const { userId } = getIdentity(event)
+
+  if (!userId) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Login required'
+    })
+  }
+
+  return { userId }
+}
+
+export async function requireQuizAccess(client, event, quizId, options = {}) {
+  if (!quizId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'quiz_id required'
+    })
+  }
+
+  const { select = 'id, user_id, visitor_id' } = options
+  const { userId, visitorId } = requireIdentity(event)
+
+  let query
+  let params
+
+  if (userId) {
+    query = `
+      SELECT ${select}
+      FROM quizzes
+      WHERE id = $1
+        AND user_id = $2
+      LIMIT 1
+    `
+    params = [quizId, userId]
+  } else {
+    query = `
+      SELECT ${select}
+      FROM quizzes
+      WHERE id = $1
+        AND visitor_id = $2
+      LIMIT 1
+    `
+    params = [quizId, visitorId]
+  }
+
+  const { rows } = await client.query(query, params)
+
+  if (!rows.length) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Quiz not found'
+    })
+  }
+
+  return rows[0]
+}

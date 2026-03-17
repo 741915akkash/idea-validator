@@ -7,6 +7,11 @@
   import QuestionNotes from '~/components/quiz/QuestionNotes.vue'
   import NotesPanel from '~/components/quiz/NotesPanel.vue'
 
+  definePageMeta({
+    layout: 'app',
+    middleware: 'auth'
+  })
+
   const route = useRoute()
   const router = useRouter()
   const quizStore = useQuizSessionStore()

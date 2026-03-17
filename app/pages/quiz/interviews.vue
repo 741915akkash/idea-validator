@@ -3,6 +3,11 @@
   import { useRouter } from 'vue-router'
   import { useQuizSessionStore } from '~/stores/quizSession'
 
+  definePageMeta({
+    layout: 'app',
+    middleware: 'auth'
+  })
+
   const router = useRouter()
   const quizStore = useQuizSessionStore()
 
@@ -169,7 +174,7 @@
 </script>
 
 <template>
-  <main class="px-6 py-12">
+  <main class="px-6 py-6">
     <div class="mx-auto max-w-2xl">
       <div class="mb-8 space-y-6">
         <!-- Page header -->

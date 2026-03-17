@@ -1,4 +1,5 @@
 import { pool } from '../../../db'
+import { requireQuizAccess } from '../../../utils/quizAccess'
 
 export default defineEventHandler(async (event) => {
   const { quiz_id, checkpoint } = await readBody(event)
@@ -6,6 +7,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     await client.query('BEGIN')
+    await requireQuizAccess(client, event, quiz_id)
 
     // 1️⃣ Verify quiz + current checkpoint
     const stateRes = await client.query(

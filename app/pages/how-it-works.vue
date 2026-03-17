@@ -2,6 +2,10 @@
   import Button from '~/components/ui/Button.vue'
   import { navigateTo } from '#app'
 
+  definePageMeta({
+    layout: 'marketing'
+  })
+
   const beginValidation = () => {
     navigateTo('/quiz/overview')
   }

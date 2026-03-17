@@ -3,6 +3,7 @@ import OpenAI from 'openai'
 import { scoreDecomposition } from '../../services/interviewEngine/scoreStructure'
 import { incrementHit, toVectorLiteral } from '../../services/interviewEngine/cache'
 import { extractJSON } from '../../services/interviewEngine/extractJSON'
+import { requireQuizAccess } from '../../utils/quizAccess'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
@@ -101,6 +102,8 @@ export default defineEventHandler(async (event) => {
   let inTransaction = false
 
   try {
+    await requireQuizAccess(client, event, quiz_id)
+
     if (!subList.length) {
       try {
         const embedding = await getEmbedding(normalizedText)

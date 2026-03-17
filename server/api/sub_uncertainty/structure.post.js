@@ -3,6 +3,7 @@ import OpenAI from 'openai'
 import { scoreGoalStructure } from '../../services/interviewEngine/scoreStructure'
 import { storeCache, incrementHit, toVectorLiteral } from '../../services/interviewEngine/cache'
 import { extractJSON } from '../../services/interviewEngine/extractJSON'
+import { requireSubUncertaintyAccess } from '../../utils/subUncertaintyAccess'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
@@ -128,6 +129,7 @@ Return JSON:
 
   try {
     await client.query('BEGIN')
+    await requireSubUncertaintyAccess(client, event, sub_uncertainty_id)
 
     const goalLookup = await client.query(
       `SELECT id FROM goals WHERE sub_uncertainty_id = $1 LIMIT 1`,

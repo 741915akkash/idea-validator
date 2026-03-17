@@ -1,60 +1,110 @@
-import { getQuery, eventHandler } from 'h3'
+import { getQuery, eventHandler, createError } from 'h3'
 import { pool } from '../../../db'
 
 export default eventHandler(async (event) => {
   const { force } = getQuery(event)
   const forceNew = force === 'true'
+  const authUserId = event.context?.user?.id || event.context?.auth?.userId || null
+  const visitorId = event.context?.visitorId || null
 
   const client = await pool.connect()
 
   try {
     await client.query('BEGIN')
 
-    // 1️⃣ Get or create SINGLE user (temporary: no auth)
-    const userRes = await client.query(`
-      SELECT id
-      FROM users
-      ORDER BY created_at ASC
-      LIMIT 1
-    `)
+    let userId = authUserId
 
-    let userId
-
-    if (userRes.rowCount > 0) {
-      userId = userRes.rows[0].id
-    } else {
-      const createdUser = await client.query(`INSERT INTO users DEFAULT VALUES RETURNING id`)
-      userId = createdUser.rows[0].id
+    if (!userId && !visitorId) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Missing identity: expected logged-in user or visitor_id'
+      })
     }
 
-    // 2️⃣ Find existing active quiz
-    const existingQuizRes = await client.query(
-      `
-      SELECT id
-      FROM quizzes
-      WHERE user_id = $1
-        AND status IN ('NOT_STARTED', 'IN_PROGRESS')
-      ORDER BY started_at DESC NULLS LAST
-      LIMIT 1
-      `,
-      [userId]
-    )
+    // 2️⃣ Find existing quiz
+    let existingQuizRes
+    if (userId) {
+      existingQuizRes = await client.query(
+        `
+        SELECT id
+        FROM quizzes
+        WHERE user_id = $1
+          AND status IN ('NOT_STARTED', 'IN_PROGRESS')
+        ORDER BY started_at DESC NULLS LAST
+        LIMIT 1
+        `,
+        [userId]
+      )
+    } else {
+      existingQuizRes = await client.query(
+        `
+        SELECT id
+        FROM quizzes
+        WHERE visitor_id = $1
+        ORDER BY started_at DESC NULLS LAST
+        LIMIT 1
+        `,
+        [visitorId]
+      )
+    }
 
     let quizId
     let isNewQuiz = false
 
     // 3️⃣ Decide reuse vs create
-    if (!forceNew && existingQuizRes.rowCount > 0) {
+    // Visitors are strictly single-quiz: always reuse if present.
+    const shouldReuseExisting = userId ? !forceNew : true
+    if (shouldReuseExisting && existingQuizRes.rowCount > 0) {
       quizId = existingQuizRes.rows[0].id
     } else {
-      const quizRes = await client.query(
-        `
-        INSERT INTO quizzes (user_id, status, started_at)
-        VALUES ($1, 'IN_PROGRESS', now())
-        RETURNING id
-        `,
-        [userId]
-      )
+      let quizRes
+      if (userId) {
+        quizRes = await client.query(
+          `
+          INSERT INTO quizzes (user_id, status, started_at)
+          VALUES ($1, 'IN_PROGRESS', now())
+          RETURNING id
+          `,
+          [userId]
+        )
+      } else {
+        try {
+          quizRes = await client.query(
+            `
+            INSERT INTO quizzes (visitor_id, status, started_at)
+            VALUES ($1, 'IN_PROGRESS', now())
+            RETURNING id
+            `,
+            [visitorId]
+          )
+        } catch (error) {
+          // Handle race on unique(visitor_id) by reusing created quiz.
+          if (error?.code === '23505') {
+            const retryExisting = await client.query(
+              `
+              SELECT id
+              FROM quizzes
+              WHERE visitor_id = $1
+              ORDER BY started_at DESC NULLS LAST
+              LIMIT 1
+              `,
+              [visitorId]
+            )
+
+            if (!retryExisting.rowCount) {
+              throw error
+            }
+
+            quizId = retryExisting.rows[0].id
+            await client.query('COMMIT')
+            return {
+              quiz_id: quizId,
+              is_new: false
+            }
+          }
+          throw error
+        }
+      }
 
       quizId = quizRes.rows[0].id
       isNewQuiz = true
@@ -75,15 +125,17 @@ export default eventHandler(async (event) => {
       )
     }
 
-    // 4️⃣ Set as current quiz (important for future)
-    await client.query(
-      `
-      UPDATE users
-      SET current_quiz_id = $1
-      WHERE id = $2
-      `,
-      [quizId, userId]
-    )
+    // 4️⃣ Set as current quiz for logged-in users
+    if (userId) {
+      await client.query(
+        `
+        UPDATE users
+        SET current_quiz_id = $1
+        WHERE id = $2
+        `,
+        [quizId, userId]
+      )
+    }
 
     await client.query('COMMIT')
 

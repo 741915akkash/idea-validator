@@ -1,5 +1,6 @@
 import { eventHandler, getQuery, createError } from 'h3'
 import { pool } from '../../db'
+import { requireQuizAccess } from '../../utils/quizAccess'
 
 export default eventHandler(async (event) => {
   const { quiz_id } = getQuery(event)
@@ -11,22 +12,11 @@ export default eventHandler(async (event) => {
     })
   }
 
-  const { rows } = await pool.query(
-    `
-    SELECT id, name
-    FROM quizzes
-    WHERE id = $1
-    LIMIT 1
-    `,
-    [quiz_id]
-  )
-
-  if (!rows.length) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Quiz not found'
-    })
+  const client = await pool.connect()
+  try {
+    const quiz = await requireQuizAccess(client, event, quiz_id, { select: 'id, name' })
+    return quiz
+  } finally {
+    client.release()
   }
-
-  return rows[0]
 })

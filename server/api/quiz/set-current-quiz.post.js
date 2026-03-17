@@ -1,34 +1,22 @@
 import { pool } from '../../db'
+import { requireQuizAccess, requireUserIdentity } from '../../utils/quizAccess'
 
 export default eventHandler(async (event) => {
   const body = await readBody(event)
-  const { user_id, quiz_id } = body || {}
+  const { quiz_id } = body || {}
+  const { userId } = requireUserIdentity(event)
 
-  if (!user_id || !quiz_id) {
+  if (!quiz_id) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'user_id and quiz_id are required'
+      statusMessage: 'quiz_id is required'
     })
   }
 
   const client = await pool.connect()
 
   try {
-    const ownership = await client.query(
-      `
-      SELECT 1
-      FROM quizzes
-      WHERE id = $1 AND user_id = $2
-      `,
-      [quiz_id, user_id]
-    )
-
-    if (ownership.rowCount === 0) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Quiz not found for user'
-      })
-    }
+    await requireQuizAccess(client, event, quiz_id)
 
     await client.query(
       `
@@ -36,7 +24,7 @@ export default eventHandler(async (event) => {
       SET current_quiz_id = $1
       WHERE id = $2
       `,
-      [quiz_id, user_id]
+      [quiz_id, userId]
     )
 
     return { success: true }

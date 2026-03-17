@@ -1,0 +1,146 @@
+.idea-validator
+├── README.md
+├── app
+│   ├── app.vue
+│   ├── components
+│   │   ├── interview
+│   │   │   ├── CompletionSummary.vue
+│   │   │   ├── GoalConfirmation.vue
+│   │   │   ├── InterviewHeader.vue
+│   │   │   ├── InterviewLayout.vue
+│   │   │   ├── InterviewPhaseStepper.vue
+│   │   │   ├── InterviewScreen.vue
+│   │   │   ├── SubUncertaintySelector.vue
+│   │   │   └── UncertaintyInput.vue
+│   │   ├── landing2
+│   │   │   ├── CTA.vue
+│   │   │   ├── Comparison.vue
+│   │   │   ├── Cost.vue
+│   │   │   ├── Features.vue
+│   │   │   ├── Footer.vue
+│   │   │   ├── Hero.vue
+│   │   │   ├── Problem.vue
+│   │   │   ├── Sidebar.vue
+│   │   │   └── Stages.vue
+│   │   ├── quiz
+│   │   │   ├── AsqDropdown.vue
+│   │   │   ├── IncompleteWarning.vue
+│   │   │   ├── NotesPanel.vue
+│   │   │   ├── QuestionNotes.vue
+│   │   │   ├── QuestionOption.vue
+│   │   │   ├── QuestionRenderer.vue
+│   │   │   ├── QuizLayout.vue
+│   │   │   ├── QuizStepper.vue
+│   │   │   └── ResumeBanner.vue
+│   │   ├── score
+│   │   │   └── InsightBlock.vue
+│   │   └── ui
+│   │       ├── Button.vue
+│   │       └── ScoreCircle.vue
+│   ├── composables
+│   │   ├── useExperiments.js
+│   │   ├── useInterviewApi.js
+│   │   ├── useQuizNavigation.js
+│   │   └── useQuizState.js
+│   ├── layouts
+│   │   └── default.vue
+│   ├── pages
+│   │   ├── how-it-works.vue
+│   │   ├── index.vue
+│   │   └── quiz
+│   │       ├── [checkpoint].vue
+│   │       ├── analytics.vue
+│   │       ├── index.vue
+│   │       ├── interview
+│   │       ├── interviews.vue
+│   │       ├── master-detail.vue
+│   │       ├── overview.vue
+│   │       └── score.vue
+│   ├── plugins
+│   │   └── posthog.client.js
+│   └── stores
+│       ├── interviewSession.js
+│       └── quizSession.js
+├── dbml-error.log
+├── docker-compose.yml
+├── nuxt.config.js
+├── package-lock.json
+├── package.json
+├── public
+│   ├── favicon.ico
+│   └── robots.txt
+├── server
+│   ├── api
+│   │   ├── evidence
+│   │   │   └── upsert.post.js
+│   │   ├── interview
+│   │   │   ├── analytics.get.js
+│   │   │   ├── condition
+│   │   │   ├── finish.post.js
+│   │   │   ├── get.get.js
+│   │   │   ├── goal
+│   │   │   ├── interviewList
+│   │   │   ├── list.get.js
+│   │   │   ├── start.post.js
+│   │   │   ├── summary.get.js
+│   │   │   ├── uncertainity
+│   │   │   └── update-respondent.post.js
+│   │   ├── quiz
+│   │   │   ├── answers
+│   │   │   ├── asqs
+│   │   │   ├── by-id.get.js
+│   │   │   ├── checkpoints
+│   │   │   ├── get-current-quiz.js
+│   │   │   ├── lifecycle
+│   │   │   ├── notes
+│   │   │   ├── quizzes.get.js
+│   │   │   ├── rename-quiz.post.js
+│   │   │   ├── revision
+│   │   │   ├── score
+│   │   │   ├── set-current-quiz.post.js
+│   │   │   ├── test-insights.get.js
+│   │   │   ├── test-rules.get.js
+│   │   │   └── validate-rule-coverage.get.js
+│   │   ├── sub_uncertainty
+│   │   │   ├── list.get.js
+│   │   │   ├── replace-conditions.post.js
+│   │   │   ├── structure.post.js
+│   │   │   ├── template.get.js
+│   │   │   └── update-goal.post.js
+│   │   └── uncertainty
+│   │       ├── create.post.js
+│   │       ├── generate.post.js
+│   │       └── list.get.js
+│   ├── db
+│   │   └── index.js
+│   ├── rules_json
+│   │   ├── how_to_proceed.rules.json
+│   │   ├── rag_knowledge.json
+│   │   ├── seed_script.js
+│   │   ├── whats_risky.rules.json
+│   │   └── whats_working.rules.json
+│   └── services
+│       ├── deriveCheckpointSignals.js
+│       ├── evaluateInsights.js
+│       ├── interviewEngine
+│       │   ├── cache.js
+│       │   ├── embed.js
+│       │   ├── extractJSON.js
+│       │   ├── normalize.js
+│       │   ├── scoreStructure.js
+│       │   └── similarity.js
+│       ├── loadQuizDecision.js
+│       ├── loadQuizSignals.js
+│       ├── loadQuizzesForCoverage.js
+│       ├── loadRules.js
+│       ├── ruleMatches.js
+│       ├── scoring.js
+│       └── validateRuleCoverage.js
+├── tree.txt
+└── zmisc
+    ├── all_question_options.json
+    ├── answers_5dd9258f.csv
+    ├── questions.csv
+    └── schema.sql
+
+38 directories, 105 files

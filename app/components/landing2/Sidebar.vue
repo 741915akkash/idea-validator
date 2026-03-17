@@ -177,7 +177,7 @@
 
       <NuxtLink
         v-else
-        to="/signup"
+        to="/signup-login"
         class="block w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-center font-medium text-white transition hover:bg-emerald-700"
       >
         Start Validating

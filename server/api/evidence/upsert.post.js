@@ -1,4 +1,5 @@
 import { pool } from '../../db'
+import { requireInterviewAccess } from '../../utils/interviewAccess'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -16,18 +17,9 @@ export default defineEventHandler(async (event) => {
   try {
     await client.query('BEGIN')
 
-    const interviewRes = await client.query(
-      `
-      SELECT id, sub_uncertainty_id
-      FROM interviews
-      WHERE id = $1
-      `,
-      [interview_id]
-    )
-
-    if (!interviewRes.rows.length) {
-      throw createError({ statusCode: 404, statusMessage: 'Interview not found' })
-    }
+    const interview = await requireInterviewAccess(client, event, interview_id, {
+      select: 'i.id, i.sub_uncertainty_id'
+    })
 
     const conditionRes = await client.query(
       `
@@ -39,7 +31,7 @@ export default defineEventHandler(async (event) => {
       WHERE c.id = $1
         AND i.id = $2
       `,
-      [condition_id, interview_id]
+      [condition_id, interview.id]
     )
 
     if (!conditionRes.rows.length) {

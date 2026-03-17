@@ -4,6 +4,11 @@
   import { useQuizSessionStore } from '~/stores/quizSession'
   import Button from '~/components/ui/Button.vue'
 
+  definePageMeta({
+    layout: 'app',
+    middleware: 'auth'
+  })
+
   // Lightweight per-session cache for overview side-panels by quiz.
   const overviewCache = new Map()
 

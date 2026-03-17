@@ -1,6 +1,7 @@
 // server/api/sub/replace-conditions.post.js
 
 import { pool } from '../../db'
+import { requireGoalAccess } from '../../utils/subUncertaintyAccess'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -17,6 +18,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     await client.query('BEGIN')
+    await requireGoalAccess(client, event, goal_id)
 
     // 1️⃣ Ensure goal exists
     const goalCheck = await client.query(`SELECT id FROM goals WHERE id = $1`, [goal_id])

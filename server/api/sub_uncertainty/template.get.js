@@ -1,4 +1,5 @@
 import { pool } from '../../db'
+import { requireSubUncertaintyAccess } from '../../utils/subUncertaintyAccess'
 
 export default defineEventHandler(async (event) => {
   const { sub_uncertainty_id } = getQuery(event)
@@ -10,20 +11,9 @@ export default defineEventHandler(async (event) => {
   const client = await pool.connect()
 
   try {
-    const subRes = await client.query(
-      `
-      SELECT id, uncertainty_id, title
-      FROM sub_uncertainties
-      WHERE id = $1
-      `,
-      [sub_uncertainty_id]
-    )
-
-    if (!subRes.rows.length) {
-      throw createError({ statusCode: 404, statusMessage: 'Sub-uncertainty not found' })
-    }
-
-    const sub = subRes.rows[0]
+    const sub = await requireSubUncertaintyAccess(client, event, sub_uncertainty_id, {
+      select: 's.id, s.uncertainty_id, s.title'
+    })
 
     const goalRes = await client.query(
       `

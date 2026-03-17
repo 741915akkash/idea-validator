@@ -1,5 +1,6 @@
 import { eventHandler, readBody, createError } from 'h3'
 import { pool } from '../../../db'
+import { requireInterviewAccess } from '../../../utils/interviewAccess'
 
 export default eventHandler(async (event) => {
   const { interview_id, name } = await readBody(event)
@@ -27,20 +28,20 @@ export default eventHandler(async (event) => {
     })
   }
 
-  const { rowCount } = await pool.query(
-    `
-    UPDATE interviews
-    SET name = $1
-    WHERE id = $2
-    `,
-    [trimmedName, interview_id]
-  )
+  const client = await pool.connect()
+  try {
+    await requireInterviewAccess(client, event, interview_id)
 
-  if (!rowCount) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Interview not found'
-    })
+    await client.query(
+      `
+      UPDATE interviews
+      SET name = $1
+      WHERE id = $2
+      `,
+      [trimmedName, interview_id]
+    )
+  } finally {
+    client.release()
   }
 
   return { success: true, interview_id, name: trimmedName }

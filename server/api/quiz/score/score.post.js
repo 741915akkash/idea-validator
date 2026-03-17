@@ -2,6 +2,7 @@ import { pool } from '../../../db'
 import { calculateScores } from '../../../services/scoring'
 import { deriveCheckpointSignals } from '../../../services/deriveCheckpointSignals'
 import { createError } from 'h3'
+import { requireQuizAccess } from '../../../utils/quizAccess'
 
 export default defineEventHandler(async (event) => {
   const { quiz_id } = await readBody(event)
@@ -11,20 +12,9 @@ export default defineEventHandler(async (event) => {
     await client.query('BEGIN')
 
     // 1️⃣ Fetch quiz
-    const quizRes = await client.query(
-      `
-      SELECT id, status, parent_quiz_id, revision_number
-      FROM quizzes
-      WHERE id = $1
-      `,
-      [quiz_id]
-    )
-
-    if (!quizRes.rows.length) {
-      throw createError({ statusCode: 404, statusMessage: 'Quiz not found' })
-    }
-
-    const quiz = quizRes.rows[0]
+    const quiz = await requireQuizAccess(client, event, quiz_id, {
+      select: 'id, status, parent_quiz_id, revision_number'
+    })
 
     if (quiz.status !== 'IN_PROGRESS') {
       throw createError({
