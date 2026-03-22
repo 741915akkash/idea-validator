@@ -24,16 +24,18 @@ export function hashOTP(code) {
   return crypto.createHash('sha256').update(String(code)).digest('hex')
 }
 
-export async function createSession(userId) {
+export async function createSession(userId, metadata = {}) {
   const expiresAt = new Date(Date.now() + SESSION_TTL_DAYS * 24 * 60 * 60 * 1000)
+  const ip = metadata?.ip || null
+  const userAgent = metadata?.userAgent || null
 
   const { rows } = await pool.query(
     `
-    INSERT INTO sessions (user_id, expires_at)
-    VALUES ($1, $2)
+    INSERT INTO sessions (user_id, expires_at, ip, user_agent)
+    VALUES ($1, $2, $3, $4)
     RETURNING id, user_id, expires_at, created_at
     `,
-    [userId, expiresAt]
+    [userId, expiresAt, ip, userAgent]
   )
 
   return rows[0]

@@ -1,13 +1,15 @@
-import { createError } from 'h3'
+import { createError, getHeader } from 'h3'
 import { pool } from '../../db'
 import {
   MAX_ATTEMPTS,
+  SESSION_TTL_DAYS,
   hashOTP,
   isValidEmail,
   normalizeEmail,
   setSessionCookie
 } from '../../utils/auth'
 import { logAuthEvent } from '../../utils/authAudit'
+import { getClientIP } from '../../utils/clientIp'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -18,6 +20,8 @@ export default defineEventHandler(async (event) => {
     .toLowerCase()
   const quizId = body?.quiz_id || null
   const visitorId = event.context?.visitorId || null
+  const ip = getClientIP(event) || null
+  const userAgent = String(getHeader(event, 'user-agent') || '').slice(0, 1024) || null
 
   if (!isValidEmail(email) || !/^\d{6}$/.test(code)) {
     logAuthEvent(event, 'verify_otp_invalid_payload', { email })
@@ -162,13 +166,22 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    const sessionRes = await client.query(
+    await client.query(
       `
-      INSERT INTO sessions (user_id, expires_at)
-      VALUES ($1, now() + interval '30 days')
-      RETURNING id, user_id, expires_at, created_at
+      DELETE FROM sessions
+      WHERE user_id = $1
       `,
       [user.id]
+    )
+
+    const sessionExpiresAt = new Date(Date.now() + SESSION_TTL_DAYS * 24 * 60 * 60 * 1000)
+    const sessionRes = await client.query(
+      `
+      INSERT INTO sessions (user_id, expires_at, ip, user_agent)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id, user_id, expires_at, created_at
+      `,
+      [user.id, sessionExpiresAt, ip, userAgent]
     )
 
     await client.query(

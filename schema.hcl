@@ -943,6 +943,14 @@ table "sessions" {
     type    = timestamptz
     default = sql("now()")
   }
+  column "ip" {
+    null = true
+    type = text
+  }
+  column "user_agent" {
+    null = true
+    type = text
+  }
   primary_key {
     columns = [column.id]
   }
@@ -957,6 +965,15 @@ table "sessions" {
   }
   index "idx_sessions_user_id" {
     columns = [column.user_id]
+  }
+  index "idx_sessions_user_created_desc" {
+    on {
+      column = column.user_id
+    }
+    on {
+      desc   = true
+      column = column.created_at
+    }
   }
 }
 table "sub_uncertainties" {
