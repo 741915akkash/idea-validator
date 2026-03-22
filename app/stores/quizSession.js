@@ -9,7 +9,10 @@ export const useQuizSessionStore = defineStore('quizSession', {
     // { checkpoint: number, total: number, unanswered: number }
     checkpoints: [],
 
-    loaded: false
+    loaded: false,
+
+    // ✅ NEW: shared quizzes list used by sidebar + pages
+    quizzes: []
   }),
 
   getters: {
@@ -23,10 +26,34 @@ export const useQuizSessionStore = defineStore('quizSession', {
 
     getCheckpoint(state) {
       return (checkpointNumber) => state.checkpoints.find((c) => c.checkpoint === checkpointNumber)
+    },
+
+    // ✅ convenient getter
+    currentQuiz(state) {
+      return state.quizzes.find((q) => q.id === state.quizId)
     }
   },
 
   actions: {
+    /**
+     * Load quizzes list for sidebar / overview
+     */
+    async loadQuizzes() {
+      try {
+        this.quizzes = await $fetch('/api/quiz/quizzes')
+      } catch {
+        this.quizzes = []
+      }
+    },
+
+    /**
+     * Update quiz name locally after rename
+     */
+    renameQuiz(id, name) {
+      const q = this.quizzes.find((q) => q.id === id)
+      if (q) q.name = name
+    },
+
     /**
      * Used ONLY when resuming or hydrating an existing quiz
      */
@@ -127,6 +154,7 @@ export const useQuizSessionStore = defineStore('quizSession', {
       this.isCompleted = false
       this.checkpoints = []
       this.loaded = false
+      this.quizzes = []
 
       if (import.meta.client) {
         localStorage.removeItem('quiz_id')

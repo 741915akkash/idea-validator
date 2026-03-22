@@ -29,7 +29,7 @@
 <template>
   <div>
     <!-- Section Label -->
-    <div class="text-lg font-medium uppercase tracking-wide text-neutral-500 sm:text-2xl">
+    <div class="text-lg font-medium uppercase text-neutral-500 sm:text-2xl">
       Deterministic Interview
     </div>
 

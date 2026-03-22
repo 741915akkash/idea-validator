@@ -222,7 +222,7 @@
     <!-- FULLSCREEN -->
     <button
       @click="toggleFullscreen"
-      class="rounded-md bg-neutral-100 px-3 py-2 text-xs font-medium uppercase tracking-wide text-neutral-700 hover:bg-neutral-200"
+      class="rounded-md bg-neutral-100 px-3 py-2 text-xs font-medium uppercase text-neutral-700 hover:bg-neutral-200"
     >
       {{ isFullscreen ? 'Exit Fullscreen' : 'Fullscreen' }}
     </button>
@@ -230,13 +230,13 @@
     <!-- RESPONDENT -->
     <button
       @click="showRespondent = !showRespondent"
-      class="rounded-md bg-neutral-100 px-3 py-2 text-xs font-medium uppercase tracking-wide text-neutral-700"
+      class="rounded-md bg-neutral-100 px-3 py-2 text-xs font-medium uppercase text-neutral-700"
     >
       {{ showRespondent ? 'Hide respondent' : 'Show respondent' }}
     </button>
 
     <div v-if="showRespondent">
-      <div class="text-xs font-medium uppercase tracking-wide text-neutral-500">Respondent</div>
+      <div class="text-xs font-medium uppercase text-neutral-500">Respondent</div>
 
       <textarea
         v-model="respondentName"
@@ -246,7 +246,7 @@
 
     <!-- CONDITION -->
     <div>
-      <div class="text-xs font-medium uppercase tracking-wide text-neutral-500">Condition</div>
+      <div class="text-xs font-medium uppercase text-neutral-500">Condition</div>
 
       <div class="mt-1 text-lg font-semibold md:text-xl">
         {{ current.description }}
@@ -255,7 +255,7 @@
 
     <!-- QUESTIONS -->
     <div>
-      <div class="text-xs font-medium uppercase tracking-wide text-neutral-500">Questions</div>
+      <div class="text-xs font-medium uppercase text-neutral-500">Questions</div>
 
       <ul class="mt-2 space-y-1 text-base md:text-lg">
         <li v-for="q in questionsForCurrent" :key="q.id">• {{ q.text }}</li>
@@ -280,7 +280,7 @@
     >
       <!-- NOTES -->
       <div v-show="mobileTab === 'notes' || isDesktop" class="flex min-h-0 flex-col gap-2">
-        <div class="text-xs font-medium uppercase tracking-wide text-neutral-500">
+        <div class="text-xs font-medium uppercase text-neutral-500">
           Interview Notes
         </div>
 
@@ -292,12 +292,12 @@
           ]"
         />
 
-        <span v-if="savedDraft" class="text-xs text-green-600">Saved ✓</span>
+        <SavedStatus v-if="savedDraft" />
       </div>
 
       <!-- EVIDENCE -->
       <div v-show="mobileTab === 'evidence' || isDesktop" class="flex min-h-0 flex-col gap-2">
-        <div class="text-xs font-medium uppercase tracking-wide text-neutral-500">
+        <div class="text-xs font-medium uppercase text-neutral-500">
           Evidence Logged
         </div>
 
@@ -309,13 +309,13 @@
           ]"
         />
 
-        <span v-if="savedDraft" class="text-xs text-green-600">Saved ✓</span>
+        <SavedStatus v-if="savedDraft" />
       </div>
     </div>
 
     <!-- DECISION -->
     <div :class="isFullscreen ? 'mt-auto border-t pt-4' : 'border-t pt-6'">
-      <div class="text-xs font-medium uppercase tracking-wide text-neutral-500">Decision</div>
+      <div class="text-xs font-medium uppercase text-neutral-500">Decision</div>
 
       <div class="mt-3 flex flex-col gap-3 md:flex-row md:justify-between">
         <div class="flex gap-2">

@@ -1,7 +1,7 @@
 <template>
   <header class="pt-32 pb-20 px-6">
     <div class="max-w-3xl mx-auto text-center">
-      <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight text-slate-900">
+      <h1 class="text-5xl md:text-6xl font-extrabold mb-6 leading-tight text-slate-900">
         Stop Building Wrong Idea. <br />
         <span class="text-emerald-600">Start Validating.</span>
       </h1>

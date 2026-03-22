@@ -11,7 +11,7 @@ const mobileMenuOpen = ref(false)
       <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <NuxtLink to="/" class="flex items-center gap-2">
           <Target class="h-6 w-6 text-emerald-600" />
-          <span class="text-lg font-semibold tracking-tight text-slate-900">Idea Validator</span>
+          <span class="text-lg font-semibold text-slate-900">Idea Validator</span>
         </NuxtLink>
 
         <nav class="hidden items-center gap-6 text-sm font-medium text-slate-700 md:flex">

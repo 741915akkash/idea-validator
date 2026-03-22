@@ -198,21 +198,21 @@
           class="grid grid-cols-1 gap-4 rounded-lg border border-neutral-200 bg-gray-50 p-4 sm:grid-cols-2 lg:grid-cols-3"
         >
           <div class="flex flex-col">
-            <span class="text-xs uppercase tracking-wide text-neutral-500"> Total Interviews </span>
+            <span class="text-xs uppercase text-neutral-500"> Total Interviews </span>
             <span class="mt-1 text-xl font-semibold text-neutral-900">
               {{ interviewSummary.total }}
             </span>
           </div>
 
           <div class="flex flex-col sm:border-l sm:border-neutral-200 sm:pl-6">
-            <span class="text-xs uppercase tracking-wide text-neutral-500"> Completed </span>
+            <span class="text-xs uppercase text-neutral-500"> Completed </span>
             <span class="mt-1 text-xl font-semibold text-neutral-900">
               {{ interviewSummary.completed }}
             </span>
           </div>
 
           <div class="flex flex-col sm:border-l sm:border-neutral-200 sm:pl-6">
-            <span class="text-xs uppercase tracking-wide text-neutral-500"> In Progress </span>
+            <span class="text-xs uppercase text-neutral-500"> In Progress </span>
             <span class="mt-1 text-xl font-semibold text-neutral-900">
               {{ interviewSummary.inProgress }}
             </span>
@@ -224,7 +224,7 @@
       <div class="mb-6">
         <select
           v-model="selectedFilter"
-          class="w-full rounded border border-gray-300 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500 md:w-auto md:min-w-64 md:px-5 md:py-3 md:text-lg"
+          class="w-64 rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
         >
           <option value="all">All</option>
           <option value="in_progress">In Progress</option>

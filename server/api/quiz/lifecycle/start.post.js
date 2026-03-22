@@ -150,3 +150,4 @@ export default eventHandler(async (event) => {
     client.release()
   }
 })
+// postgresql://postgres.hanmufojbcpihqbzmdht:0fdwNSrKCBK011oP@aws-1-us-east-1.pooler.supabase.com:5432/postgres

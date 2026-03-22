@@ -6,7 +6,7 @@
       </h2>
       <div class="space-y-6">
         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-          <h3 class="mb-4 text-xs font-bold uppercase tracking-widest text-slate-400">
+          <h3 class="mb-4 text-xs font-bold uppercase text-slate-400">
             Standard AI Tools
           </h3>
           <ul class="space-y-3">
@@ -23,7 +23,7 @@
         <div
           class="rounded-2xl border-2 border-emerald-600 bg-white p-6 shadow-xl shadow-emerald-100"
         >
-          <h3 class="mb-4 text-xs font-bold uppercase tracking-widest text-emerald-600">
+          <h3 class="mb-4 text-xs font-bold uppercase text-emerald-600">
             Idea Validator
           </h3>
           <ul class="space-y-3">

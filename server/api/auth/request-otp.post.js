@@ -1,11 +1,13 @@
-import { createError, getRequestIP } from 'h3'
+import { createError } from 'h3'
 import { pool } from '../../db'
 import { generateOTP, hashOTP, isValidEmail, normalizeEmail, OTP_TTL_MIN } from '../../utils/auth'
 import { sendOtpEmail } from '../../services/email/sendOtpEmail'
 import { logAuthEvent } from '../../utils/authAudit'
+import { getClientIP } from '../../utils/clientIp'
 
 const RATE_LIMIT_MAX = 3
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000
+const OTP_COOLDOWN_MS = 30 * 1000
 const rateLimitBuckets = new Map()
 
 function checkRateLimit(email, ip) {
@@ -36,7 +38,29 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const ip = getRequestIP(event, { xForwardedFor: true }) || 'unknown'
+  const lastRequestRes = await pool.query(
+    `
+    SELECT created_at
+    FROM login_codes
+    WHERE email = $1
+    ORDER BY created_at DESC
+    LIMIT 1
+    `,
+    [email]
+  )
+
+  const lastRequestAt = lastRequestRes.rows[0]?.created_at
+  const elapsedMs = lastRequestAt ? Date.now() - new Date(lastRequestAt).getTime() : Infinity
+
+  if (elapsedMs < OTP_COOLDOWN_MS) {
+    logAuthEvent(event, 'request_otp_cooldown', { email, elapsedMs })
+    throw createError({
+      statusCode: 429,
+      statusMessage: 'Wait 30 seconds before requesting OTP again'
+    })
+  }
+
+  const ip = getClientIP(event) || 'unknown'
   const allowed = checkRateLimit(email, ip)
 
   if (!allowed) {

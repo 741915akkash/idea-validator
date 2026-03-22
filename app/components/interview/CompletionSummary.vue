@@ -135,7 +135,7 @@
       <h2 class="text-xl font-semibold text-neutral-900">Resolution Complete</h2>
 
       <div class="mt-5">
-        <div class="text-xs font-medium uppercase tracking-wide text-neutral-500">Respondent</div>
+        <div class="text-xs font-medium uppercase text-neutral-500">Respondent</div>
 
         <textarea
           v-model="respondentName"
@@ -143,7 +143,7 @@
           class="mt-2 w-full resize-none rounded-md border border-neutral-300 px-3 py-2 text-sm"
         />
 
-        <span v-if="respondentSaved" class="mt-1 inline-block text-xs text-green-600">Saved ✓</span>
+        <SavedStatus v-if="respondentSaved" class="mt-1" />
       </div>
     </div>
 

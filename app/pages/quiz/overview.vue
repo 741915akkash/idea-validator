@@ -120,6 +120,7 @@
       }
     })
 
+    quizStore.renameQuiz(currentQuiz.value.id, nameDraft.value)
     currentQuiz.value.name = nameDraft.value
     renaming.value = false
   }
@@ -192,7 +193,6 @@
             <button @click="renaming = false" class="text-sm text-gray-500">Cancel</button>
           </div>
         </div>
-
       </div>
 
       <!-- Deterministic Interview Section -->
@@ -203,7 +203,7 @@
         <div class="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <!-- Left Content -->
           <div class="flex-1">
-            <div class="text-xs font-medium uppercase tracking-wide text-neutral-500">
+            <div class="text-xs font-medium uppercase text-neutral-500">
               Deterministic Validation
             </div>
 
@@ -222,7 +222,6 @@
 
             <div v-else class="mt-4 text-sm text-neutral-600">No uncertainties resolved yet.</div>
           </div>
-
         </div>
       </section>
 

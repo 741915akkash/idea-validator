@@ -63,7 +63,7 @@
   <div class="space-y-3">
     <!-- Section header -->
     <div class="flex items-center justify-between">
-      <h3 class="text-s font-semibold uppercase tracking-wide" :class="toneClasses[tone].title">
+      <h3 class="text-s font-semibold uppercase" :class="toneClasses[tone].title">
         {{ title }}
       </h3>
 

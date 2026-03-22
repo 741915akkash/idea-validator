@@ -51,6 +51,6 @@
       class="box-border min-h-[270px] w-full resize-y rounded border border-2 border-gray-500 p-3 text-base focus:border-emerald-500 focus:outline-none focus:ring-0"
     />
 
-    <span v-if="saved" class="text-xs text-green-600">Saved ✓</span>
+    <SavedStatus v-if="saved" />
   </div>
 </template>

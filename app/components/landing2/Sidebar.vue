@@ -1,7 +1,14 @@
 <script setup>
   import { ref, onMounted, computed } from 'vue'
   import { useRoute } from 'vue-router'
-  import { Target, LayoutDashboard, Rocket, BookOpen, MessagesSquare, PanelLeftRightDashed, PanelLeftRightDashedIcon, Columns3 } from 'lucide-vue-next'
+  import {
+    Target,
+    LayoutDashboard,
+    Rocket,
+    BookOpen,
+    MessagesSquare,
+    Columns3
+  } from 'lucide-vue-next'
   import { useQuizSessionStore } from '~/stores/quizSession'
 
   const props = defineProps({
@@ -15,14 +22,14 @@
   const route = useRoute()
 
   const isClientReady = ref(false)
-  const quizzes = ref([])
+  const quizzes = computed(() => quizStore.quizzes)
 
   onMounted(async () => {
     quizStore.hydrate()
     isClientReady.value = true
 
     try {
-      quizzes.value = await $fetch('/api/quiz/quizzes')
+      await quizStore.loadQuizzes()
     } catch {
       quizzes.value = []
     }
@@ -50,6 +57,7 @@
     })
 
     quizStore.startFreshQuiz(res.quiz_id)
+    await quizStore.loadQuizzes()
     await quizStore.loadOverview(res.quiz_id)
 
     navigateTo('/quiz/overview')
@@ -65,35 +73,37 @@
 </script>
 
 <template>
-  <nav class="flex h-screen w-64 flex-col border-r border-slate-200 bg-white px-6 pt-10 pb-6">
+  <nav class="flex min-h-screen w-64 flex-col border-r border-slate-200 bg-white px-6 pb-6 pt-10">
     <!-- Logo -->
     <NuxtLink v-if="props.showBrand" to="/" class="flex items-center gap-2">
       <Target class="h-6 w-6 text-emerald-600 md:h-8 md:w-8" />
-      <span class="text-lg font-semibold tracking-tight text-slate-900 md:text-xl">
+      <span class="text-lg font-semibold text-slate-900 md:text-xl">
         Idea Validator
       </span>
     </NuxtLink>
 
-    <!-- QUIZ SELECTOR -->
-    <div v-if="isClientReady && quizzes.length" class="mt-6">
-      <label class="mb-2 block text-xs font-medium uppercase tracking-wide text-neutral-500">
-        Quiz
+    <!-- IDEA SELECTOR -->
+    <div v-if="isClientReady" class="mt-6">
+      <label class="mb-2 block text-xs font-medium uppercase text-neutral-500">
+        Idea
       </label>
 
       <select
-        class="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-        :value="quizStore.quizId"
+        class="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:bg-neutral-100"
+        :value="quizStore.quizId || ''"
+        :disabled="!quizzes.length"
         @change="switchQuiz($event.target.value)"
       >
+        <option v-if="!quizzes.length" value="" disabled>No ideas yet</option>
         <option v-for="q in quizzes" :key="q.id" :value="q.id">
-          {{ quizLabel(q) || 'Untitled quiz' }}
+          {{ quizLabel(q) || 'Untitled idea' }}
         </option>
       </select>
     </div>
 
     <!-- MAIN SECTION -->
     <div class="mt-8">
-      <div class="mb-2 text-xs uppercase tracking-wide text-neutral-500">Main</div>
+      <div class="mb-2 text-xs uppercase text-neutral-500">Main</div>
 
       <div class="flex flex-col gap-1 text-sm">
         <!-- Overview -->
@@ -111,7 +121,9 @@
         </NuxtLink>
 
         <NuxtLink
-          :to="quizStore.quizId ? `/quiz/interviews?quiz_id=${quizStore.quizId}` : '/quiz/interviews'"
+          :to="
+            quizStore.quizId ? `/quiz/interviews?quiz_id=${quizStore.quizId}` : '/quiz/interviews'
+          "
           class="flex items-center gap-2 rounded-lg px-3 py-2 transition"
           :class="
             isInterviews
@@ -149,7 +161,7 @@
 
     <!-- LEARN SECTION -->
     <div class="mt-6">
-      <div class="mb-2 text-xs uppercase tracking-wide text-neutral-500">Learn</div>
+      <div class="mb-2 text-xs uppercase text-neutral-500">Learn</div>
 
       <NuxtLink
         to="/how-it-works"

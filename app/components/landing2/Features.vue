@@ -4,7 +4,7 @@
       <h2 class="mb-4 text-center text-3xl font-extrabold text-slate-900">
         What Idea Validator Actually Does
       </h2>
-      <p class="mb-12 text-center text-sm font-medium uppercase tracking-widest text-slate-500">
+      <p class="mb-12 text-center text-sm font-medium uppercase text-slate-500">
         Not an Idea Checker. A Validation System.
       </p>
 

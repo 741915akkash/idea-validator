@@ -220,7 +220,7 @@
 
     <!-- SELECTED SUB UNCERTAINTY -->
     <div v-else-if="subUncertainty" class="rounded-lg border border-emerald-100 bg-emerald-50 p-5">
-      <div class="text-xs font-medium uppercase tracking-wide text-emerald-700">
+      <div class="text-xs font-medium uppercase text-emerald-700">
         Selected Sub-uncertainty
       </div>
 
@@ -238,7 +238,7 @@
       class="rounded-lg border p-5"
       :class="verdict.className"
     >
-      <div class="text-xs font-medium uppercase tracking-wide">Hypothesis Verdict</div>
+      <div class="text-xs font-medium uppercase">Hypothesis Verdict</div>
       <div class="mt-2 text-2xl font-semibold">{{ verdict.icon }} {{ verdict.title }}</div>
       <div class="mt-2 text-sm">
         {{ satisfiedConditions }} / {{ totalConditions }} conditions satisfied across
