@@ -9,7 +9,7 @@ if (import.meta.client) {
 
 <template>
   <div
-    class="tracking-[0.02em] [&_h1]:tracking-[0.03em] [&_h2]:tracking-[0.03em] [&_h3]:tracking-[0.03em]"
+    class="tracking-[0.02em] [&_h1]:tracking-[0.02em] [&_h2]:tracking-[0.02em] [&_h3]:tracking-[0.02em]"
   >
     <NuxtLayout>
       <NuxtPage />
