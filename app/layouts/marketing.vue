@@ -6,7 +6,7 @@ const mobileMenuOpen = ref(false)
 </script>
 
 <template>
-  <div class="min-h-screen bg-white">
+  <div class="min-h-screen bg-white font-sans">
     <header class="relative border-b border-slate-200">
       <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <NuxtLink to="/" class="flex items-center gap-2">
