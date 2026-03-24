@@ -7,6 +7,7 @@ import Comparison from '~/components/landing2/Comparison.vue'
 import Cost from '~/components/landing2/Cost.vue'
 import CTA from '~/components/landing2/CTA.vue'
 import Footer from '~/components/landing2/Footer.vue'
+import LightExplaination from '../components/landing2/LightExplaination.vue'
 
 definePageMeta({
   layout: 'marketing'
@@ -16,6 +17,7 @@ definePageMeta({
 <template>
   <div>
     <Hero />
+    <LightExplaination />
     <Problem />
     <Features />
     <Stages />

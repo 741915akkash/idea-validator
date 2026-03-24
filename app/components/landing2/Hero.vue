@@ -1,25 +1,30 @@
 <template>
-  <header class="pt-32 pb-20 px-6">
-    <div class="max-w-3xl mx-auto text-center">
-      <h1 class="text-5xl md:text-6xl font-extrabold mb-6 leading-tight text-slate-900">
-        Stop Building Wrong Idea. <br />
-        <span class="text-emerald-600">Start Validating.</span>
+  <header class="px-6 pb-24 pt-40">
+    <div class="mx-auto max-w-3xl text-center">
+      <!-- H1: primary keyword + intent -->
+      <h1 class="mb-6 text-5xl font-extrabold leading-tight text-slate-900 md:text-6xl">
+        Validate Your Idea
+        <span class="text-emerald-600">Before You Build</span>
       </h1>
-      <p class="text-xl text-slate-600 mb-10 leading-relaxed">
-        Turn your startup idea into a clear validation roadmap — and always know what to test next.
+
+      <!-- Subheadline: expands keywords + explains system -->
+      <p class="mx-auto mb-10 max-w-2xl text-xl leading-relaxed text-slate-600">
+        Break your idea into clear assumptions and validate them through real customer
+        conversations—so you know exactly what to build next.
       </p>
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-        <button class="w-full sm:w-auto bg-emerald-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-200">
-          Start Validating <ArrowRight class="w-5 h-5" />
+
+      <div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <button
+          class="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-8 py-4 text-lg font-bold text-white shadow-lg shadow-emerald-200 transition-all hover:bg-emerald-700 sm:w-auto"
+        >
+          Start Validating <ArrowRight class="h-5 w-5" />
         </button>
       </div>
-      <p class="mt-8 text-sm text-slate-500 font-medium">
-        Idea Validator is your structured thinking partner from idea to traction.
-      </p>
+      <p class="mt-6 text-sm text-slate-500">No guesswork. Just structured validation.</p>
     </div>
   </header>
 </template>
 
 <script setup>
-import { ArrowRight } from 'lucide-vue-next'
+  import { ArrowRight } from 'lucide-vue-next'
 </script>

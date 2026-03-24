@@ -1,4 +1,17 @@
 export default defineNuxtConfig({
+  app: {
+    head: {
+      title: 'GoLaunchCall – Validate Your Business Idea with Customer Interviews',
+      meta: [
+        {
+          name: 'description',
+          content:
+            'Break your business idea into clear assumptions, validate them with real people through fast customer interviews, and get confidence before you build.'
+        }
+      ]
+    }
+  },
+
   ssr: true,
   runtimeConfig: {
     public: {

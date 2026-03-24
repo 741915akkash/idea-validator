@@ -38,6 +38,9 @@
           </ul>
         </div>
       </div>
+      <p class="mt-8 text-center text-base font-semibold text-slate-900">
+        ChatGPT gives ideas. This helps you prove them.
+      </p>
       <p class="mt-12 text-center font-medium italic text-slate-500">
         "Why Not Just Read Books or Take Courses? Because knowledge isn't the bottleneck. Execution
         is."
@@ -50,14 +53,16 @@
   import { XCircle, CheckCircle2 } from 'lucide-vue-next'
 
   const standardAi = [
-    'Reacts to what you ask',
-    'Gives generic "good idea" feedback',
-    'No memory of your progress'
+    'Gives answers',
+    "Doesn't force validation",
+    'No structure across steps',
+    'No memory of decisions'
   ]
 
   const ideaValidator = [
-    "Proactively tells you what's missing",
-    'Forces you to confront risky assumptions',
-    'Builds a persistent roadmap of evidence'
+    'Forces you to test real assumptions',
+    'Builds a structured validation flow',
+    'Tracks decisions and learnings',
+    'Turns thinking into evidence'
   ]
 </script>

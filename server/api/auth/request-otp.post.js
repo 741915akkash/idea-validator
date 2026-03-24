@@ -104,6 +104,11 @@ export default defineEventHandler(async (event) => {
       `,
       [email, codeHash]
     )
+
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Unable to send verification code email. Check OTP email provider configuration.'
+    })
   }
 
   return { success: true }

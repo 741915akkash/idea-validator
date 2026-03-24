@@ -1,19 +1,23 @@
 <template>
-  <section class="py-20 bg-slate-50 px-6">
-    <div class="max-w-3xl mx-auto">
-      <h2 class="text-3xl font-extrabold mb-8 text-center text-slate-900">The Real Problem</h2>
-      <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
-        <p class="text-xl font-semibold mb-6 text-slate-800">
+  <section class="bg-slate-50 px-6 py-20">
+    <div class="mx-auto max-w-3xl">
+      <h2 class="mb-8 text-center text-3xl font-extrabold text-slate-900">The Real Problem</h2>
+      <div class="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <p class="mb-6 text-xl font-semibold text-slate-800">
           Founders Don't Fail From Lack of Effort. <br />
-          <span class="text-emerald-600 underline decoration-emerald-200 underline-offset-4">They fail because they validate the wrong things.</span>
+          <span class="text-red-600 underline decoration-red-200 underline-offset-4"
+            >They fail because they validate the wrong things.</span
+          >
         </p>
         <ul class="space-y-4">
           <li v-for="(item, i) in problems" :key="i" class="flex items-start gap-3">
-            <XCircle class="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+            <XCircle class="mt-0.5 h-5 w-5 shrink-0 text-rose-500" />
             <span>{{ item }}</span>
           </li>
         </ul>
-        <p class="mt-8 pt-8 border-t border-slate-100 text-slate-700 font-medium italic text-center">
+        <p
+          class="mt-8 border-t border-slate-100 pt-8 text-center font-medium italic text-slate-700"
+        >
           "Most first-time founders don't need more motivation. They need a clear way to think."
         </p>
       </div>
@@ -22,13 +26,13 @@
 </template>
 
 <script setup>
-import { XCircle } from 'lucide-vue-next'
+  import { XCircle } from 'lucide-vue-next'
 
-const problems = [
-  "They Build before confirming demand",
-  "They Add features without proof",
-  "They Chase feedback without structure",
-  "They Pivot without clarity",
-  "They Overthink instead of testing"
-]
+  const problems = [
+    'Build before confirming demand',
+    'Add features without proof',
+    'Chase feedback without structure',
+    'Pivot without clarity',
+    'Overthink instead of testing'
+  ]
 </script>

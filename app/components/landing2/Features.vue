@@ -32,11 +32,11 @@
   import { Target, Zap, BarChart3, ShieldCheck, Clock, TrendingUp } from 'lucide-vue-next'
 
   const features = [
-    { icon: Target, text: 'Breaks it into core assumptions' },
-    { icon: Zap, text: 'Identifies the most critical uncertainties' },
-    { icon: BarChart3, text: 'Ranks what must be validated first' },
-    { icon: ShieldCheck, text: 'Converts doubts into testable conditions' },
-    { icon: Clock, text: 'Tracks your validation progress over time' },
-    { icon: TrendingUp, text: 'Updates your confidence score as evidence grows' }
+    { icon: Target, text: 'Turn your idea into clear assumptions you can test' },
+    { icon: Zap, text: 'Know what could kill your idea before you build' },
+    { icon: BarChart3, text: 'Focus on the most important things to validate first' },
+    { icon: ShieldCheck, text: 'Turn doubts into simple questions you can ask users' },
+    { icon: Clock, text: "See what's working — based on real feedback" },
+    { icon: TrendingUp, text: 'Gain confidence as you collect real evidence' }
   ]
 </script>
