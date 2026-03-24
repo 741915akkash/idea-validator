@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
   app: {
     head: {
-      title: 'GoLaunchCall – Validate Your Business Idea with Customer Interviews',
+      title: 'GoLaunchScall – Validate Your Business Idea with Customer Interviews',
       meta: [
         {
           name: 'description',
