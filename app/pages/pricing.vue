@@ -46,6 +46,17 @@
     }
   ]
 
+  const features = [
+    { name: 'Active Ideas', free: '1', growth: '5', isBold: true },
+    { name: 'Interviews / month', free: '20', growth: '50', isBold: true },
+    { name: 'AI Sentiment Analysis', free: 'Basic', growth: 'Advanced', isBold: true },
+    { name: 'Progress Tracking', free: 'minus', growth: 'check' },
+    { name: 'Team Collaboration', free: 'minus', growth: 'minus' },
+    { name: 'CRM', free: 'minus', growth: 'check', badge: 'Coming Soon' },
+    { name: 'Social Media Leads Finder', free: 'minus', growth: 'check', badge: 'Coming Soon' },
+    { name: 'Market Research', free: 'minus', growth: 'check', badge: 'Coming Soon' }
+  ]
+
   const openFaq = ref(0)
 
   function toggleFaq(index) {
@@ -222,13 +233,16 @@
     </div>
 
     <!-- COMPARISON TABLE -->
-    <div class="mt-32 hidden lg:block">
+    <div class="mt-32">
       <div class="mb-12 text-center">
-        <h2 class="text-3xl font-bold text-slate-900">Compare features</h2>
-        <p class="mt-4 text-slate-600">A detailed breakdown of everything included in each plan.</p>
+        <h2 class="text-3xl font-bold text-slate-900 sm:text-4xl">Compare features</h2>
+        <p class="mt-4 text-lg text-slate-600">
+          A detailed breakdown of everything included in each plan.
+        </p>
       </div>
-      <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-        <table class="w-full table-fixed border-collapse text-left">
+
+      <div class="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <table class="w-full min-w-[600px] table-fixed border-collapse text-left">
           <colgroup>
             <col class="w-1/2" />
             <col class="w-1/4" />
@@ -236,88 +250,47 @@
           </colgroup>
           <thead>
             <tr class="bg-slate-50">
-              <th class="px-16 py-4 text-sm font-semibold text-slate-900">Feature</th>
+              <th class="px-8 py-4 text-sm font-semibold text-slate-900 sm:px-16">Feature</th>
               <th class="px-6 py-4 text-center text-sm font-semibold text-slate-900">Free</th>
               <th class="px-6 py-4 text-center text-sm font-semibold text-slate-900">Growth</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
-            <tr>
-              <td class="px-16 py-4 text-sm text-slate-600">Active Ideas</td>
-              <td class="px-6 py-4 text-center text-sm text-slate-900">1</td>
-              <td class="px-6 py-4 text-center text-sm font-bold text-slate-900">5</td>
-            </tr>
-            <tr>
-              <td class="px-16 py-4 text-sm text-slate-600">Interviews / month</td>
-              <td class="px-6 py-4 text-center text-sm text-slate-900">20</td>
-              <td class="px-6 py-4 text-center text-sm font-bold text-slate-900">50</td>
-            </tr>
-            <tr>
-              <td class="px-16 py-4 text-sm text-slate-600">AI Sentiment Analysis</td>
-              <td class="px-6 py-4 text-center text-sm text-slate-900">Basic</td>
-              <td class="px-6 py-4 text-center text-sm font-bold text-slate-900">Advanced</td>
-            </tr>
-            <tr>
-              <td class="px-16 py-4 text-sm text-slate-600">Progress Tracking</td>
-              <td class="px-6 py-4 text-center">
-                <Minus class="mx-auto h-4 w-4 text-slate-300" />
-              </td>
-              <td class="px-6 py-4 text-center">
-                <Check class="mx-auto h-5 w-5 text-emerald-600" />
-              </td>
-            </tr>
-            <tr>
-              <td class="px-16 py-4 text-sm text-slate-600">Team Collaboration</td>
-              <td class="px-6 py-4 text-center">
-                <Minus class="mx-auto h-4 w-4 text-slate-300" />
-              </td>
-              <td class="px-6 py-4 text-center">
-                <Minus class="mx-auto h-4 w-4 text-slate-300" />
-              </td>
-            </tr>
-            <tr>
-              <td class="px-16 py-4 text-sm text-slate-600">
-                CRM
+            <tr v-for="f in features" :key="f.name">
+              <td class="px-8 py-4 text-sm text-slate-600 sm:px-16">
+                {{ f.name }}
                 <span
-                  class="ml-2 inline-flex items-center rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold uppercase text-emerald-700 ring-1 ring-inset ring-emerald-600/20"
-                  >Coming Soon</span
+                  v-if="f.badge"
+                  class="ml-2 inline-flex items-center whitespace-nowrap rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold uppercase text-emerald-700 ring-1 ring-inset ring-emerald-600/20"
                 >
+                  {{ f.badge }}
+                </span>
               </td>
               <td class="px-6 py-4 text-center">
-                <Minus class="mx-auto h-4 w-4 text-slate-300" />
+                <template v-if="f.free === 'check'">
+                  <Check class="mx-auto h-5 w-5 text-emerald-600" />
+                </template>
+                <template v-else-if="f.free === 'minus'">
+                  <Minus class="mx-auto h-4 w-4 text-slate-300" />
+                </template>
+                <span v-else class="text-sm text-slate-600" :class="{ 'font-bold': f.isBold }">{{
+                  f.free
+                }}</span>
               </td>
               <td class="px-6 py-4 text-center">
-                <Check class="mx-auto h-5 w-5 text-emerald-600" />
-              </td>
-            </tr>
-            <tr>
-              <td class="px-16 py-4 text-sm text-slate-600">
-                Social Media Leads Finder
+                <template v-if="f.growth === 'check'">
+                  <Check class="mx-auto h-5 w-5 text-emerald-600" />
+                </template>
+                <template v-else-if="f.growth === 'minus'">
+                  <Minus class="mx-auto h-4 w-4 text-slate-300" />
+                </template>
                 <span
-                  class="ml-2 inline-flex items-center rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold uppercase text-emerald-700 ring-1 ring-inset ring-emerald-600/20"
-                  >Coming Soon</span
+                  v-else
+                  class="text-sm text-slate-900"
+                  :class="{ 'font-bold': f.isBold }"
                 >
-              </td>
-              <td class="px-6 py-4 text-center">
-                <Minus class="mx-auto h-4 w-4 text-slate-300" />
-              </td>
-              <td class="px-6 py-4 text-center">
-                <Check class="mx-auto h-5 w-5 text-emerald-600" />
-              </td>
-            </tr>
-            <tr>
-              <td class="px-16 py-4 text-sm text-slate-600">
-                Market Research
-                <span
-                  class="ml-2 inline-flex items-center rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold uppercase text-emerald-700 ring-1 ring-inset ring-emerald-600/20"
-                  >Coming Soon</span
-                >
-              </td>
-              <td class="px-6 py-4 text-center">
-                <Minus class="mx-auto h-4 w-4 text-slate-300" />
-              </td>
-              <td class="px-6 py-4 text-center">
-                <Check class="mx-auto h-5 w-5 text-emerald-600" />
+                  {{ f.growth }}
+                </span>
               </td>
             </tr>
           </tbody>
