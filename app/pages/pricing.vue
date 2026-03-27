@@ -72,7 +72,7 @@
       <h1 class="mt-2 text-4xl font-bold text-slate-900 sm:text-5xl">
         Simple, transparent pricing
       </h1>
-      <p class="mt-6 text-lg leading-8 text-slate-600">
+      <p class="mt-6 text-lg leading-8 text-slate-700">
         Choose the plan that's right for your stage. Whether you're just starting or scaling
         multiple ideas, we've got you covered.
       </p>
@@ -108,16 +108,16 @@
       >
         <div>
           <div class="flex items-center justify-between gap-x-4">
-            <h2 class="text-lg font-semibold leading-8 text-slate-900">Free</h2>
+            <h2 class="text-xl font-bold leading-8 tracking-tight text-slate-900">Free</h2>
           </div>
-          <p class="mt-4 text-sm leading-6 text-slate-600">
+          <p class="mt-4 text-sm leading-6 text-slate-700">
             Perfect for testing the waters and learning the framework.
           </p>
           <p class="mt-6 flex items-baseline gap-x-1">
             <span class="text-4xl font-bold text-slate-900">$0</span>
-            <span class="text-sm font-semibold leading-6 text-slate-400">/forever</span>
+            <span class="text-sm font-semibold leading-6 text-slate-500">/forever</span>
           </p>
-          <ul role="list" class="mt-8 space-y-3 text-sm leading-6 text-slate-600">
+          <ul role="list" class="mt-8 space-y-3 text-sm leading-6 text-slate-700">
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-600" aria-hidden="true" />
               1 active idea validation
@@ -155,22 +155,22 @@
         </div>
         <div>
           <div class="flex items-center justify-between gap-x-4">
-            <h2 class="text-lg font-semibold leading-8 text-slate-900">Growth</h2>
+            <h2 class="text-xl font-bold leading-8 tracking-tight text-slate-900">Growth</h2>
           </div>
-          <p class="mt-4 text-sm leading-6 text-slate-600">
+          <p class="mt-4 text-sm leading-6 text-slate-700">
             For serious builders who want to move fast and avoid failure.
           </p>
           <p class="mt-6 flex items-baseline gap-x-1">
             <span class="text-4xl font-bold text-slate-900"
               >${{ current.price }}</span
             >
-            <span class="text-sm font-semibold leading-6 text-slate-400"
+            <span class="text-sm font-semibold leading-6 text-slate-500"
               >/{{ billing === 'monthly' ? 'mo' : billing }}</span
             >
           </p>
-          <p class="mt-1 text-xs text-slate-400">Equivalent to ${{ perMonth }}/month</p>
+          <p class="mt-1 text-xs text-slate-600">Equivalent to ${{ perMonth }}/month</p>
 
-          <ul role="list" class="mt-8 space-y-3 text-sm leading-6 text-slate-600">
+          <ul role="list" class="mt-8 space-y-3 text-sm leading-6 text-slate-700">
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-600" aria-hidden="true" />
               5 active idea validations
@@ -191,7 +191,7 @@
               <Check class="h-6 w-5 flex-none text-emerald-600" aria-hidden="true" />
               Priority email support
             </li>
-            <li class="flex items-center gap-x-3 text-slate-400">
+            <li class="flex items-center gap-x-3 text-slate-600">
               <Check class="h-6 w-5 flex-none text-slate-300" aria-hidden="true" />
               <span class="flex items-center gap-x-2">
                 CRM
@@ -201,7 +201,7 @@
                 >
               </span>
             </li>
-            <li class="flex items-center gap-x-3 text-slate-400">
+            <li class="flex items-center gap-x-3 text-slate-600">
               <Check class="h-6 w-5 flex-none text-slate-300" aria-hidden="true" />
               <span class="flex items-center gap-x-2">
                 Social Media Leads Finder
@@ -211,7 +211,7 @@
                 >
               </span>
             </li>
-            <li class="flex items-center gap-x-3 text-slate-400">
+            <li class="flex items-center gap-x-3 text-slate-600">
               <Check class="h-6 w-5 flex-none text-slate-300" aria-hidden="true" />
               <span class="flex items-center gap-x-2">
                 Market Research
@@ -235,8 +235,10 @@
     <!-- COMPARISON TABLE -->
     <div class="mt-32">
       <div class="mb-12 text-center">
-        <h2 class="text-3xl font-bold text-slate-900 sm:text-4xl">Compare features</h2>
-        <p class="mt-4 text-lg text-slate-600">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+          Compare features
+        </h2>
+        <p class="mt-4 text-lg text-slate-700">
           A detailed breakdown of everything included in each plan.
         </p>
       </div>
@@ -250,14 +252,20 @@
           </colgroup>
           <thead>
             <tr class="bg-slate-50">
-              <th class="px-8 py-4 text-sm font-semibold text-slate-900 sm:px-16">Feature</th>
-              <th class="px-6 py-4 text-center text-sm font-semibold text-slate-900">Free</th>
-              <th class="px-6 py-4 text-center text-sm font-semibold text-slate-900">Growth</th>
+              <th class="px-8 py-4 text-base font-bold tracking-tight text-slate-900 sm:px-16">
+                Feature
+              </th>
+              <th class="px-6 py-4 text-center text-base font-bold tracking-tight text-slate-900">
+                Free
+              </th>
+              <th class="px-6 py-4 text-center text-base font-bold tracking-tight text-slate-900">
+                Growth
+              </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
             <tr v-for="f in features" :key="f.name">
-              <td class="px-8 py-4 text-sm text-slate-600 sm:px-16">
+              <td class="px-8 py-4 text-sm text-slate-700 sm:px-16">
                 {{ f.name }}
                 <span
                   v-if="f.badge"
@@ -266,18 +274,22 @@
                   {{ f.badge }}
                 </span>
               </td>
-              <td class="px-6 py-4 text-center">
+              <td class="px-6 py-4 text-center align-middle">
                 <template v-if="f.free === 'check'">
                   <Check class="mx-auto h-5 w-5 text-emerald-600" />
                 </template>
                 <template v-else-if="f.free === 'minus'">
                   <Minus class="mx-auto h-4 w-4 text-slate-300" />
                 </template>
-                <span v-else class="text-sm text-slate-600" :class="{ 'font-bold': f.isBold }">{{
+                <span
+                  v-else
+                  class="text-sm font-medium leading-6 text-slate-800"
+                  :class="{ 'font-bold': f.isBold }"
+                >{{
                   f.free
                 }}</span>
               </td>
-              <td class="px-6 py-4 text-center">
+              <td class="px-6 py-4 text-center align-middle">
                 <template v-if="f.growth === 'check'">
                   <Check class="mx-auto h-5 w-5 text-emerald-600" />
                 </template>
@@ -286,7 +298,7 @@
                 </template>
                 <span
                   v-else
-                  class="text-sm text-slate-900"
+                  class="text-sm font-medium leading-6 text-slate-900"
                   :class="{ 'font-bold': f.isBold }"
                 >
                   {{ f.growth }}
@@ -300,7 +312,7 @@
 
     <!-- FAQ -->
     <div class="mx-auto mt-32 max-w-3xl">
-      <h2 class="mb-12 text-center text-2xl font-bold text-slate-900">
+      <h2 class="mb-12 text-center text-3xl font-extrabold tracking-tight text-slate-900">
         Pricing FAQ
       </h2>
       <div class="space-y-4">
@@ -313,11 +325,13 @@
             @click="toggleFaq(index)"
             class="flex w-full items-center justify-between p-6 text-left"
           >
-            <span class="font-semibold text-slate-900">{{ faq.question }}</span>
+            <span class="text-lg font-bold leading-7 text-slate-600">{{
+              faq.question
+            }}</span>
             <ChevronDown v-if="openFaq !== index" class="h-5 w-5 text-slate-400" />
             <ChevronUp v-else class="h-5 w-5 text-slate-900" />
           </button>
-          <div v-if="openFaq === index" class="px-6 pb-6 text-sm leading-relaxed text-slate-600">
+          <div v-if="openFaq === index" class="px-6 pb-6 text-sm leading-relaxed text-slate-700">
             {{ faq.answer }}
           </div>
         </div>
