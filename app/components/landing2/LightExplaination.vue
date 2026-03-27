@@ -12,7 +12,7 @@
     { id: 4, name: 'Key uncertainties', example: 'Uncertainty: Are they already using alternatives?' },
     { id: 5, name: 'Testable questions', example: 'Testable question: "Would you pay ₹500/month?" -> Yes / No' },
     { id: 6, name: 'Real user interviews', example: 'Interviews: Talked to 10 users' },
-    { id: 7, name: 'Learnings & decision', example: 'Learnings: 7 said no. Decision: Pivot pricing & positioning' }
+    { id: 7, name: 'Learnings & decision', example: 'Learnings: 7 said no.' }
   ]
 </script>
 
@@ -56,7 +56,7 @@
 
             <!-- Right Side: Example -->
             <div
-              class="relative flex flex-col items-center justify-center border-l-0 border-slate-100 py-1 text-center text-sm leading-relaxed text-slate-600 sm:items-start sm:border-l sm:border-emerald-100/50 sm:py-3 sm:pl-6 sm:text-left sm:text-base"
+              class="relative flex flex-col items-center justify-center border-l-0 border-slate-100 py-1 text-center text-sm leading-relaxed text-slate-900 sm:items-start sm:border-l sm:border-emerald-100/50 sm:py-3 sm:pl-6 sm:text-left sm:text-base"
             >
               <!-- Connection Dot (Desktop) -->
               <div
@@ -103,6 +103,18 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="mt-10 text-center">
+      <p class="text-sm font-medium text-slate-700">
+        Want to see exactly how this works step-by-step?
+      </p>
+      <NuxtLink
+        to="/how-it-works"
+        class="mt-3 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-base font-semibold leading-6 text-white shadow-sm transition-all hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
+      >
+        View full system <ArrowRight class="h-5 w-5" />
+      </NuxtLink>
     </div>
   </section>
 </template>

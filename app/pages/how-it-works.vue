@@ -1,540 +1,724 @@
 <script setup>
-  import { ref, computed, reactive, onMounted, onUnmounted, markRaw } from 'vue'
-  import { useSwipe } from '@vueuse/core'
   import {
+    Hash,
     ArrowRight,
-    Play,
-    Pause,
-    ClipboardList,
-    Star,
-    AlertTriangle,
-    Users,
-    Brain,
-    RefreshCcw
+    Terminal,
+    BookOpen,
+    ShieldCheck,
+    AlertCircle,
+    CheckCircle2,
+    MessageSquare,
+    BarChart3,
+    Lightbulb,
+    XCircle,
+    Briefcase,
+    ShoppingBag,
+    Truck,
+    HeartPulse,
+    Layers
   } from 'lucide-vue-next'
 
   definePageMeta({
     layout: 'marketing'
   })
 
-  const steps = [
-    {
-      id: 1,
-      title: 'Define',
-      tooltip: 'Turn your idea into testable bets',
-      description:
-        'Break your idea into what must be true — problem, customer, and willingness to pay.',
-      icon: markRaw(ClipboardList)
-    },
-    {
-      id: 2,
-      title: 'Score',
-      tooltip: 'See how strong your idea is',
-      description:
-        'Answer a quick quiz and get a validation score based on real signals — not opinions.',
-      icon: markRaw(Star)
-    },
-    {
-      id: 3,
-      title: 'Expose',
-      tooltip: 'Expose what could fail',
-      description: 'We surface the exact uncertainties in your idea so you know what to test next.',
-      icon: markRaw(AlertTriangle)
-    },
-    {
-      id: 4,
-      title: 'Talk',
-      tooltip: 'Get real answers',
-      description: 'Ask the right questions and collect real feedback — no bias, no guessing.',
-      icon: markRaw(Users)
-    },
-    {
-      id: 5,
-      title: 'Learn',
-      tooltip: 'Turn data into insight',
-      description:
-        'AI summarizes conversations so you quickly see patterns, objections, and demand.',
-      icon: markRaw(Brain)
-    },
-    {
-      id: 6,
-      title: 'Refine',
-      tooltip: 'Improve with confidence',
-      description: 'Update your idea based on real data — or pivot before you waste months.',
-      icon: markRaw(RefreshCcw)
-    }
+  // Navigation for the sticky sidebar
+  const stepsNav = [
+    { title: 'The Reality Check', anchor: 'reality-check', icon: AlertCircle },
+    { title: 'System Overview', anchor: 'overview', icon: Layers },
+    { title: 'How it Works', anchor: 'mechanic', icon: Terminal },
+    { title: 'Step 1: Define', anchor: 'step-1', icon: Lightbulb },
+    { title: 'Step 2: Score', anchor: 'step-2', icon: ShieldCheck },
+    { title: 'Step 3: Expose', anchor: 'step-3', icon: Hash },
+    { title: 'Step 4: Talk', anchor: 'step-4', icon: MessageSquare },
+    { title: 'Step 5: Learn', anchor: 'step-5', icon: BarChart3 },
+    { title: 'Step 6: Refine', anchor: 'step-6', icon: CheckCircle2 },
+    { title: 'Industry Scenarios', anchor: 'example', icon: BookOpen }
   ]
 
-  const activeStep = ref(1)
-  const isPlaying = ref(true)
-  const stepProgress = ref(0) // 0 to 1
-  const transitionName = ref('slide-right')
-  const mobileCardRef = ref(null)
-  let progressRaf = null
-  let startTime = null
+  // Common failure reasons for the analysis section
+  const failureReasons = [
+    { t: 'Wrong focus', d: 'Validating features instead of the core problem.' },
+    { t: 'Biased questions', d: 'Asking "Would you use this?" instead of looking for behavior.' },
+    { t: 'Opinions over data', d: 'Listening to friends instead of target users.' },
+    { t: 'No tracking', d: 'Insights lost in scattered notes.' }
+  ]
 
-  // SWIPE LOGIC
-  useSwipe(mobileCardRef, {
-    onSwipeEnd(e, direction) {
-      if (direction === 'left') nextStep()
-      if (direction === 'right') prevStep()
+  const stepDescriptions = [
+    'Turn your idea into something specific and testable. If your idea is vague, your validation will be useless.',
+    "Know exactly where you're guessing. Low confidence = high risk. Score your idea across problem, audience, and pricing.",
+    'Convert your idea into assumptions, uncertainties, and testable questions. Find the "leap of faith" assumptions.',
+    'Ask clear, neutral, decision-focused questions. Avoid "Would you use this?" and focus on "What do you do today?"',
+    'Spot patterns, avoid confirmation bias, and identify strong vs weak signals. Look for "surprising" answers.',
+    "Proceed, pivot, change pricing, or drop the idea — based on evidence. Don't fall in love with your solution."
+  ]
+
+  const stepOutcomes = [
+    'Clear direction',
+    'Identify risks',
+    'Find blind spots',
+    'Real signals',
+    'Insights',
+    'Confident action'
+  ]
+
+  const stepOutcomeKinds = ['risk', 'risk', 'signal', 'signal', 'decision', 'decision']
+
+  const stepChecklists = [
+    ['Target users', 'Problem clarity', 'Single use-case'],
+    ['Problem Severity', 'Audience Access', 'Pricing Willingness']
+  ]
+
+  const stepQaBlocks = [
+    [
+      { q: 'What is the leap-of-faith assumption?', a: 'Users care enough to switch behavior.' },
+      { q: 'What must be tested first?', a: 'The highest-uncertainty assumption.' }
+    ],
+    [
+      { q: 'What should you ask?', a: 'Neutral, behavior-based questions.' },
+      { q: 'What should you avoid?', a: 'Leading questions and opinion fishing.' }
+    ]
+  ]
+
+  const stepSignalBadges = [
+    [
+      { label: 'Pattern Matching', score: 'High' },
+      { label: 'Bias Detection', score: 'Medium' },
+      { label: 'Signal Strength', score: 'High' }
+    ],
+    [
+      { label: 'Evidence Review', score: 'High' },
+      { label: 'Pivot Strategy', score: 'Medium' },
+      { label: 'Next Milestone', score: 'High' }
+    ]
+  ]
+
+  // Hyper-realistic case studies for SEO and scannability
+  const caseStudies = {
+    saas: {
+      name: 'B2B SaaS: LegalCompliance AI',
+      description: 'Automated compliance audits for small law firms.',
+      icon: Briefcase,
+      steps: [
+        {
+          step: '01',
+          process: 'Define',
+          detail:
+            'The Idea: A tool that scans case files for GDPR/HIPAA compliance errors. Target: Solo practitioners and firms with < 5 lawyers.'
+        },
+        {
+          step: '02',
+          process: 'Score',
+          detail:
+            'Confidence: 3/10. Risks: Do they know they are non-compliant? Is the liability high enough to pay for a tool?'
+        },
+        {
+          step: '03',
+          process: 'Expose',
+          detail:
+            'Assumption: Firms fear fines. Testable Question: "When was your last audit, and what did it cost in billable hours?"'
+        },
+        {
+          step: '04',
+          process: 'Talk',
+          detail:
+            "Signal: They aren't afraid of fines; they are afraid of losing malpractice insurance or failing a client audit."
+        },
+        {
+          step: '05',
+          process: 'Learn',
+          detail:
+            'Insight: Value is "insurance readiness." 7/10 would pay if it guaranteed a lower malpractice premium.'
+        },
+        {
+          step: '06',
+          process: 'Refine',
+          detail:
+            'Decision: Pivot to "Insurance-Ready Audit Tool." Partner with malpractice insurers for distribution.'
+        }
+      ]
+    },
+    ecommerce: {
+      name: 'D2C: EcoClean Kits',
+      description: 'Subscription-based plastic-free cleaning concentrates.',
+      icon: ShoppingBag,
+      steps: [
+        {
+          step: '01',
+          process: 'Define',
+          detail:
+            'The Idea: Glass spray bottles + dissolvable tablets. Target: Urban millennials prioritizing zero-waste living.'
+        },
+        {
+          step: '02',
+          process: 'Score',
+          detail:
+            'Confidence: 6/10. Risks: Is cleaning power good? Will they refill? Is ₹800/mo too high?'
+        },
+        {
+          step: '03',
+          process: 'Expose',
+          detail:
+            'Assumption: Users hate plastic. Testable Question: "Which bottle would you replace first if a plastic-free version existed?"'
+        },
+        {
+          step: '04',
+          process: 'Talk',
+          detail:
+            'Signal: They hate the clutter of 10 bottles more than the plastic. They want one "universal" cleaner.'
+        },
+        {
+          step: '05',
+          process: 'Learn',
+          detail:
+            'Insight: Convenience > Eco-friendliness. Switch if it saves space under the sink.'
+        },
+        {
+          step: '06',
+          process: 'Refine',
+          detail:
+            'Decision: Rebrand as "The Minimalist Cleaning System." Focus on "One Bottle, Infinite Refills."'
+        }
+      ]
+    },
+    service: {
+      name: 'Local Service: LuxeDetail',
+      description: 'On-demand mobile car detailing for luxury vehicles.',
+      icon: Truck,
+      steps: [
+        {
+          step: '01',
+          process: 'Define',
+          detail:
+            'The Idea: App-based detailing at your office. Target: Executives in tech hubs driving cars worth ₹50L+.'
+        },
+        {
+          step: '02',
+          process: 'Score',
+          detail:
+            'Confidence: 5/10. Risks: Will security allow it? Do owners trust mobile units with expensive paint?'
+        },
+        {
+          step: '03',
+          process: 'Expose',
+          detail:
+            'Assumption: They are too busy. Testable Question: "How do you currently clean your car, and what is the biggest friction?"'
+        },
+        {
+          step: '04',
+          process: 'Talk',
+          detail:
+            'Signal: They hate the waiting room experience and worry about "swirl marks" from cheap cleaners.'
+        },
+        {
+          step: '05',
+          process: 'Learn',
+          detail:
+            'Insight: Trust > Convenience. They want "expert" care, asking about specific chemicals and tools.'
+        },
+        {
+          step: '06',
+          process: 'Refine',
+          detail:
+            'Decision: Pivot to "Certified Paint Correction Specialists." Focus on "Museum-Quality Care at Your Door."'
+        }
+      ]
+    },
+    health: {
+      name: 'HealthTech: SleepSync',
+      description: 'AI-powered circadian rhythm optimization for night-shift workers.',
+      icon: HeartPulse,
+      steps: [
+        {
+          step: '01',
+          process: 'Define',
+          detail:
+            'The Idea: Wearable integration for shift schedule optimization. Target: Nurses, pilots, and security personnel.'
+        },
+        {
+          step: '02',
+          process: 'Score',
+          detail:
+            'Confidence: 4/10. Risks: Will they follow strict schedules? Can AI improve shift-lag better than caffeine?'
+        },
+        {
+          step: '03',
+          process: 'Expose',
+          detail:
+            'Assumption: Workers want health optimization. Testable Question: "What would you sacrifice 30 mins of sleep for?"'
+        },
+        {
+          step: '04',
+          process: 'Talk',
+          detail:
+            'Signal: They care about "not feeling like a zombie" when they get home to their kids, not "optimization."'
+        },
+        {
+          step: '05',
+          process: 'Learn',
+          detail:
+            'Insight: Pain point is "family presence." Pay for anything that helps them stay awake for dinner.'
+        },
+        {
+          step: '06',
+          process: 'Refine',
+          detail:
+            'Decision: Pivot to "Family-First Recovery." Focus on the "Transition Hour" between work and home.'
+        }
+      ]
     }
-  })
-
-  function updateProgress(timestamp) {
-    if (!startTime) startTime = timestamp
-    const elapsed = timestamp - startTime
-    const duration = 4000 // 4 seconds
-
-    stepProgress.value = Math.min(elapsed / duration, 1)
-
-    if (elapsed >= duration) {
-      startTime = timestamp
-      nextStep(false)
-      progressRaf = requestAnimationFrame(updateProgress)
-    } else {
-      progressRaf = requestAnimationFrame(updateProgress)
-    }
-  }
-
-  function startRotation() {
-    if (progressRaf) return
-    startTime = null
-    progressRaf = requestAnimationFrame(updateProgress)
-  }
-
-  function stopRotation() {
-    if (progressRaf) {
-      cancelAnimationFrame(progressRaf)
-      progressRaf = null
-    }
-    stepProgress.value = 0
-  }
-
-  function togglePlay() {
-    isPlaying.value = !isPlaying.value
-    if (isPlaying.value) {
-      startRotation()
-    } else {
-      stopRotation()
-    }
-  }
-
-  function handleStepClick(id, isManual = true) {
-    transitionName.value = id > activeStep.value ? 'slide-right' : 'slide-left'
-    activeStep.value = id
-
-    // Reset progress
-    startTime = performance.now()
-    stepProgress.value = 0
-
-    // Stop auto-play ONLY on manual interaction
-    if (isManual && isPlaying.value) {
-      isPlaying.value = false
-      stopRotation()
-    }
-  }
-
-  function nextStep(isManual = true) {
-    if (activeStep.value < steps.length) {
-      handleStepClick(activeStep.value + 1, isManual)
-    } else {
-      if (isManual) {
-        navigateTo('/recommendation')
-      } else {
-        // Loop back to start on autoplay
-        handleStepClick(1, false)
-      }
-    }
-  }
-
-  function prevStep(isManual = true) {
-    if (activeStep.value > 1) {
-      handleStepClick(activeStep.value - 1, isManual)
-    }
-  }
-
-  onMounted(() => {
-    startRotation()
-  })
-
-  onUnmounted(() => {
-    stopRotation()
-  })
-
-  const currentStep = computed(() => steps.find((s) => s.id === activeStep.value) || steps[0])
-  const ringRadius = 46
-  const ringCircumference = 2 * Math.PI * ringRadius
-  const totalSteps = computed(() => steps.length)
-  const overallProgress = computed(() => {
-    const base = (activeStep.value - 1) / totalSteps.value
-    const segment = stepProgress.value / totalSteps.value
-    return Math.min(base + segment, 1)
-  })
-  const ringDashOffset = computed(() => ringCircumference * (1 - overallProgress.value))
-
-  const tooltip = reactive({
-    x: 0,
-    y: 0,
-    visible: false,
-    text: ''
-  })
-
-  const cx = 150
-  const cy = 150
-  const outerR = 130
-  const innerR = 95
-  const arrowDepth = 18
-  const gap = 6
-
-  function polar(cx, cy, r, angle) {
-    const rad = ((angle - 90) * Math.PI) / 180
-    return {
-      x: cx + r * Math.cos(rad),
-      y: cy + r * Math.sin(rad)
-    }
-  }
-
-  function createArrow(i, total) {
-    const slice = 360 / total
-    const headSize = 12 // degrees for the arrow head
-
-    const startAngle = i * slice + gap
-    const endAngle = (i + 1) * slice - gap
-
-    const centerR = (outerR + innerR) / 2
-    const bodyThickness = (outerR - innerR) * 0.7
-    const headThickness = (outerR - innerR) * 1.1
-
-    const bOuterR = centerR + bodyThickness / 2
-    const bInnerR = centerR - bodyThickness / 2
-    const hOuterR = centerR + headThickness / 2
-    const hInnerR = centerR - headThickness / 2
-
-    const headBaseAngle = endAngle - headSize
-
-    // Points
-    const p1 = polar(cx, cy, bOuterR, startAngle) // tail outer
-    const p2 = polar(cx, cy, bOuterR, headBaseAngle) // body-head junction outer
-    const p3 = polar(cx, cy, hOuterR, headBaseAngle) // head base outer
-    const p4 = polar(cx, cy, centerR, endAngle) // tip
-    const p5 = polar(cx, cy, hInnerR, headBaseAngle) // head base inner
-    const p6 = polar(cx, cy, bInnerR, headBaseAngle) // body-head junction inner
-    const p7 = polar(cx, cy, bInnerR, startAngle) // tail inner
-
-    const largeArc = headBaseAngle - startAngle > 180 ? 1 : 0
-
-    return `
-      M ${p1.x} ${p1.y}
-      A ${bOuterR} ${bOuterR} 0 ${largeArc} 1 ${p2.x} ${p2.y}
-      L ${p3.x} ${p3.y}
-      L ${p4.x} ${p4.y}
-      L ${p5.x} ${p5.y}
-      L ${p6.x} ${p6.y}
-      A ${bInnerR} ${bInnerR} 0 ${largeArc} 0 ${p7.x} ${p7.y}
-      Z
-    `
-  }
-
-  function showTooltip(e, text) {
-    tooltip.x = e.clientX
-    tooltip.y = e.clientY
-    tooltip.visible = true
-    tooltip.text = text
-  }
-
-  function moveTooltip(e) {
-    tooltip.x = e.clientX
-    tooltip.y = e.clientY
-  }
-
-  function hideTooltip() {
-    tooltip.visible = false
   }
 </script>
 
 <template>
-  <main
-    class="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-slate-50 px-6 py-24"
+  <div
+    class="min-h-screen bg-white font-sans text-slate-900 selection:bg-emerald-100 selection:text-emerald-900"
   >
-    <!-- DOT GRID BACKGROUND -->
-    <div
-      class="pointer-events-none absolute inset-0 opacity-[0.03] [mask-image:radial-gradient(ellipse_at_center,black,transparent)]"
-      style="
-        background-image: radial-gradient(#000 1px, transparent 1px);
-        background-size: 24px 24px;
-      "
-    ></div>
-
-    <div class="relative z-10 w-full max-w-4xl text-center">
-      <h1 class="mb-4 text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
-        Validate your idea before you build
-      </h1>
-      <p class="mb-16 text-lg font-medium text-slate-600 sm:mb-20 sm:text-xl">
-        Stop guessing. Get real signals in days, not months.
-      </p>
-
-      <!-- DESKTOP DIAGRAM (HIDDEN ON MOBILE) -->
-      <div
-        class="group/cycle relative mx-auto mb-20 hidden h-[450px] w-[450px] items-center justify-center sm:flex"
-      >
-        <!-- PREMIUM PLAY/PAUSE CONTROL -->
-        <button
-          @click="togglePlay"
-          class="absolute -right-6 -top-6 z-30 rounded-full border border-slate-200 bg-white/90 p-2.5 text-slate-400 opacity-0 shadow-lg backdrop-blur-md transition-all duration-300 hover:border-emerald-200 hover:text-emerald-600 focus:opacity-100 group-hover/cycle:opacity-100"
-          :title="isPlaying ? 'Pause Rotation' : 'Start Rotation'"
-        >
-          <Pause v-if="isPlaying" class="h-4 w-4 fill-current" />
-          <Play v-else class="ml-0.5 h-4 w-4 fill-current" />
-        </button>
-        <!-- BACKGROUND GLOW FOR SELECTED ARROW -->
-        <div
-          class="pointer-events-none absolute inset-0 transition-transform duration-700 ease-in-out"
-          :style="{ transform: `rotate(${(activeStep - 1) * (360 / steps.length)}deg)` }"
-        >
-          <div
-            class="absolute left-1/2 top-0 h-full w-full -translate-x-1/2 animate-pulse rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.08),transparent)] blur-3xl"
-          />
-        </div>
-
-        <!-- THE NEW SVG LOOP -->
-        <ClientOnly>
-          <svg viewBox="0 0 300 300" class="relative z-10 h-full w-full drop-shadow-2xl">
-            <defs>
-              <linearGradient id="activeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#059669" />
-                <stop offset="100%" stop-color="#34d399" />
-              </linearGradient>
-              <linearGradient id="inactiveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#fafaf9" />
-                <stop offset="100%" stop-color="#f5f5f4" />
-              </linearGradient>
-            </defs>
-            <g
-              v-for="(step, i) in steps"
-              :key="step.id"
-              @click="handleStepClick(step.id)"
-              @mouseenter="showTooltip($event, step.tooltip)"
-              @mousemove="moveTooltip"
-              @mouseleave="hideTooltip"
-              class="cursor-pointer transition-all duration-300"
-              :opacity="activeStep === step.id ? 1 : 0.7"
-            >
-              <path
-                :d="createArrow(i, steps.length)"
-                :fill="activeStep === step.id ? 'url(#activeGradient)' : 'url(#inactiveGradient)'"
-              />
-              <!-- ICON INSIDE ARROW -->
-              <foreignObject
-                :x="polar(cx, cy, (outerR + innerR) / 2, (i + 0.5) * (360 / steps.length)).x - 10"
-                :y="polar(cx, cy, (outerR + innerR) / 2, (i + 0.5) * (360 / steps.length)).y - 10"
-                width="20"
-                height="20"
-                class="pointer-events-none"
-              >
-                <component
-                  :is="step.icon"
-                  :class="activeStep === step.id ? 'text-white' : 'text-slate-400'"
-                  class="h-5 w-5 transition-colors duration-300"
-                />
-              </foreignObject>
-            </g>
-          </svg>
-        </ClientOnly>
-
-        <!-- CENTERED LABEL (OPTIONAL) -->
-        <div class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
-          <div class="text-center">
-            <span
-              class="mb-1 block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400"
-              >Validation</span
-            >
-            <span class="text-xl font-black text-slate-900">Cycle</span>
-          </div>
-        </div>
-
-        <!-- TOOLTIP -->
-        <div
-          v-if="tooltip.visible"
-          class="pointer-events-none fixed z-50 rounded-md bg-slate-900 px-3 py-2 text-sm text-white shadow-lg transition"
-          :style="{
-            top: tooltip.y + 12 + 'px',
-            left: tooltip.x + 12 + 'px'
-          }"
-        >
-          {{ tooltip.text }}
-        </div>
-      </div>
-
-      <!-- DESKTOP INFO CARD (BELOW LOOP) -->
-      <div class="mb-16 hidden flex-col items-center sm:flex">
-        <div
-          :key="activeStep"
-          class="animate-in fade-in slide-in-from-bottom-4 flex w-full max-w-xl items-start gap-8 rounded-3xl border border-slate-100 bg-white p-10 text-left shadow-xl duration-500"
-        >
-          <div
-            class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600"
-          >
-            <component :is="currentStep.icon" class="h-8 w-8" />
-          </div>
-          <div class="flex-1">
-            <div class="mb-2 flex items-center justify-between">
-              <h3 class="text-2xl font-black text-slate-900">{{ currentStep.title }}</h3>
-              <span class="text-xs font-bold uppercase tracking-widest text-slate-400">
-                Step {{ activeStep }} of {{ steps.length }}
-              </span>
-            </div>
-            <p class="mb-6 text-lg font-medium leading-relaxed text-slate-600">
-              {{ currentStep.description }}
+    <main class="mx-auto max-w-7xl px-6 py-12 lg:flex lg:gap-x-12">
+      <!-- LEFT SIDEBAR: PERSUASION NAV -->
+      <aside class="hidden lg:block lg:w-64 lg:shrink-0">
+        <nav class="sticky top-24 space-y-8">
+          <div>
+            <p class="mb-6 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">
+              The Validation System
             </p>
-
-            <div class="flex items-center justify-between">
-              <button
-                @click="nextStep"
-                class="group inline-flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-3 text-sm font-bold text-white shadow-lg transition-all hover:bg-slate-800"
-              >
-                {{ activeStep === steps.length ? 'Start validating' : 'Next step' }}
-                <ArrowRight class="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </button>
-
-              <!-- MINI PROGRESS INDICATOR -->
-              <div class="flex gap-1.5">
-                <div
-                  v-for="i in steps.length"
-                  :key="i"
-                  class="h-1.5 w-1.5 rounded-full transition-all duration-300"
-                  :class="activeStep === i ? 'w-4 bg-emerald-500' : 'bg-slate-200'"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- MOBILE ONBOARDING FLOW (HIDDEN ON DESKTOP) -->
-      <div class="mx-auto mb-12 w-full max-w-sm sm:hidden">
-        <!-- Progress Ring -->
-        <div class="mb-8 flex flex-col items-center">
-          <div class="relative h-32 w-32">
-            <svg class="h-full w-full -rotate-90" viewBox="0 0 120 120" aria-hidden="true">
-              <circle cx="60" cy="60" :r="ringRadius" fill="none" stroke="#e2e8f0" stroke-width="10" />
-              <circle
-                cx="60"
-                cy="60"
-                :r="ringRadius"
-                fill="none"
-                stroke="#059669"
-                stroke-width="10"
-                stroke-linecap="round"
-                :stroke-dasharray="ringCircumference"
-                :stroke-dashoffset="ringDashOffset"
-                class="transition-[stroke-dashoffset] duration-100 ease-linear"
-              />
-            </svg>
-
-            <div class="absolute inset-0 flex flex-col items-center justify-center">
-              <span class="text-[10px] font-bold uppercase text-slate-500">Step</span>
-              <span class="text-2xl font-black text-slate-900">
-                {{ activeStep }}<span class="text-sm text-slate-400">/{{ steps.length }}</span>
-              </span>
-            </div>
+            <ul class="space-y-1">
+              <li v-for="step in stepsNav" :key="step.anchor">
+                <a
+                  :href="`#${step.anchor}`"
+                  class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-600 transition-all duration-200 hover:bg-slate-50 hover:text-slate-900"
+                >
+                  <component
+                    :is="step.icon"
+                    class="h-4 w-4 text-slate-400 transition-colors group-hover:text-emerald-500"
+                  />
+                  {{ step.title }}
+                </a>
+              </li>
+            </ul>
           </div>
 
-          <div class="mt-4 flex gap-1.5">
-            <div
-              v-for="i in steps.length"
-              :key="`mobile-step-${i}`"
-              class="h-1.5 rounded-full transition-all duration-300"
-              :class="activeStep === i ? 'w-5 bg-emerald-600' : 'w-1.5 bg-slate-300'"
-            />
-          </div>
-        </div>
-
-        <!-- Step Card -->
-        <div ref="mobileCardRef" class="relative min-h-[420px]">
-          <Transition :name="transitionName">
-            <div
-              :key="activeStep"
-              class="absolute inset-0 flex flex-col rounded-3xl border border-slate-100 bg-white p-8 text-left shadow-xl"
+          <div class="rounded-xl bg-slate-900 p-4 text-white shadow-xl shadow-slate-200">
+            <p class="mb-3 text-base font-black leading-tight text-white">Start validating your idea</p>
+            <ul class="mb-4 space-y-1.5 text-xs text-slate-200">
+              <li>→ Turn assumptions into testable questions</li>
+              <li>→ Talk to real users</li>
+              <li>→ Get clear decisions</li>
+            </ul>
+            <NuxtLink
+              to="/recommendation"
+              class="group flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 py-2.5 text-[11px] font-black uppercase tracking-wide text-white transition-all hover:bg-emerald-400 active:scale-95"
             >
-              <div
-                class="mb-6 inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600"
-              >
-                <component :is="currentStep.icon" class="h-8 w-8" />
-              </div>
+              Start Validating Free
+              <ArrowRight class="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+            </NuxtLink>
+          </div>
+        </nav>
+      </aside>
 
-              <h2 class="mb-3 text-2xl font-black text-slate-900">{{ currentStep.title }}</h2>
-              <p class="mb-8 grow font-medium leading-relaxed text-slate-600">
-                {{ currentStep.description }}
+      <!-- MAIN CONTENT -->
+      <div class="flex-1 lg:max-w-3xl">
+        <!-- 1. HERO: EDITORIAL STYLE -->
+        <section id="introduction" class="mb-20">
+          <div
+            class="mb-8 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1"
+          >
+            <span class="relative flex h-2 w-2">
+              <span
+                class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"
+              ></span>
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+            </span>
+            <span class="text-xs font-black uppercase tracking-widest text-emerald-700"
+              >System Status: Active</span
+            >
+          </div>
+
+          <h1 class="mb-8 text-5xl font-black leading-[0.95] tracking-tighter text-slate-900 lg:text-7xl">
+            Stop building ideas that <span class="text-slate-300">don’t work.</span>
+          </h1>
+          <p class="max-w-2xl text-xl leading-relaxed text-slate-700">
+            Validate your idea with real user signals before you waste months building the wrong
+            thing.
+          </p>
+        </section>
+
+        <!-- 2. URGENCY BLOCK -->
+        <section
+          id="reality-check"
+          class="mb-20 scroll-mt-24 rounded-3xl border border-amber-100 bg-amber-50 p-10"
+        >
+          <div class="flex gap-6">
+            <div
+              class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100"
+            >
+              <AlertCircle class="h-6 w-6 text-amber-600" />
+            </div>
+            <div>
+              <h3 class="mb-2 text-lg font-black text-slate-900">The Reality Check</h3>
+              <p class="text-base leading-relaxed text-slate-700">
+                Most founders waste 3–6 months building something nobody wants. Not because they
+                lack skill — but because they validate the wrong things. This system prevents that
+                by forcing you to face the data early.
               </p>
+            </div>
+          </div>
+        </section>
 
-              <div class="flex shrink-0 flex-col gap-3">
-                <button
-                  @click="nextStep"
-                  class="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 py-4 font-bold text-white shadow-lg shadow-slate-200 transition-all active:scale-[0.98]"
-                >
-                  {{ activeStep === steps.length ? 'Start validating' : 'Next step' }}
-                  <ArrowRight class="h-5 w-5" />
-                </button>
+        <!-- 3. SYSTEM OVERVIEW: DATA GRID STYLE -->
+        <section id="overview" class="mb-32 scroll-mt-24">
+          <div class="mb-10 flex items-end justify-between">
+            <div>
+              <h2 class="text-3xl font-black tracking-tight text-slate-900">System Overview</h2>
+              <p class="mt-1 text-base text-slate-600">
+                The 6-step process from idea → evidence → decision.
+              </p>
+            </div>
+            <div class="mx-8 mb-3 hidden h-px flex-1 bg-slate-100 sm:block"></div>
+          </div>
 
-                <button
-                  v-if="activeStep > 1"
-                  @click="prevStep"
-                  class="w-full py-2 text-sm font-bold text-slate-400 transition-colors hover:text-slate-600"
+          <div class="overflow-hidden rounded-3xl border border-slate-100 shadow-sm">
+            <table class="w-full border-collapse text-left">
+              <thead>
+                <tr class="border-b border-slate-100 bg-slate-50">
+                  <th
+                    class="px-8 py-5 text-xs font-black uppercase tracking-widest text-slate-500"
+                  >
+                    Step
+                  </th>
+                  <th
+                    class="px-8 py-5 text-xs font-black uppercase tracking-widest text-slate-500"
+                  >
+                    Process
+                  </th>
+                  <th
+                    class="px-8 py-5 text-xs font-black uppercase tracking-widest text-slate-500"
+                  >
+                    Outcome
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr
+                  v-for="(step, idx) in ['Define', 'Score', 'Expose', 'Talk', 'Learn', 'Refine']"
+                  :key="step"
+                  class="group transition-colors hover:bg-slate-50/50"
                 >
-                  ← Back
-                </button>
+                  <td
+                    class="px-8 py-5 font-mono text-sm text-slate-400 transition-colors group-hover:text-slate-900"
+                  >
+                    0{{ idx + 1 }}
+                  </td>
+                  <td class="px-8 py-5 text-sm font-black text-slate-900">{{ step }}</td>
+                  <td class="px-8 py-5">
+                    <span
+                      class="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-700"
+                    >
+                      <CheckCircle2 class="h-3 w-3" />
+                      {{
+                        [
+                          'Clear direction',
+                          'Identify risks',
+                          'Find blind spots',
+                          'Real signals',
+                          'Insights',
+                          'Confident action'
+                        ][idx]
+                      }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 4. CORE MECHANIC: TERMINAL STYLE -->
+        <section id="mechanic" class="mb-32 scroll-mt-24">
+          <p class="mb-3 text-base font-semibold text-slate-700">
+            This is where validation actually happens:
+          </p>
+          <h2 class="mb-8 flex items-center gap-3 text-2xl font-black text-slate-900">
+            <Terminal class="h-6 w-6 text-emerald-500" />
+            The Logic Engine
+          </h2>
+          <div
+            class="relative overflow-hidden rounded-[2rem] bg-slate-900 p-10 font-mono text-sm leading-relaxed shadow-2xl shadow-emerald-900/10"
+          >
+            <div class="pointer-events-none absolute right-0 top-0 p-8 opacity-5">
+              <Terminal class="h-64 w-64 text-white" />
+            </div>
+            <div class="relative z-10 space-y-6">
+              <div class="flex gap-4">
+                <span class="font-bold text-emerald-500">INPUT:</span>
+                <span class="text-slate-300">"Fitness app for busy professionals"</span>
+              </div>
+              <div class="border-l border-slate-800 pl-4 text-slate-500">↓ [BREAKDOWN]</div>
+              <div class="flex gap-4">
+                <span class="font-bold text-amber-500">ASSUMPTIONS:</span>
+                <span class="text-slate-300"
+                  >Users are busy, want short workouts, will pay ₹500/mo</span
+                >
+              </div>
+              <div class="border-l border-slate-800 pl-4 text-slate-500">↓ [EXPOSE]</div>
+              <div class="flex gap-4">
+                <span class="font-bold text-blue-400">UNCERTAINTIES:</span>
+                <span class="text-slate-300"
+                  >Are they using alternatives? Will they actually pay?</span
+                >
+              </div>
+              <div class="border-l border-slate-800 pl-4 text-slate-500">↓ [TEST]</div>
+              <div class="flex gap-4">
+                <span class="font-bold text-purple-400">QUESTIONS:</span>
+                <span class="text-slate-300"
+                  >"What are you using today?" "Would you pay ₹500/mo?"</span
+                >
+              </div>
+              <div class="border-l border-slate-800 pl-4 text-slate-500">↓ [PROCESS]</div>
+              <div class="flex gap-4">
+                <span class="font-bold text-emerald-500">OUTPUT:</span>
+                <span class="text-sm font-black tracking-tight text-white"
+                  >DECISION: CHANGE PRICING / REPOSITION / DROP</span
+                >
               </div>
             </div>
-          </Transition>
+          </div>
+        </section>
+
+        <!-- 5. THE STEPS: MINIMALIST CARDS -->
+        <div class="mb-40 space-y-40">
+          <section
+            v-for="(step, idx) in stepsNav.slice(3, 9)"
+            :key="step.anchor"
+            :id="step.anchor"
+            class="group scroll-mt-24 rounded-3xl p-6 md:p-8"
+            :class="idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'"
+          >
+            <div
+              class="flex flex-col items-start gap-16"
+              :class="idx % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'"
+            >
+              <div class="flex-1">
+                <div class="mb-8 flex items-center gap-6">
+                  <span
+                    class="text-6xl font-black text-slate-100 transition-colors duration-500 group-hover:text-emerald-50"
+                    >0{{ idx + 1 }}</span
+                  >
+                  <h3 class="text-4xl font-black tracking-tighter text-slate-900">
+                    {{ step.title.split(': ')[1] }}
+                  </h3>
+                </div>
+                <p class="mb-10 text-lg leading-relaxed text-slate-700">{{ stepDescriptions[idx] }}</p>
+                <div
+                  class="inline-flex items-center gap-3 rounded-xl border px-4 py-2"
+                  :class="{
+                    'border-amber-200 bg-amber-50': stepOutcomeKinds[idx] === 'risk',
+                    'border-sky-200 bg-sky-50': stepOutcomeKinds[idx] === 'signal',
+                    'border-emerald-200 bg-emerald-50': stepOutcomeKinds[idx] === 'decision'
+                  }"
+                >
+                  <span
+                    class="rounded-md px-2 py-1 text-xs font-black uppercase tracking-wide"
+                    :class="{
+                      'bg-amber-100 text-amber-700': stepOutcomeKinds[idx] === 'risk',
+                      'bg-sky-100 text-sky-700': stepOutcomeKinds[idx] === 'signal',
+                      'bg-emerald-100 text-emerald-700': stepOutcomeKinds[idx] === 'decision'
+                    }"
+                  >
+                    {{ stepOutcomeKinds[idx] }}
+                  </span>
+                  <span class="text-sm font-black text-slate-900">{{ stepOutcomes[idx] }}</span>
+                </div>
+              </div>
+              <div
+                class="w-full shrink-0 rounded-3xl border border-slate-100 bg-slate-50 p-8 transition-all duration-500 group-hover:border-emerald-200 group-hover:bg-emerald-50/30 md:w-64"
+              >
+                <template v-if="idx < 2">
+                  <p class="mb-6 text-xs font-black uppercase tracking-widest text-slate-500">
+                    Checklist
+                  </p>
+                  <ul class="space-y-4 text-sm font-bold text-slate-700">
+                    <li
+                      v-for="item in stepChecklists[idx]"
+                      :key="item"
+                      class="flex items-center gap-2"
+                    >
+                      <CheckCircle2 class="h-4 w-4 text-emerald-500" />
+                      {{ item }}
+                    </li>
+                  </ul>
+                </template>
+
+                <template v-else-if="idx < 4">
+                  <p class="mb-6 text-xs font-black uppercase tracking-widest text-slate-500">Q/A</p>
+                  <div class="space-y-4">
+                    <div
+                      v-for="item in stepQaBlocks[idx - 2]"
+                      :key="item.q"
+                      class="rounded-xl border border-slate-200 bg-white p-3"
+                    >
+                      <p class="text-[11px] font-black uppercase tracking-wide text-slate-500">Q</p>
+                      <p class="text-sm font-semibold text-slate-900">{{ item.q }}</p>
+                      <p class="mt-2 text-[11px] font-black uppercase tracking-wide text-emerald-600">
+                        A
+                      </p>
+                      <p class="text-sm text-slate-700">{{ item.a }}</p>
+                    </div>
+                  </div>
+                </template>
+
+                <template v-else>
+                  <p class="mb-6 text-xs font-black uppercase tracking-widest text-slate-500">
+                    Signal Scores
+                  </p>
+                  <div class="space-y-3">
+                    <div
+                      v-for="item in stepSignalBadges[idx - 4]"
+                      :key="item.label"
+                      class="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2"
+                    >
+                      <span class="text-sm font-semibold text-slate-800">{{ item.label }}</span>
+                      <span
+                        class="rounded-md px-2 py-1 text-xs font-bold uppercase"
+                        :class="
+                          item.score === 'High'
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-amber-100 text-amber-700'
+                        "
+                      >
+                        {{ item.score }}
+                      </span>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </section>
         </div>
-      </div>
 
-      <!-- CTA (HIDDEN ON MOBILE AS IT'S INTEGRATED INTO FLOW) -->
-      <div class="hidden flex-col items-center gap-4 sm:flex">
-        <NuxtLink
-          to="/recommendation"
-          class="inline-flex items-center gap-x-2 rounded-full bg-slate-900 px-10 py-5 text-base font-bold text-white shadow-lg transition-all hover:scale-105 hover:bg-slate-800 active:scale-95"
+        <!-- 6. HYPER-DETAILED EXAMPLES: EDITORIAL STACK -->
+        <section id="example" class="mb-40 scroll-mt-24">
+          <div class="mb-16">
+            <h2 class="mb-4 text-4xl font-black tracking-tighter text-slate-900">
+              Industry Scenarios
+            </h2>
+            <p class="max-w-xl text-lg text-slate-700">
+              Real-world examples of the system in action. From B2B SaaS to Local Services.
+            </p>
+          </div>
+
+          <div class="space-y-32">
+            <div
+              v-for="(study, key) in caseStudies"
+              :key="key"
+              :id="`example-${key}`"
+              class="group scroll-mt-24"
+            >
+              <div class="mb-10 flex items-center gap-5">
+                <div
+                  class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-xl shadow-slate-200 transition-transform duration-500 group-hover:scale-110"
+                >
+                  <component :is="study.icon" class="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 class="text-2xl font-black tracking-tight text-slate-900">
+                    {{ study.name }}
+                  </h3>
+                  <p class="text-base text-slate-600">{{ study.description }}</p>
+                </div>
+              </div>
+
+              <div
+                class="overflow-hidden rounded-[2.5rem] border border-slate-100 bg-white shadow-2xl shadow-slate-100"
+              >
+                <div class="overflow-x-auto">
+                  <table class="w-full min-w-[700px] border-collapse text-left">
+                    <thead>
+                      <tr class="border-b border-slate-100 bg-slate-50">
+                        <th
+                          class="w-24 px-8 py-6 text-xs font-black uppercase tracking-widest text-slate-500"
+                        >
+                          Step
+                        </th>
+                        <th
+                          class="w-44 px-8 py-6 text-xs font-black uppercase tracking-widest text-slate-500"
+                        >
+                          Process
+                        </th>
+                        <th
+                          class="px-8 py-6 text-xs font-black uppercase tracking-widest text-slate-500"
+                        >
+                          Scenario Detail
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                      <tr
+                        v-for="item in study.steps"
+                        :key="item.step"
+                        class="align-top transition-colors hover:bg-slate-50/30"
+                      >
+                        <td class="px-8 py-8 font-mono text-sm text-slate-400">{{ item.step }}</td>
+                        <td class="px-8 py-8">
+                          <p class="text-base font-bold leading-relaxed text-slate-900">{{ item.process }}</p>
+                        </td>
+                        <td class="px-8 py-8">
+                          <p class="text-base leading-relaxed text-slate-700">{{ item.detail }}</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. FAILURE ANALYSIS -->
+        <section id="failure" class="mb-40 scroll-mt-24">
+          <h2 class="mb-10 text-3xl font-black tracking-tight text-slate-900">
+            Why Most Ideas Fail Validation
+          </h2>
+          <ul class="space-y-6">
+            <li v-for="reason in failureReasons" :key="reason.t">
+              <div class="flex items-start gap-3">
+                <XCircle class="mt-0.5 h-5 w-5 shrink-0 text-rose-500" />
+                <div>
+                  <h4 class="text-lg font-black text-slate-900">{{ reason.t }}</h4>
+                  <p class="mt-1 text-base leading-relaxed text-slate-700">{{ reason.d }}</p>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        <!-- 8. FINAL CTA -->
+        <section
+          class="relative overflow-hidden rounded-[3rem] bg-slate-900 p-16 text-center text-white"
         >
-          Start validating your idea
-          <span aria-hidden="true">→</span>
-        </NuxtLink>
-        <p class="text-sm font-bold text-slate-400">Takes 2 minutes. No signup required.</p>
+          <div
+            class="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent"
+          ></div>
+          <div class="relative z-10">
+            <h2 class="mb-6 text-4xl font-black tracking-tighter lg:text-5xl">
+              Stop guessing. <br class="sm:hidden" />Start validating.
+            </h2>
+            <p class="mx-auto mb-10 max-w-md text-lg text-slate-300">
+              Join 1,000+ founders who use this system to build evidence-backed startups.
+            </p>
+            <NuxtLink
+              to="/recommendation"
+              class="group inline-flex items-center gap-3 rounded-2xl bg-emerald-500 px-10 py-5 text-lg font-black text-slate-900 transition-all hover:bg-emerald-400 active:scale-95"
+            >
+              Validate Your Idea Now
+              <ArrowRight class="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </NuxtLink>
+            <p class="mt-6 text-xs font-black uppercase tracking-widest text-white/40">
+              No credit card required • Instant access
+            </p>
+          </div>
+        </section>
       </div>
-    </div>
-  </main>
+    </main>
+  </div>
 </template>
-
-<style scoped>
-  /* SPRING-LIKE SLIDE ANIMATIONS */
-  .slide-right-enter-active,
-  .slide-right-leave-active,
-  .slide-left-enter-active,
-  .slide-left-leave-active {
-    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .slide-right-enter-from {
-    opacity: 0;
-    transform: translateX(30px) scale(0.95);
-  }
-  .slide-right-leave-to {
-    opacity: 0;
-    transform: translateX(-30px) scale(0.95);
-  }
-
-  .slide-left-enter-from {
-    opacity: 0;
-    transform: translateX(-30px) scale(0.95);
-  }
-  .slide-left-leave-to {
-    opacity: 0;
-    transform: translateX(30px) scale(0.95);
-  }
-
-  /* Ensure cards overlap correctly during transition */
-  .slide-right-leave-active,
-  .slide-left-leave-active {
-    position: absolute;
-  }
-</style>

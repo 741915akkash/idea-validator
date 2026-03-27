@@ -33,7 +33,38 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ['@nuxtjs/tailwindcss', '@nuxt/fonts', '@pinia/nuxt', 'lucide-nuxt'],
+  modules: ['@nuxtjs/tailwindcss', '@nuxt/fonts', '@pinia/nuxt', 'lucide-nuxt', '@nuxtjs/sitemap'],
+
+  sitemap: {
+    siteUrl: 'https://golaunchscall.com',
+
+    urls: async () => {
+      const posts = await fetch(
+        'https://wp.golaunchscall.com/wp-json/wp/v2/posts?per_page=100'
+      ).then((res) => res.json())
+
+      const categories = await fetch('https://wp.golaunchscall.com/wp-json/wp/v2/categories').then(
+        (res) => res.json()
+      )
+
+      return [
+        // static pages
+        { loc: '/' },
+        { loc: '/blog' },
+
+        // blog posts
+        ...posts.map((post) => ({
+          loc: `/blog/${post.slug}`,
+          lastmod: post.modified ? new Date(post.modified).toISOString() : undefined
+        })),
+
+        // category pages
+        ...categories.map((cat) => ({
+          loc: `/blog/category/${cat.slug}`
+        }))
+      ]
+    }
+  },
 
   fonts: {
     families: [

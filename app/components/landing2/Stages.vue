@@ -1,7 +1,7 @@
 <template>
   <section class="bg-slate-900 px-6 py-20 text-white">
     <div class="mx-auto max-w-4xl">
-      <h2 class="mb-12 text-center text-3xl font-extrabold">
+      <h2 class="mb-12 text-center text-3xl font-extrabold leading-tight sm:text-4xl">
         How It Grows With You: From Idea to Traction — Without Guesswork
       </h2>
       <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
