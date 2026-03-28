@@ -5,13 +5,16 @@
 </script>
 
 <template>
-  <div class="mx-auto mt-16 max-w-3xl px-4">
+  <div class="mx-auto mt-16 max-w-3xl px-4 border-t border-gray-100 pt-12">
     <h3 class="mb-6 text-xl font-semibold">Related posts</h3>
 
-    <div v-for="post in posts" :key="post.id">
-      <NuxtLink :to="`/blog/${post.slug}`">
-        {{ post.title.rendered }}
-      </NuxtLink>
+    <div class="grid gap-6">
+      <div v-for="post in posts" :key="post.id" class="group">
+        <NuxtLink :to="`/blog/${post.slug}`" class="block">
+          <h4 class="text-lg font-medium group-hover:text-blue-600 transition-colors" v-html="post.title.rendered"></h4>
+          <p class="text-sm text-gray-500 mt-1">Read more →</p>
+        </NuxtLink>
+      </div>
     </div>
   </div>
 </template>

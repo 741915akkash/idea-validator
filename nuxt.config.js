@@ -2,6 +2,11 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: 'GoLaunchScall – Validate Your Business Idea with Customer Interviews',
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg?v=2' },
+        { rel: 'shortcut icon', href: '/favicon.svg?v=2' },
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico?v=2' }
+      ],
       meta: [
         {
           name: 'description',

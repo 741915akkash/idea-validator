@@ -1,17 +1,13 @@
 <template>
-  <div class="max-w-3xl mx-auto px-4 mt-12">
-    <div class="bg-black text-white p-8 rounded-xl text-center">
-      <h3 class="text-2xl font-semibold mb-3">
-        Validate your startup idea
-      </h3>
+  <div class="mx-auto mt-12 max-w-3xl px-4">
+    <div class="rounded-xl border border-slate-200 bg-slate-50 p-8 text-center">
+      <h3 class="mb-3 text-2xl font-semibold text-slate-900">Validate your startup idea</h3>
 
-      <p class="text-gray-300 mb-6">
-        Reduce risk before you build anything.
-      </p>
+      <p class="mb-6 text-slate-600">Reduce risk before you build anything.</p>
 
       <NuxtLink
         to="/"
-        class="bg-white text-black px-6 py-3 rounded"
+        class="inline-block rounded bg-emerald-600 px-6 py-3 font-medium text-white transition-colors hover:bg-emerald-700"
       >
         Try it free →
       </NuxtLink>

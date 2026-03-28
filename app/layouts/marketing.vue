@@ -17,6 +17,7 @@ const mobileMenuOpen = ref(false)
         <nav class="hidden items-center gap-6 text-sm font-medium text-slate-700 md:flex">
           <NuxtLink to="/how-it-works" class="transition hover:text-slate-900">How it works</NuxtLink>
           <NuxtLink to="/pricing" class="transition hover:text-slate-900">Pricing</NuxtLink>
+          <NuxtLink to="/blog" class="transition hover:text-slate-900">Blog</NuxtLink>
           <NuxtLink to="/signup-login?mode=login" class="transition hover:text-slate-900">Login</NuxtLink>
           <NuxtLink
             to="/signup-login?mode=signup"
@@ -43,6 +44,9 @@ const mobileMenuOpen = ref(false)
           </NuxtLink>
           <NuxtLink to="/pricing" class="rounded-md px-2 py-2 hover:bg-slate-100" @click="mobileMenuOpen = false">
             Pricing
+          </NuxtLink>
+          <NuxtLink to="/blog" class="rounded-md px-2 py-2 hover:bg-slate-100" @click="mobileMenuOpen = false">
+            Blog
           </NuxtLink>
           <NuxtLink to="/signup-login?mode=login" class="rounded-md px-2 py-2 hover:bg-slate-100" @click="mobileMenuOpen = false">
             Login

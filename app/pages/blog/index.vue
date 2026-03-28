@@ -1,6 +1,10 @@
 <script setup>
   import { computed } from 'vue'
 
+  definePageMeta({
+    layout: 'blog'
+  })
+
   const route = useRoute()
 
   // current page
