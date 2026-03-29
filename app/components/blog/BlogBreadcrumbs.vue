@@ -3,7 +3,8 @@
   const route = useRoute()
 
   const segments = computed(() => {
-    return route.path.split('/').filter(Boolean)
+    const allSegments = route.path.split('/').filter(Boolean)
+    return allSegments[0] === 'blog' ? allSegments.slice(1) : allSegments
   })
 </script>
 
@@ -11,7 +12,7 @@
   <nav
     class="mx-auto flex max-w-3xl items-center gap-2 px-4 py-6 text-xs font-medium text-gray-400"
   >
-    <NuxtLink to="/" class="transition-colors hover:text-black">Home</NuxtLink>
+    <NuxtLink to="/blog" class="transition-colors hover:text-black">Blog</NuxtLink>
 
     <template v-for="(seg, i) in segments" :key="i">
       <span class="text-gray-300">/</span>

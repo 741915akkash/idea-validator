@@ -37,7 +37,7 @@
 </style>
 
 <template>
-  <div class="min-h-screen bg-white font-sans text-gray-900 antialiased">
+  <div class="flex min-h-screen flex-col bg-white font-sans text-gray-900 antialiased">
     <!-- Sticky header -->
     <header
       :class="[
@@ -98,7 +98,7 @@
     </header>
 
     <!-- Page content -->
-    <main>
+    <main class="flex-1">
       <slot />
     </main>
 
