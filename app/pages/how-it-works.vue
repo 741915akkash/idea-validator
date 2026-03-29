@@ -43,42 +43,79 @@
     { t: 'No tracking', d: 'Insights lost in scattered notes.' }
   ]
 
-  const stepDescriptions = [
-    'Turn your idea into something specific and testable. If your idea is vague, your validation will be useless.',
-    "Know exactly where you're guessing. Low confidence = high risk. Assess urgency across problem, audience, and pricing.",
-    'Convert your idea into assumptions, uncertainties, and testable questions. Find the "leap of faith" assumptions.',
-    'Ask clear, neutral, decision-focused questions. Avoid "Would you use this?" and focus on "What do you do today?"',
-    'Spot patterns, avoid confirmation bias, and identify strong vs weak signals. Look for "surprising" answers.',
-    "Proceed, pivot, change pricing, or drop the idea — based on evidence. Don't fall in love with your solution."
-  ]
-
-  const stepChecklists = [
-    ['Target users', 'Problem clarity', 'Single use-case'],
-    ['Problem Severity', 'Audience Access', 'Pricing Willingness']
-  ]
-
-  const stepQaBlocks = [
-    [
-      { q: 'What is the leap-of-faith assumption?', a: 'Users care enough to switch behavior.' },
-      { q: 'What must be tested first?', a: 'The highest-uncertainty assumption.' }
-    ],
-    [
-      { q: 'What should you ask?', a: 'Neutral, behavior-based questions.' },
-      { q: 'What should you avoid?', a: 'Leading questions and opinion fishing.' }
-    ]
-  ]
-
-  const stepSignalBadges = [
-    [
-      { label: 'Pattern Matching', score: 'High' },
-      { label: 'Bias Detection', score: 'Medium' },
-      { label: 'Signal Strength', score: 'High' }
-    ],
-    [
-      { label: 'Evidence Review', score: 'High' },
-      { label: 'Pivot Strategy', score: 'Medium' },
-      { label: 'Next Milestone', score: 'High' }
-    ]
+  const finalSteps = [
+    {
+      anchor: 'step-1',
+      number: '01',
+      title: 'Problem',
+      label: 'Demand check',
+      bullets: [
+        'Is this problem real or assumed?',
+        'How often does it occur?',
+        'Does it actually impact users?'
+      ],
+      insight: '💡 We verify if the problem truly exists'
+    },
+    {
+      anchor: 'step-2',
+      number: '02',
+      title: 'Urgency',
+      label: 'Behavior check',
+      bullets: [
+        'What triggers someone to act?',
+        'Is there a time-sensitive moment?',
+        'What happens if they delay?'
+      ],
+      insight: '⚡ We check if people take action — not just care'
+    },
+    {
+      anchor: 'step-3',
+      number: '03',
+      title: 'Money',
+      label: 'Monetization check',
+      bullets: [
+        'Have people paid for this before?',
+        'Who controls the budget?',
+        "What's the cost of current solutions?"
+      ],
+      insight: '💰 We validate real willingness to pay'
+    },
+    {
+      anchor: 'step-4',
+      number: '04',
+      title: 'Customer',
+      label: 'Market clarity',
+      bullets: [
+        'Is the ideal customer clearly defined?',
+        'Do they share the same pain?',
+        'Can you easily find them?'
+      ],
+      insight: '🎯 We make sure you know exactly who this is for'
+    },
+    {
+      anchor: 'step-5',
+      number: '05',
+      title: 'Edge',
+      label: 'Competitive advantage',
+      bullets: [
+        'Is there a clear differentiation?',
+        'Do users complain about current options?',
+        'How competitive is the market?'
+      ],
+      insight: '🔥 We identify how you can actually stand out'
+    },
+    {
+      anchor: 'step-6',
+      number: '06',
+      title: 'Reality',
+      label: 'Execution fit',
+      bullets: [
+        'Do you have the skills to build this?',
+        'Can you reach customers effectively?',
+        'Do you have time and resources?'
+      ],
+      insight: '🚀 We check if you can realistically pull this off'
+    }
   ]
 
   // Hyper-realistic case studies for SEO and scannability
@@ -495,107 +532,51 @@
           </div>
         </section>
 
-        <!-- 5. THE STEPS: MINIMALIST CARDS -->
-        <div class="mb-40 space-y-40">
-          <section
-            v-for="(step, idx) in stepsNav.slice(3, 9)"
-            :key="step.anchor"
-            :id="step.anchor"
-            class="group scroll-mt-24 rounded-3xl p-6 md:p-8"
-            :class="idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'"
-          >
-            <div
-              class="flex flex-col items-start gap-16"
-              :class="idx % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'"
+        <!-- 5. HOW IT WORKS: FINAL PRODUCT-LAYERED STEPS -->
+        <section class="mb-24">
+          <div class="mb-14">
+            <h2 class="text-4xl font-black tracking-tighter text-slate-900">Steps</h2>
+            <p class="mt-3 max-w-2xl text-lg text-slate-700">
+              A structured system to evaluate your idea before you build.
+            </p>
+          </div>
+
+          <div class="space-y-8">
+            <section
+              v-for="step in finalSteps"
+              :id="step.anchor"
+              :key="step.anchor"
+              class="scroll-mt-24 rounded-3xl border border-slate-100 bg-white p-8 shadow-sm"
             >
-              <div class="flex-1">
-                <div class="mb-8 flex items-center gap-6">
-                  <span
-                    class="text-6xl font-black text-slate-100 transition-colors duration-500 group-hover:text-emerald-50"
-                    >0{{ idx + 1 }}</span
-                  >
-                  <h3 class="text-4xl font-black tracking-tighter text-slate-900">
-                    {{ step.title.split(': ')[1] }}
-                  </h3>
-                </div>
-                <p class="mb-10 text-lg leading-relaxed text-slate-700">
-                  {{ stepDescriptions[idx] }}
+              <div class="mb-4">
+                <p class="text-2xl font-black tracking-tight text-slate-900">
+                  {{ step.number }} - {{ step.title }}
+                </p>
+                <p class="mt-3 inline-flex rounded bg-slate-500 px-2 py-0.5 text-sm font-semibold text-white">
+                  {{ step.label }}
                 </p>
               </div>
-              <div
-                class="w-full shrink-0 rounded-3xl border border-slate-100 bg-slate-50 p-8 transition-all duration-500 group-hover:border-emerald-200 group-hover:bg-emerald-50/30 md:w-64"
-              >
-                <template v-if="idx < 2">
-                  <p class="mb-6 text-xs font-black uppercase tracking-widest text-slate-500">
-                    Checklist
-                  </p>
-                  <ul class="space-y-4 text-sm font-bold text-slate-700">
-                    <li
-                      v-for="item in stepChecklists[idx]"
-                      :key="item"
-                      class="flex items-center gap-2"
-                    >
-                      <CheckCircle2 class="h-4 w-4 text-emerald-500" />
-                      {{ item }}
-                    </li>
-                  </ul>
-                </template>
 
-                <template v-else-if="idx < 4">
-                  <p class="mb-6 text-xs font-black uppercase tracking-widest text-slate-500">
-                    Q/A
-                  </p>
-                  <div class="space-y-4">
-                    <div
-                      v-for="item in stepQaBlocks[idx - 2]"
-                      :key="item.q"
-                      class="rounded-xl border border-slate-200 bg-white p-3"
-                    >
-                      <p class="text-[11px] font-black uppercase tracking-wide text-slate-500">Q</p>
-                      <p class="text-sm font-semibold text-slate-900">{{ item.q }}</p>
-                      <p
-                        class="mt-2 text-[11px] font-black uppercase tracking-wide text-emerald-600"
-                      >
-                        A
-                      </p>
-                      <p class="text-sm text-slate-700">{{ item.a }}</p>
-                    </div>
-                  </div>
-                </template>
+              <ul class="space-y-2 text-base leading-relaxed text-slate-700">
+                <li v-for="item in step.bullets" :key="item">- {{ item }}</li>
+              </ul>
 
-                <template v-else>
-                  <p class="mb-6 text-xs font-black uppercase tracking-widest text-slate-500">
-                    Signal Scores
-                  </p>
-                  <div class="space-y-3">
-                    <div
-                      v-for="item in stepSignalBadges[idx - 4]"
-                      :key="item.label"
-                      class="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2"
-                    >
-                      <span class="text-sm font-semibold text-slate-800">{{ item.label }}</span>
-                      <span
-                        class="rounded-md px-2 py-1 text-xs font-bold uppercase"
-                        :class="
-                          item.score === 'High'
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-amber-100 text-amber-700'
-                        "
-                      >
-                        {{ item.score }}
-                      </span>
-                    </div>
-                  </div>
-                </template>
-              </div>
-            </div>
-          </section>
-        </div>
+              <p class="mt-5 text-sm font-bold text-emerald-600">{{ step.insight }}</p>
+              <p v-if="step.subnote" class="mt-2 text-sm font-medium text-slate-500">
+                {{ step.subnote }}
+              </p>
+              <p v-if="step.micro" class="mt-2 text-xs font-semibold tracking-wide text-slate-400">
+                {{ step.micro }}
+              </p>
+            </section>
+          </div>
+
+        </section>
 
         <!-- 7. FAILURE ANALYSIS -->
         <section id="failure" class="mb-40 scroll-mt-24">
           <h2 class="mb-10 text-3xl font-black tracking-tight text-slate-900">
-            Why Most Ideas Fail Validation
+            Why Most Ideas Fail
           </h2>
           <ul class="space-y-6">
             <li v-for="reason in failureReasons" :key="reason.t">
