@@ -1,5 +1,5 @@
 <template>
-  <header class="px-6 pb-24 pt-40">
+  <header class="px-6 pb-24 pt-20 md:pt-40">
     <div class="mx-auto max-w-3xl text-center">
       <!-- H1: primary keyword + intent -->
       <h1 class="mb-6 text-5xl font-extrabold leading-tight text-slate-900 md:text-6xl">
