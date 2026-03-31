@@ -20,7 +20,11 @@ export default defineNuxtConfig({
   ssr: true,
   runtimeConfig: {
     public: {
-      gaMeasurementId: process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID || ''
+      gaMeasurementId: process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID || '',
+      posthog: {
+        publicKey: process.env.NUXT_PUBLIC_POSTHOG_PROJECT_TOKEN || '',
+        host: process.env.NUXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com'
+      }
     }
   },
 
@@ -38,7 +42,19 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ['@nuxtjs/tailwindcss', '@nuxt/fonts', '@pinia/nuxt', 'lucide-nuxt', '@nuxtjs/sitemap'],
+  modules: ['@posthog/nuxt', '@nuxtjs/tailwindcss', '@nuxt/fonts', '@pinia/nuxt', 'lucide-nuxt', '@nuxtjs/sitemap'],
+
+  posthogConfig: {
+    publicKey: process.env.NUXT_PUBLIC_POSTHOG_PROJECT_TOKEN || '',
+    host: process.env.NUXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
+    clientConfig: {
+      capture_exceptions: true,
+      __add_tracing_headers: ['localhost', 'golaunchscall.com']
+    },
+    serverConfig: {
+      enableExceptionAutocapture: true
+    }
+  },
 
   sitemap: {
     siteUrl: 'https://golaunchscall.com',

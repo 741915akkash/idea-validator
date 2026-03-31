@@ -16,6 +16,7 @@
       <div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
         <button
           class="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-8 py-4 text-lg font-bold text-white shadow-lg shadow-emerald-200 transition-all hover:bg-emerald-700 sm:w-auto"
+          @click="posthog?.capture('start_validation_clicked')"
         >
           Start Validating <ArrowRight class="h-5 w-5" />
         </button>
@@ -27,4 +28,5 @@
 
 <script setup>
   import { ArrowRight } from 'lucide-vue-next'
+  const posthog = usePostHog()
 </script>

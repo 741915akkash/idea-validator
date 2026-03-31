@@ -1,0 +1,22 @@
+[
+  {
+    "event": "landing_page_viewed",
+    "description": "User views the landing page",
+    "file": "app/pages/index.vue"
+  },
+  {
+    "event": "start_validation_clicked",
+    "description": "User clicks a Start Validation CTA on the landing page hero section",
+    "file": "app/components/landing2/Hero.vue"
+  },
+  {
+    "event": "start_validation_clicked",
+    "description": "User clicks a Start Validation CTA in the landing page bottom section",
+    "file": "app/components/landing2/CTA.vue"
+  },
+  {
+    "event": "pricing_page_viewed",
+    "description": "User views the pricing page",
+    "file": "app/pages/pricing.vue"
+  }
+]

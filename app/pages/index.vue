@@ -1,4 +1,5 @@
 <script setup>
+import { onMounted } from 'vue'
 import Hero from '~/components/landing2/Hero.vue'
 import Problem from '~/components/landing2/Problem.vue'
 import Features from '~/components/landing2/Features.vue'
@@ -11,6 +12,12 @@ import LightExplaination from '../components/landing2/LightExplaination.vue'
 
 definePageMeta({
   layout: 'marketing'
+})
+
+const posthog = usePostHog()
+
+onMounted(() => {
+  posthog?.capture('landing_page_viewed')
 })
 </script>
 

@@ -1,5 +1,12 @@
-// import { PostHog } from 'posthog-node'
+import { PostHog } from 'posthog-node'
 
-// export const posthog = new PostHog(process.env.POSTHOG_KEY, {
-//   host: 'https://app.posthog.com'
-// })
+let client = null
+
+export function useServerPostHog() {
+  if (!client) {
+    const config = useRuntimeConfig()
+    const posthogConfig = config.public.posthog
+    client = new PostHog(posthogConfig.publicKey, { host: posthogConfig.host })
+  }
+  return client
+}
