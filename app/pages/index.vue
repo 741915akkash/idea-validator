@@ -15,6 +15,12 @@ definePageMeta({
 })
 
 const posthog = usePostHog()
+const user = useUser()
+
+await bootstrapUser()
+if (user.value) {
+  await navigateTo('/quiz/overview')
+}
 
 onMounted(() => {
   posthog?.capture('landing_page_viewed')

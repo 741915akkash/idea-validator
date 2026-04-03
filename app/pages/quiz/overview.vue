@@ -86,7 +86,8 @@
     // 1️⃣ Ensure quiz exists
     if (!quizStore.quizId) {
       const res = await $fetch('/api/quiz/lifecycle/start', { method: 'POST' })
-      quizStore.setQuizId(res.quiz_id)
+      quizStore.startFreshQuiz(res.quiz_id)
+      await loadQuizzes()
     }
 
     await quizStore.loadOverview(quizStore.quizId)
@@ -106,7 +107,8 @@
   }
 
   async function loadQuizzes() {
-    quizzes.value = await $fetch('/api/quiz/quizzes')
+    await quizStore.loadQuizzes()
+    quizzes.value = [...quizStore.quizzes]
   }
 
   async function saveRename() {
@@ -288,8 +290,6 @@
           >
             View Score
           </NuxtLink>
-
-          <NuxtLink to="/" class="text-base text-gray-600 hover:underline"> Exit </NuxtLink>
         </div>
       </div>
     </div>

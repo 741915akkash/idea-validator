@@ -32,9 +32,19 @@ export default defineEventHandler(async (event) => {
         i.sub_uncertainty_id,
         i.started_at,
         i.finished_at,
-        s.title AS sub_uncertainty
+        s.title AS sub_uncertainty,
+        ev.notes AS latest_notes,
+        ev.evidence_log AS latest_evidence_log,
+        ev.structured_responses AS latest_structured_responses
       FROM interviews i
       LEFT JOIN sub_uncertainties s ON s.id = i.sub_uncertainty_id
+      LEFT JOIN LATERAL (
+        SELECT e.notes, e.evidence_log, e.structured_responses, e.created_at
+        FROM evidence_entries e
+        WHERE e.interview_id = i.id
+        ORDER BY e.created_at DESC, e.id DESC
+        LIMIT 1
+      ) ev ON true
       WHERE ${whereClauses.join(' AND ')}
       ORDER BY i.started_at DESC
       `,

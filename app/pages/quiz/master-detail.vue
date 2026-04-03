@@ -219,14 +219,16 @@
 
         <!-- UNCERTAINTIES -->
         <div class="hidden w-80 flex-col border-r md:flex">
-          <div class="flex items-center justify-between border-b px-4 py-3">
+          <div class="flex min-h-[104px] flex-col border-b px-4 py-3">
             <span class="font-semibold">Uncertainties</span>
-            <button
-              @click="startNewInterview"
-              class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
-            >
-              Resolve New Uncertainties
-            </button>
+            <div class="mt-3 min-h-[30px]">
+              <button
+                @click="startNewInterview"
+                class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+              >
+                Resolve New Uncertainties
+              </button>
+            </div>
           </div>
 
           <div class="flex-1 overflow-y-auto">
@@ -247,7 +249,10 @@
 
         <!-- SUB UNCERTAINTIES -->
         <div class="hidden w-96 flex-col border-r md:flex">
-          <div class="border-b px-4 py-3 font-semibold">Sub-uncertainties</div>
+          <div class="flex min-h-[104px] flex-col border-b px-4 py-3">
+            <div class="font-semibold">Sub-uncertainties</div>
+            <div class="mt-3 min-h-[30px]"></div>
+          </div>
 
           <div class="flex-1 overflow-y-auto">
             <div v-if="!selectedUncertainty" class="p-4 text-sm text-gray-500">
@@ -275,24 +280,25 @@
 
         <!-- INTERVIEWS -->
         <div class="hidden flex-1 flex-col md:flex">
-          <div class="flex items-center justify-between border-b px-4 py-3 font-semibold">
-            <span>Interviews</span>
+          <div class="flex min-h-[104px] flex-col border-b px-4 py-3">
+            <span class="font-semibold">Interviews</span>
+            <div class="mt-3 min-h-[30px]">
+              <div v-if="selectedSub" class="flex items-center gap-2">
+                <button
+                  @click="interviewAnotherPerson"
+                  :disabled="startingAnother"
+                  class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:bg-neutral-300"
+                >
+                  {{ startingAnother ? 'Starting...' : 'Interview Another Person' }}
+                </button>
 
-            <div v-if="selectedSub" class="flex items-center gap-2">
-              <button
-                @click="openAnalytics"
-                class="rounded-md border border-emerald-300 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
-              >
-                Analytics
-              </button>
-
-              <button
-                @click="interviewAnotherPerson"
-                :disabled="startingAnother"
-                class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
-              >
-                {{ startingAnother ? 'Starting...' : 'Interview Another Person' }}
-              </button>
+                <button
+                  @click="openAnalytics"
+                  class="rounded-md border border-emerald-300 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
+                >
+                  Analytics
+                </button>
+              </div>
             </div>
           </div>
 
@@ -334,11 +340,11 @@
         <div class="flex w-full flex-col md:hidden">
           <!-- UNCERTAINTIES -->
           <div v-if="mobileView === 'uncertainties'">
-            <div class="flex items-center justify-between border-b px-4 py-3">
+            <div class="border-b px-4 py-3">
               <span class="font-semibold">Uncertainties</span>
               <button
                 @click="startNewInterview"
-                class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                class="mt-3 rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
               >
                 Resolve New Uncertainties
               </button>
