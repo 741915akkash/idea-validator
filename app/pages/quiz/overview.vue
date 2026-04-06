@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted, computed } from 'vue'
+  import { ref, onMounted, computed, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import Button from '~/components/ui/Button.vue'
@@ -14,7 +14,7 @@
 
   const router = useRouter()
   const quizStore = useQuizSessionStore()
-  const quizzes = ref([])
+  const quizzes = computed(() => quizStore.quizzes)
   const renaming = ref(false)
   const nameDraft = ref('')
   const interviewSummary = ref({
@@ -22,6 +22,7 @@
     completed: 0,
     inProgress: 0
   })
+  const isMounted = ref(false)
 
   const currentQuiz = computed(() => quizzes.value.find((q) => q.id === quizStore.quizId))
 
@@ -29,6 +30,28 @@
   const checkpointHasNotes = ref({})
 
   const scoreError = ref('')
+  const historyEntries = computed(() => {
+    if (!currentQuiz.value) return []
+
+    const rootId = currentQuiz.value.parent_quiz_id || currentQuiz.value.id
+    return quizzes.value
+      .filter((q) => (q.parent_quiz_id || q.id) === rootId && q.status === 'COMPLETED')
+      .sort((a, b) => Number(a.revision_number ?? 0) - Number(b.revision_number ?? 0))
+  })
+  const canViewHistory = computed(() => historyEntries.value.length > 0)
+
+  function latestQuizIdForIdeaRoot(rootId) {
+    if (!rootId) return null
+
+    const family = quizzes.value.filter((q) => String(q.parent_quiz_id || q.id) === String(rootId))
+    if (!family.length) return null
+
+    const latest = family.reduce((best, q) => {
+      return Number(q.revision_number ?? 0) > Number(best.revision_number ?? 0) ? q : best
+    }, family[0])
+
+    return latest?.id || null
+  }
 
   async function loadOverviewSideData(quizId, { force = false } = {}) {
     if (!quizId) return
@@ -63,6 +86,25 @@
     })
   }
 
+  watch(
+    () => quizStore.quizId,
+    async (nextQuizId, prevQuizId) => {
+      if (!nextQuizId || String(nextQuizId) === String(prevQuizId || '')) return
+
+      // Prevent stale badges/panels while switching ideas.
+      checkpointHasNotes.value = {}
+      interviewSummary.value = {
+        total: 0,
+        completed: 0,
+        inProgress: 0
+      }
+      scoreError.value = ''
+
+      await quizStore.loadOverview(nextQuizId)
+      await loadOverviewSideData(nextQuizId)
+    }
+  )
+
   async function handleScoreClick() {
     try {
       await $fetch('/api/quiz/score/score', {
@@ -77,6 +119,7 @@
   }
 
   onMounted(async () => {
+    isMounted.value = true
     quizStore.hydrate()
     await loadQuizzes()
 
@@ -92,6 +135,16 @@
 
     if (!quizStore.quizId && quizzes.value.length) {
       quizStore.setQuizId(quizzes.value[0].id)
+    }
+
+    // Always resolve overview to latest revision in the selected idea family.
+    if (quizStore.quizId) {
+      const selected = quizzes.value.find((q) => String(q.id) === String(quizStore.quizId))
+      const rootId = selected ? selected.parent_quiz_id || selected.id : quizStore.quizId
+      const latestId = latestQuizIdForIdeaRoot(rootId)
+      if (latestId && String(latestId) !== String(quizStore.quizId)) {
+        quizStore.setQuizId(latestId)
+      }
     }
 
     // 1️⃣ Ensure quiz exists (or recover if session/store is stale)
@@ -127,7 +180,6 @@
 
   async function loadQuizzes() {
     await quizStore.loadQuizzes()
-    quizzes.value = [...quizStore.quizzes]
   }
 
   async function saveRename() {
@@ -145,6 +197,11 @@
     currentQuiz.value.name = nameDraft.value
     renaming.value = false
   }
+
+  function openHistory() {
+    if (!currentQuiz.value || !canViewHistory.value) return
+    router.push(`/quiz/history?quiz_id=${currentQuiz.value.id}`)
+  }
 </script>
 
 <template>
@@ -154,10 +211,8 @@
 
       <div class="mb-8 h-1 w-16 bg-emerald-500"></div>
 
-      <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <!-- Quiz title + rename -->
-        <div v-if="currentQuiz" class="group flex items-center gap-2">
-          <!-- View mode -->
+      <div class="mb-6 flex items-start justify-between gap-3">
+        <div v-if="currentQuiz" class="group min-w-0">
           <div
             v-if="!renaming"
             class="flex cursor-pointer items-center gap-2"
@@ -168,57 +223,42 @@
               }
             "
           >
-            <h1 class="text-xl font-semibold md:text-2xl">
-              {{ currentQuiz.name || 'Untitled quiz' }}
-              {{
-                currentQuiz && currentQuiz.revision_number > 0
-                  ? `Revision ${currentQuiz.revision_number}`
-                  : ''
-              }}
-            </h1>
-
-            <!-- Pencil icon -->
-            <span
-              class="opacity-60 transition-opacity md:opacity-0 md:group-hover:opacity-100"
-              title="Rename"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 text-emerald-600"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M12 20h9" />
-                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-              </svg>
-            </span>
+            <h2 class="truncate text-xl font-semibold md:text-2xl">
+              {{ currentQuiz.name || 'New idea' }}
+              <span v-if="currentQuiz.revision_number > 0" class="text-base text-slate-500">
+                — Rev {{ currentQuiz.revision_number }}
+              </span>
+            </h2>
           </div>
 
-          <!-- Rename mode -->
-          <div class="flex flex-wrap items-center gap-2" v-else>
+          <div class="mt-1 flex flex-wrap items-center gap-2" v-else>
             <input
               v-model="nameDraft"
               class="w-full rounded border px-2 py-2 text-sm md:w-auto"
               placeholder="Quiz name"
             />
-
             <button
               @click="saveRename"
               class="rounded bg-emerald-600 px-3 py-1 text-sm text-white hover:bg-emerald-700"
             >
               Save
             </button>
-
             <button @click="renaming = false" class="text-sm text-gray-500">Cancel</button>
           </div>
         </div>
+
+        <button
+          class="shrink-0 rounded-lg bg-[#E5E4E2] px-4 py-2 text-sm font-medium text-black transition hover:bg-[#DAD8D4] disabled:cursor-not-allowed disabled:opacity-50"
+          :disabled="!canViewHistory"
+          @click="openHistory"
+        >
+          🕘 History
+        </button>
       </div>
 
       <!-- Deterministic Interview Section -->
       <section
-        v-if="quizStore.quizId"
+        v-if="isMounted && quizStore.quizId"
         class="mb-10 rounded-lg border border-neutral-200 bg-gray-50 p-6"
       >
         <div class="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
@@ -247,7 +287,7 @@
       </section>
 
       <!-- Checkpoints list -->
-      <section v-if="quizStore.checkpoints.length" class="space-y-4">
+      <section v-if="isMounted && quizStore.checkpoints.length" class="space-y-4">
         <div
           v-for="cp in quizStore.checkpoints"
           :key="cp.checkpoint"

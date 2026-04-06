@@ -15,10 +15,12 @@ export default eventHandler(async (event) => {
             name,
             status,
             parent_quiz_id,
-            revision_number
+            revision_number,
+            archived_at
           FROM quizzes
           WHERE user_id = $1
           ORDER BY
+            (archived_at IS NOT NULL),
             COALESCE(parent_quiz_id, id),
             revision_number
           `,
@@ -31,10 +33,12 @@ export default eventHandler(async (event) => {
             name,
             status,
             parent_quiz_id,
-            revision_number
+            revision_number,
+            archived_at
           FROM quizzes
           WHERE visitor_id = $1
           ORDER BY
+            (archived_at IS NOT NULL),
             COALESCE(parent_quiz_id, id),
             revision_number
           `,

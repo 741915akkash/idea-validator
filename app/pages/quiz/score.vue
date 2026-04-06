@@ -22,6 +22,7 @@
   const loading = ref(true)
   const result = ref(null)
   const error = ref(null)
+  const canStartRevision = ref(false)
 
   // --------------------
   // Revision diff
@@ -59,6 +60,27 @@
       }
 
       result.value = existing
+
+      // ✅ 1.5️⃣ Allow new revision only from latest revision in this idea family
+      try {
+        const [quizMeta, allQuizzes] = await Promise.all([
+          $fetch('/api/quiz/by-id', {
+            query: { quiz_id: quizId }
+          }),
+          $fetch('/api/quiz/quizzes')
+        ])
+
+        const rootQuizId = quizMeta.parent_quiz_id || quizMeta.id
+        const family = (allQuizzes || []).filter((q) => (q.parent_quiz_id || q.id) === rootQuizId)
+        const latestRevisionNumber = family.reduce(
+          (max, q) => Math.max(max, Number(q.revision_number ?? 0)),
+          0
+        )
+
+        canStartRevision.value = Number(quizMeta.revision_number ?? 0) === latestRevisionNumber
+      } catch {
+        canStartRevision.value = false
+      }
 
       // ✅ 2️⃣ Fetch revision diff (safe even for original quiz)
       const diffRes = await $fetch('/api/quiz/revision/revision-diff', {
@@ -102,7 +124,7 @@
   // Actions
   // --------------------
   async function startNewRevision() {
-    if (!quizId) return
+    if (!quizId || !canStartRevision.value) return
     await quizStore.startRevision(quizId)
   }
 </script>
@@ -313,6 +335,7 @@
         <!-- Actions -->
         <div class="flex items-center gap-6">
           <button
+            v-if="canStartRevision"
             class="rounded-md bg-indigo-600 px-4 py-2 text-base font-medium text-white hover:bg-indigo-700"
             @click="startNewRevision"
           >
@@ -320,10 +343,10 @@
           </button>
 
           <NuxtLink
-            to="/quiz/overview"
+            :to="`/quiz/history?quiz_id=${quizId}`"
             class="inline-flex items-center justify-center rounded-lg bg-[#E5E4E2] px-4 py-2 text-sm font-medium text-black transition hover:bg-[#DAD8D4]"
           >
-            Back to Overview
+            Back to History
           </NuxtLink>
         </div>
       </div>

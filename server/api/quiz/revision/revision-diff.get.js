@@ -13,7 +13,8 @@ export default defineEventHandler(async (event) => {
   try {
     // 1️⃣ Fetch quiz + revision info
     const quiz = await requireQuizAccess(client, event, quiz_id, {
-      select: 'id, parent_quiz_id, revision_number, user_id, visitor_id'
+      select: 'id, parent_quiz_id, revision_number, user_id, visitor_id',
+      includeArchived: true
     })
 
     if (quiz.revision_number === 0) {

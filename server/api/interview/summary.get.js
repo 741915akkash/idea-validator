@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   const client = await pool.connect()
   try {
-    await requireQuizAccess(client, event, quiz_id)
+    await requireQuizAccess(client, event, quiz_id, { includeArchived: true })
 
     const { rows } = await client.query(
       `

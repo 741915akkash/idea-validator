@@ -60,6 +60,27 @@ export default defineEventHandler(async (event) => {
 
     const newQuizId = insertRes.rows[0].id
 
+    // 3.1 Initialize lifecycle tables for the new revision quiz.
+    await client.query(
+      `
+      INSERT INTO quiz_state (quiz_id)
+      VALUES ($1)
+      `,
+      [newQuizId]
+    )
+
+    await client.query(
+      `
+      INSERT INTO quiz_checkpoints (quiz_id, checkpoint)
+      SELECT $1, checkpoint
+      FROM (
+        SELECT DISTINCT checkpoint
+        FROM questions
+      ) q
+      `,
+      [newQuizId]
+    )
+
     // 4️⃣ Copy answers
     await client.query(
       `

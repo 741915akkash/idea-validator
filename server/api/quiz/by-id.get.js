@@ -14,7 +14,9 @@ export default eventHandler(async (event) => {
 
   const client = await pool.connect()
   try {
-    const quiz = await requireQuizAccess(client, event, quiz_id, { select: 'id, name' })
+    const quiz = await requireQuizAccess(client, event, quiz_id, {
+      select: 'id, name, status, parent_quiz_id, revision_number'
+    })
     return quiz
   } finally {
     client.release()

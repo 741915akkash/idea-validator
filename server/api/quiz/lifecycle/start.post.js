@@ -29,6 +29,7 @@ export default eventHandler(async (event) => {
         SELECT id
         FROM quizzes
         WHERE user_id = $1
+          AND archived_at IS NULL
           AND status IN ('NOT_STARTED', 'IN_PROGRESS')
         ORDER BY started_at DESC NULLS LAST
         LIMIT 1
@@ -41,6 +42,7 @@ export default eventHandler(async (event) => {
         SELECT id
         FROM quizzes
         WHERE visitor_id = $1
+          AND archived_at IS NULL
         ORDER BY started_at DESC NULLS LAST
         LIMIT 1
         `,
@@ -85,6 +87,7 @@ export default eventHandler(async (event) => {
               SELECT id
               FROM quizzes
               WHERE visitor_id = $1
+                AND archived_at IS NULL
               ORDER BY started_at DESC NULLS LAST
               LIMIT 1
               `,

@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   const client = await pool.connect()
   try {
-    await requireQuizAccess(client, event, quizId)
+    await requireQuizAccess(client, event, quizId, { includeArchived: true })
 
     const { rows } = await client.query(`SELECT * FROM quiz_results WHERE quiz_id = $1`, [quizId])
     if (!rows[0]) return null

@@ -1,10 +1,16 @@
 <script setup>
-  import { Check, Minus, Plus, ChevronDown, ChevronUp, HelpCircle } from 'lucide-vue-next'
+  import { Check, X, ChevronDown, ChevronUp } from 'lucide-vue-next'
+  import { ref, onMounted } from 'vue'
 
   definePageMeta({
     layout: 'marketing'
   })
-  import { ref, onMounted } from 'vue'
+
+  const user = useUser()
+  await bootstrapUser()
+  if (user.value) {
+    setPageLayout('app')
+  }
 
   const billing = ref('yearly')
 
@@ -32,14 +38,66 @@
   ]
 
   const features = [
-    { name: 'Active Ideas', free: '1', growth: '5', isBold: true },
-    { name: 'Interviews / month', free: '20', growth: '50', isBold: true },
-    { name: 'AI Sentiment Analysis', free: 'Basic', growth: 'Advanced', isBold: true },
-    { name: 'Progress Tracking', free: 'minus', growth: 'check' },
-    { name: 'Team Collaboration', free: 'minus', growth: 'minus' },
-    { name: 'CRM', free: 'minus', growth: 'check', badge: 'Coming Soon' },
-    { name: 'Social Media Leads Finder', free: 'minus', growth: 'check', badge: 'Coming Soon' },
-    { name: 'Market Research', free: 'minus', growth: 'check', badge: 'Coming Soon' }
+    { name: 'Active ideas', free: '2', growth: '5', founder: '5', isBold: true },
+    {
+      name: 'Archived ideas',
+      free: '3',
+      growth: '50',
+      founder: '100',
+      isBold: true
+    },
+    {
+      name: 'Revisions per idea',
+      free: '30',
+      growth: 'Unlimited',
+      founder: 'Unlimited',
+      isBold: true
+    },
+    {
+      name: 'Freeform interviews',
+      free: '30/month/idea',
+      growth: 'Unlimited',
+      founder: 'Unlimited',
+      isBold: true
+    },
+    {
+      name: 'Structured validation (AI)',
+      free: '❌',
+      growth: 'Full',
+      founder: 'Full',
+      isBold: true
+    },
+    { name: 'AI scoring & breakdown', free: '❌', growth: '✅', founder: '✅', isBold: true },
+    { name: 'Compare revisions', free: '✅', growth: '✅', founder: '✅', isBold: true },
+    { name: 'Notes & diff tracking', free: '✅', growth: '✅', founder: '✅', isBold: true },
+    { name: 'History view', free: '✅', growth: '✅', founder: '✅', isBold: true },
+    {
+      name: 'CRM',
+      free: '❌',
+      growth: 'Included (when released)',
+      founder: 'Full access (when released)',
+      isBold: true,
+      badge: 'Coming Soon'
+    },
+    {
+      name: 'Social lead finder',
+      free: '❌',
+      growth: 'Included (when released)',
+      founder: 'Generous (when released)',
+      isBold: true,
+      badge: 'Coming Soon'
+    },
+    {
+      name: 'Market research agent',
+      free: '❌',
+      growth: 'Included (when released)',
+      founder: 'Generous (when released)',
+      isBold: true,
+      badge: 'Coming Soon'
+    },
+    { name: 'AI priority / speed', free: '❌', growth: 'Standard', founder: 'High', isBold: true },
+    { name: 'Early feature access', free: '❌', growth: '✅', founder: '✅', isBold: true },
+    { name: 'Priority support', free: '❌', growth: '✅', founder: '✅', isBold: true }
   ]
 
   const openFaq = ref(0)
@@ -89,15 +147,23 @@
           <ul role="list" class="mt-8 space-y-3 text-sm leading-6 text-slate-600">
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-600" aria-hidden="true" />
-              1 active idea validation
+              2 active ideas + 3 archived ideas
             </li>
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-600" aria-hidden="true" />
-              20 interview templates
+              30 revisions per idea
             </li>
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-600" aria-hidden="true" />
-              Basic AI insight reports
+              30 freeform interviews/month/idea
+            </li>
+            <li class="flex gap-x-3">
+              <Check class="h-6 w-5 flex-none text-emerald-600" aria-hidden="true" />
+              Compare revisions, notes & diff tracking
+            </li>
+            <li class="flex gap-x-3">
+              <Check class="h-6 w-5 flex-none text-emerald-600" aria-hidden="true" />
+              History view
             </li>
           </ul>
         </div>
@@ -177,19 +243,23 @@
           <ul role="list" class="mt-8 space-y-3 text-sm leading-6 text-slate-600">
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-600" aria-hidden="true" />
-              5 active idea validations
+              5 active ideas + 50 archived ideas
             </li>
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-600" aria-hidden="true" />
-              Advanced AI sentiment analysis
+              Unlimited revisions + freeform interviews
             </li>
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-600" aria-hidden="true" />
-              Full validation dashboard
+              Full structured validation + AI scoring
             </li>
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-600" aria-hidden="true" />
-              Faster, structured decision making
+              Early feature access + priority support
+            </li>
+            <li class="flex gap-x-3">
+              <Check class="h-6 w-5 flex-none text-emerald-600" aria-hidden="true" />
+              CRM, Social lead finder, Market research agent included (when released)
             </li>
           </ul>
           <p class="mt-5 text-sm font-medium text-slate-700">
@@ -240,23 +310,27 @@
           <ul role="list" class="mt-8 space-y-3 text-sm leading-6 text-slate-300">
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-400" aria-hidden="true" />
-              Everything in Growth
+              5 active ideas + 100 archived ideas
             </li>
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-400" aria-hidden="true" />
-              2 years of uninterrupted access
+              Unlimited revisions + freeform interviews
             </li>
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-400" aria-hidden="true" />
-              Access to all upcoming features
+              Full structured validation + AI scoring
             </li>
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-400" aria-hidden="true" />
-              Generous limits on new modules
+              High AI priority / speed
             </li>
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-400" aria-hidden="true" />
-              Founder-only perks & early releases
+              Full CRM + generous Social lead finder/Market research (when released)
+            </li>
+            <li class="flex gap-x-3">
+              <Check class="h-6 w-5 flex-none text-emerald-400" aria-hidden="true" />
+              Early feature access + priority support
             </li>
           </ul>
           <div class="mt-6 rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-3">
@@ -292,9 +366,10 @@
       <div class="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
         <table class="w-full min-w-[600px] table-fixed border-collapse text-left">
           <colgroup>
-            <col class="w-1/2" />
-            <col class="w-1/4" />
-            <col class="w-1/4" />
+            <col class="w-2/5" />
+            <col class="w-1/5" />
+            <col class="w-1/5" />
+            <col class="w-1/5" />
           </colgroup>
           <thead>
             <tr class="bg-slate-50">
@@ -306,6 +381,9 @@
               </th>
               <th class="px-6 py-4 text-center text-base font-bold tracking-tight text-slate-900">
                 Growth
+              </th>
+              <th class="px-6 py-4 text-center text-base font-bold tracking-tight text-slate-900">
+                Founder
               </th>
             </tr>
           </thead>
@@ -321,32 +399,36 @@
                 </span>
               </td>
               <td class="px-6 py-4 text-center align-middle">
-                <template v-if="f.free === 'check'">
+                <template v-if="f.free === '✅'">
                   <Check class="mx-auto h-5 w-5 text-emerald-600" />
                 </template>
-                <template v-else-if="f.free === 'minus'">
-                  <Minus class="mx-auto h-4 w-4 text-slate-300" />
+                <template v-else-if="f.free === '❌'">
+                  <X class="mx-auto h-5 w-5 text-rose-500" />
                 </template>
-                <span
-                  v-else
-                  class="text-sm font-medium leading-6 text-slate-800"
-                  :class="{ 'font-bold': f.isBold }"
-                  >{{ f.free }}</span
-                >
+                <span v-else class="text-sm font-medium leading-6 text-slate-800" :class="{ 'font-bold': f.isBold }">
+                  {{ f.free }}
+                </span>
               </td>
               <td class="px-6 py-4 text-center align-middle">
-                <template v-if="f.growth === 'check'">
+                <template v-if="f.growth === '✅'">
                   <Check class="mx-auto h-5 w-5 text-emerald-600" />
                 </template>
-                <template v-else-if="f.growth === 'minus'">
-                  <Minus class="mx-auto h-4 w-4 text-slate-300" />
+                <template v-else-if="f.growth === '❌'">
+                  <X class="mx-auto h-5 w-5 text-rose-500" />
                 </template>
-                <span
-                  v-else
-                  class="text-sm font-medium leading-6 text-slate-900"
-                  :class="{ 'font-bold': f.isBold }"
-                >
+                <span v-else class="text-sm font-medium leading-6 text-slate-900" :class="{ 'font-bold': f.isBold }">
                   {{ f.growth }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-center align-middle">
+                <template v-if="f.founder === '✅'">
+                  <Check class="mx-auto h-5 w-5 text-emerald-600" />
+                </template>
+                <template v-else-if="f.founder === '❌'">
+                  <X class="mx-auto h-5 w-5 text-rose-500" />
+                </template>
+                <span v-else class="text-sm font-medium leading-6 text-slate-900" :class="{ 'font-bold': f.isBold }">
+                  {{ f.founder }}
                 </span>
               </td>
             </tr>

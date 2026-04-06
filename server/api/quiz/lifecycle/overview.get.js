@@ -17,7 +17,8 @@ export default eventHandler(async (event) => {
   try {
     // 1️⃣ Fetch quiz status
     const quiz = await requireQuizAccess(client, event, quiz_id, {
-      select: 'id, status'
+      select: 'id, status',
+      includeArchived: true
     })
 
     // 2️⃣ Aggregate checkpoint overview

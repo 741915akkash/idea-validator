@@ -54,6 +54,10 @@ export const useQuizSessionStore = defineStore('quizSession', {
       if (q) q.name = name
     },
 
+    removeQuiz(id) {
+      this.quizzes = this.quizzes.filter((q) => q.id !== id)
+    },
+
     /**
      * Used ONLY when resuming or hydrating an existing quiz
      */

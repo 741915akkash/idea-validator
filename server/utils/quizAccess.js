@@ -40,7 +40,7 @@ export async function requireQuizAccess(client, event, quizId, options = {}) {
     })
   }
 
-  const { select = 'id, user_id, visitor_id' } = options
+  const { select = 'id, user_id, visitor_id', includeArchived = false } = options
   const { userId, visitorId } = requireIdentity(event)
 
   let query
@@ -52,6 +52,7 @@ export async function requireQuizAccess(client, event, quizId, options = {}) {
       FROM quizzes
       WHERE id = $1
         AND user_id = $2
+        ${includeArchived ? '' : 'AND archived_at IS NULL'}
       LIMIT 1
     `
     params = [quizId, userId]
@@ -61,6 +62,7 @@ export async function requireQuizAccess(client, event, quizId, options = {}) {
       FROM quizzes
       WHERE id = $1
         AND visitor_id = $2
+        ${includeArchived ? '' : 'AND archived_at IS NULL'}
       LIMIT 1
     `
     params = [quizId, visitorId]

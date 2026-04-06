@@ -130,6 +130,12 @@
       }
     })
 
+    // Final checkpoint should always return to overview.
+    if (checkpoint === 9) {
+      await navigateTo('/quiz/overview')
+      return
+    }
+
     // Ask backend for lifecycle state
     const lifecycle = await $fetch('/api/quiz/lifecycle/state', {
       query: { quiz_id: quizId }

@@ -9,6 +9,34 @@ export default defineEventHandler(async (event) => {
     await client.query('BEGIN')
     await requireQuizAccess(client, event, quiz_id)
 
+    // Self-heal older revision quizzes that were created without lifecycle rows.
+    await client.query(
+      `
+      INSERT INTO quiz_state (quiz_id, current_checkpoint, last_updated)
+      VALUES ($1, 1, now())
+      ON CONFLICT (quiz_id) DO NOTHING
+      `,
+      [quiz_id]
+    )
+
+    await client.query(
+      `
+      INSERT INTO quiz_checkpoints (quiz_id, checkpoint, status)
+      SELECT $1, q.checkpoint, 'UNANSWERED'
+      FROM (
+        SELECT DISTINCT checkpoint
+        FROM questions
+      ) q
+      WHERE NOT EXISTS (
+        SELECT 1
+        FROM quiz_checkpoints qc
+        WHERE qc.quiz_id = $1
+          AND qc.checkpoint = q.checkpoint
+      )
+      `,
+      [quiz_id]
+    )
+
     // 1️⃣ Verify quiz + current checkpoint
     const stateRes = await client.query(
       `
