@@ -77,20 +77,39 @@
   }
 
   onMounted(async () => {
+    quizStore.hydrate()
     await loadQuizzes()
 
-    if (quizStore.quizId) {
-      await quizStore.loadOverview(quizStore.quizId)
+    const availableQuizIds = new Set(quizzes.value.map((q) => String(q.id)))
+
+    if (quizStore.quizId && !availableQuizIds.has(String(quizStore.quizId))) {
+      quizStore.quizId = null
+      quizStore.loaded = false
+      if (import.meta.client) {
+        localStorage.removeItem('quiz_id')
+      }
     }
 
-    // 1️⃣ Ensure quiz exists
+    if (!quizStore.quizId && quizzes.value.length) {
+      quizStore.setQuizId(quizzes.value[0].id)
+    }
+
+    // 1️⃣ Ensure quiz exists (or recover if session/store is stale)
     if (!quizStore.quizId) {
       const res = await $fetch('/api/quiz/lifecycle/start', { method: 'POST' })
       quizStore.startFreshQuiz(res.quiz_id)
       await loadQuizzes()
     }
 
-    await quizStore.loadOverview(quizStore.quizId)
+    try {
+      await quizStore.loadOverview(quizStore.quizId)
+    } catch {
+      const res = await $fetch('/api/quiz/lifecycle/start', { method: 'POST' })
+      quizStore.startFreshQuiz(res.quiz_id)
+      await loadQuizzes()
+      await quizStore.loadOverview(quizStore.quizId)
+    }
+
     await loadOverviewSideData(quizStore.quizId)
   })
 

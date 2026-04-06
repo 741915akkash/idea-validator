@@ -161,9 +161,9 @@
         to="/quiz/overview"
         active-class=""
         exact-active-class=""
-        class="text-base text-emerald-700 hover:underline"
+        class="inline-flex items-center justify-center rounded-lg bg-[#E5E4E2] px-4 py-2 text-sm font-medium text-black transition hover:bg-[#DAD8D4]"
       >
-        Back to overview
+        Back to Overview
       </NuxtLink>
     </header>
 

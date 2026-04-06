@@ -59,6 +59,9 @@ export const useQuizSessionStore = defineStore('quizSession', {
      */
     setQuizId(id) {
       this.quizId = id
+      this.loaded = false
+      this.checkpoints = []
+      this.isCompleted = false
 
       if (import.meta.client) {
         localStorage.setItem('quiz_id', id)
@@ -83,7 +86,7 @@ export const useQuizSessionStore = defineStore('quizSession', {
 
     async loadOverview(quizId) {
       // prevent unnecessary reloads
-      if (this.loaded && this.quizId === quizId) return
+      if (this.loaded && this.quizId === quizId && this.checkpoints.length > 0) return
 
       const res = await $fetch('/api/quiz/lifecycle/overview', {
         query: { quiz_id: quizId }

@@ -21,6 +21,15 @@
     layout: 'marketing'
   })
 
+  const user = useUser()
+
+  await bootstrapUser()
+  if (user.value) {
+    setPageLayout('app')
+  }
+
+  const isLoggedIn = computed(() => Boolean(user.value))
+
   // Navigation for the sticky sidebar
   const stepsNav = [
     { title: 'The Reality Check', anchor: 'reality-check', icon: AlertCircle },
@@ -323,7 +332,7 @@
             </ul>
           </div>
 
-          <div class="rounded-xl bg-slate-900 p-4 text-white shadow-xl shadow-slate-200">
+          <div v-if="!isLoggedIn" class="rounded-xl bg-slate-900 p-4 text-white shadow-xl shadow-slate-200">
             <p class="mb-3 text-base font-black leading-tight text-white">
               Start validating your idea
             </p>
@@ -593,6 +602,7 @@
 
         <!-- 8. FINAL CTA -->
         <section
+          v-if="!isLoggedIn"
           class="relative overflow-hidden rounded-xl bg-slate-900 p-16 text-center text-white"
         >
           <div

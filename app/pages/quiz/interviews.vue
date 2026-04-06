@@ -348,7 +348,7 @@
     />
     <button
       v-if="showFreeformInterview"
-      class="fixed right-4 top-4 z-[60] rounded-md border border-black bg-white px-3 py-2 text-sm font-medium text-black hover:bg-gray-100"
+      class="fixed right-4 top-4 z-[60] rounded-md bg-slate-700 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
       :disabled="closingFreeform"
       @click="closeFreeformInterview"
     >
@@ -412,7 +412,7 @@
 
             <NuxtLink
               to="/quiz/overview"
-              class="inline-flex flex-1 items-center justify-center rounded-lg border border-black bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg-gray-100 md:flex-none"
+              class="inline-flex flex-1 items-center justify-center rounded-lg bg-[#E5E4E2] px-4 py-2 text-sm font-medium text-black transition hover:bg-[#DAD8D4] md:flex-none"
             >
               Back to Overview
             </NuxtLink>

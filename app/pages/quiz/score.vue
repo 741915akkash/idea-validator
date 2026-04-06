@@ -321,9 +321,9 @@
 
           <NuxtLink
             to="/quiz/overview"
-            class="rounded-md border border-neutral-400 bg-white px-4 py-2 text-base font-medium text-black hover:bg-neutral-100"
+            class="inline-flex items-center justify-center rounded-lg bg-[#E5E4E2] px-4 py-2 text-sm font-medium text-black transition hover:bg-[#DAD8D4]"
           >
-            Back to overview
+            Back to Overview
           </NuxtLink>
         </div>
       </div>

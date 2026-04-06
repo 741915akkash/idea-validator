@@ -7,7 +7,8 @@
     Rocket,
     BookOpen,
     MessagesSquare,
-    Columns3
+    Columns3,
+    Settings
   } from 'lucide-vue-next'
   import { useQuizSessionStore } from '~/stores/quizSession'
 
@@ -31,7 +32,7 @@
     try {
       await quizStore.loadQuizzes()
     } catch {
-      quizzes.value = []
+      quizStore.quizzes = []
     }
   })
 
@@ -68,6 +69,7 @@
   const isOverview = computed(() => route.path.startsWith('/quiz/overview'))
 
   const isInterviews = computed(() => route.path.startsWith('/quiz/interviews'))
+  const isSettings = computed(() => route.path.startsWith('/quiz/settings'))
 
   const isHowItWorks = computed(() => route.path.startsWith('/how-it-works'))
 </script>
@@ -142,7 +144,12 @@
               ? `/quiz/master-detail?quiz_id=${quizStore.quizId}`
               : '/quiz/master-detail'
           "
-          class="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-700 transition hover:bg-slate-100"
+          class="flex items-center gap-2 rounded-lg px-3 py-2 transition"
+          :class="
+            route.path.startsWith('/quiz/master-detail')
+              ? 'bg-emerald-50 font-medium text-emerald-700'
+              : 'text-slate-700 hover:bg-slate-100'
+          "
         >
           <Columns3 class="h-4 w-4" />
           Master Detail
@@ -193,6 +200,21 @@
         class="block w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-center font-medium text-white transition hover:bg-emerald-700"
       >
         Start Validating
+      </NuxtLink>
+    </div>
+
+    <div class="mt-auto pt-6">
+      <NuxtLink
+        to="/quiz/settings"
+        class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
+        :class="
+          isSettings
+            ? 'bg-emerald-50 font-medium text-emerald-700'
+            : 'text-slate-700 hover:bg-slate-100'
+        "
+      >
+        <Settings class="h-4 w-4" />
+        Settings
       </NuxtLink>
     </div>
   </nav>

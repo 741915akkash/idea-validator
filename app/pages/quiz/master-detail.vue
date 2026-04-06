@@ -25,6 +25,18 @@
   const selectedUncertainty = ref(null)
   const selectedSub = ref(null)
 
+  function isFreeformTemplateUncertainty(item) {
+    return String(item?.text || '').trim() === '__FREEFORM_TEMPLATE__'
+  }
+
+  function isFreeformSubUncertainty(item) {
+    return String(item?.title || '').trim().toUpperCase() === 'FREEFORM'
+  }
+
+  function isFreeformInterview(item) {
+    return String(item?.sub_uncertainty || '').trim().toUpperCase() === 'FREEFORM'
+  }
+
   /* ---------------- MOBILE NAVIGATION ---------------- */
 
   const mobileView = ref('uncertainties')
@@ -43,9 +55,10 @@
     }
 
     try {
-      uncertainties.value = await $fetch('/api/uncertainty/list', {
+      const rows = await $fetch('/api/uncertainty/list', {
         query: { quiz_id: quizStore.quizId }
       })
+      uncertainties.value = rows.filter((u) => !isFreeformTemplateUncertainty(u))
 
       const queryUncertaintyId = route.query.uncertainty_id
       const querySubUncertaintyId = route.query.sub_uncertainty_id
@@ -90,9 +103,10 @@
     }
 
     try {
-      subUncertainties.value = await $fetch('/api/sub_uncertainty/list', {
+      const rows = await $fetch('/api/sub_uncertainty/list', {
         query: { uncertainty_id: u.id }
       })
+      subUncertainties.value = rows.filter((sub) => !isFreeformSubUncertainty(sub))
     } finally {
       loadingSubs.value = false
     }
@@ -110,9 +124,18 @@
     }
 
     try {
-      interviews.value = await $fetch('/api/interview/list', {
-        query: { sub_uncertainty_id: sub.id }
+      if (!quizStore.quizId) {
+        interviews.value = []
+        return
+      }
+
+      const rows = await $fetch('/api/interview/list', {
+        query: {
+          quiz_id: quizStore.quizId,
+          sub_uncertainty_id: sub.id
+        }
       })
+      interviews.value = rows.filter((interview) => !isFreeformInterview(interview))
     } finally {
       loadingInterviews.value = false
     }
