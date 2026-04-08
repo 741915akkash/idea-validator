@@ -1,3 +1,5 @@
+const posthogEnabled = process.env.NUXT_PUBLIC_POSTHOG_ENABLED === 'true'
+
 export default defineNuxtConfig({
   app: {
     head: {
@@ -21,6 +23,7 @@ export default defineNuxtConfig({
     public: {
       gaMeasurementId: process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID || '',
       posthog: {
+        enabled: posthogEnabled,
         publicKey: process.env.NUXT_PUBLIC_POSTHOG_PROJECT_TOKEN || '',
         host: process.env.NUXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com'
       }
@@ -41,7 +44,14 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ['@posthog/nuxt', '@nuxtjs/tailwindcss', '@nuxt/fonts', '@pinia/nuxt', 'lucide-nuxt', '@nuxtjs/sitemap'],
+  modules: [
+    ...(posthogEnabled ? ['@posthog/nuxt'] : []),
+    '@nuxtjs/tailwindcss',
+    '@nuxt/fonts',
+    '@pinia/nuxt',
+    'lucide-nuxt',
+    '@nuxtjs/sitemap'
+  ],
 
   posthogConfig: {
     publicKey: process.env.NUXT_PUBLIC_POSTHOG_PROJECT_TOKEN || '',

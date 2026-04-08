@@ -14,7 +14,7 @@ definePageMeta({
   layout: 'marketing'
 })
 
-const posthog = usePostHog()
+const { $posthog } = useNuxtApp()
 const user = useUser()
 
 await bootstrapUser()
@@ -23,7 +23,7 @@ if (user.value) {
 }
 
 onMounted(() => {
-  posthog?.capture('landing_page_viewed')
+  $posthog?.capture('landing_page_viewed')
 })
 </script>
 

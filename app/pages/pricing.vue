@@ -106,10 +106,10 @@
     openFaq.value = openFaq.value === index ? null : index
   }
 
-  const posthog = usePostHog()
+  const { $posthog } = useNuxtApp()
 
   onMounted(() => {
-    posthog?.capture('pricing_page_viewed')
+    $posthog?.capture('pricing_page_viewed')
   })
 </script>
 

@@ -11,10 +11,10 @@
 </template>
 
 <script setup>
-  const posthog = usePostHog()
+  const { $posthog } = useNuxtApp()
 
   function startValidation() {
-    posthog?.capture('start_validation_clicked')
+    $posthog?.capture('start_validation_clicked')
     navigateTo('/quiz/overview')
   }
 </script>

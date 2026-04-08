@@ -28,10 +28,10 @@
 
 <script setup>
   import { ArrowRight } from 'lucide-vue-next'
-  const posthog = usePostHog()
+  const { $posthog } = useNuxtApp()
 
   function startValidation() {
-    posthog?.capture('start_validation_clicked')
+    $posthog?.capture('start_validation_clicked')
     navigateTo('/quiz/overview')
   }
 </script>
