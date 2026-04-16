@@ -121,6 +121,16 @@
         </NuxtLink>
       </div>
 
+      <div class="mb-3 flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3">
+        <span class="text-sm font-medium text-slate-700">Usage</span>
+        <NuxtLink
+          to="/quiz/usage"
+          class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+        >
+          View usage
+        </NuxtLink>
+      </div>
+
       <div class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3">
         <span class="text-sm font-medium text-slate-700">Account</span>
         <button

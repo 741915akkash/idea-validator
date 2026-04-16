@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import { useInterviewSession } from '@/stores/interviewSession'
   import { useInterviewApi } from '@/composables/useInterviewApi'
@@ -7,10 +7,18 @@
   const interview = useInterviewSession()
   const api = useInterviewApi()
   const router = useRouter()
+  const { credits, fetchCredits } = useCredits()
 
   const loading = ref(false)
   const generating = ref(false)
   const error = ref(null)
+  const generateCost = 10
+  const creditsLeft = computed(() =>
+    Number.isFinite(Number(credits.value?.balance)) ? Number(credits.value.balance) : null
+  )
+  const creditsHint = computed(() =>
+    creditsLeft.value == null ? 'Credits unavailable' : `${creditsLeft.value} credits left`
+  )
 
   function toEditable(conditions, questions) {
     return (conditions || []).map((c) => ({
@@ -53,6 +61,10 @@
     return loading.value || generating.value || interview.disableGoalPrevious
   })
 
+  onMounted(async () => {
+    await fetchCredits()
+  })
+
   async function generateConditionsAndQuestions() {
     if (!editableGoal.value.trim() || generating.value || loading.value) return
 
@@ -76,6 +88,7 @@
       error.value = 'Unable to generate conditions and questions.'
     } finally {
       generating.value = false
+      await fetchCredits(true)
     }
   }
 
@@ -118,6 +131,7 @@
       error.value = 'Unable to start interview.'
     } finally {
       loading.value = false
+      await fetchCredits(true)
     }
   }
 </script>
@@ -157,6 +171,7 @@
         >
           {{ generating ? 'Generating…' : 'Generate Conditions + Questions' }}
         </button>
+        <span class="text-xs text-neutral-500">Costs {{ generateCost }} credits • {{ creditsHint }}</span>
 
         <!-- Add -->
         <button

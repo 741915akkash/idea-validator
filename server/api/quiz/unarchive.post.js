@@ -1,6 +1,11 @@
 import { eventHandler, readBody, createError } from 'h3'
 import { pool } from '../../db'
 import { requireQuizAccess, requireUserIdentity } from '../../utils/quizAccess'
+import {
+  getEventEntitlementsFromDb,
+  getUsageSnapshot,
+  observeCountLimit
+} from '../../utils/track-usage'
 
 export default eventHandler(async (event) => {
   const { quiz_id } = await readBody(event)
@@ -19,6 +24,18 @@ export default eventHandler(async (event) => {
     await client.query('BEGIN')
 
     await requireQuizAccess(client, event, quiz_id, { includeArchived: true })
+    const { tier, limits } = await getEventEntitlementsFromDb({ event, client })
+    const usage = await getUsageSnapshot(client, event, { quizId: quiz_id })
+
+    observeCountLimit(event, {
+      mode: 'observe',
+      checkpoint: 'quiz.unarchive',
+      key: 'activeIdeas',
+      tier,
+      used: usage.activeIdeas,
+      limit: limits.activeIdeas,
+      increment: 1
+    })
 
     const updateResult = await client.query(
       `

@@ -10,6 +10,7 @@ import {
 } from '../../utils/auth'
 import { logAuthEvent } from '../../utils/authAudit'
 import { getClientIP } from '../../utils/clientIp'
+import { ensureUserCreditsRow } from '../../services/creditLifecycle.js'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -165,6 +166,8 @@ export default defineEventHandler(async (event) => {
         )
       }
     }
+
+    await ensureUserCreditsRow({ client, userId: user.id })
 
     await client.query(
       `

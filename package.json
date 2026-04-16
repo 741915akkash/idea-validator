@@ -8,7 +8,9 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "db-diff": "./scripts/db-diff.sh"
+    "db-diff": "./scripts/db-diff.sh",
+    "credits:smoke": "node scripts/credits-smoke.mjs",
+    "credits:daily-check": "node scripts/credits-daily-check.mjs"
   },
   "dependencies": {
     "@nuxt/fonts": "^0.14.0",

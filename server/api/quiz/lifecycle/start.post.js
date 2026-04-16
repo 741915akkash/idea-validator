@@ -1,5 +1,10 @@
 import { getQuery, eventHandler, createError } from 'h3'
 import { pool } from '../../../db'
+import {
+  getEventEntitlementsFromDb,
+  getUsageSnapshot,
+  observeCountLimit
+} from '../../../utils/track-usage'
 
 export default eventHandler(async (event) => {
   const { force } = getQuery(event)
@@ -59,6 +64,21 @@ export default eventHandler(async (event) => {
     if (shouldReuseExisting && existingQuizRes.rowCount > 0) {
       quizId = existingQuizRes.rows[0].id
     } else {
+      if (userId) {
+        const { tier, limits } = await getEventEntitlementsFromDb({ event, client })
+        const usage = await getUsageSnapshot(client, event)
+
+        observeCountLimit(event, {
+          mode: 'observe',
+          checkpoint: 'quiz.lifecycle.start',
+          key: 'activeIdeas',
+          tier,
+          used: usage.activeIdeas,
+          limit: limits.activeIdeas,
+          increment: 1
+        })
+      }
+
       let quizRes
       if (userId) {
         quizRes = await client.query(

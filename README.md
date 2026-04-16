@@ -118,3 +118,17 @@ SES_FROM_EMAIL=noreply@yourdomain.com
 3. Check server logs:
    - You should **not** see: `provider=console`
    - If sending fails, API now returns `500 Unable to send verification code email...`
+
+## Credits Ops Checks
+
+Run daily billing sanity check:
+
+```bash
+npm run credits:daily-check -- --days 7 --limit-users 50
+```
+
+Optional filter for one feature:
+
+```bash
+npm run credits:daily-check -- --feature structured_validation_run
+```

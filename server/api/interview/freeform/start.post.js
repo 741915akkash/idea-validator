@@ -1,5 +1,12 @@
 import { pool } from '../../../db'
 import { requireQuizAccess } from '../../../utils/quizAccess'
+import {
+  getEventEntitlementsFromDb,
+  getUsageSnapshot,
+  observeCountLimit
+} from '../../../utils/track-usage'
+import { recordUsageEvent } from '../../../utils/usageEvents'
+import { FEATURES } from '../../../utils/features'
 
 const FREEFORM_NORMALIZED_TEXT = '__freeform_template__'
 const FREEFORM_UNCERTAINTY_TEXT = '__FREEFORM_TEMPLATE__'
@@ -9,7 +16,7 @@ const FREEFORM_CONDITION_DESCRIPTION = 'freeform_randomid'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { quiz_id } = body || {}
+  const { quiz_id, idempotency_key } = body || {}
 
   if (!quiz_id) {
     throw createError({ statusCode: 400, statusMessage: 'quiz_id required' })
@@ -20,6 +27,17 @@ export default defineEventHandler(async (event) => {
   try {
     await client.query('BEGIN')
     await requireQuizAccess(client, event, quiz_id)
+    const { tier, limits } = await getEventEntitlementsFromDb({ event, client })
+    const usage = await getUsageSnapshot(client, event, { quizId: quiz_id })
+    observeCountLimit(event, {
+      mode: 'observe',
+      checkpoint: 'interview.freeform.start',
+      key: 'freeformInterviewsPerIdeaPerMonth',
+      tier,
+      used: usage.freeformInterviewsForIdeaThisMonth ?? 0,
+      limit: limits.freeformInterviewsPerIdeaPerMonth,
+      increment: 1
+    })
 
     // 1) Create/reuse hidden uncertainty template for this quiz.
     let uncertaintyId = null
@@ -159,6 +177,22 @@ export default defineEventHandler(async (event) => {
       `,
       [interviewId, conditionId]
     )
+
+    const userId = event.context?.user?.id || event.context?.auth?.userId || null
+    if (userId) {
+      await recordUsageEvent({
+        userId,
+        feature: FEATURES.FREEFORM_INTERVIEWS,
+        referenceId: interviewId,
+        idempotencyKey: idempotency_key || null,
+        quantity: 1,
+        metadata: {
+          quiz_id,
+          source: 'interview.freeform.start'
+        },
+        client
+      })
+    }
 
     await client.query('COMMIT')
 

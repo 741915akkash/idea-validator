@@ -12,17 +12,50 @@ export default defineEventHandler(async (event) => {
     return
   }
 
-  const sessionRes = await pool.query(
-    `
-    SELECT u.id, u.email, u.is_guest, s.id AS session_id, s.expires_at AS session_expires_at
-    FROM sessions s
-    JOIN users u ON u.id = s.user_id
-    WHERE s.id = $1
-      AND s.expires_at > now()
-    LIMIT 1
-    `,
-    [sessionId]
-  )
+  let sessionRes
+  try {
+    sessionRes = await pool.query(
+      `
+      SELECT
+        u.id,
+        u.email,
+        u.is_guest,
+        COALESCE(u.plan_tier, 'free') AS plan_tier,
+        u.plan_status,
+        u.plan_expires_at,
+        s.id AS session_id,
+        s.expires_at AS session_expires_at
+      FROM sessions s
+      JOIN users u ON u.id = s.user_id
+      WHERE s.id = $1
+        AND s.expires_at > now()
+      LIMIT 1
+      `,
+      [sessionId]
+    )
+  } catch (error) {
+    // Safe fallback while migration rolls out.
+    if (error?.code !== '42703') {
+      throw error
+    }
+
+    sessionRes = await pool.query(
+      `
+      SELECT
+        u.id,
+        u.email,
+        u.is_guest,
+        s.id AS session_id,
+        s.expires_at AS session_expires_at
+      FROM sessions s
+      JOIN users u ON u.id = s.user_id
+      WHERE s.id = $1
+        AND s.expires_at > now()
+      LIMIT 1
+      `,
+      [sessionId]
+    )
+  }
 
   if (!sessionRes.rows.length) {
     clearSessionCookie(event)
@@ -51,6 +84,13 @@ export default defineEventHandler(async (event) => {
     )
   }
 
-  event.context.user = { id: row.id, email: row.email, is_guest: row.is_guest }
+  event.context.user = {
+    id: row.id,
+    email: row.email,
+    is_guest: row.is_guest,
+    plan_tier: row.plan_tier || 'free',
+    plan_status: row.plan_status || null,
+    plan_expires_at: row.plan_expires_at || null
+  }
   event.context.auth = { userId: row.id, sessionId: row.session_id }
 })

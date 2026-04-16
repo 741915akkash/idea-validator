@@ -2,13 +2,17 @@ import { pool } from '../../db'
 import OpenAI from 'openai'
 import { scoreDecomposition } from '../../services/interviewEngine/scoreStructure'
 import { incrementHit, toVectorLiteral } from '../../services/interviewEngine/cache'
-import { extractJSON } from '../../services/interviewEngine/extractJSON'
+import { getEventEntitlementsFromDb, observeFeatureGate } from '../../utils/track-usage'
+import {
+  callJsonCompletion,
+  findCacheByNormalizedText,
+  findSimilarCache,
+  getEmbedding,
+  normalizeSemanticText,
+  executeWithStructuredValidationCharge
+} from '../../services/llm/structuredValidation'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
-function normalize(text) {
-  return text.toLowerCase().trim().replace(/\s+/g, ' ')
-}
 
 function normalizeSubList(items) {
   if (!Array.isArray(items)) return []
@@ -27,52 +31,6 @@ function normalizeSubList(items) {
   }
 
   return normalized
-}
-
-async function getEmbedding(text) {
-  const res = await openai.embeddings.create({
-    model: 'text-embedding-3-small',
-    input: text
-  })
-  return res.data[0].embedding
-}
-
-async function findSimilar(client, embedding) {
-  const vector = toVectorLiteral(embedding)
-
-  const result = await client.query(
-    `
-    SELECT id,
-           structured_json,
-           confidence_score,
-           1 - (embedding <=> $1::vector) AS similarity
-    FROM interview_cache
-    WHERE level = 'uncertainty_decomposition'
-      AND confidence_score >= 75
-    ORDER BY embedding <=> $1::vector
-    LIMIT 1
-    `,
-    [vector]
-  )
-
-  return result.rows[0] || null
-}
-
-async function findByNormalizedText(client, normalizedText) {
-  const result = await client.query(
-    `
-    SELECT id, structured_json
-    FROM interview_cache
-    WHERE level = 'uncertainty_decomposition'
-      AND normalized_text = $1
-      AND confidence_score >= 75
-    ORDER BY created_at DESC
-    LIMIT 1
-    `,
-    [normalizedText]
-  )
-
-  return result.rows[0] || null
 }
 
 function heuristicSubUncertainties(text) {
@@ -94,14 +52,27 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'text required' })
   }
 
-  const normalizedText = normalize(text)
+  const { tier, limits } = await getEventEntitlementsFromDb({ event, client: pool })
+  observeFeatureGate(event, {
+    mode: 'observe',
+    checkpoint: 'uncertainty.generate',
+    key: 'structuredValidation',
+    tier,
+    allowed: limits.structuredValidation
+  })
+
+  const normalizedText = normalizeSemanticText(text)
 
   const client = await pool.connect()
 
   try {
     try {
-      const embedding = await getEmbedding(normalizedText)
-      const cached = await findSimilar(client, embedding)
+      const embedding = await getEmbedding(openai, normalizedText)
+      const cached = await findSimilarCache({
+        client,
+        level: 'uncertainty_decomposition',
+        embedding
+      })
 
       if (cached && cached.similarity > 0.85) {
         await incrementHit(cached.id)
@@ -125,33 +96,49 @@ Uncertainty:
 "${text}"
 `
 
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.2
+      const { sub_uncertainties } = await executeWithStructuredValidationCharge({
+        event,
+        client,
+        referenceParts: [normalizedText],
+        description: 'Structured validation run for uncertainty.generate',
+        run: async () => {
+          const structured = await callJsonCompletion({
+            openai,
+            prompt,
+            temperature: 0.2
+          })
+          const sub_uncertainties = normalizeSubList(structured?.sub_uncertainties)
+          const confidence = scoreDecomposition(structured)
+          const vector = toVectorLiteral(embedding)
+
+          await client.query(
+            `
+            INSERT INTO interview_cache
+            (level, input_text, normalized_text, structured_json, embedding, confidence_score)
+            VALUES ('uncertainty_decomposition', $1, $2, $3, $4::vector, $5)
+            `,
+            [text, normalizedText, structured, vector, confidence]
+          )
+
+          return { sub_uncertainties }
+        }
       })
-
-      const structured = extractJSON(response.choices[0].message.content)
-      const sub_uncertainties = normalizeSubList(structured?.sub_uncertainties)
-      const confidence = scoreDecomposition(structured)
-      const vector = toVectorLiteral(embedding)
-
-      await client.query(
-        `
-        INSERT INTO interview_cache
-        (level, input_text, normalized_text, structured_json, embedding, confidence_score)
-        VALUES ('uncertainty_decomposition', $1, $2, $3, $4::vector, $5)
-        `,
-        [text, normalizedText, structured, vector, confidence]
-      )
 
       return {
         source: 'llm',
         similarity: null,
         sub_uncertainties
       }
-    } catch {
-      const textCached = await findByNormalizedText(client, normalizedText)
+    } catch (error) {
+      if (error?.statusCode) {
+        throw error
+      }
+
+      const textCached = await findCacheByNormalizedText({
+        client,
+        level: 'uncertainty_decomposition',
+        normalizedText
+      })
       if (textCached) {
         await incrementHit(textCached.id)
         return {

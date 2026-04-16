@@ -1,6 +1,11 @@
 import { pool } from '../../../db'
 import { createError } from 'h3'
 import { requireQuizAccess } from '../../../utils/quizAccess'
+import {
+  getEventEntitlementsFromDb,
+  getUsageSnapshot,
+  observeCountLimit
+} from '../../../utils/track-usage'
 
 export default defineEventHandler(async (event) => {
   const { quiz_id } = await readBody(event)
@@ -29,6 +34,18 @@ export default defineEventHandler(async (event) => {
 
     // 2️⃣ Determine parent + next revision number
     const parentQuizId = quiz.parent_quiz_id ?? quiz.id
+    const { tier, limits } = await getEventEntitlementsFromDb({ event, client })
+    const usage = await getUsageSnapshot(client, event, { quizId: parentQuizId })
+
+    observeCountLimit(event, {
+      mode: 'observe',
+      checkpoint: 'quiz.revision.create',
+      key: 'revisionsPerIdea',
+      tier,
+      used: usage.revisionsForIdea ?? 0,
+      limit: limits.revisionsPerIdea,
+      increment: 1
+    })
 
     const revRes = await client.query(
       `

@@ -1,5 +1,6 @@
 import { pool } from '../../db'
 import { requireQuizAccess } from '../../utils/quizAccess'
+import { getEventEntitlementsFromDb, observeFeatureGate } from '../../utils/track-usage'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -8,6 +9,15 @@ export default defineEventHandler(async (event) => {
   if (!sub_uncertainty_id || !quiz_id) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid payload' })
   }
+
+  const { tier, limits } = await getEventEntitlementsFromDb({ event, client: pool })
+  observeFeatureGate(event, {
+    mode: 'observe',
+    checkpoint: 'interview.start',
+    key: 'structuredValidation',
+    tier,
+    allowed: limits.structuredValidation
+  })
 
   const client = await pool.connect()
 

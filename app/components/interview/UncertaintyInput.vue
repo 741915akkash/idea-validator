@@ -1,12 +1,13 @@
 <!-- app/components/interview/UncertaintyInput.vue -->
 
 <script setup>
-  import { ref, computed, watch } from 'vue'
+  import { ref, computed, watch, onMounted } from 'vue'
   import { useInterviewSession } from '@/stores/interviewSession'
   import { useInterviewApi } from '@/composables/useInterviewApi'
 
   const interview = useInterviewSession()
   const api = useInterviewApi()
+  const { credits, fetchCredits } = useCredits()
 
   const text = ref(interview.uncertainty?.text || '')
   const selectedId = ref(interview.selectedSub?.id || null)
@@ -24,6 +25,14 @@
   const hasSubUncertainties = computed(() => interview.subUncertainties.length > 0)
   const hasSelected = computed(() =>
     interview.subUncertainties.some((sub) => sub.id === selectedId.value)
+  )
+  const creditsLeft = computed(() =>
+    Number.isFinite(Number(credits.value?.balance)) ? Number(credits.value.balance) : null
+  )
+  const generateCost = 10
+  const continueMaxCost = 20
+  const creditsHint = computed(() =>
+    creditsLeft.value == null ? 'Credits unavailable' : `${creditsLeft.value} credits left`
   )
 
   function createDraftSubs(items) {
@@ -51,6 +60,10 @@
       interview.resetDecomposition()
       selectedId.value = null
     }
+  })
+
+  onMounted(async () => {
+    await fetchCredits()
   })
 
   function selectSub(id) {
@@ -94,6 +107,7 @@
       error.value = 'Unable to generate sub-uncertainties. Please try again.'
     } finally {
       generating.value = false
+      await fetchCredits(true)
     }
   }
 
@@ -146,6 +160,7 @@
       error.value = 'Unable to continue. Please try again.'
     } finally {
       saving.value = false
+      await fetchCredits(true)
     }
   }
 </script>
@@ -186,6 +201,9 @@
       >
         {{ generating ? 'Generating…' : 'Generate sub-uncertainties' }}
       </button>
+      <div class="mt-2 text-xs text-neutral-500">
+        Costs {{ generateCost }} credits • {{ creditsHint }}
+      </div>
     </div>
 
     <div v-if="hasSubUncertainties" class="mt-10">
@@ -246,6 +264,9 @@
       >
         {{ saving ? 'Saving…' : 'Continue →' }}
       </button>
+      <div class="mt-2 text-xs text-neutral-500">
+        Uses up to {{ continueMaxCost }} credits • {{ creditsHint }}
+      </div>
     </div>
   </div>
 </template>
