@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { useQuizSessionStore } from '~/stores/quizSession'
 
@@ -16,20 +16,75 @@
   const showDeleteModal = ref(false)
   const deleteConfirmName = ref('')
   const deleteError = ref('')
+  const refreshingPlan = ref(false)
   const currentQuiz = computed(() => quizStore.currentQuiz)
   const currentIdeaName = computed(() => String(currentQuiz.value?.name || 'Untitled idea'))
+  const normalizedTier = computed(() =>
+    String(user.value?.plan_tier || 'free')
+      .trim()
+      .toLowerCase()
+  )
+  const tierLabel = computed(() => {
+    const tier = normalizedTier.value
+    if (tier === 'growth') return 'Growth'
+    if (tier === 'founder') return 'Founder'
+    return 'Free'
+  })
+  const planStatusLabel = computed(() => {
+    const status = String(user.value?.plan_status || '')
+      .trim()
+      .toLowerCase()
+    if (!status) return null
+    return status.charAt(0).toUpperCase() + status.slice(1)
+  })
+  const planExpiryLabel = computed(() => {
+    const raw = user.value?.plan_expires_at
+    if (!raw) return null
+    const date = new Date(raw)
+    if (Number.isNaN(date.getTime())) return null
+    return date.toLocaleDateString()
+  })
   const isDeleteConfirmationValid = computed(
     () => deleteConfirmName.value.trim() === currentIdeaName.value.trim()
   )
 
+  async function refreshPlan(force = true) {
+    if (refreshingPlan.value) return
+    refreshingPlan.value = true
+    try {
+      await bootstrapUser({ force })
+    } finally {
+      refreshingPlan.value = false
+    }
+  }
+
+  function onWindowFocus() {
+    refreshPlan(true)
+  }
+
+  function onVisibilityChange() {
+    if (document.visibilityState === 'visible') {
+      refreshPlan(true)
+    }
+  }
+
   onMounted(async () => {
+    await refreshPlan(true)
     quizStore.hydrate()
     await quizStore.loadQuizzes()
+
+    window.addEventListener('focus', onWindowFocus)
+    document.addEventListener('visibilitychange', onVisibilityChange)
 
     if (!quizStore.quizId && quizStore.quizzes.length) {
       quizStore.setQuizId(quizStore.quizzes[0].id)
       await quizStore.loadOverview(quizStore.quizId)
     }
+  })
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('focus', onWindowFocus)
+    document.removeEventListener('visibilitychange', onVisibilityChange)
   })
 
   async function logout() {
@@ -110,6 +165,16 @@
   <main class="px-6 py-6">
     <div class="mx-auto max-w-4xl">
       <h1 class="mb-4 text-xl font-semibold text-slate-900">Settings</h1>
+
+      <div class="mb-3 rounded-lg border border-slate-200 bg-white px-4 py-3">
+        <div class="text-sm font-medium text-slate-700">Current plan</div>
+        <div class="mt-1 text-sm text-slate-900">{{ tierLabel }}</div>
+        <div class="mt-1 text-xs text-slate-500">
+          <span v-if="planStatusLabel">Status: {{ planStatusLabel }}</span>
+          <span v-if="planStatusLabel && planExpiryLabel"> • </span>
+          <span v-if="planExpiryLabel">Renews/Expires: {{ planExpiryLabel }}</span>
+        </div>
+      </div>
 
       <div class="mb-3 flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3">
         <span class="text-sm font-medium text-slate-700">Pricing</span>

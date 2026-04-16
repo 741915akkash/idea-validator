@@ -69,13 +69,26 @@ export default defineNuxtConfig({
     siteUrl: 'https://golaunchscall.com',
 
     urls: async () => {
-      const posts = await fetch(
-        'https://wp.golaunchscall.com/wp-json/wp/v2/posts?per_page=100'
-      ).then((res) => res.json())
+      const fetchJsonArray = async (url) => {
+        try {
+          const res = await fetch(url, {
+            headers: { accept: 'application/json' }
+          })
+          const contentType = res.headers.get('content-type') || ''
+          if (!res.ok || !contentType.includes('application/json')) {
+            return []
+          }
+          const data = await res.json()
+          return Array.isArray(data) ? data : []
+        } catch {
+          return []
+        }
+      }
 
-      const categories = await fetch('https://wp.golaunchscall.com/wp-json/wp/v2/categories').then(
-        (res) => res.json()
-      )
+      const [posts, categories] = await Promise.all([
+        fetchJsonArray('https://wp.golaunchscall.com/wp-json/wp/v2/posts?per_page=100'),
+        fetchJsonArray('https://wp.golaunchscall.com/wp-json/wp/v2/categories')
+      ])
 
       return [
         // static pages

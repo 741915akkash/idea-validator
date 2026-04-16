@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { computed, ref, onMounted } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { useQuizSessionStore } from '~/stores/quizSession'
 
@@ -11,11 +11,13 @@
   const router = useRouter()
   const route = useRoute()
   const quizStore = useQuizSessionStore()
+  const user = useUser()
 
   const loading = ref(true)
   const loadingSubs = ref(false)
   const loadingInterviews = ref(false)
   const startingAnother = ref(false)
+  const showUpgradeModal = ref(false)
   const error = ref(null)
 
   const uncertainties = ref([])
@@ -24,6 +26,12 @@
 
   const selectedUncertainty = ref(null)
   const selectedSub = ref(null)
+  const isPaidTier = computed(() => {
+    const tier = String(user.value?.plan_tier || 'free')
+      .trim()
+      .toLowerCase()
+    return tier === 'growth' || tier === 'founder'
+  })
 
   function isFreeformTemplateUncertainty(item) {
     return String(item?.text || '').trim() === '__FREEFORM_TEMPLATE__'
@@ -230,7 +238,15 @@
 
   function startNewInterview() {
     if (!quizStore.quizId) return
+    if (!isPaidTier.value) {
+      showUpgradeModal.value = true
+      return
+    }
     router.push(`/quiz/interview/new?quiz_id=${quizStore.quizId}`)
+  }
+
+  function closeUpgradeModal() {
+    showUpgradeModal.value = false
   }
 </script>
 
@@ -469,6 +485,33 @@
               </button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showUpgradeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-slate-900/50" @click="closeUpgradeModal" />
+
+      <div class="relative z-10 w-full max-w-md rounded-lg border border-slate-200 bg-white p-5 shadow-xl">
+        <h2 class="text-lg font-semibold text-slate-900">Upgrade required</h2>
+        <p class="mt-2 text-sm text-slate-600">
+          Move to a paid tier to access Resolve New Uncertainties.
+        </p>
+
+        <div class="mt-5 flex items-center justify-end gap-2">
+          <button
+            class="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            @click="closeUpgradeModal"
+          >
+            Not now
+          </button>
+          <NuxtLink
+            to="/pricing"
+            class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+            @click="closeUpgradeModal"
+          >
+            View pricing
+          </NuxtLink>
         </div>
       </div>
     </div>

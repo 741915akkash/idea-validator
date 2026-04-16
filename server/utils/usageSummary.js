@@ -36,6 +36,7 @@ export async function getUsageSummary({ user, client, now = new Date() }) {
       period: 'monthly'
     }
 
+    const period = limitInfo.period || 'monthly'
     const used = usageByFeature[feature] || 0
     const limit = limitInfo.limit
     const remaining = limit == null ? null : Math.max(limit - used, 0)
@@ -46,10 +47,10 @@ export async function getUsageSummary({ user, client, now = new Date() }) {
       remaining,
       enabled: Boolean(limitInfo.enabled),
       tier,
-      period: limitInfo.period || 'monthly',
+      period,
       window_start: windowStart.toISOString(),
       window_end: windowEnd.toISOString(),
-      resets_at: windowEnd.toISOString()
+      resets_at: period === 'monthly' ? windowEnd.toISOString() : null
     }
   }
 

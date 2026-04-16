@@ -39,7 +39,11 @@
   }
 
   function formatLimit(limit) {
-    return limit == null ? 'Unlimited' : String(limit)
+    return limit == null ? '0' : String(limit)
+  }
+
+  function formatEnabled(enabled) {
+    return enabled ? 'Enabled' : 'Disabled'
   }
 
   onMounted(async () => {
@@ -91,12 +95,28 @@
             <span class="text-xs text-slate-500">Tier: {{ feature.data.tier }}</span>
           </div>
 
-          <div class="mb-2 text-sm text-slate-700">
+          <div v-if="feature.data.period !== 'none'" class="mb-2 text-sm text-slate-700">
             <span class="font-medium">{{ feature.data.used }}</span>
             <span class="text-slate-500"> / {{ formatLimit(feature.data.limit) }}</span>
             <span v-if="feature.data.limit !== null" class="ml-2 text-xs text-slate-500">
               ({{ feature.data.remaining }} remaining)
             </span>
+          </div>
+
+          <div v-else class="mb-2 flex items-center justify-between gap-3 text-sm text-slate-700">
+            <div>
+              <span class="font-medium">Status:</span>
+              <span :class="feature.data.enabled ? 'text-emerald-700' : 'text-rose-700'">
+                {{ formatEnabled(feature.data.enabled) }}
+              </span>
+            </div>
+            <NuxtLink
+              v-if="!feature.data.enabled"
+              to="/pricing"
+              class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+            >
+              Upgrade
+            </NuxtLink>
           </div>
 
           <div
@@ -110,7 +130,10 @@
           </div>
 
           <div class="mt-2 text-xs text-slate-500">
-            Period: {{ feature.data.period }} · Resets: {{ formatResetDate(feature.data.resets_at) }}
+            <template v-if="feature.data.resets_at">
+              Period: {{ feature.data.period }} · Resets: {{ formatResetDate(feature.data.resets_at) }}
+            </template>
+            <template v-else>Period: {{ feature.data.period }}</template>
           </div>
         </section>
       </div>

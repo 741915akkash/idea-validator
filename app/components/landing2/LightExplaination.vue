@@ -1,10 +1,6 @@
 <script setup>
   import { ArrowDown, ArrowRight, RefreshCw } from 'lucide-vue-next'
 
-  definePageMeta({
-    layout: 'marketing'
-  })
-
   const loopSteps = [
     { id: 1, name: 'Idea', example: 'Idea: AI fitness app for busy people' },
     { id: 2, name: 'Confidence Score', example: 'Confidence Score: Low — not sure people will pay' },
