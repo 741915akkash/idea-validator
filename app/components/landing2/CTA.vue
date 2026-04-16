@@ -14,7 +14,8 @@
   const { $posthog } = useNuxtApp()
 
   function startValidation() {
-    $posthog?.capture('start_validation_clicked')
+    const posthog = typeof $posthog === 'function' ? $posthog() : $posthog
+    posthog?.capture?.('start_validation_clicked')
     navigateTo('/quiz/overview')
   }
 </script>

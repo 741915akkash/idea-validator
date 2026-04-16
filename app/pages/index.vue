@@ -23,7 +23,8 @@ if (user.value) {
 }
 
 onMounted(() => {
-  $posthog?.capture('landing_page_viewed')
+  const posthog = typeof $posthog === 'function' ? $posthog() : $posthog
+  posthog?.capture?.('landing_page_viewed')
 })
 </script>
 

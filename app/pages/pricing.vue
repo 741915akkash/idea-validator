@@ -109,7 +109,8 @@
   const { $posthog } = useNuxtApp()
 
   onMounted(() => {
-    $posthog?.capture('pricing_page_viewed')
+    const posthog = typeof $posthog === 'function' ? $posthog() : $posthog
+    posthog?.capture?.('pricing_page_viewed')
   })
 </script>
 

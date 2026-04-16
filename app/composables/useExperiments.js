@@ -3,7 +3,8 @@ export const useExperiments = () => {
 
   const getVariant = (flag) => {
     if (process.server) return null
-    return $posthog?.getFeatureFlag(flag) ?? null
+    const posthog = typeof $posthog === 'function' ? $posthog() : $posthog
+    return posthog?.getFeatureFlag?.(flag) ?? null
   }
 
   return { getVariant }
