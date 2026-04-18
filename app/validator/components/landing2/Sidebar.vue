@@ -8,11 +8,13 @@
     BookOpen,
     MessagesSquare,
     Columns3,
+    Briefcase,
     Settings
   } from 'lucide-vue-next'
   import IdeaSelector from '~/components/landing2/sidebar/IdeaSelector.vue'
   import SidebarModals from '~/components/landing2/sidebar/SidebarModals.vue'
   import { useQuizSessionStore } from '~/stores/quizSession'
+  import { useUser } from '~/composables/useUser'
 
   const props = defineProps({
     showBrand: {
@@ -23,6 +25,7 @@
 
   const quizStore = useQuizSessionStore()
   const route = useRoute()
+  const user = useUser()
 
   const isClientReady = ref(false)
   const isArchiving = ref(false)
@@ -232,7 +235,9 @@
   const isOverview = computed(() => route.path.startsWith('/quiz/overview'))
 
   const isInterviews = computed(() => route.path.startsWith('/quiz/interviews'))
+  const isCrm = computed(() => route.path.startsWith('/quiz/crm'))
   const isSettings = computed(() => route.path.startsWith('/quiz/settings'))
+  const isCrmEnabled = computed(() => Boolean(user.value?.crm_enabled))
 
   const isHowItWorks = computed(() => route.path.startsWith('/how-it-works'))
   const interviewsLink = computed(() =>
@@ -319,6 +324,20 @@
         >
           <Columns3 class="h-4 w-4" />
           Master Detail
+        </NuxtLink>
+
+        <NuxtLink
+          v-if="isCrmEnabled"
+          to="/quiz/crm"
+          class="flex items-center gap-2 rounded-lg px-3 py-2 transition"
+          :class="
+            isCrm
+              ? 'bg-emerald-50 font-medium text-emerald-700'
+              : 'text-slate-700 hover:bg-slate-100'
+          "
+        >
+          <Briefcase class="h-4 w-4" />
+          CRM
         </NuxtLink>
       </div>
     </div>

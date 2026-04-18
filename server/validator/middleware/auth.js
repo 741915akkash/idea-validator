@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
         u.id,
         u.email,
         u.is_guest,
+        COALESCE(u.crm_enabled, false) AS crm_enabled,
         COALESCE(u.plan_tier, 'free') AS plan_tier,
         u.plan_status,
         u.plan_expires_at,
@@ -88,6 +89,7 @@ export default defineEventHandler(async (event) => {
     id: row.id,
     email: row.email,
     is_guest: row.is_guest,
+    crm_enabled: Boolean(row.crm_enabled),
     plan_tier: row.plan_tier || 'free',
     plan_status: row.plan_status || null,
     plan_expires_at: row.plan_expires_at || null

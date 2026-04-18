@@ -134,6 +134,26 @@ export default defineEventHandler(async (event) => {
       user = created.rows[0]
     }
 
+    let crmEnabled = false
+    try {
+      const crmAccessRes = await client.query(
+        `
+        SELECT COALESCE(crm_enabled, false) AS crm_enabled
+        FROM users
+        WHERE id = $1
+        LIMIT 1
+        `,
+        [user.id]
+      )
+      crmEnabled = Boolean(crmAccessRes.rows[0]?.crm_enabled)
+    } catch (error) {
+      // Safe fallback while migration rolls out.
+      if (error?.code !== '42703') {
+        throw error
+      }
+    }
+    user.crm_enabled = crmEnabled
+
     let transferredQuizId = null
     const shouldTransferScoreWallQuiz =
       signupSource === 'score_wall' && Boolean(quizId) && Boolean(visitorId)

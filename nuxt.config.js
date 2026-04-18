@@ -1,6 +1,9 @@
 const posthogEnabled = process.env.NUXT_PUBLIC_POSTHOG_ENABLED === 'true'
 
 export default defineNuxtConfig({
+  srcDir: 'app/validator',
+  serverDir: 'server/validator',
+
   app: {
     head: {
       title: 'GoLaunchScall – Validate Your Business Idea with Customer Interviews',
