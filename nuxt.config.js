@@ -29,6 +29,12 @@ export default defineNuxtConfig({
 
   ssr: true,
 
+  nitro: {
+    prerender: {
+      ignore: ['/__nuxt_content/**']
+    }
+  },
+
   runtimeConfig: {
     public: {
       isDev: process.env.NODE_ENV !== 'production',
