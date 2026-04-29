@@ -1,22 +1,40 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed, ref } from 'vue'
   import draggable from 'vuedraggable'
   import { useLeadsStore } from '~/stores/leads'
   import { useStagesStore } from '~/stores/stages'
   import KanbanColumn from './KanbanColumn.vue'
+  import LeadDetailPanel from '../lead-detail/LeadDetailPanel.vue'
 
   const leadsStore = useLeadsStore()
   const stagesStore = useStagesStore()
 
   const stages = computed(() => stagesStore.stages)
+  const selectedLeadId = ref(null)
+  const showDetail = ref(false)
+
+  function openLead(lead) {
+    if (!lead?.id) return
+    selectedLeadId.value = lead.id
+    showDetail.value = true
+  }
+
+  function closeLead() {
+    showDetail.value = false
+    selectedLeadId.value = null
+  }
 </script>
 
 <template>
-  <div class="custom-scrollbar flex h-full items-start gap-6 overflow-x-auto pb-4">
-    <KanbanColumn v-for="stage in stages" :key="stage.id" :stage="stage" />
+  <div class="flex h-[calc(100vh-140px)] flex-col">
+    <!-- Scroll area -->
+    <div class="custom-scrollbar flex flex-1 items-start gap-6 overflow-x-auto pb-4">
+      <KanbanColumn v-for="stage in stages" :key="stage.id" :stage="stage" @open-lead="openLead" />
+    </div>
+
+    <LeadDetailPanel v-if="showDetail" :leadId="selectedLeadId" @close="closeLead" />
   </div>
 </template>
-
 <style scoped>
   .custom-scrollbar::-webkit-scrollbar {
     height: 10px;

@@ -38,19 +38,32 @@
 
 <template>
   <div class="mx-auto max-w-3xl px-6 py-12">
-    <header class="mb-10 flex items-center justify-between">
+    <header class="mb-8 flex items-center justify-between">
+      <!-- LEFT -->
       <div>
-        <h1 class="text-2xl font-black tracking-tight text-gray-900">Sequences</h1>
-        <p class="mt-1 text-xs font-bold uppercase tracking-widest text-gray-400">
-          Automate your outreach workflows
-        </p>
+        <h1 class="text-2xl font-bold text-gray-900">Sequences</h1>
+        <p class="mt-0.5 text-xs text-gray-500">Automate your outreach workflows</p>
       </div>
-      <button
-        @click="$emit('edit', null)"
-        class="flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-xl shadow-gray-900/10 transition-all hover:bg-gray-800 active:scale-95"
-      >
-        <Plus class="h-4 w-4" /> New Sequence
-      </button>
+
+      <!-- RIGHT -->
+      <div class="flex items-center gap-2">
+        <!-- Back (your style) -->
+        <button
+          @click="$router.push('/crm/leads')"
+          class="inline-flex items-center justify-center rounded-lg bg-[#E5E4E2] px-4 py-2 text-sm font-medium text-black transition hover:bg-[#DAD8D4] active:scale-95"
+        >
+          Back To Leads
+        </button>
+
+        <!-- Primary CTA -->
+        <button
+          @click="$emit('edit', null)"
+          class="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700 active:scale-95"
+        >
+          <Plus class="h-4 w-4" />
+          New Sequence
+        </button>
+      </div>
     </header>
 
     <div v-if="sequencesStore.sequences.length" class="space-y-4">
@@ -157,7 +170,7 @@
       </p>
       <button
         @click="$emit('edit', null)"
-        class="mt-8 rounded-xl bg-gray-900 px-8 py-3 text-[10px] font-bold uppercase tracking-widest text-white shadow-xl shadow-gray-900/10 transition-all hover:bg-gray-800"
+        class="mt-8 rounded-xl bg-emerald-600 px-8 py-3 text-[10px] font-bold uppercase tracking-widest text-white shadow-xl shadow-emerald-600/20 transition-all hover:bg-emerald-700"
       >
         Create First Sequence
       </button>

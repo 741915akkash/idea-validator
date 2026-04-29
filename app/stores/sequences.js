@@ -1,5 +1,10 @@
 import { defineStore } from 'pinia'
 
+function apiFetch(url, options = {}) {
+  const requestFetch = import.meta.server ? useRequestFetch() : $fetch
+  return requestFetch(url, options)
+}
+
 function normalizeSequence(sequence) {
   const steps = Array.isArray(sequence?.steps)
     ? sequence.steps.map((step, index) => ({
@@ -61,13 +66,13 @@ export const useSequencesStore = defineStore('sequences', {
     },
 
     async fetchSequences() {
-      const data = await $fetch('/api/crm/sequences')
+      const data = await apiFetch('/api/crm/sequences')
       this.setSequences(data)
       return this.sequences
     },
 
     async fetchSequenceById(id) {
-      const data = await $fetch('/api/crm/sequences/by-id', {
+      const data = await apiFetch('/api/crm/sequences/by-id', {
         query: { id }
       })
 
@@ -84,7 +89,7 @@ export const useSequencesStore = defineStore('sequences', {
       this.sequences = [optimistic, ...this.sequences]
 
       try {
-        const created = await $fetch('/api/crm/sequences/create', {
+        const created = await apiFetch('/api/crm/sequences/create', {
           method: 'POST',
           body: normalizePayload(sequence)
         })
@@ -109,7 +114,7 @@ export const useSequencesStore = defineStore('sequences', {
       }
 
       try {
-        const updated = await $fetch('/api/crm/sequences/update', {
+        const updated = await apiFetch('/api/crm/sequences/update', {
           method: 'PATCH',
           body: normalizePayload(sequence)
         })
@@ -136,7 +141,7 @@ export const useSequencesStore = defineStore('sequences', {
       this.sequences = this.sequences.filter((item) => item.id !== id)
 
       try {
-        await $fetch('/api/crm/sequences/delete', {
+        await apiFetch('/api/crm/sequences/delete', {
           method: 'DELETE',
           body: { id }
         })

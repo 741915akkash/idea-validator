@@ -335,7 +335,6 @@
   function quickRespondent(interview) {
     return (interview.respondent_info || '').trim() || 'Unknown respondent'
   }
-
 </script>
 
 <template>
@@ -403,22 +402,21 @@
           </div>
 
           <div class="flex w-full flex-wrap items-center gap-2 md:w-auto">
-            <button
-              class="inline-flex flex-1 items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700 md:flex-none"
-              @click="openFreeformInterview"
-            >
-              + Quick Interview
-            </button>
-
             <NuxtLink
               to="/quiz/overview"
               class="inline-flex flex-1 items-center justify-center rounded-lg bg-[#E5E4E2] px-4 py-2 text-sm font-medium text-black transition hover:bg-[#DAD8D4] md:flex-none"
             >
               Back to Overview
             </NuxtLink>
+
+            <button
+              class="inline-flex flex-1 items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700 md:flex-none"
+              @click="openFreeformInterview"
+            >
+              + Quick Interview
+            </button>
           </div>
         </div>
-
       </div>
 
       <!-- Loading -->
@@ -466,9 +464,7 @@
                   <div class="mt-1 text-xs text-neutral-500">
                     Respondent: {{ quickRespondent(interview) }}
                   </div>
-                  <div class="mt-1 text-sm text-neutral-600">
-                    "{{ quickSnippet(interview) }}"
-                  </div>
+                  <div class="mt-1 text-sm text-neutral-600">"{{ quickSnippet(interview) }}"</div>
                   <div class="mt-2 text-xs text-neutral-500">
                     {{ quickMeta(interview) }}
                   </div>
@@ -513,7 +509,9 @@
                         <h3 class="text-lg font-semibold text-gray-900">
                           {{ group.subUncertainty }}
                         </h3>
-                        <div class="text-xs text-gray-500">{{ group.interviews.length }} interviews</div>
+                        <div class="text-xs text-gray-500">
+                          {{ group.interviews.length }} interviews
+                        </div>
                       </div>
 
                       <button
@@ -572,7 +570,9 @@
                         </div>
 
                         <div class="mt-1 text-xs font-medium">
-                          <span v-if="interview.finished_at" class="text-emerald-700"> Completed </span>
+                          <span v-if="interview.finished_at" class="text-emerald-700">
+                            Completed
+                          </span>
                           <span v-else class="text-amber-600"> In Progress </span>
                         </div>
                       </div>
@@ -620,9 +620,7 @@
                 <div class="mt-1 text-xs text-neutral-500">
                   Respondent: {{ quickRespondent(interview) }}
                 </div>
-                <div class="mt-1 text-sm text-neutral-600">
-                  "{{ quickSnippet(interview) }}"
-                </div>
+                <div class="mt-1 text-sm text-neutral-600">"{{ quickSnippet(interview) }}"</div>
                 <div class="mt-2 text-xs text-neutral-500">
                   {{ quickMeta(interview) }}
                 </div>
@@ -682,7 +680,9 @@
                         {{ group.subUncertainty }}
                       </h3>
 
-                      <div class="text-xs text-gray-500">{{ group.interviews.length }} interviews</div>
+                      <div class="text-xs text-gray-500">
+                        {{ group.interviews.length }} interviews
+                      </div>
                     </div>
 
                     <button
@@ -741,7 +741,9 @@
                       </div>
 
                       <div class="mt-1 text-xs font-medium">
-                        <span v-if="interview.finished_at" class="text-emerald-700"> Completed </span>
+                        <span v-if="interview.finished_at" class="text-emerald-700">
+                          Completed
+                        </span>
                         <span v-else class="text-amber-600"> In Progress </span>
                       </div>
                     </div>

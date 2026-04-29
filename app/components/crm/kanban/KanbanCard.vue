@@ -9,6 +9,7 @@
       required: true
     }
   })
+  const emit = defineEmits(['open'])
 
   const usersStore = useUsersStore()
   const owner = computed(() => usersStore.users.find((u) => u.id === props.lead.user_id))
@@ -36,6 +37,7 @@
 <template>
   <div
     draggable="true"
+    @click="emit('open', lead)"
     class="group/card cursor-grab rounded-xl border border-gray-200 bg-white p-3.5 shadow-sm transition-all hover:border-emerald-300 hover:shadow-md active:cursor-grabbing"
   >
     <div class="mb-2 flex items-start justify-between">

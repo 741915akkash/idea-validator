@@ -9,6 +9,7 @@
   const props = defineProps({
     stage: Object
   })
+  const emit = defineEmits(['open-lead'])
 
   const leadsStore = useLeadsStore()
   const showEditModal = ref(false)
@@ -99,7 +100,7 @@
       @change="onDragChange"
     >
       <template #item="{ element }">
-        <KanbanCard :lead="element" />
+        <KanbanCard :lead="element" @open="emit('open-lead', $event)" />
       </template>
     </draggable>
 
