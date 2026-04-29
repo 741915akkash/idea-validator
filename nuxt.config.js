@@ -1,12 +1,18 @@
 const posthogEnabled = process.env.NUXT_PUBLIC_POSTHOG_ENABLED === 'true'
 
 export default defineNuxtConfig({
-  srcDir: 'app/validator',
-  serverDir: 'server/validator',
+  // ✅ fix nitro warning
+  compatibilityDate: '2026-04-25',
+
+  srcDir: 'app',
+
+  routeRules: {
+    '/quiz/crm': { redirect: '/crm' }
+  },
 
   app: {
     head: {
-      title: 'GoLaunchScall – Validate Your Business Idea with Customer Interviews',
+      title: 'Go Launch Scall – Validate Your Business Idea with Customer Interviews',
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg?v=3' },
         { rel: 'shortcut icon', href: '/favicon.svg?v=3' }
@@ -22,8 +28,10 @@ export default defineNuxtConfig({
   },
 
   ssr: true,
+
   runtimeConfig: {
     public: {
+      isDev: process.env.NODE_ENV !== 'production',
       gaMeasurementId: process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID || '',
       posthog: {
         enabled: posthogEnabled,
@@ -38,7 +46,7 @@ export default defineNuxtConfig({
 
   vite: {
     optimizeDeps: {
-      include: ['lucide-vue-next', 'posthog-js']
+      include: ['lucide-vue-next', 'posthog-js', '@tanstack/vue-table', 'vuedraggable']
     },
     server: {
       watch: {
@@ -53,8 +61,27 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@pinia/nuxt',
     'lucide-nuxt',
-    '@nuxtjs/sitemap'
+    '@nuxtjs/sitemap',
+    '@nuxt/content'
   ],
+
+  // ✅ Nuxt Content FIX + config
+  content: {
+    sources: {
+      content: {
+        driver: 'fs',
+        base: './content'
+      }
+    },
+
+    navigation: {
+      fields: ['title']
+    },
+
+    highlight: {
+      theme: 'github-light'
+    }
+  },
 
   posthogConfig: {
     publicKey: process.env.NUXT_PUBLIC_POSTHOG_PROJECT_TOKEN || '',
@@ -94,17 +121,14 @@ export default defineNuxtConfig({
       ])
 
       return [
-        // static pages
         { loc: '/' },
         { loc: '/blog' },
 
-        // blog posts
         ...posts.map((post) => ({
           loc: `/blog/${post.slug}`,
           lastmod: post.modified ? new Date(post.modified).toISOString() : undefined
         })),
 
-        // category pages
         ...categories.map((cat) => ({
           loc: `/blog/category/${cat.slug}`
         }))
@@ -122,15 +146,7 @@ export default defineNuxtConfig({
   },
 
   tailwindcss: {
-    config: {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif']
-          }
-        }
-      }
-    }
+    configPath: 'tailwind.config.js'
   },
 
   hooks: {
