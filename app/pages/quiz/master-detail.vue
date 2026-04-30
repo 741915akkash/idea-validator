@@ -506,7 +506,7 @@
             Not now
           </button>
           <NuxtLink
-            to="/pricing"
+            to="/general/pricing"
             class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
             @click="closeUpgradeModal"
           >

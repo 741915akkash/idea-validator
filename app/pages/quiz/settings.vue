@@ -174,7 +174,7 @@
       user.value = null
       quizStore.reset()
       loggingOut.value = false
-      router.push('/signup-login')
+      router.push('/general/signup-login')
     }
   }
 
@@ -334,7 +334,7 @@
 
       <!-- Pricing -->
       <SettingsBar title="Pricing">
-        <Button2 to="/pricing" variant="success" size="sm"> View plans </Button2>
+        <Button2 to="/general/pricing" variant="success" size="sm"> View plans </Button2>
       </SettingsBar>
 
       <!-- Usage -->

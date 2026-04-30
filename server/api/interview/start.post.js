@@ -11,13 +11,20 @@ export default defineEventHandler(async (event) => {
   }
 
   const { tier, limits } = await getEventEntitlementsFromDb({ event, client: pool })
-  observeFeatureGate(event, {
+  const structuredValidationGate = observeFeatureGate(event, {
     mode: 'observe',
     checkpoint: 'interview.start',
     key: 'structuredValidation',
     tier,
     allowed: limits.structuredValidation
   })
+
+  if (structuredValidationGate.wouldBlock) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Structured validation is not available on your current plan'
+    })
+  }
 
   const client = await pool.connect()
 

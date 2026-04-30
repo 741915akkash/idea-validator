@@ -7,21 +7,27 @@ export const PLAN_LIMITS = {
     [FEATURES.ARCHIVED_IDEAS]: 3,
     [FEATURES.REVISIONS]: 30,
     [FEATURES.FREEFORM_INTERVIEWS]: 30,
-    [FEATURES.STRUCTURED_VALIDATION]: false
+    [FEATURES.STRUCTURED_VALIDATION]: false,
+    [FEATURES.CONTACTS]: 100,
+    [FEATURES.PIPELINES]: 1
   },
   growth: {
     [FEATURES.ACTIVE_IDEAS]: 5,
     [FEATURES.ARCHIVED_IDEAS]: 50,
     [FEATURES.REVISIONS]: null,
     [FEATURES.FREEFORM_INTERVIEWS]: null,
-    [FEATURES.STRUCTURED_VALIDATION]: true
+    [FEATURES.STRUCTURED_VALIDATION]: true,
+    [FEATURES.CONTACTS]: 5000,
+    [FEATURES.PIPELINES]: null
   },
   founder: {
     [FEATURES.ACTIVE_IDEAS]: 5,
     [FEATURES.ARCHIVED_IDEAS]: 100,
     [FEATURES.REVISIONS]: null,
     [FEATURES.FREEFORM_INTERVIEWS]: null,
-    [FEATURES.STRUCTURED_VALIDATION]: true
+    [FEATURES.STRUCTURED_VALIDATION]: true,
+    [FEATURES.CONTACTS]: 25000,
+    [FEATURES.PIPELINES]: null
   }
 }
 
@@ -214,6 +220,32 @@ async function countRevisionsForRoot(client, userId, rootQuizId) {
   return Number(rows[0]?.count || 0)
 }
 
+async function countContacts(client, userId) {
+  const { rows } = await client.query(
+    `
+    SELECT COUNT(*)::int AS count
+    FROM leads
+    WHERE user_id = $1
+    `,
+    [userId]
+  )
+
+  return Number(rows[0]?.count || 0)
+}
+
+async function countPipelines(client, userId) {
+  const { rows } = await client.query(
+    `
+    SELECT COUNT(*)::int AS count
+    FROM pipeline_stages
+    WHERE user_id = $1
+    `,
+    [userId]
+  )
+
+  return Number(rows[0]?.count || 0)
+}
+
 async function countFreeformInterviewsForRootInMonth(
   client,
   userId,
@@ -255,6 +287,8 @@ export async function getUsageSnapshot(client, event, options = {}) {
     return {
       activeIdeas: 0,
       archivedIdeas: 0,
+      contacts: 0,
+      pipelines: 0,
       revisionsForIdea: null,
       freeformInterviewsForIdeaThisMonth: null,
       monthStart,
@@ -262,9 +296,11 @@ export async function getUsageSnapshot(client, event, options = {}) {
     }
   }
 
-  const [activeIdeas, archivedIdeas] = await Promise.all([
+  const [activeIdeas, archivedIdeas, contacts, pipelines] = await Promise.all([
     countRootIdeas(client, userId, { archived: false }),
-    countRootIdeas(client, userId, { archived: true })
+    countRootIdeas(client, userId, { archived: true }),
+    countContacts(client, userId),
+    countPipelines(client, userId)
   ])
 
   const rootQuizId = quizId ? await resolveRootQuizId(client, quizId) : null
@@ -285,6 +321,8 @@ export async function getUsageSnapshot(client, event, options = {}) {
   return {
     activeIdeas,
     archivedIdeas,
+    contacts,
+    pipelines,
     revisionsForIdea,
     freeformInterviewsForIdeaThisMonth,
     monthStart,

@@ -311,7 +311,7 @@
           </p>
           <NuxtLink
             :to="{
-              path: '/signup-login',
+              path: '/general/signup-login',
               query: {
                 signup_source: 'score_wall',
                 quiz_id: quizId

@@ -13,7 +13,9 @@
     { key: 'activeIdeas', label: 'Active Ideas' },
     { key: 'archivedIdeas', label: 'Archived Ideas' },
     { key: 'revisionsPerIdea', label: 'Revisions Per Idea' },
-    { key: 'structuredValidation', label: 'Structured Validation' }
+    { key: 'structuredValidation', label: 'Structured Validation' },
+    { key: 'contacts', label: 'Contacts' },
+    { key: 'pipelines', label: 'Pipelines' }
   ]
 
   const rows = computed(() =>
@@ -112,7 +114,7 @@
             </div>
             <NuxtLink
               v-if="!feature.data.enabled"
-              to="/pricing"
+              to="/general/pricing"
               class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
             >
               Upgrade

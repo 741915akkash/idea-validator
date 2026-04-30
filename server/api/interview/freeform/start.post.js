@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
     await requireQuizAccess(client, event, quiz_id)
     const { tier, limits } = await getEventEntitlementsFromDb({ event, client })
     const usage = await getUsageSnapshot(client, event, { quizId: quiz_id })
-    observeCountLimit(event, {
+    const freeformLimitCheck = observeCountLimit(event, {
       mode: 'observe',
       checkpoint: 'interview.freeform.start',
       key: 'freeformInterviewsPerIdeaPerMonth',
@@ -38,6 +38,13 @@ export default defineEventHandler(async (event) => {
       limit: limits.freeformInterviewsPerIdeaPerMonth,
       increment: 1
     })
+
+    if (freeformLimitCheck.wouldBlock) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Freeform interview limit reached for this idea in the current period'
+      })
+    }
 
     // 1) Create/reuse hidden uncertainty template for this quiz.
     let uncertaintyId = null

@@ -1,0 +1,217 @@
+PLAN LIMIT + BLOCK SYSTEM (with OBSERVE) — CONTACTS EXAMPLE
+============================================================
+
+Goal
+----
+Enforce plan limits for a feature (here: "contacts") while still logging
+"would block" telemetry through observe helpers.
+
+Core Building Blocks
+--------------------
+1) Feature key registry
+   server/utils/features.js
+   - FEATURES.CONTACTS = "contacts"
+
+2) Plan limits source
+   - DB table: public.plan_limits
+   - Seed/updates via migrations
+   - Fallback map in code: PLAN_LIMITS in server/utils/track-usage.js
+
+3) Runtime entitlement resolution
+   getEventEntitlementsFromDb({ event, client })
+   - normalizes user tier (free/growth/founder)
+   - reads plan_limits rows for that tier
+   - merges DB rows over fallback PLAN_LIMITS
+
+4) Runtime usage snapshot
+   getUsageSnapshot(client, event, options)
+   - counts current usage for relevant features
+   - for contacts: COUNT(*) FROM leads WHERE user_id = $1
+
+5) Observe helper
+   observeCountLimit(event, { ... })
+   - computes wouldBlock = used + increment > limit (if limit finite)
+   - logs [plan_limits][would_block] when true
+   - returns structured result object
+
+6) Hard block decision (endpoint-level)
+   if (result.wouldBlock) throw createError({ statusCode: 403, ... })
+
+7) UI visibility
+   /api/billing/limits + usage UI page
+   - shows limit / used / remaining for contacts and pipelines
+
+-----------------------------------------------------------------------
+
+HIGH-LEVEL FLOW (WRITE ENDPOINT)
+--------------------------------
+Example endpoint: server/api/crm/leads/create.post.js
+
+Client --> POST /api/crm/leads/create
+            |
+            v
+      requireCrmEnabled(event)
+            |
+            v
+      validate payload
+            |
+            v
+      getEventEntitlementsFromDb(...)
+            |
+            v
+      getUsageSnapshot(...)
+            |
+            v
+      observeCountLimit(mode:'observe', key:'contacts', used, limit, increment:1)
+            |
+            +--> logs would-block telemetry if exceeded
+            |
+            v
+      if wouldBlock => throw 403 "Contacts limit reached..."
+      else
+            |
+            v
+      INSERT lead
+            |
+            v
+         return created lead
+
+-----------------------------------------------------------------------
+
+ASCII SEQUENCE (CONTACTS)
+-------------------------
+
+User/API Client
+    |
+    | POST /api/crm/leads/create
+    v
++------------------------------+
+| crm/leads/create.post.js     |
++------------------------------+
+    |
+    | 1) Auth gate
+    |    requireCrmEnabled(event)
+    v
++------------------------------+
+| user context ready           |
++------------------------------+
+    |
+    | 2) Entitlements
+    |    getEventEntitlementsFromDb({event, client: pool})
+    |      - tier = normalizePlanTier(user.plan_tier)
+    |      - read plan_limits for tier
+    |      - merge over fallback PLAN_LIMITS
+    v
++------------------------------+
+| limits.contacts resolved     |
+| e.g. free => 100             |
++------------------------------+
+    |
+    | 3) Usage
+    |    getUsageSnapshot(pool, event)
+    |      - countContacts(user_id) from leads
+    v
++------------------------------+
+| usage.contacts resolved      |
+| e.g. currently 100           |
++------------------------------+
+    |
+    | 4) Observe + compute
+    |    observeCountLimit({
+    |      mode:'observe',
+    |      key:'contacts',
+    |      used: 100,
+    |      limit: 100,
+    |      increment: 1
+    |    })
+    |    => wouldBlock = true
+    |    => logs [plan_limits][would_block]
+    v
++------------------------------+
+| result.wouldBlock = true     |
++------------------------------+
+    |
+    | 5) Hard enforcement
+    |    if (wouldBlock) throw 403
+    v
++------------------------------+
+| BLOCKED (no INSERT)          |
++------------------------------+
+
+
+If used = 99:
+- observe still runs
+- wouldBlock = false
+- request continues
+- lead INSERT succeeds
+
+-----------------------------------------------------------------------
+
+DATA + CONFIG FLOW
+------------------
+
+[Migrations] --> public.plan_limits
+                 (contacts limits per tier)
+
+[features.js]
+  CONTACTS key
+       |
+       v
+[track-usage.js fallback PLAN_LIMITS]
+       |
+       v
+[getEventEntitlementsFromDb]
+  DB-first (with fallback)
+       |
+       v
+[Endpoint check]
+  observeCountLimit + if(wouldBlock) block
+
+-----------------------------------------------------------------------
+
+WHERE CONTACTS WAS ADDED
+------------------------
+1) Feature key
+   server/utils/features.js
+
+2) Plan limits in DB migration (forward migration)
+   supabase/migrations/20260430120000_add_crm_plan_limits_contacts_pipelines.sql
+
+3) Fallback limits
+   server/utils/track-usage.js (PLAN_LIMITS)
+
+4) Usage counting
+   server/utils/track-usage.js
+   - countContacts(...)
+   - included in getUsageSnapshot return
+
+5) Enforcement endpoint
+   server/api/crm/leads/create.post.js
+   - observeCountLimit(...)
+   - hard block on wouldBlock
+
+6) Visibility
+   app/pages/quiz/usage.vue
+   - added contacts/pipelines rows
+
+-----------------------------------------------------------------------
+
+PATTERN TO ADD ANY NEW LIMITED FEATURE
+--------------------------------------
+1) Add key in FEATURES.
+2) Add plan_limits rows (new migration only).
+3) Add fallback PLAN_LIMITS entry.
+4) Add usage counter in getUsageSnapshot (or equivalent metric source).
+5) At write path:
+   - resolve limits + usage
+   - call observeCountLimit / observeFeatureGate
+   - hard block on wouldBlock
+6) Expose in usage/limits UI if needed.
+
+-----------------------------------------------------------------------
+
+OBSERVE + HARD-BLOCK TOGETHER (WHY BOTH)
+----------------------------------------
+- Observe gives consistent telemetry/logging for near-limit and blocked events.
+- Hard block enforces product policy immediately.
+- Keeping both is useful for auditing, debugging, and plan tuning.

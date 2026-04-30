@@ -1,5 +1,10 @@
 import { pool } from '../../../db/index.js';
 import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js';
+import {
+  getEventEntitlementsFromDb,
+  getUsageSnapshot,
+  observeCountLimit
+} from '../../../utils/track-usage.js';
 
 const UUID_V4_OR_V1_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -22,6 +27,25 @@ export default defineEventHandler(async (event) => {
 
   if (!UUID_V4_OR_V1_REGEX.test(ownerId)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid user_id' });
+  }
+
+  const { tier, limits } = await getEventEntitlementsFromDb({ event, client: pool });
+  const usage = await getUsageSnapshot(pool, event);
+  const contactsLimitCheck = observeCountLimit(event, {
+    mode: 'enforce',
+    checkpoint: 'crm.leads.create',
+    key: 'contacts',
+    tier,
+    used: usage.contacts ?? 0,
+    limit: limits.contacts,
+    increment: 1
+  });
+
+  if (contactsLimitCheck.wouldBlock) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Contacts limit reached for your current plan'
+    });
   }
 
   const result = await pool.query(

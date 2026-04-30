@@ -21,7 +21,7 @@
       name: 'CRM',
       icon: Users,
       features: [
-        { name: 'Contacts', free: '100', growth: '2,000 – 5,000', founder: 'Unlimited' },
+        { name: 'Contacts', free: '100', growth: '5,000', founder: '25,000' },
         { name: 'Pipelines', free: '1', growth: 'Unlimited', founder: 'Unlimited' },
         {
           name: 'Stages per pipeline',
@@ -73,7 +73,7 @@
       <table class="w-full min-w-[720px] table-fixed border-collapse bg-white text-left">
         <!-- HEADER -->
         <thead>
-          <tr class="bg-slate-50">
+          <tr class="bg-slate-100">
             <th class="min-w-[220px] px-6 py-4 text-sm font-semibold text-slate-700">
               <div class="max-w-[220px]">Feature</div>
             </th>
@@ -92,7 +92,7 @@
         <!-- BODY -->
         <tbody>
           <template v-for="cat in categories" :key="cat.name">
-            <tr class="border-t border-slate-200 bg-white">
+            <tr class="border-t border-slate-200 bg-slate-100">
               <td colspan="4" class="px-6 py-3 text-sm font-semibold text-slate-900">
                 <div class="flex items-center gap-2">
                   <component :is="cat.icon" class="h-5 w-5 text-emerald-500" />

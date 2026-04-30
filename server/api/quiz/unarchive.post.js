@@ -27,7 +27,7 @@ export default eventHandler(async (event) => {
     const { tier, limits } = await getEventEntitlementsFromDb({ event, client })
     const usage = await getUsageSnapshot(client, event, { quizId: quiz_id })
 
-    observeCountLimit(event, {
+    const activeIdeasLimitCheck = observeCountLimit(event, {
       mode: 'observe',
       checkpoint: 'quiz.unarchive',
       key: 'activeIdeas',
@@ -36,6 +36,13 @@ export default eventHandler(async (event) => {
       limit: limits.activeIdeas,
       increment: 1
     })
+
+    if (activeIdeasLimitCheck.wouldBlock) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Active ideas limit reached for your current plan'
+      })
+    }
 
     const updateResult = await client.query(
       `

@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
     const { tier, limits } = await getEventEntitlementsFromDb({ event, client })
     const usage = await getUsageSnapshot(client, event, { quizId: parentQuizId })
 
-    observeCountLimit(event, {
+    const revisionsLimitCheck = observeCountLimit(event, {
       mode: 'observe',
       checkpoint: 'quiz.revision.create',
       key: 'revisionsPerIdea',
@@ -46,6 +46,13 @@ export default defineEventHandler(async (event) => {
       limit: limits.revisionsPerIdea,
       increment: 1
     })
+
+    if (revisionsLimitCheck.wouldBlock) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Revisions limit reached for this idea on your current plan'
+      })
+    }
 
     const revRes = await client.query(
       `

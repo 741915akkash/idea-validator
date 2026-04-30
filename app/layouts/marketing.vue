@@ -15,12 +15,12 @@ const mobileMenuOpen = ref(false)
         </NuxtLink>
 
         <nav class="hidden items-center gap-6 text-sm font-medium text-slate-700 md:flex">
-          <NuxtLink to="/how-it-works" class="transition hover:text-slate-900">How it works</NuxtLink>
-          <NuxtLink to="/pricing" class="transition hover:text-slate-900">Pricing</NuxtLink>
+          <NuxtLink to="/general/how-it-works" class="transition hover:text-slate-900">How it works</NuxtLink>
+          <NuxtLink to="/general/pricing" class="transition hover:text-slate-900">Pricing</NuxtLink>
           <NuxtLink to="/blog" class="transition hover:text-slate-900">Blog</NuxtLink>
-          <NuxtLink to="/signup-login?mode=login" class="transition hover:text-slate-900">Login</NuxtLink>
+          <NuxtLink to="/general/signup-login?mode=login" class="transition hover:text-slate-900">Login</NuxtLink>
           <NuxtLink
-            to="/signup-login?mode=signup"
+            to="/general/signup-login?mode=signup"
             class="rounded-md bg-emerald-600 px-3 py-2 text-white transition hover:bg-emerald-700"
           >
             Signup
@@ -39,20 +39,20 @@ const mobileMenuOpen = ref(false)
 
       <div v-if="mobileMenuOpen" class="border-t border-slate-200 bg-white px-4 py-3 md:hidden">
         <nav class="flex flex-col gap-2 text-sm font-medium text-slate-700">
-          <NuxtLink to="/how-it-works" class="rounded-md px-2 py-2 hover:bg-slate-100" @click="mobileMenuOpen = false">
+          <NuxtLink to="/general/how-it-works" class="rounded-md px-2 py-2 hover:bg-slate-100" @click="mobileMenuOpen = false">
             How it works
           </NuxtLink>
-          <NuxtLink to="/pricing" class="rounded-md px-2 py-2 hover:bg-slate-100" @click="mobileMenuOpen = false">
+          <NuxtLink to="/general/pricing" class="rounded-md px-2 py-2 hover:bg-slate-100" @click="mobileMenuOpen = false">
             Pricing
           </NuxtLink>
           <NuxtLink to="/blog" class="rounded-md px-2 py-2 hover:bg-slate-100" @click="mobileMenuOpen = false">
             Blog
           </NuxtLink>
-          <NuxtLink to="/signup-login?mode=login" class="rounded-md px-2 py-2 hover:bg-slate-100" @click="mobileMenuOpen = false">
+          <NuxtLink to="/general/signup-login?mode=login" class="rounded-md px-2 py-2 hover:bg-slate-100" @click="mobileMenuOpen = false">
             Login
           </NuxtLink>
           <NuxtLink
-            to="/signup-login?mode=signup"
+            to="/general/signup-login?mode=signup"
             class="mt-1 rounded-md bg-emerald-600 px-3 py-2 text-center text-white hover:bg-emerald-700"
             @click="mobileMenuOpen = false"
           >

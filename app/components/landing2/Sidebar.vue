@@ -245,7 +245,7 @@
     return isCrmEnabled(user.value, config)
   })
 
-  const isHowItWorks = computed(() => route.path.startsWith('/how-it-works'))
+  const isHowItWorks = computed(() => route.path.startsWith('/general/how-it-works'))
   const isDocs = computed(() => route.path.startsWith('/docs'))
   const interviewsLink = computed(() =>
     isClientReady.value && quizStore.quizId
@@ -359,7 +359,7 @@
 
       <NuxtLink
         v-else
-        to="/signup-login"
+        to="/general/signup-login"
         class="block w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-center font-medium text-white transition hover:bg-emerald-700"
       >
         Start Validating
@@ -383,7 +383,7 @@
       <div class="mb-2 text-xs uppercase text-neutral-500">Learn</div>
 
       <NuxtLink
-        to="/how-it-works"
+        to="/general/how-it-works"
         class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
         :class="
           isHowItWorks
@@ -397,6 +397,7 @@
 
       <NuxtLink
         to="/docs"
+        target="_blank"
         class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
         :class="
           isDocs

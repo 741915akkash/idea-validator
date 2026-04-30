@@ -106,7 +106,7 @@
         Want to see exactly how this works step-by-step?
       </p>
       <NuxtLink
-        to="/how-it-works"
+        to="/general/how-it-works"
         class="mt-3 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-base font-semibold leading-6 text-white shadow-sm transition-all hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
       >
         View full system <ArrowRight class="h-5 w-5" />

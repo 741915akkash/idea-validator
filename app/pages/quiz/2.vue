@@ -98,7 +98,7 @@
       user.value = null
       quizStore.reset()
       loggingOut.value = false
-      router.push('/signup-login')
+      router.push('/general/signup-login')
     }
   }
 
@@ -182,7 +182,7 @@
       >
         <span class="text-sm font-medium text-slate-700">Pricing</span>
         <NuxtLink
-          to="/pricing"
+          to="/general/pricing"
           class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
         >
           View plans
