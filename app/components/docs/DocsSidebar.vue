@@ -1,6 +1,8 @@
-<!-- /app/components/DocsSidebar.vue -->
 <script setup>
   import { computed } from 'vue'
+
+  // 🔥 add emit
+  const emit = defineEmits(['navigate'])
 
   const { data: pages } = await useAsyncData('docs-sidebar-pages', async () => {
     const docs = await queryCollection('docs').select('path', 'title').all()
@@ -25,7 +27,7 @@
     for (const page of pages.value || []) {
       if (!page?.path || page.path === '/docs') continue
 
-      const parts = page.path.split('/').filter(Boolean) // docs/<section>/<page...>
+      const parts = page.path.split('/').filter(Boolean)
       if (parts.length < 3) continue
 
       const sectionSlug = parts[1]
@@ -52,7 +54,8 @@
 </script>
 
 <template>
-  <div>
+  <!-- 🔥 single handler instead of adding click everywhere -->
+  <div @click="emit('navigate')">
     <div class="mb-4">
       <input placeholder="Search..." class="w-full rounded-md border px-3 py-2 text-sm" />
     </div>
@@ -72,6 +75,7 @@
         <p class="mb-1 px-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
           {{ section.title }}
         </p>
+
         <ul class="space-y-1">
           <li v-for="item in section.items" :key="item.path">
             <NuxtLink

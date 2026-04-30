@@ -306,7 +306,7 @@
   <div
     class="min-h-screen bg-white font-sans text-slate-900 selection:bg-emerald-100 selection:text-emerald-900"
   >
-    <main class="mx-auto max-w-7xl px-6 py-12 lg:flex lg:gap-x-12">
+    <main class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:flex lg:gap-x-12">
       <!-- LEFT SIDEBAR: PERSUASION NAV -->
       <aside class="hidden lg:block lg:w-64 lg:shrink-0">
         <nav class="sticky top-24 space-y-8">
@@ -353,13 +353,13 @@
       <!-- MAIN CONTENT -->
       <div class="flex-1 lg:max-w-3xl">
         <!-- 1. HERO: EDITORIAL STYLE -->
-        <section id="introduction" class="mb-20">
+        <section id="introduction" class="mb-16 sm:mb-24 lg:mb-32">
           <h1
-            class="mb-8 text-5xl font-black leading-[0.95] tracking-tighter text-slate-900 lg:text-7xl"
+            class="mb-6 text-3xl font-black leading-[0.95] tracking-tighter text-slate-900 sm:mb-8 sm:text-5xl lg:text-7xl"
           >
             Stop building ideas that <span class="text-slate-300">don’t work.</span>
           </h1>
-          <p class="max-w-2xl text-xl leading-relaxed text-slate-700">
+          <p class="max-w-2xl text-base leading-relaxed text-slate-700 sm:text-lg">
             Validate your idea with real user signals before you waste months building the wrong
             thing.
           </p>
@@ -368,17 +368,17 @@
         <!-- 2. URGENCY BLOCK -->
         <section
           id="reality-check"
-          class="mb-20 scroll-mt-24 rounded-3xl border border-amber-100 bg-amber-50 p-10"
+          class="mb-16 scroll-mt-24 rounded-3xl border border-amber-100 bg-amber-50 p-6 sm:mb-24 sm:p-8 lg:mb-32 lg:p-10"
         >
-          <div class="flex gap-6">
+          <div class="flex gap-4 sm:gap-6">
             <div
               class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100"
             >
               <AlertCircle class="h-6 w-6 text-amber-600" />
             </div>
             <div>
-              <h3 class="mb-2 text-lg font-black text-slate-900">The Reality Check</h3>
-              <p class="text-base leading-relaxed text-slate-700">
+              <h3 class="mb-2 text-base font-black text-slate-900 sm:text-lg">The Reality Check</h3>
+              <p class="text-sm leading-relaxed text-slate-700 sm:text-base">
                 Most founders waste 3–6 months building something nobody wants. Not because they
                 lack skill — but because they validate the wrong things. This system prevents that
                 by forcing you to face the data early.
@@ -388,11 +388,11 @@
         </section>
 
         <!-- 3. SYSTEM OVERVIEW: DATA GRID STYLE -->
-        <section id="overview" class="mb-32 scroll-mt-24">
-          <div class="mb-10 flex items-end justify-between">
+        <section id="overview" class="mb-16 scroll-mt-24 sm:mb-24 lg:mb-32">
+          <div class="mb-8 flex items-end justify-between sm:mb-10">
             <div>
-              <h2 class="text-3xl font-black tracking-tight text-slate-900">System Overview</h2>
-              <p class="mt-1 text-base text-slate-600">
+              <h2 class="text-2xl font-black tracking-tight text-slate-900 sm:text-4xl">System Overview</h2>
+              <p class="mt-1 text-sm text-slate-600 sm:text-base">
                 The 6-step process from idea → evidence → decision.
               </p>
             </div>
@@ -400,7 +400,7 @@
           </div>
 
           <div class="rounded-3xl border border-slate-100 shadow-sm">
-            <div class="overflow-x-auto">
+            <div class="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
               <table class="w-full min-w-[640px] border-collapse text-left">
                 <thead>
                   <tr class="border-b border-slate-100 bg-slate-50">
@@ -460,41 +460,41 @@
         </section>
 
         <!-- 6. HYPER-DETAILED EXAMPLES: EDITORIAL STACK -->
-        <section id="example" class="mb-40 scroll-mt-24">
-          <div class="mb-16">
-            <h2 class="mb-4 text-4xl font-black tracking-tighter text-slate-900">
+        <section id="example" class="mb-16 scroll-mt-24 sm:mb-24 lg:mb-32">
+          <div class="mb-10 sm:mb-16">
+            <h2 class="mb-4 text-2xl font-black tracking-tighter text-slate-900 sm:text-4xl">
               Industry Scenarios
             </h2>
-            <p class="max-w-xl text-lg text-slate-700">
+            <p class="max-w-xl text-base text-slate-700 sm:text-lg">
               Real-world examples of the system in action. From B2B SaaS to Local Services.
             </p>
           </div>
 
-          <div class="space-y-32">
+          <div class="space-y-16 sm:space-y-24 lg:space-y-32">
             <div
               v-for="(study, key) in caseStudies"
               :key="key"
               :id="`example-${key}`"
               class="group scroll-mt-24"
             >
-              <div class="mb-10 flex items-center gap-5">
+              <div class="mb-8 flex items-center gap-4 sm:mb-10 sm:gap-5">
                 <div
                   class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-xl shadow-slate-200 transition-transform duration-500 group-hover:scale-110"
                 >
                   <component :is="study.icon" class="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 class="text-2xl font-black tracking-tight text-slate-900">
+                  <h3 class="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
                     {{ study.name }}
                   </h3>
-                  <p class="text-base text-slate-600">{{ study.description }}</p>
+                  <p class="text-sm text-slate-600 sm:text-base">{{ study.description }}</p>
                 </div>
               </div>
 
               <div
                 class="overflow-hidden rounded-[2.5rem] border border-slate-100 bg-white shadow-2xl shadow-slate-100"
               >
-                <div class="overflow-x-auto">
+                <div class="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
                   <table class="w-full min-w-[700px] border-collapse text-left">
                     <thead>
                       <tr class="border-b border-slate-100 bg-slate-50">
@@ -540,10 +540,10 @@
         </section>
 
         <!-- 5. HOW IT WORKS: FINAL PRODUCT-LAYERED STEPS -->
-        <section class="mb-24">
-          <div class="mb-14">
-            <h2 class="text-4xl font-black tracking-tighter text-slate-900">Steps</h2>
-            <p class="mt-3 max-w-2xl text-lg text-slate-700">
+        <section class="mb-16 sm:mb-24 lg:mb-32">
+          <div class="mb-10 sm:mb-14">
+            <h2 class="text-2xl font-black tracking-tighter text-slate-900 sm:text-4xl">Steps</h2>
+            <p class="mt-3 max-w-2xl text-base text-slate-700 sm:text-lg">
               A structured system to evaluate your idea before you build.
             </p>
           </div>
@@ -553,7 +553,7 @@
               v-for="step in finalSteps"
               :id="step.anchor"
               :key="step.anchor"
-              class="scroll-mt-24 rounded-3xl border border-slate-100 bg-white p-8 shadow-sm"
+              class="scroll-mt-24 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm sm:rounded-3xl sm:p-8"
             >
               <div class="mb-4">
                 <p class="text-2xl font-black tracking-tight text-slate-900">
@@ -581,8 +581,8 @@
         </section>
 
         <!-- 7. FAILURE ANALYSIS -->
-        <section id="failure" class="mb-40 scroll-mt-24">
-          <h2 class="mb-10 text-3xl font-black tracking-tight text-slate-900">
+        <section id="failure" class="mb-16 scroll-mt-24 sm:mb-24 lg:mb-32">
+          <h2 class="mb-8 text-2xl font-black tracking-tight text-slate-900 sm:mb-10 sm:text-4xl">
             Why Most Ideas Fail
           </h2>
           <ul class="space-y-6">
@@ -601,21 +601,21 @@
         <!-- 8. FINAL CTA -->
         <section
           v-if="!isLoggedIn"
-          class="relative overflow-hidden rounded-xl bg-slate-900 p-16 text-center text-white"
+          class="relative overflow-hidden rounded-xl bg-slate-900 p-6 text-center text-white sm:p-12 lg:p-16"
         >
           <div
             class="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent"
           ></div>
           <div class="relative z-10">
-            <h2 class="mb-6 text-4xl font-black tracking-tighter lg:text-5xl">
+            <h2 class="mb-6 text-2xl font-black tracking-tighter sm:text-4xl lg:text-5xl">
               Stop guessing. <br class="sm:hidden" />Start validating.
             </h2>
-            <p class="mx-auto mb-10 max-w-md text-lg text-slate-300">
+            <p class="mx-auto mb-8 max-w-md text-base text-slate-300 sm:mb-10 sm:text-lg">
               Join 1,000+ founders who use this system to build evidence-backed startups.
             </p>
             <NuxtLink
               to="/recommendation"
-              class="group inline-flex items-center gap-3 rounded-2xl border-4 border-white bg-emerald-600 px-10 py-5 text-lg font-black text-white transition-colors hover:bg-emerald-500 active:scale-95"
+              class="group inline-flex items-center gap-3 rounded-2xl border-4 border-white bg-emerald-600 px-6 py-3 text-base font-black text-white transition-colors hover:bg-emerald-500 active:scale-95 sm:px-10 sm:py-5 sm:text-lg"
             >
               Validate Your Idea Now
               <ArrowRight class="h-5 w-5 transition-transform group-hover:translate-x-1" />
