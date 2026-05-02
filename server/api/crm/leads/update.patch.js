@@ -2,6 +2,19 @@ import { pool } from '../../../db/index.js'
 import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js'
 
 const UUID_V4_OR_V1_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const PHONE_REGEX = /^\+?[1-9]\d{7,14}$/
+
+function normalizePhone(value) {
+  const raw = String(value || '').trim()
+  if (!raw) return null
+
+  const hasPlusPrefix = raw.startsWith('+')
+  const digitsOnly = raw.replace(/\D/g, '')
+  if (!digitsOnly) return null
+
+  return hasPlusPrefix ? `+${digitsOnly}` : digitsOnly
+}
 
 export default defineEventHandler(async (event) => {
   const { userId } = await requireCrmEnabled(event)
@@ -10,6 +23,7 @@ export default defineEventHandler(async (event) => {
     'name',
     'company',
     'email',
+    'phone',
     'stage_id',
     'user_id',
     'source_id',
@@ -71,6 +85,16 @@ export default defineEventHandler(async (event) => {
       }
 
       value = date.toISOString()
+    }
+  } else if (body.field === 'email') {
+    value = String(body.value || '').trim()
+    if (!EMAIL_REGEX.test(value)) {
+      throw createError({ statusCode: 400, statusMessage: 'Invalid email' })
+    }
+  } else if (body.field === 'phone') {
+    value = normalizePhone(body.value)
+    if (value && !PHONE_REGEX.test(value)) {
+      throw createError({ statusCode: 400, statusMessage: 'Invalid phone' })
     }
   } else {
     value = body.value // keep as string (UUID for user_id)

@@ -7,6 +7,19 @@ import {
 } from '../../../utils/track-usage.js';
 
 const UUID_V4_OR_V1_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^\+?[1-9]\d{7,14}$/;
+
+function normalizePhone(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return null;
+
+  const hasPlusPrefix = raw.startsWith('+');
+  const digitsOnly = raw.replace(/\D/g, '');
+  if (!digitsOnly) return null;
+
+  return hasPlusPrefix ? `+${digitsOnly}` : digitsOnly;
+}
 
 export default defineEventHandler(async (event) => {
   const { userId: authUserId } = await requireCrmEnabled(event);
@@ -27,6 +40,16 @@ export default defineEventHandler(async (event) => {
 
   if (!UUID_V4_OR_V1_REGEX.test(ownerId)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid user_id' });
+  }
+
+  const normalizedEmail = String(body.email || '').trim();
+  if (!EMAIL_REGEX.test(normalizedEmail)) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid email' });
+  }
+
+  const normalizedPhone = normalizePhone(body.phone);
+  if (normalizedPhone && !PHONE_REGEX.test(normalizedPhone)) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid phone' });
   }
 
   const { tier, limits } = await getEventEntitlementsFromDb({ event, client: pool });
@@ -53,15 +76,15 @@ export default defineEventHandler(async (event) => {
     WITH selected_stage AS (
       SELECT id
       FROM pipeline_stages
-      WHERE id = $4
-        AND user_id = $6
+      WHERE id = $5
+        AND user_id = $7
       LIMIT 1
     ),
     selected_sequence AS (
       SELECT id
       FROM sequences
-      WHERE id = $7
-        AND user_id = $6
+      WHERE id = $8
+        AND user_id = $7
       LIMIT 1
     ),
     first_sequence_step AS (
@@ -72,13 +95,14 @@ export default defineEventHandler(async (event) => {
       LIMIT 1
     ),
     inserted AS (
-      INSERT INTO leads (name, company, email, stage_id, user_id, sequence_id, current_step, next_follow_up_at)
+      INSERT INTO leads (name, company, email, phone, stage_id, user_id, sequence_id, current_step, next_follow_up_at)
       SELECT
         $1,
         $2,
         $3,
+        $4,
         selected_stage.id,
-        $5,
+        $6,
         (SELECT id FROM selected_sequence),
         CASE WHEN (SELECT id FROM selected_sequence) IS NULL THEN NULL ELSE 1 END,
         CASE
@@ -86,7 +110,7 @@ export default defineEventHandler(async (event) => {
           ELSE NOW() + ((COALESCE((SELECT offset_days FROM first_sequence_step), 0))::text || ' days')::interval
         END
       FROM selected_stage
-      WHERE $7 IS NULL OR EXISTS (SELECT 1 FROM selected_sequence)
+      WHERE $8 IS NULL OR EXISTS (SELECT 1 FROM selected_sequence)
       RETURNING *
     )
     SELECT
@@ -124,7 +148,7 @@ export default defineEventHandler(async (event) => {
     LEFT JOIN sequences
       ON inserted.sequence_id = sequences.id
     `,
-    [body.name, body.company, body.email, stageId, ownerId, authUserId, sequenceId],
+    [body.name, body.company, normalizedEmail, normalizedPhone, stageId, ownerId, authUserId, sequenceId],
   );
 
   if (!result.rows.length) {

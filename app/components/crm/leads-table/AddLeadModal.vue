@@ -13,10 +13,49 @@
   const name = ref('')
   const company = ref('')
   const email = ref('')
+  const phone = ref('')
   const stageId = ref(null)
   const userId = ref(null)
   const sequenceId = ref('')
   const sequences = ref([])
+  const emailError = ref('')
+  const phoneError = ref('')
+
+  function isValidEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim())
+  }
+
+  function normalizePhone(value) {
+    const raw = String(value || '').trim()
+    if (!raw) return ''
+
+    const hasPlusPrefix = raw.startsWith('+')
+    const digitsOnly = raw.replace(/\D/g, '')
+    return hasPlusPrefix ? `+${digitsOnly}` : digitsOnly
+  }
+
+  function isValidPhone(value) {
+    if (!value) return true
+    return /^\+?[1-9]\d{7,14}$/.test(value)
+  }
+
+  watch(email, (value) => {
+    const normalized = String(value || '').trim()
+    if (!normalized) {
+      emailError.value = ''
+      return
+    }
+    emailError.value = isValidEmail(normalized) ? '' : 'Enter a valid email address'
+  })
+
+  watch(phone, (value) => {
+    const normalized = normalizePhone(value)
+    if (!normalized) {
+      phoneError.value = ''
+      return
+    }
+    phoneError.value = isValidPhone(normalized) ? '' : 'Enter a valid phone number'
+  })
 
   watch(
     () => stagesStore.stages,
@@ -56,13 +95,25 @@
   })
 
   async function createLead() {
+    const normalizedEmail = String(email.value || '').trim()
+    const normalizedPhone = normalizePhone(phone.value)
+    if (!isValidEmail(normalizedEmail)) {
+      emailError.value = 'Enter a valid email address'
+      return
+    }
+    if (!isValidPhone(normalizedPhone)) {
+      phoneError.value = 'Enter a valid phone number'
+      return
+    }
+
     try {
       const lead = await $fetch('/api/crm/leads/create', {
         method: 'POST',
         body: {
           name: name.value,
           company: company.value,
-          email: email.value,
+          email: normalizedEmail,
+          phone: normalizedPhone || null,
           stage_id: stageId.value,
           user_id: userId.value,
           sequence_id: sequenceId.value || null
@@ -115,8 +166,36 @@
           <input
             v-model="email"
             placeholder="john@example.com"
-            class="w-full rounded-lg border border-gray-300 p-2.5 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+            class="w-full rounded-lg border p-2.5 outline-none transition-all focus:ring-2"
+            :class="
+              emailError
+                ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500'
+                : 'border-gray-300 focus:border-emerald-500 focus:ring-emerald-500'
+            "
           />
+          <p v-if="emailError" class="mt-1 text-xs font-medium text-rose-600">
+            {{ emailError }}
+          </p>
+        </div>
+
+        <!-- Phone -->
+        <div>
+          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">
+            Phone Number
+          </label>
+          <input
+            v-model="phone"
+            placeholder="+14155552671"
+            class="w-full rounded-lg border p-2.5 outline-none transition-all focus:ring-2"
+            :class="
+              phoneError
+                ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500'
+                : 'border-gray-300 focus:border-emerald-500 focus:ring-emerald-500'
+            "
+          />
+          <p v-if="phoneError" class="mt-1 text-xs font-medium text-rose-600">
+            {{ phoneError }}
+          </p>
         </div>
 
         <!-- Stage + Owner -->

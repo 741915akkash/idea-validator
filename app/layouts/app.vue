@@ -35,7 +35,7 @@
 
         <NuxtLink to="/" class="flex items-center gap-2">
           <Target class="h-6 w-6 text-emerald-600" />
-          <span class="text-lg font-semibold text-slate-900">Idea Validator</span>
+          <span class="text-lg font-semibold text-slate-900">GO Launch Scall</span>
         </NuxtLink>
       </div>
 

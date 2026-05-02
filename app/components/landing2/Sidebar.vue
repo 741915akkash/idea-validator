@@ -264,7 +264,7 @@
     <!-- Logo -->
     <NuxtLink v-if="props.showBrand" to="/" class="flex items-center gap-2">
       <Target class="h-6 w-6 text-emerald-600 md:h-8 md:w-8" />
-      <span class="text-lg font-semibold text-slate-900 md:text-xl"> Idea Validator </span>
+      <span class="text-lg font-semibold text-slate-900 md:text-xl"> GO Launch Scall </span>
     </NuxtLink>
 
     <IdeaSelector

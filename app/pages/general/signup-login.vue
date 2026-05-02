@@ -80,7 +80,7 @@
 
 <template>
   <main class="mx-auto max-w-md px-4 py-16">
-    <h1 class="text-2xl font-semibold text-slate-900">Continue to Idea Validator</h1>
+    <h1 class="text-2xl font-semibold text-slate-900">Continue to GO Launch Scall</h1>
     <p class="mt-2 text-sm text-slate-600">Enter your email to get a one-time code.</p>
 
     <form class="mt-6 space-y-4" @submit.prevent="verifyOtp">
