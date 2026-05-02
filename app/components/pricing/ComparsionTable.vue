@@ -1,16 +1,103 @@
 <script setup>
   import { Check, X, ClipboardList, Users, Sparkles } from 'lucide-vue-next'
+  import { computed } from 'vue'
 
-  const categories = [
+  const { data: pricingLimits } = await useFetch('/api/billing/public-limits', {
+    default: () => ({ tiers: {} })
+  })
+
+  function formatLimit(entry, { showMonthlySuffix = false, trueLabel = '✅' } = {}) {
+    if (!entry) return null
+    if (entry.enabled === false) return '❌'
+    if (entry.limit == null) return 'Unlimited'
+    if (typeof entry.limit !== 'number') return null
+    const base = Number(entry.limit).toLocaleString('en-US')
+    if (showMonthlySuffix && entry.period === 'monthly') return `${base}/mo`
+    if (typeof trueLabel === 'string' && entry.limit > 0 && entry.enabled === true) return base
+    return base
+  }
+
+  const dynamicLimits = computed(() => {
+    const tiers = pricingLimits.value?.tiers || {}
+    const free = tiers.free || {}
+    const growth = tiers.growth || {}
+    const founder = tiers.founder || {}
+
+    return {
+      activeIdeas: {
+        free: formatLimit(free.activeIdeas) || '2',
+        growth: formatLimit(growth.activeIdeas) || '5',
+        founder: formatLimit(founder.activeIdeas) || '5'
+      },
+      archivedIdeas: {
+        free: formatLimit(free.archivedIdeas) || '3',
+        growth: formatLimit(growth.archivedIdeas) || '50',
+        founder: formatLimit(founder.archivedIdeas) || '100'
+      },
+      revisionsPerIdea: {
+        free: formatLimit(free.revisionsPerIdea) || '30',
+        growth: formatLimit(growth.revisionsPerIdea) || 'Unlimited',
+        founder: formatLimit(founder.revisionsPerIdea) || 'Unlimited'
+      },
+      freeformInterviewsPerIdeaPerMonth: {
+        free:
+          formatLimit(free.freeformInterviewsPerIdeaPerMonth, { showMonthlySuffix: true }) || '30/mo',
+        growth: formatLimit(growth.freeformInterviewsPerIdeaPerMonth) || 'Unlimited',
+        founder: formatLimit(founder.freeformInterviewsPerIdeaPerMonth) || 'Unlimited'
+      },
+      structuredValidation: {
+        free: free.structuredValidation?.enabled ? 'Full' : '❌',
+        growth: growth.structuredValidation?.enabled ? 'Full' : '❌',
+        founder: founder.structuredValidation?.enabled ? 'Full' : '❌'
+      },
+      contacts: {
+        free: formatLimit(free.contacts) || '500',
+        growth: formatLimit(growth.contacts) || '10,000',
+        founder: formatLimit(founder.contacts) || '25,000'
+      },
+      pipelines: {
+        free: formatLimit(free.pipelines) || '1',
+        growth: formatLimit(growth.pipelines) || 'Unlimited',
+        founder: formatLimit(founder.pipelines) || 'Unlimited'
+      }
+    }
+  })
+
+  const categories = computed(() => [
     {
       name: 'Validator',
       icon: ClipboardList,
       features: [
-        { name: 'Active ideas', free: '2', growth: '5', founder: '5' },
-        { name: 'Archived ideas', free: '3', growth: '50', founder: '100' },
-        { name: 'Revisions per idea', free: '30', growth: 'Unlimited', founder: 'Unlimited' },
-        { name: 'Freeform interviews', free: '30/mo', growth: 'Unlimited', founder: 'Unlimited' },
-        { name: 'Structured validation (AI)', free: '❌', growth: 'Full', founder: 'Full' },
+        {
+          name: 'Active ideas',
+          free: dynamicLimits.value.activeIdeas.free,
+          growth: dynamicLimits.value.activeIdeas.growth,
+          founder: dynamicLimits.value.activeIdeas.founder
+        },
+        {
+          name: 'Archived ideas',
+          free: dynamicLimits.value.archivedIdeas.free,
+          growth: dynamicLimits.value.archivedIdeas.growth,
+          founder: dynamicLimits.value.archivedIdeas.founder
+        },
+        {
+          name: 'Revisions per idea',
+          free: dynamicLimits.value.revisionsPerIdea.free,
+          growth: dynamicLimits.value.revisionsPerIdea.growth,
+          founder: dynamicLimits.value.revisionsPerIdea.founder
+        },
+        {
+          name: 'Freeform interviews',
+          free: dynamicLimits.value.freeformInterviewsPerIdeaPerMonth.free,
+          growth: dynamicLimits.value.freeformInterviewsPerIdeaPerMonth.growth,
+          founder: dynamicLimits.value.freeformInterviewsPerIdeaPerMonth.founder
+        },
+        {
+          name: 'Structured validation (AI)',
+          free: dynamicLimits.value.structuredValidation.free,
+          growth: dynamicLimits.value.structuredValidation.growth,
+          founder: dynamicLimits.value.structuredValidation.founder
+        },
         { name: 'AI scoring & breakdown', free: '❌', growth: '✅', founder: '✅' },
         { name: 'Compare revisions', free: '✅', growth: '✅', founder: '✅' },
         { name: 'Notes & diff tracking', free: '✅', growth: '✅', founder: '✅' },
@@ -21,8 +108,18 @@
       name: 'CRM',
       icon: Users,
       features: [
-        { name: 'Contacts', free: '100', growth: '5,000', founder: '25,000' },
-        { name: 'Pipelines', free: '1', growth: 'Unlimited', founder: 'Unlimited' },
+        {
+          name: 'Contacts',
+          free: dynamicLimits.value.contacts.free,
+          growth: dynamicLimits.value.contacts.growth,
+          founder: dynamicLimits.value.contacts.founder
+        },
+        {
+          name: 'Pipelines',
+          free: dynamicLimits.value.pipelines.free,
+          growth: dynamicLimits.value.pipelines.growth,
+          founder: dynamicLimits.value.pipelines.founder
+        },
         {
           name: 'Stages per pipeline',
           free: 'Unlimited',
@@ -56,7 +153,7 @@
         { name: 'Priority support', free: '❌', growth: '✅', founder: '✅' }
       ]
     }
-  ]
+  ])
 
   const isCheck = (val) => val === '✅'
   const isCross = (val) => val === '❌'

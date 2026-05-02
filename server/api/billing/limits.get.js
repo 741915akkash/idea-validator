@@ -14,12 +14,12 @@ export default eventHandler(async (event) => {
   }
 
   const tier = normalizePlanTier(user.plan_tier)
-  const client = await pool.connect()
 
   try {
-    const rows = await getPlanLimitsRows({ client, tier })
-    const limits = {}
+    // use pool instead of client
+    const rows = await getPlanLimitsRows({ pool, tier })
 
+    const limits = {}
     for (const row of rows) {
       limits[row.feature] = {
         enabled: Boolean(row.enabled),
@@ -34,7 +34,13 @@ export default eventHandler(async (event) => {
       tier,
       limits
     }
-  } finally {
-    client.release()
+  } catch (error) {
+    console.error('Error fetching plan limits:', error)
+
+    return {
+      authenticated: true,
+      tier,
+      limits: {}
+    }
   }
 })

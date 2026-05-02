@@ -8,7 +8,7 @@ export const PLAN_LIMITS = {
     [FEATURES.REVISIONS]: 30,
     [FEATURES.FREEFORM_INTERVIEWS]: 30,
     [FEATURES.STRUCTURED_VALIDATION]: false,
-    [FEATURES.CONTACTS]: 100,
+    [FEATURES.CONTACTS]: 500,
     [FEATURES.PIPELINES]: 1
   },
   growth: {
@@ -17,7 +17,7 @@ export const PLAN_LIMITS = {
     [FEATURES.REVISIONS]: null,
     [FEATURES.FREEFORM_INTERVIEWS]: null,
     [FEATURES.STRUCTURED_VALIDATION]: true,
-    [FEATURES.CONTACTS]: 5000,
+    [FEATURES.CONTACTS]: 10000,
     [FEATURES.PIPELINES]: null
   },
   founder: {
@@ -85,8 +85,7 @@ export async function getEventEntitlementsFromDb({ event, client }) {
         continue
       }
 
-      mergedLimits[featureKey] =
-        dbRow.limit_value == null ? null : Number(dbRow.limit_value)
+      mergedLimits[featureKey] = dbRow.limit_value == null ? null : Number(dbRow.limit_value)
     }
 
     return {

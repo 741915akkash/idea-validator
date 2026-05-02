@@ -1,20 +1,9 @@
-import { createError } from 'h3'
 import { normalizePlanTier } from '../../utils/track-usage.js'
 
-function assertClient(client) {
-  if (!client || typeof client.query !== 'function') {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'A database client with query(...) is required'
-    })
-  }
-}
-
-export async function getPlanLimitsRows({ client, tier }) {
-  assertClient(client)
-
+export async function getPlanLimitsRows({ pool, tier }) {
   const normalizedTier = normalizePlanTier(tier)
-  const { rows } = await client.query(
+
+  const { rows } = await pool.query(
     `
     SELECT plan_tier, feature, enabled, limit_value, period
     FROM plan_limits
@@ -26,8 +15,8 @@ export async function getPlanLimitsRows({ client, tier }) {
   return rows
 }
 
-export async function getPlanLimitsMap({ client, tier }) {
-  const rows = await getPlanLimitsRows({ client, tier })
+export async function getPlanLimitsMap({ pool, tier }) {
+  const rows = await getPlanLimitsRows({ pool, tier })
 
   const limits = {}
   for (const row of rows) {
