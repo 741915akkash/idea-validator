@@ -15,18 +15,21 @@ export default eventHandler(async (event) => {
   const client = await pool.connect()
 
   try {
-    await requireQuizAccess(client, event, quiz_id)
+    const quiz = await requireQuizAccess(client, event, quiz_id, {
+      select: 'id, parent_quiz_id'
+    })
+    const rootId = quiz.parent_quiz_id || quiz.id
 
     await client.query(
       `
       UPDATE quizzes
       SET name = $1
-      WHERE id = $2
+      WHERE id = $2 OR parent_quiz_id = $2
       `,
-      [name.trim(), quiz_id]
+      [name.trim(), rootId]
     )
 
-    return { success: true }
+    return { success: true, root_id: rootId }
   } finally {
     client.release()
   }

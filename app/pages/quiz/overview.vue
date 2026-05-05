@@ -224,17 +224,19 @@
 
   async function saveRename() {
     if (!currentQuiz.value) return
+    const trimmed = nameDraft.value.trim()
+    if (!trimmed) return
 
     await $fetch('/api/quiz/rename-quiz', {
       method: 'POST',
       body: {
         quiz_id: currentQuiz.value.id,
-        name: nameDraft.value
+        name: trimmed
       }
     })
 
-    quizStore.renameQuiz(currentQuiz.value.id, nameDraft.value)
-    currentQuiz.value.name = nameDraft.value
+    quizStore.renameQuiz(currentQuiz.value.id, trimmed)
+    currentQuiz.value.name = trimmed
     renaming.value = false
   }
 

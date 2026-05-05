@@ -50,8 +50,17 @@ export const useQuizSessionStore = defineStore('quizSession', {
      * Update quiz name locally after rename
      */
     renameQuiz(id, name) {
-      const q = this.quizzes.find((q) => q.id === id)
-      if (q) q.name = name
+      const target = this.quizzes.find((q) => q.id === id)
+      if (!target) return
+
+      const rootId = target.parent_quiz_id || target.id
+      this.quizzes = this.quizzes.map((q) => {
+        const familyRoot = q.parent_quiz_id || q.id
+        if (String(familyRoot) === String(rootId)) {
+          return { ...q, name }
+        }
+        return q
+      })
     },
 
     removeQuiz(id) {
