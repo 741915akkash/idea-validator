@@ -293,21 +293,23 @@
           </div>
         </section>
 
-        <section v-if="!loadingInsights && !insightsError && !insightsLocked" class="mt-10 space-y-10">
-          <!-- WHAT'S WORKING -->
-          <InsightBlock title="What’s working" tone="positive" :items="insights.working" />
+                <!--
+        <template>
+          <section v-if="!loadingInsights && !insightsError && !insightsLocked" class="mt-10 space-y-10">
+            <InsightBlock title="What’s working" tone="positive" :items="insights.working" />
+            <InsightBlock title="What’s risky" tone="negative" :items="insights.risky" />
+            <InsightBlock title="How to proceed" tone="neutral" :items="insights.proceed" />
+          </section>
 
-          <!-- WHAT'S RISKY -->
-          <InsightBlock title="What’s risky" tone="negative" :items="insights.risky" />
 
-          <!-- HOW TO PROCEED -->
-          <InsightBlock title="How to proceed" tone="neutral" :items="insights.proceed" />
-        </section>
-
-        <section v-if="!loadingInsights && !insightsError && insightsLocked" class="mt-10 rounded-xl border p-6">
+        <section
+          v-if="!loadingInsights && !insightsError && insightsLocked"
+          class="mt-10 rounded-xl border p-6"
+        >
           <h2 class="text-lg font-semibold">Insights are locked</h2>
           <p class="mt-2 text-sm text-gray-600">
-            Create an account to unlock your full What’s working, What’s risky, and How to proceed insights.
+            Create an account to unlock your full What’s working, What’s risky, and How to proceed
+            insights.
           </p>
           <NuxtLink
             :to="{
@@ -328,6 +330,8 @@
         <div v-if="insightsError" class="mt-6 text-base text-red-600">
           {{ insightsError }}
         </div>
+        </template>
+        -->
 
         <!-- Footer -->
         <p class="mb-8 text-xs text-gray-500">Results are locked to preserve objectivity.</p>
