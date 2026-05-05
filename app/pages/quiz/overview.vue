@@ -114,7 +114,12 @@
 
       router.push(`/quiz/score?quiz_id=${quizStore.quizId}`)
     } catch (e) {
-      scoreError.value = e.statusMessage || 'Unable to score'
+      scoreError.value =
+        e?.data?.statusMessage ||
+        e?.data?.message ||
+        e?.statusMessage ||
+        e?.message ||
+        'Unable to score'
     }
   }
 
