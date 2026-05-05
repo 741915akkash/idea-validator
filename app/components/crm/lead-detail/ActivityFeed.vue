@@ -1,11 +1,15 @@
 <script setup>
   import { History, X } from 'lucide-vue-next'
   import { ref, computed } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { useQuizSessionStore } from '~/stores/quizSession'
 
   const props = defineProps({
     activities: { type: Array, default: () => [] }
   })
 
+  const router = useRouter()
+  const quizStore = useQuizSessionStore()
   const showPanel = ref(false)
 
   const recentActivities = computed(() => {
@@ -46,6 +50,21 @@
 
     return formatExactDate(dateString)
   }
+
+  async function openInterviewFromActivity(interviewId) {
+    const quizId = quizStore.quizId
+    if (!quizId || !interviewId) return
+
+    showPanel.value = false
+
+    await router.push({
+      path: '/quiz/interviews',
+      query: {
+        quiz_id: quizId,
+        open_interview_id: interviewId
+      }
+    })
+  }
 </script>
 
 <template>
@@ -77,12 +96,20 @@
           <div class="h-1.5 w-1.5 rounded-full bg-white"></div>
         </div>
 
-        <div class="flex flex-col gap-1">
-          <p class="text-[13px] leading-relaxed text-gray-700">
-            {{ act.text }}
-          </p>
+          <div class="flex flex-col gap-1">
+            <p class="text-[13px] leading-relaxed text-gray-700">
+              {{ act.text }}
+            </p>
 
-          <div class="flex items-center gap-2 text-[11px] text-gray-400">
+            <button
+              v-if="act.type === 'interview' && act.interview_id"
+              @click="openInterviewFromActivity(act.interview_id)"
+              class="w-fit text-[11px] font-medium text-violet-700 hover:underline"
+            >
+              Open Interview
+            </button>
+
+            <div class="flex items-center gap-2 text-[11px] text-gray-400">
             <span :title="new Date(act.created_at).toLocaleString()">
               {{ formatExactDate(act.created_at) }}
             </span>
@@ -176,6 +203,14 @@
                 <p class="text-sm leading-relaxed text-gray-700">
                   {{ act.text }}
                 </p>
+
+                <button
+                  v-if="act.type === 'interview' && act.interview_id"
+                  @click="openInterviewFromActivity(act.interview_id)"
+                  class="mt-3 w-fit text-xs font-medium text-violet-700 hover:underline"
+                >
+                  Open Interview
+                </button>
               </div>
             </div>
 

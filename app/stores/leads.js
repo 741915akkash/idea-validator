@@ -75,12 +75,12 @@ export const useLeadsStore = defineStore('leads', {
     },
 
     addLead(lead) {
-      this.leads.push(
-        normalizeLead({
-          ...lead,
-          activities: lead?.activities || []
-        })
-      )
+      const newLead = normalizeLead({
+        ...lead,
+        activities: lead?.activities || []
+      })
+
+      this.leads = [newLead, ...this.leads] // ✅ NEW reference (important)
     },
 
     setActivities(leadId, activities) {

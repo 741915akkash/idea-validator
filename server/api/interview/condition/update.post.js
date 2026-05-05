@@ -1,5 +1,6 @@
 import { pool } from '../../../db'
 import { requireInterviewAccess } from '../../../utils/interviewAccess'
+import { addInterviewToCrm } from '../add-to-crm/add-to-crm.post.js'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -75,6 +76,13 @@ export default defineEventHandler(async (event) => {
         `,
         [interview_id, completionStatus]
       )
+
+      const currentUserId = event.context?.user?.id || event.context?.auth?.userId || null
+      await addInterviewToCrm({
+        client,
+        interviewId: interview_id,
+        userId: currentUserId
+      })
 
       // 5️⃣ If fully met → mark sub resolved
       if (!hasFailures) {

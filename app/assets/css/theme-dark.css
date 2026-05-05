@@ -1,0 +1,27 @@
+/* Dark theme tokens for Tailwind arbitrary values.
+   Usage examples:
+   - dark:bg-[var(--bg)]
+   - dark:text-[var(--text)]
+   - dark:border-[var(--border)]
+*/
+
+:root.dark {
+  --bg: #0b1220;
+  --surface: #111a2b;
+  --surface-2: #162238;
+
+  --text: #e6edf7;
+  --text-muted: #9fb0c7;
+
+  --border: #25324a;
+  --border-soft: #1b2740;
+
+  --accent: #10b981;
+  --accent-hover: #34d399;
+  --accent-soft: #0f2e2a;
+
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #38bdf8;
+}

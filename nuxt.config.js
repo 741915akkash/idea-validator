@@ -38,6 +38,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       isDev: process.env.NODE_ENV !== 'production',
+      experimentsEnabled: process.env.NUXT_PUBLIC_EXPERIMENTS_ENABLED === 'true',
       gaMeasurementId: process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID || '',
       posthog: {
         enabled: posthogEnabled,

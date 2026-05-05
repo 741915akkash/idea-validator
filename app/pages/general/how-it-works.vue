@@ -340,7 +340,7 @@
               <li>→ Get clear decisions</li>
             </ul>
             <NuxtLink
-              to="/recommendation"
+              to="signup-login"
               class="group flex w-full items-center justify-center gap-2 rounded-lg border-4 border-white bg-emerald-600 py-2.5 text-[11px] font-black uppercase tracking-wide text-white transition-colors hover:bg-emerald-500 active:scale-95"
             >
               Start Validating Free
@@ -614,7 +614,7 @@
               Join 1,000+ founders who use this system to build evidence-backed startups.
             </p>
             <NuxtLink
-              to="/recommendation"
+              to="signup-login"
               class="group inline-flex items-center gap-3 rounded-2xl border-4 border-white bg-emerald-600 px-6 py-3 text-base font-black text-white transition-colors hover:bg-emerald-500 active:scale-95 sm:px-10 sm:py-5 sm:text-lg"
             >
               Validate Your Idea Now

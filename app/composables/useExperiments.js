@@ -1,4 +1,6 @@
 export const useExperiments = () => {
+  const config = useRuntimeConfig()
+  const enabled = config.public.experimentsEnabled && config.public.isDev
   const { $posthog } = useNuxtApp()
 
   const getVariant = (flag) => {
@@ -7,5 +9,5 @@ export const useExperiments = () => {
     return posthog?.getFeatureFlag?.(flag) ?? null
   }
 
-  return { getVariant }
+  return { enabled, getVariant }
 }

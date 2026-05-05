@@ -1,6 +1,8 @@
 <script setup>
-  import { ref, computed, nextTick } from 'vue'
+  import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
   import { useLeadsStore } from '~/stores/leads'
+  import { useQuizSessionStore } from '~/stores/quizSession'
+
   import LeadDetailHeader from './Header.vue'
   import FollowUpSection from './FollowUpSection.vue'
   import ActivityFeed from './ActivityFeed.vue'
@@ -16,15 +18,20 @@
   const emit = defineEmits(['close'])
 
   const leadsStore = useLeadsStore()
+  const quizStore = useQuizSessionStore()
   const lead = computed(() => leadsStore.leads.find((l) => l.id === props.leadId))
 
   // Inline Editing State
   const editingField = ref(null)
   const editValue = ref('')
 
+  // Visual State
+  const showMeta = ref(false)
+
   function startInlineEdit(field, value) {
     editingField.value = field
     editValue.value = value
+
     nextTick(() => {
       const el = document.getElementById(`edit-${field}`)
       if (el) el.focus()
@@ -38,7 +45,6 @@
     const value = editValue.value
     const previous = { ...lead.value }
 
-    // optimistic update
     leadsStore.updateLead({ id: props.leadId, [field]: value })
 
     editingField.value = null
@@ -55,13 +61,21 @@
     }
   }
 
+  // ✅ FIXED outside click
   function handleOutsideClick() {
-    if (editingField.value || newNote.value.trim()) {
+    if (editingField.value) {
       const confirmClose = confirm('Discard changes?')
       if (!confirmClose) return
     }
 
     emit('close')
+  }
+
+  // ✅ ESC key support (very useful)
+  function handleKeydown(e) {
+    if (e.key === 'Escape') {
+      handleOutsideClick()
+    }
   }
 
   onMounted(async () => {
@@ -70,14 +84,19 @@
     })
 
     leadsStore.setActivities(props.leadId, activities)
+
+    window.addEventListener('keydown', handleKeydown)
   })
 
-  // Visual State
-  const showMeta = ref(false)
+  onBeforeUnmount(() => {
+    window.removeEventListener('keydown', handleKeydown)
+  })
 </script>
 
 <template>
+  <!-- overlay -->
   <div class="fixed inset-0 z-[140] bg-black/20" @click="handleOutsideClick">
+    <!-- modal -->
     <div
       v-if="lead"
       @click.stop
@@ -98,7 +117,7 @@
 
         <FollowUpSection :lead-id="leadId" :follow-up="lead.follow_up" />
 
-        <ActivitySection :activities="lead?.activities || []" :leadId="leadId" />
+        <ActivitySection :activities="lead?.activities || []" :leadId="leadId" :quiz-id="quizStore.quizId" />
 
         <ActivityFeed :activities="lead.activities" />
 

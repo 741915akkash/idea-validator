@@ -1,6 +1,5 @@
 <script setup>
   import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
-  import { useInterviewSession } from '@/stores/interviewSession'
 
   const props = defineProps({
     interviewId: {
@@ -12,8 +11,6 @@
       default: null
     }
   })
-
-  const interview = useInterviewSession()
 
   const showRespondent = ref(true)
 
@@ -27,10 +24,11 @@
   const savedDraft = ref(false)
   const isHydratingDraft = ref(false)
 
-  const respondentName = computed({
-    get: () => interview.respondentName,
-    set: (v) => (interview.respondentName = v)
-  })
+  // ✅ NEW structured fields
+  const name = ref('')
+  const email = ref('')
+  const phone = ref('')
+  const company = ref('')
 
   const canAutosave = computed(() => {
     return !!props.interviewId && !!props.conditionId
@@ -40,11 +38,14 @@
     title: '',
     tags: '',
     notes: '',
-    evidence_log: ''
+    evidence_log: '',
+    name: '',
+    email: '',
+    phone: '',
+    company: ''
   })
 
   let autosaveTimer = null
-  let respondentSaveTimer = null
 
   function updateScreenSize() {
     isDesktop.value = window.innerWidth >= 768
@@ -63,12 +64,6 @@
       autosaveTimer = null
       saveDraft().catch(() => {})
     }
-
-    if (respondentSaveTimer) {
-      clearTimeout(respondentSaveTimer)
-      respondentSaveTimer = null
-      interview.saveRespondent().catch(() => {})
-    }
   })
 
   function toggleMobileTab() {
@@ -80,7 +75,11 @@
       title: title.value || '',
       tags: tags.value || '',
       notes: notes.value || '',
-      evidence_log: evidence.value || ''
+      evidence_log: evidence.value || '',
+      name: name.value || '',
+      email: email.value || '',
+      phone: phone.value || '',
+      company: company.value || ''
     }
   }
 
@@ -94,7 +93,11 @@
       snapshot.title === last.title &&
       snapshot.tags === last.tags &&
       snapshot.notes === last.notes &&
-      snapshot.evidence_log === last.evidence_log
+      snapshot.evidence_log === last.evidence_log &&
+      snapshot.name === last.name &&
+      snapshot.email === last.email &&
+      snapshot.phone === last.phone &&
+      snapshot.company === last.company
     ) {
       return
     }
@@ -103,7 +106,11 @@
       !snapshot.title.trim() &&
       !snapshot.tags.trim() &&
       !snapshot.notes.trim() &&
-      !snapshot.evidence_log.trim()
+      !snapshot.evidence_log.trim() &&
+      !snapshot.name.trim() &&
+      !snapshot.email.trim() &&
+      !snapshot.phone.trim() &&
+      !snapshot.company.trim()
 
     if (isEmpty) return
 
@@ -116,7 +123,11 @@
         evidence_log: snapshot.evidence_log,
         structured_responses: {
           title: snapshot.title,
-          tags: snapshot.tags
+          tags: snapshot.tags,
+          name: snapshot.name,
+          email: snapshot.email,
+          phone: snapshot.phone,
+          company: snapshot.company
         }
       }
     })
@@ -143,22 +154,15 @@
       notes.value = latest?.notes || ''
       evidence.value = latest?.evidence_log || ''
 
-      if (res?.interview?.respondent_info) {
-        interview.respondentName = res.interview.respondent_info
-      } else if (latest?.respondent_name) {
-        interview.respondentName = latest.respondent_name
-      }
+      name.value = structured?.name || ''
+      email.value = structured?.email || ''
+      phone.value = structured?.phone || ''
+      company.value = structured?.company || ''
 
-      lastSavedSnapshot.value = {
-        title: title.value || '',
-        tags: tags.value || '',
-        notes: notes.value || '',
-        evidence_log: evidence.value || ''
-      }
-
+      lastSavedSnapshot.value = currentSnapshot()
       savedDraft.value = !!latest
     } catch {
-      // Ignore hydration errors; user can still type and autosave.
+      // ignore
     } finally {
       setTimeout(() => {
         isHydratingDraft.value = false
@@ -173,28 +177,38 @@
     }
 
     await saveDraft()
-    await interview.saveRespondent().catch(() => {})
+
+    // 🔥 trigger CRM creation
+    await $fetch('/api/interview/add-to-crm/add-to-crm', {
+      method: 'POST',
+      body: {
+        interview_id: props.interviewId
+      }
+    })
   }
 
-  watch([title, tags, notes, evidence, () => props.interviewId, () => props.conditionId], () => {
-    if (isHydratingDraft.value) return
-    if (!canAutosave.value) return
-
-    savedDraft.value = false
-
-    if (autosaveTimer) clearTimeout(autosaveTimer)
-    autosaveTimer = setTimeout(() => {
-      saveDraft().catch(() => {})
-    }, 1500)
-  })
-
   watch(
-    () => interview.respondentName,
+    [
+      title,
+      tags,
+      notes,
+      evidence,
+      name,
+      email,
+      phone,
+      company,
+      () => props.interviewId,
+      () => props.conditionId
+    ],
     () => {
-      if (respondentSaveTimer) clearTimeout(respondentSaveTimer)
+      if (isHydratingDraft.value) return
+      if (!canAutosave.value) return
 
-      respondentSaveTimer = setTimeout(() => {
-        interview.saveRespondent().catch(() => {})
+      savedDraft.value = false
+
+      if (autosaveTimer) clearTimeout(autosaveTimer)
+      autosaveTimer = setTimeout(() => {
+        saveDraft().catch(() => {})
       }, 1500)
     }
   )
@@ -214,7 +228,6 @@
 
 <template>
   <div class="fixed inset-0 z-50 flex flex-col gap-4 overflow-hidden bg-white p-4 md:p-6">
-
     <button
       @click="showRespondent = !showRespondent"
       class="rounded-md bg-neutral-100 px-3 py-2 text-xs font-medium uppercase text-neutral-700"
@@ -222,18 +235,51 @@
       {{ showRespondent ? 'Hide respondent' : 'Show respondent' }}
     </button>
 
-    <div v-if="showRespondent">
-      <div class="text-xs font-medium uppercase text-black">Respondent</div>
+    <!-- ✅ NEW RESPONDENT SECTION -->
+    <div v-if="showRespondent" class="grid grid-cols-1 gap-3 md:grid-cols-2">
+      <div>
+        <div class="text-xs font-medium uppercase text-black">Respondent Name</div>
+        <input
+          v-model="name"
+          type="text"
+          placeholder="John Doe"
+          class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        />
+      </div>
 
-      <textarea
-        v-model="respondentName"
-        class="mt-1 h-20 w-full resize-none overflow-y-auto rounded-md border border-neutral-300 px-3 py-2 text-sm"
-      />
+      <div>
+        <div class="text-xs font-medium uppercase text-black">Email</div>
+        <input
+          v-model="email"
+          type="text"
+          placeholder="john@example.com"
+          class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
+        <div class="text-xs font-medium uppercase text-black">Phone</div>
+        <input
+          v-model="phone"
+          type="text"
+          placeholder="+123456789"
+          class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div>
+        <div class="text-xs font-medium uppercase text-black">Company</div>
+        <input
+          v-model="company"
+          type="text"
+          placeholder="Acme Inc"
+          class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        />
+      </div>
     </div>
 
     <div>
       <div class="text-xs font-medium uppercase text-black">Title</div>
-
       <input
         v-model="title"
         type="text"
@@ -244,7 +290,6 @@
 
     <div>
       <div class="text-xs font-medium uppercase text-black">Tags</div>
-
       <input
         v-model="tags"
         type="text"
@@ -256,38 +301,28 @@
     <div class="md:hidden">
       <button
         @click="toggleMobileTab"
-        class="w-full rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+        class="w-full rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white"
       >
         {{ mobileTab === 'notes' ? 'Switch to Evidence' : 'Switch to Notes' }}
       </button>
     </div>
 
-    <div
-      class="grid min-h-0 flex-1 gap-4 md:grid-cols-2"
-    >
-      <div v-show="mobileTab === 'notes' || isDesktop" class="flex min-h-0 flex-col gap-2">
-        <div class="text-xs font-medium uppercase text-black">
-          Interview Notes
-        </div>
-
+    <div class="grid min-h-0 flex-1 gap-4 md:grid-cols-2">
+      <div v-show="mobileTab === 'notes' || isDesktop" class="flex flex-col gap-2">
+        <div class="text-xs font-medium uppercase text-black">Interview Notes</div>
         <textarea
           v-model="notes"
-          class="w-full flex-1 resize-none overflow-y-auto rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          class="w-full flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm"
         />
-
         <SavedStatus v-if="savedDraft" />
       </div>
 
-      <div v-show="mobileTab === 'evidence' || isDesktop" class="flex min-h-0 flex-col gap-2">
-        <div class="text-xs font-medium uppercase text-black">
-          Evidence Logged
-        </div>
-
+      <div v-show="mobileTab === 'evidence' || isDesktop" class="flex flex-col gap-2">
+        <div class="text-xs font-medium uppercase text-black">Evidence Logged</div>
         <textarea
           v-model="evidence"
-          class="w-full flex-1 resize-none overflow-y-auto rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          class="w-full flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm"
         />
-
         <SavedStatus v-if="savedDraft" />
       </div>
     </div>

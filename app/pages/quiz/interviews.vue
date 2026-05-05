@@ -1,6 +1,6 @@
 <script setup>
   import { ref, onMounted, computed } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { useRouter, useRoute } from 'vue-router'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import InterviewScreenFreeform from '~/components/interview/InterviewScreenFreeform.vue'
 
@@ -10,6 +10,7 @@
   })
 
   const router = useRouter()
+  const route = useRoute()
   const quizStore = useQuizSessionStore()
 
   const interviews = ref([])
@@ -50,7 +51,26 @@
     quizName.value = quiz?.name || ''
   }
 
+  async function maybeOpenInterviewFromQuery() {
+    const openInterviewId = route.query?.open_interview_id
+    if (!openInterviewId) return
+
+    const target = interviews.value.find((interview) => String(interview.id) === String(openInterviewId))
+    if (!target) return
+
+    await openQuickInterview(target)
+
+    const nextQuery = { ...route.query }
+    delete nextQuery.open_interview_id
+    await router.replace({ query: nextQuery })
+  }
+
   onMounted(async () => {
+    const quizIdFromQuery = route.query?.quiz_id
+    if (quizIdFromQuery && !quizStore.quizId) {
+      quizStore.setQuizId(String(quizIdFromQuery))
+    }
+
     if (!quizStore.quizId) {
       loading.value = false
       return
@@ -58,6 +78,7 @@
 
     try {
       await loadInterviewData()
+      await maybeOpenInterviewFromQuery()
     } finally {
       loading.value = false
     }
@@ -108,8 +129,12 @@
 
         showFreeformInterview.value = true
       })
-      .catch(() => {
-        actionError.value = 'Unable to start freeform interview.'
+      .catch((err) => {
+        actionError.value =
+          err?.data?.statusMessage ||
+          err?.statusMessage ||
+          err?.message ||
+          'Unable to start freeform interview.'
       })
   }
 
@@ -117,15 +142,25 @@
     if (closingFreeform.value) return
     closingFreeform.value = true
 
+    let saveCloseError = null
+
     try {
       await freeformScreenRef.value?.flushAndSave?.()
-    } catch {
-      // Best effort save on close; still allow exit.
+    } catch (err) {
+      saveCloseError =
+        err?.data?.statusMessage ||
+        err?.statusMessage ||
+        err?.message ||
+        'Failed to save quick interview changes while closing.'
     }
 
     showFreeformInterview.value = false
     freeformInterviewId.value = null
     freeformConditionId.value = null
+
+    if (saveCloseError) {
+      actionError.value = `Closed quick interview, but save failed: ${saveCloseError}`
+    }
 
     try {
       await loadInterviewData()
@@ -282,32 +317,19 @@
     groupStructured(structuredInterviewsForTab.value)
   )
 
-  function formatDateShort(value) {
+  function formatLocalDateTime(value) {
     if (!value) return ''
-    return new Date(value).toLocaleDateString(undefined, {
+
+    const date = new Date(value)
+    if (!Number.isFinite(date.getTime())) return ''
+
+    return new Intl.DateTimeFormat(undefined, {
       month: 'short',
-      day: 'numeric'
-    })
-  }
-
-  function formatRelative(value) {
-    if (!value) return ''
-
-    const now = Date.now()
-    const target = new Date(value).getTime()
-    if (!Number.isFinite(target)) return ''
-
-    const diffMs = target - now
-    const abs = Math.abs(diffMs)
-    const minute = 60 * 1000
-    const hour = 60 * minute
-    const day = 24 * hour
-
-    const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' })
-
-    if (abs < hour) return rtf.format(Math.round(diffMs / minute), 'minute')
-    if (abs < day) return rtf.format(Math.round(diffMs / hour), 'hour')
-    return rtf.format(Math.round(diffMs / day), 'day')
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    }).format(date)
   }
 
   function quickTitle(interview) {
@@ -324,12 +346,6 @@
     const raw = (interview.latest_notes || interview.latest_evidence_log || '').trim()
     if (!raw) return 'No notes yet.'
     return raw.length > 90 ? `${raw.slice(0, 90)}...` : raw
-  }
-
-  function quickMeta(interview) {
-    const date = formatDateShort(interview.started_at)
-    const relative = formatRelative(interview.started_at)
-    return relative ? `${date} • ${relative}` : date
   }
 
   function quickRespondent(interview) {
@@ -465,9 +481,6 @@
                     Respondent: {{ quickRespondent(interview) }}
                   </div>
                   <div class="mt-1 text-sm text-neutral-600">"{{ quickSnippet(interview) }}"</div>
-                  <div class="mt-2 text-xs text-neutral-500">
-                    {{ quickMeta(interview) }}
-                  </div>
                 </button>
               </div>
 
@@ -621,9 +634,6 @@
                   Respondent: {{ quickRespondent(interview) }}
                 </div>
                 <div class="mt-1 text-sm text-neutral-600">"{{ quickSnippet(interview) }}"</div>
-                <div class="mt-2 text-xs text-neutral-500">
-                  {{ quickMeta(interview) }}
-                </div>
               </button>
             </div>
 
@@ -737,7 +747,7 @@
                       </div>
 
                       <div class="mt-1 text-xs text-gray-500">
-                        Started {{ new Date(interview.started_at).toLocaleDateString() }}
+                        Started {{ formatLocalDateTime(interview.started_at) }}
                       </div>
 
                       <div class="mt-1 text-xs font-medium">

@@ -1,7 +1,8 @@
 import { pool } from '../../../db/index.js'
 import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js'
 
-const UUID_V4_OR_V1_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+const UUID_V4_OR_V1_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const PHONE_REGEX = /^\+?[1-9]\d{7,14}$/
 
@@ -109,7 +110,7 @@ export default defineEventHandler(async (event) => {
         SELECT id
         FROM sources
         WHERE id = $1
-          AND user_id = $4
+          AND user_id = $4 OR user_id IS NULL
         LIMIT 1
       ),
       updated AS (
@@ -168,7 +169,7 @@ export default defineEventHandler(async (event) => {
         SELECT id
         FROM sequences
         WHERE id = $1
-          AND user_id = $4
+          AND user_id = $4 OR user_id IS NULL
         LIMIT 1
       ),
       updated AS (

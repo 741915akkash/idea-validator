@@ -1,13 +1,16 @@
 <script setup>
   import { ref, nextTick } from 'vue'
-  import { MessageSquare, Phone, Mail, ChevronDown, X, Send } from 'lucide-vue-next'
+  import { MessageSquare, Phone, Mail, ChevronDown, X, Send, Mic } from 'lucide-vue-next'
   import { useLeadsStore } from '~/stores/leads'
+  import { useRouter } from 'vue-router'
 
   const props = defineProps({
-    leadId: { type: Number, required: true }
+    leadId: { type: Number, required: true },
+    quizId: { type: String, default: null }
   })
 
   const leadsStore = useLeadsStore()
+  const router = useRouter()
 
   // Modal State
   const isModalOpen = ref(false)
@@ -77,6 +80,44 @@
   defineExpose({
     focus: () => openModal('note')
   })
+
+  async function startInterviewFromLead() {
+    const quizId = props.quizId
+    if (!quizId) return
+
+    try {
+      const started = await $fetch('/api/interview/freeform/start', {
+        method: 'POST',
+        body: { quiz_id: quizId }
+      })
+
+      if (!started?.interview_id) {
+        throw new Error('Missing interview id')
+      }
+
+      const activity = await $fetch('/api/crm/activities/create', {
+        method: 'POST',
+        body: {
+          leadId: props.leadId,
+          type: 'interview',
+          text: 'Started quick interview from lead detail',
+          interviewId: started.interview_id
+        }
+      })
+
+      leadsStore.addActivity(props.leadId, activity)
+
+      await router.push({
+        path: '/quiz/interviews',
+        query: {
+          quiz_id: quizId,
+          open_interview_id: started.interview_id
+        }
+      })
+    } catch (e) {
+      console.error('Failed to start quick interview', e)
+    }
+  }
 </script>
 
 <template>
@@ -128,6 +169,24 @@
         <span
           class="text-[10px] font-bold uppercase tracking-wider text-gray-500 group-hover:text-orange-700"
           >Email</span
+        >
+      </button>
+    </div>
+
+    <div class="mt-3 grid grid-cols-3 gap-3">
+      <button
+        @click="startInterviewFromLead"
+        :disabled="!quizId"
+        class="group flex flex-col items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-gray-50/50 p-4 transition-all hover:border-violet-200 hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <div
+          class="rounded-lg bg-white p-2 shadow-sm transition-colors group-hover:text-violet-600"
+        >
+          <Mic class="h-4 w-4" />
+        </div>
+        <span
+          class="text-[10px] font-bold uppercase tracking-wider text-gray-500 group-hover:text-violet-700"
+          >Interview</span
         >
       </button>
     </div>
