@@ -171,16 +171,19 @@
     await loadOverviewSideData(quizStore.quizId)
   })
 
-  async function goToCheckpoint(checkpointNumber) {
-    await $fetch('/api/quiz/checkpoints/set-current-checkpoint', {
+  function goToCheckpoint(checkpointNumber) {
+    // Optimistic navigation: switch screen immediately, sync checkpoint in background.
+    router.push(`/quiz/${checkpointNumber}`)
+
+    $fetch('/api/quiz/checkpoints/set-current-checkpoint', {
       method: 'POST',
       body: {
         quiz_id: quizStore.quizId,
         checkpoint: checkpointNumber
       }
+    }).catch((err) => {
+      console.error('Failed to persist current checkpoint:', err)
     })
-
-    router.push(`/quiz/${checkpointNumber}`)
   }
 
   async function loadQuizzes() {

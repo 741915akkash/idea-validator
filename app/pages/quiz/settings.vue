@@ -164,18 +164,22 @@
     document.removeEventListener('visibilitychange', onVisibilityChange)
   })
 
-  async function logout() {
+  function logout() {
     if (loggingOut.value) return
     loggingOut.value = true
 
-    try {
-      await $fetch('/api/auth/logout', { method: 'POST' })
-    } finally {
-      user.value = null
-      quizStore.reset()
-      loggingOut.value = false
-      router.push('/general/signup-login')
-    }
+    // Optimistic navigation: move immediately, finish logout request in background.
+    router.push('/general/signup-login')
+    user.value = null
+    quizStore.reset()
+
+    $fetch('/api/auth/logout', { method: 'POST' })
+      .catch((err) => {
+        console.error('Logout request failed after navigation:', err)
+      })
+      .finally(() => {
+        loggingOut.value = false
+      })
   }
 
   async function deleteCurrentIdea() {
