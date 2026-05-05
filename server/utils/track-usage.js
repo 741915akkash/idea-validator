@@ -295,12 +295,12 @@ export async function getUsageSnapshot(client, event, options = {}) {
     }
   }
 
-  const [activeIdeas, archivedIdeas, contacts, pipelines] = await Promise.all([
-    countRootIdeas(client, userId, { archived: false }),
-    countRootIdeas(client, userId, { archived: true }),
-    countContacts(client, userId),
-    countPipelines(client, userId)
-  ])
+  // Do not parallelize queries on a single pg client connection.
+  // Concurrent client.query calls trigger deprecation warnings in pg.
+  const activeIdeas = await countRootIdeas(client, userId, { archived: false })
+  const archivedIdeas = await countRootIdeas(client, userId, { archived: true })
+  const contacts = await countContacts(client, userId)
+  const pipelines = await countPipelines(client, userId)
 
   const rootQuizId = quizId ? await resolveRootQuizId(client, quizId) : null
 
@@ -308,13 +308,16 @@ export async function getUsageSnapshot(client, event, options = {}) {
   let freeformInterviewsForIdeaThisMonth = null
 
   if (rootQuizId) {
-    ;[revisionsForIdea, freeformInterviewsForIdeaThisMonth] = await Promise.all([
-      countRevisionsForRoot(client, userId, rootQuizId),
-      countFreeformInterviewsForRootInMonth(client, userId, rootQuizId, {
+    revisionsForIdea = await countRevisionsForRoot(client, userId, rootQuizId)
+    freeformInterviewsForIdeaThisMonth = await countFreeformInterviewsForRootInMonth(
+      client,
+      userId,
+      rootQuizId,
+      {
         monthStart,
         monthEnd
-      })
-    ])
+      }
+    )
   }
 
   return {

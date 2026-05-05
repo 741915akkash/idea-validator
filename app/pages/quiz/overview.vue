@@ -53,6 +53,36 @@
     return latest?.id || null
   }
 
+  async function ensureActiveRevisionForSelectedFamily() {
+    if (!quizStore.quizId) return
+
+    const selected = quizzes.value.find((q) => String(q.id) === String(quizStore.quizId))
+    if (!selected) return
+
+    const rootId = selected.parent_quiz_id || selected.id
+    const family = quizzes.value.filter((q) => String(q.parent_quiz_id || q.id) === String(rootId))
+    if (!family.length) return
+
+    const latest = family.reduce((best, q) => {
+      return Number(q.revision_number ?? 0) > Number(best.revision_number ?? 0) ? q : best
+    }, family[0])
+
+    // Auto-create next revision only when latest scored revision is completed
+    // and no active in-progress quiz exists in the same idea family.
+    const hasInProgress = family.some((q) => String(q.status) === 'IN_PROGRESS')
+    const shouldAutoCreate = !hasInProgress && String(latest.status) === 'COMPLETED'
+
+    if (!shouldAutoCreate) return
+
+    const res = await $fetch('/api/quiz/revision/create-revision', {
+      method: 'POST',
+      body: { quiz_id: latest.id }
+    })
+
+    quizStore.startFreshQuiz(res.quiz_id)
+    await loadQuizzes()
+  }
+
   async function loadOverviewSideData(quizId, { force = false } = {}) {
     if (!quizId) return
 
@@ -151,6 +181,8 @@
         quizStore.setQuizId(latestId)
       }
     }
+
+    await ensureActiveRevisionForSelectedFamily()
 
     // 1️⃣ Ensure quiz exists (or recover if session/store is stale)
     if (!quizStore.quizId) {

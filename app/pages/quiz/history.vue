@@ -15,7 +15,6 @@
 
   const quizzes = ref([])
   const loading = ref(true)
-  const startingRevision = ref(false)
   const comparisonScores = ref({})
   const revisionDiffs = ref({})
 
@@ -46,10 +45,6 @@
     if (!rootQuizId.value) return 'Idea'
     const root = quizzes.value.find((q) => String(q.id) === rootQuizId.value)
     return root?.name || selectedQuiz.value?.name || 'Idea'
-  })
-  const latestCompletedRevision = computed(() => {
-    if (!historyEntries.value.length) return null
-    return historyEntries.value[historyEntries.value.length - 1]
   })
   const displayedHistoryEntries = computed(() =>
     [...historyEntries.value].sort(
@@ -203,17 +198,6 @@
     router.push(`/quiz/score?quiz_id=${entry.id}`)
   }
 
-  async function startNewRevision() {
-    if (!latestCompletedRevision.value || startingRevision.value) return
-    startingRevision.value = true
-
-    try {
-      await quizStore.startRevision(latestCompletedRevision.value.id)
-    } finally {
-      startingRevision.value = false
-    }
-  }
-
   onMounted(async () => {
     await loadHistory()
   })
@@ -243,13 +227,12 @@
 
         <!-- Optional actions -->
         <div class="flex gap-2">
-          <button
-            class="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
-            :disabled="!latestCompletedRevision || startingRevision"
-            @click="startNewRevision"
+          <NuxtLink
+            to="/quiz/overview"
+            class="inline-flex flex-1 items-center justify-center rounded-lg bg-[#E5E4E2] px-4 py-2 text-sm font-medium text-black transition hover:bg-[#DAD8D4] md:flex-none"
           >
-            {{ startingRevision ? 'Starting...' : 'New Revision' }}
-          </button>
+            Back to Overview
+          </NuxtLink>
         </div>
       </div>
     </div>

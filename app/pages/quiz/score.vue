@@ -22,7 +22,7 @@
   const loading = ref(true)
   const result = ref(null)
   const error = ref(null)
-  const canStartRevision = ref(false)
+  const quizMeta = ref(null)
 
   // --------------------
   // Revision diff
@@ -61,35 +61,23 @@
 
       result.value = existing
 
-      // ✅ 1.5️⃣ Allow new revision only from latest revision in this idea family
+      // ✅ 2️⃣ Fetch quiz meta for heading
       try {
-        const [quizMeta, allQuizzes] = await Promise.all([
-          $fetch('/api/quiz/by-id', {
-            query: { quiz_id: quizId }
-          }),
-          $fetch('/api/quiz/quizzes')
-        ])
-
-        const rootQuizId = quizMeta.parent_quiz_id || quizMeta.id
-        const family = (allQuizzes || []).filter((q) => (q.parent_quiz_id || q.id) === rootQuizId)
-        const latestRevisionNumber = family.reduce(
-          (max, q) => Math.max(max, Number(q.revision_number ?? 0)),
-          0
-        )
-
-        canStartRevision.value = Number(quizMeta.revision_number ?? 0) === latestRevisionNumber
+        quizMeta.value = await $fetch('/api/quiz/by-id', {
+          query: { quiz_id: quizId }
+        })
       } catch {
-        canStartRevision.value = false
+        quizMeta.value = null
       }
 
-      // ✅ 2️⃣ Fetch revision diff (safe even for original quiz)
+      // ✅ 3️⃣ Fetch revision diff (safe even for original quiz)
       const diffRes = await $fetch('/api/quiz/revision/revision-diff', {
         query: { quiz_id: quizId }
       })
 
       revisionDiff.value = diffRes.changes || []
 
-      // ✅ 3️⃣ Fetch insights (STEP 4)
+      // ✅ 4️⃣ Fetch insights (STEP 4)
       try {
         const insightsRes = await $fetch('/api/quiz/test-insights', {
           query: { quiz_id: quizId }
@@ -123,10 +111,6 @@
   // --------------------
   // Actions
   // --------------------
-  async function startNewRevision() {
-    if (!quizId || !canStartRevision.value) return
-    await quizStore.startRevision(quizId)
-  }
 </script>
 
 <template>
@@ -142,6 +126,14 @@
 
       <!-- ✅ SAFE RENDER (score exists) -->
       <div v-else-if="ready">
+        <!-- Idea heading -->
+        <h2 class="mb-20 truncate text-xl font-semibold md:text-2xl">
+          {{ quizMeta?.name || 'New idea' }}
+          <span v-if="Number(quizMeta?.revision_number ?? 0) > 0" class="text-base text-slate-500">
+            — Rev {{ quizMeta.revision_number }}
+          </span>
+        </h2>
+
         <!-- Scores -->
         <section class="mb-12 grid grid-cols-1 gap-10 sm:grid-cols-2">
           <ScoreCircle
@@ -275,18 +267,21 @@
             </div>
 
             <!-- Notes -->
-            <div v-if="change.notes.previous.length || change.notes.current.length" class="mb-2">
-              <p class="mb-1 text-xs font-medium text-gray-600">Notes</p>
+            <div
+              v-if="(change.notes?.previous?.length || 0) > 0 || (change.notes?.current?.length || 0) > 0"
+              class="mb-2"
+            >
+              <p class="mb-1 text-md font-medium text-gray-600">Notes</p>
 
-              <div class="grid grid-cols-2 gap-6 text-xs">
+              <div class="grid grid-cols-2 gap-6 text-md">
                 <!-- Previous -->
                 <div class="whitespace-pre-wrap text-gray-400">
-                  {{ change.notes.previous.join('; ') || '—' }}
+                  {{ change.notes?.previous?.join('; ') || '—' }}
                 </div>
 
                 <!-- Current -->
                 <div class="whitespace-pre-wrap font-medium text-gray-900">
-                  {{ change.notes.current.join('; ') || '—' }}
+                  {{ change.notes?.current?.join('; ') || '—' }}
                 </div>
               </div>
             </div>
@@ -338,14 +333,6 @@
 
         <!-- Actions -->
         <div class="flex items-center gap-6">
-          <button
-            v-if="canStartRevision"
-            class="rounded-md bg-indigo-600 px-4 py-2 text-base font-medium text-white hover:bg-indigo-700"
-            @click="startNewRevision"
-          >
-            Start new revision
-          </button>
-
           <NuxtLink
             :to="`/quiz/history?quiz_id=${quizId}`"
             class="inline-flex items-center justify-center rounded-lg bg-[#E5E4E2] px-4 py-2 text-sm font-medium text-black transition hover:bg-[#DAD8D4]"
