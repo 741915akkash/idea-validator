@@ -333,7 +333,7 @@
         <div
           v-for="cp in quizStore.checkpoints"
           :key="cp.checkpoint"
-          class="flex items-center justify-between rounded border px-4 py-3"
+          class="flex items-center justify-between rounded border bg-white px-4 py-3"
         >
           <div>
             <div class="flex items-center gap-2 text-base font-medium">

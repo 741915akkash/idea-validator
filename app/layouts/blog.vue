@@ -37,7 +37,7 @@
 </style>
 
 <template>
-  <div class="flex min-h-screen flex-col bg-white font-sans text-gray-900 antialiased">
+  <div class="flex min-h-screen flex-col bg-slate-50 font-sans text-gray-900 antialiased">
     <!-- Sticky header -->
     <header
       :class="[
