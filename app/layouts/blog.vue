@@ -47,7 +47,7 @@
     >
       <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
         <!-- Logo -->
-        <NuxtLink to="/" class="text-xl font-bold tracking-tight"> GoLaunchScall </NuxtLink>
+        <NuxtLink to="/" class="text-xl font-bold tracking-tight"> GO Launch Scall </NuxtLink>
 
         <!-- Navigation -->
         <div class="hidden items-center gap-6 md:flex">
@@ -104,8 +104,8 @@
 
     <footer class="mt-20 border-t border-gray-100 py-12 text-center text-sm text-gray-400">
       <div class="mx-auto max-w-5xl px-4">
-        <p class="mb-2 font-semibold text-gray-900">GoLaunchScall</p>
-        <p>&copy; 2026 GoLaunchScall. All rights reserved.</p>
+        <p class="mb-2 font-semibold text-gray-900">GO Launch Scall</p>
+        <p>&copy; 2026 GO Launch Scall. All rights reserved.</p>
       </div>
     </footer>
   </div>

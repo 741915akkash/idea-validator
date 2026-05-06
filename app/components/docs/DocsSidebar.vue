@@ -4,52 +4,41 @@
   // 🔥 add emit
   const emit = defineEmits(['navigate'])
 
-  const { data: pages } = await useAsyncData('docs-sidebar-pages', async () => {
-    const docs = await queryCollection('docs').select('path', 'title').all()
-    return docs
-      .filter((doc) => typeof doc.path === 'string' && doc.path.startsWith('/docs'))
-      .sort((a, b) => a.path.localeCompare(b.path))
-  })
+  const { data: navigation } = await useAsyncData('docs-sidebar-navigation', () =>
+    queryCollectionNavigation('docs')
+  )
 
-  function titleFromSlug(slug = '') {
-    return slug
-      .split('-')
-      .filter(Boolean)
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join(' ')
+  function collectLeafPages(nodes = []) {
+    const out = []
+    for (const node of nodes) {
+      if (!node) continue
+      if (Array.isArray(node.children) && node.children.length) {
+        out.push(...collectLeafPages(node.children))
+      } else if (node.path && node.path !== '/docs') {
+        out.push({ path: node.path, title: node.title || 'Untitled' })
+      }
+    }
+    return out
   }
 
-  const rootPage = computed(() => pages.value?.find((page) => page.path === '/docs') || null)
+  const rootPage = computed(() => {
+    const nodes = navigation.value || []
+    return nodes.find((page) => page?.path === '/docs') || null
+  })
 
   const sections = computed(() => {
-    const bySection = new Map()
+    const nodes = navigation.value || []
+    const root = nodes.find((n) => n?.path === '/docs')
+    const topLevel = root?.children || nodes.filter((n) => n?.path !== '/docs')
 
-    for (const page of pages.value || []) {
-      if (!page?.path || page.path === '/docs') continue
-
-      const parts = page.path.split('/').filter(Boolean)
-      if (parts.length < 3) continue
-
-      const sectionSlug = parts[1]
-      const sectionTitle = titleFromSlug(sectionSlug)
-      const pageSlug = parts[parts.length - 1]
-      const pageTitle = page.title || titleFromSlug(pageSlug)
-
-      if (!bySection.has(sectionSlug)) {
-        bySection.set(sectionSlug, {
-          slug: sectionSlug,
-          title: sectionTitle,
-          items: []
-        })
-      }
-
-      bySection.get(sectionSlug).items.push({
-        path: page.path,
-        title: pageTitle
-      })
-    }
-
-    return Array.from(bySection.values())
+    return topLevel
+      .filter((section) => section?.path)
+      .map((section) => ({
+        slug: section.path,
+        title: section.title || 'Section',
+        items: collectLeafPages(section.children || [])
+      }))
+      .filter((section) => section.items.length > 0)
   })
 </script>
 
@@ -72,7 +61,9 @@
       </NuxtLink>
 
       <div v-for="section in sections" :key="section.slug">
-        <p class="mb-1 px-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <p
+          class="mb-1 rounded bg-slate-700 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-slate-100"
+        >
           {{ section.title }}
         </p>
 
