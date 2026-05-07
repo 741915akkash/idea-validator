@@ -1,5 +1,6 @@
 <script setup>
   import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+  import { useUser } from '~/composables/useUser'
   import { useSequencesStore } from '~/stores/sequences'
   import { useSourcesStore } from '~/stores/sources'
   import { useStagesStore } from '~/stores/stages'
@@ -21,6 +22,7 @@
   const usersStore = useUsersStore()
   const sourcesStore = useSourcesStore()
   const sequencesStore = useSequencesStore()
+  const user = useUser()
 
   const filterTypes = [
     { id: 'stage_id', label: 'Stage' },
@@ -94,10 +96,14 @@
     }
 
     if (typeId === 'user_id') {
-      activeFilterOptions.value = usersStore.users
-        .map((user) => user?.name || user?.email)
-        .filter((value) => value !== null && value !== undefined && String(value).trim() !== '')
-        .map((value) => String(value))
+      const ownerLabel =
+        user.value?.name ||
+        user.value?.email ||
+        usersStore.currentUser?.name ||
+        usersStore.currentUser?.email ||
+        ''
+
+      activeFilterOptions.value = ownerLabel ? [String(ownerLabel)] : []
       return
     }
 
