@@ -16,6 +16,7 @@
   const store = useLeadsStore()
   const columnVisibility = ref({})
   const sorting = ref([])
+  const searchQuery = ref('')
   const columnSizing = ref({})
   const EMPTY_ROW_COUNT = 30
 
@@ -100,6 +101,9 @@
       get columnVisibility() {
         return columnVisibility.value
       },
+      get globalFilter() {
+        return searchQuery.value
+      },
       get columnSizing() {
         return columnSizing.value
       }
@@ -111,10 +115,25 @@
       columnVisibility.value =
         typeof updater === 'function' ? updater(columnVisibility.value) : updater
     },
+    onGlobalFilterChange: (updater) => {
+      searchQuery.value =
+        typeof updater === 'function' ? updater(searchQuery.value) : String(updater ?? '')
+    },
     onColumnSizingChange: (updater) => {
       columnSizing.value = typeof updater === 'function' ? updater(columnSizing.value) : updater
     },
     columnResizeMode: 'onChange',
+    globalFilterFn: (row, _columnId, filterValue) => {
+      const term = String(filterValue || '').toLowerCase().trim()
+      if (!term) return true
+
+      const lead = row.original || {}
+      const searchable = [lead.name, lead.email, lead.company, lead.phone, lead.notes]
+        .map((value) => String(value || '').toLowerCase())
+        .join(' ')
+
+      return searchable.includes(term)
+    },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel()
