@@ -9,12 +9,15 @@
     MessagesSquare,
     Columns3,
     Briefcase,
-    Settings
+    Settings,
+    FlaskConical,
+    Orbit
   } from 'lucide-vue-next'
   import IdeaSelector from '~/components/landing2/sidebar/IdeaSelector.vue'
   import SidebarModals from '~/components/landing2/sidebar/SidebarModals.vue'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import { useUser } from '~/composables/useUser'
+  import { useExperiments } from '~/composables/useExperiments'
   import { isCrmEnabled } from '~/utils/feature-flags'
 
   const props = defineProps({
@@ -238,6 +241,8 @@
   const isInterviews = computed(() => route.path.startsWith('/quiz/interviews'))
   const isCrm = computed(() => route.path.startsWith('/crm'))
   const isSettings = computed(() => route.path.startsWith('/quiz/settings'))
+  const isExperiments = computed(() => route.path.startsWith('/experiments'))
+  const { enabled: experimentsEnabled } = useExperiments()
   const config = useRuntimeConfig()
   const showCRM = computed(() => {
     if (route.path.startsWith('/crm')) return true
@@ -263,7 +268,7 @@
   <nav class="flex min-h-screen w-64 flex-col border-r border-slate-200 bg-white px-6 pb-6 pt-10">
     <!-- Logo -->
     <NuxtLink v-if="props.showBrand" to="/" class="flex items-center gap-2">
-      <Target class="h-6 w-6 text-emerald-600 md:h-8 md:w-8" />
+      <Orbit class="h-6 w-6 text-emerald-600 md:h-8 md:w-8" />
       <span class="text-lg font-semibold text-slate-900 md:text-xl"> GO Launch Scall </span>
     </NuxtLink>
 
@@ -343,6 +348,20 @@
         >
           <Briefcase class="h-4 w-4" />
           CRM
+        </NuxtLink>
+
+        <NuxtLink
+          v-if="experimentsEnabled"
+          to="/experiments"
+          class="flex items-center gap-2 rounded-lg px-3 py-2 transition"
+          :class="
+            isExperiments
+              ? 'bg-emerald-50 font-medium text-emerald-700'
+              : 'text-slate-700 hover:bg-slate-100'
+          "
+        >
+          <FlaskConical class="h-4 w-4" />
+          Experiments
         </NuxtLink>
       </div>
     </div>

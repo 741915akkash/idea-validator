@@ -6,10 +6,6 @@ export default defineNuxtConfig({
 
   srcDir: 'app',
 
-  routeRules: {
-    '/quiz/crm': { redirect: '/crm' }
-  },
-
   app: {
     head: {
       title: 'Go Launch Scall – Validate Your Business Idea with Customer Interviews',

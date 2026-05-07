@@ -1,6 +1,6 @@
 export const useExperiments = () => {
   const config = useRuntimeConfig()
-  const enabled = config.public.experimentsEnabled && config.public.isDev
+  const enabled = config.public.experimentsEnabled
   const { $posthog } = useNuxtApp()
 
   const getVariant = (flag) => {
