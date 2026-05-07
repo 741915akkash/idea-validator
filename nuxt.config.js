@@ -14,8 +14,8 @@ export default defineNuxtConfig({
     head: {
       title: 'Go Launch Scall – Validate Your Business Idea with Customer Interviews',
       link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg?v=3' },
-        { rel: 'shortcut icon', href: '/favicon.svg?v=3' }
+        { rel: 'icon', type: 'image/svg+xml', href: '/orbit3.svg' },
+        { rel: 'shortcut icon', href: '/orbit3.svg' }
       ],
       meta: [
         {
