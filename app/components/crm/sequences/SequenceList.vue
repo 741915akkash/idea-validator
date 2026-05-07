@@ -71,13 +71,13 @@
         v-for="seq in sequencesStore.sequences"
         :key="seq.id"
         @click="$emit('edit', seq)"
-        class="group relative cursor-pointer rounded-3xl border border-gray-100 bg-white p-6 transition-all hover:border-emerald-200 hover:shadow-2xl hover:shadow-emerald-500/5"
+        class="group relative cursor-pointer rounded-3xl border border-gray-300 bg-white p-6 transition-all hover:border-emerald-200 hover:shadow-2xl hover:shadow-emerald-500/5"
       >
         <div class="flex flex-col gap-6">
           <div class="flex items-start justify-between">
             <div class="flex items-center gap-4">
               <div
-                class="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50 text-gray-400 transition-colors group-hover:bg-emerald-50 group-hover:text-emerald-500"
+                class="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-300 bg-white text-gray-400 transition-colors group-hover:bg-emerald-50 group-hover:text-emerald-500"
               >
                 <Layers class="h-5 w-5" />
               </div>
@@ -89,7 +89,7 @@
                   class="mt-1 flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-gray-400"
                 >
                   <span>{{ seq.steps.length }} steps</span>
-                  <span class="h-1 w-1 rounded-full bg-gray-200"></span>
+                  <span class="h-1 w-1 rounded-full bg-gray"></span>
                   <span>{{ getSequenceDuration(seq.steps) }} days total</span>
                 </div>
               </div>
@@ -136,7 +136,7 @@
                   >Day {{ getCumulativeDay(seq.steps, i) }}</span
                 >
               </div>
-              <div v-if="i < seq.steps.length - 1" class="h-px w-4 shrink-0 bg-gray-100"></div>
+              <div v-if="i < seq.steps.length - 1" class="h-px w-4 shrink-0 bg-gray"></div>
             </template>
           </div>
 

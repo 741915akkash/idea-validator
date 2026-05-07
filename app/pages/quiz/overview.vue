@@ -301,7 +301,7 @@
       <!-- Deterministic Interview Section -->
       <section
         v-if="isMounted && quizStore.quizId"
-        class="mb-10 rounded-lg border border-neutral-200 bg-gray-50 p-6"
+        class="mb-10 rounded-lg border border-neutral-300 bg-gray-50 p-6"
       >
         <div class="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <!-- Left Content -->
@@ -333,7 +333,7 @@
         <div
           v-for="cp in quizStore.checkpoints"
           :key="cp.checkpoint"
-          class="flex items-center justify-between rounded border bg-white px-4 py-3"
+          class="flex items-center justify-between rounded border border-neutral-300 bg-white px-4 py-3"
         >
           <div>
             <div class="flex items-center gap-2 text-base font-medium">

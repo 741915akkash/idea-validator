@@ -178,7 +178,11 @@
 
     <!-- Questions -->
     <section v-show="!pending" class="space-y-6">
-      <div v-for="q in questions" :key="q.id" class="relative w-full max-w-xl rounded border p-4">
+      <div
+        v-for="q in questions"
+        :key="q.id"
+        class="relative w-full max-w-xl rounded border border-neutral-300 bg-white p-4"
+      >
         <div>
           <div>
             <p class="mb-3 break-words font-medium">

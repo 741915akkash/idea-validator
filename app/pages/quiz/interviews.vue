@@ -471,7 +471,7 @@
                 <button
                   v-for="interview in quickPreviewInterviews"
                   :key="interview.id"
-                  class="rounded-lg border border-neutral-200 bg-white p-4 text-left transition hover:border-neutral-300 hover:bg-neutral-50"
+                  class="rounded-lg border border-neutral-300 bg-white p-4 text-left transition hover:border-neutral-300 hover:bg-neutral-50"
                   @click="openQuickInterview(interview)"
                 >
                   <div class="text-base font-semibold text-neutral-900">
@@ -624,7 +624,7 @@
               <button
                 v-for="interview in filteredQuickInterviews"
                 :key="interview.id"
-                class="rounded-lg border border-neutral-200 bg-white p-4 text-left transition hover:border-neutral-300 hover:bg-neutral-50"
+                class="rounded-lg border border-neutral-300 bg-white p-4 text-left transition hover:border-neutral-300 hover:bg-neutral-50"
                 @click="openQuickInterview(interview)"
               >
                 <div class="text-base font-semibold text-neutral-900">

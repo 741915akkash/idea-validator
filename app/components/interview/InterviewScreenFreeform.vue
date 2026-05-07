@@ -227,103 +227,107 @@
 </script>
 
 <template>
-  <div class="fixed inset-0 z-50 flex flex-col gap-4 overflow-hidden bg-white p-4 md:p-6">
-    <button
-      @click="showRespondent = !showRespondent"
-      class="rounded-md bg-neutral-100 px-3 py-2 text-xs font-medium uppercase text-neutral-700"
+  <div class="fixed inset-0 z-50 overflow-y-auto bg-slate-50 p-4 md:p-6">
+    <div
+      class="mx-auto flex min-h-full w-full max-w-5xl flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:p-6"
     >
-      {{ showRespondent ? 'Hide respondent' : 'Show respondent' }}
-    </button>
-
-    <!-- ✅ NEW RESPONDENT SECTION -->
-    <div v-if="showRespondent" class="grid grid-cols-1 gap-3 md:grid-cols-2">
-      <div>
-        <div class="text-xs font-medium uppercase text-black">Respondent Name</div>
-        <input
-          v-model="name"
-          type="text"
-          placeholder="John Doe"
-          class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
-        />
-      </div>
-
-      <div>
-        <div class="text-xs font-medium uppercase text-black">Email</div>
-        <input
-          v-model="email"
-          type="text"
-          placeholder="john@example.com"
-          class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
-        />
-      </div>
-
-      <div>
-        <div class="text-xs font-medium uppercase text-black">Phone</div>
-        <input
-          v-model="phone"
-          type="text"
-          placeholder="+123456789"
-          class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
-        />
-      </div>
-
-      <div>
-        <div class="text-xs font-medium uppercase text-black">Company</div>
-        <input
-          v-model="company"
-          type="text"
-          placeholder="Acme Inc"
-          class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
-        />
-      </div>
-    </div>
-
-    <div>
-      <div class="text-xs font-medium uppercase text-black">Title</div>
-      <input
-        v-model="title"
-        type="text"
-        placeholder="Add interview title"
-        class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
-      />
-    </div>
-
-    <div>
-      <div class="text-xs font-medium uppercase text-black">Tags</div>
-      <input
-        v-model="tags"
-        type="text"
-        placeholder="Add tags (comma-separated)"
-        class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
-      />
-    </div>
-
-    <div class="md:hidden">
       <button
-        @click="toggleMobileTab"
-        class="w-full rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white"
+        @click="showRespondent = !showRespondent"
+        class="rounded-md bg-neutral-100 px-3 py-2 text-xs font-medium uppercase text-neutral-700"
       >
-        {{ mobileTab === 'notes' ? 'Switch to Evidence' : 'Switch to Notes' }}
+        {{ showRespondent ? 'Hide respondent' : 'Show respondent' }}
       </button>
-    </div>
 
-    <div class="grid min-h-0 flex-1 gap-4 md:grid-cols-2">
-      <div v-show="mobileTab === 'notes' || isDesktop" class="flex flex-col gap-2">
-        <div class="text-xs font-medium uppercase text-black">Interview Notes</div>
-        <textarea
-          v-model="notes"
-          class="w-full flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm"
-        />
-        <SavedStatus v-if="savedDraft" />
+      <!-- ✅ NEW RESPONDENT SECTION -->
+      <div v-if="showRespondent" class="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div>
+          <div class="text-xs font-medium uppercase text-black">Respondent Name</div>
+          <input
+            v-model="name"
+            type="text"
+            placeholder="John Doe"
+            class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div>
+          <div class="text-xs font-medium uppercase text-black">Email</div>
+          <input
+            v-model="email"
+            type="text"
+            placeholder="john@example.com"
+            class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div>
+          <div class="text-xs font-medium uppercase text-black">Phone</div>
+          <input
+            v-model="phone"
+            type="text"
+            placeholder="+123456789"
+            class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div>
+          <div class="text-xs font-medium uppercase text-black">Company</div>
+          <input
+            v-model="company"
+            type="text"
+            placeholder="Acme Inc"
+            class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          />
+        </div>
       </div>
 
-      <div v-show="mobileTab === 'evidence' || isDesktop" class="flex flex-col gap-2">
-        <div class="text-xs font-medium uppercase text-black">Evidence Logged</div>
-        <textarea
-          v-model="evidence"
-          class="w-full flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm"
+      <div>
+        <div class="text-xs font-medium uppercase text-black">Title</div>
+        <input
+          v-model="title"
+          type="text"
+          placeholder="Add interview title"
+          class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
         />
-        <SavedStatus v-if="savedDraft" />
+      </div>
+
+      <div>
+        <div class="text-xs font-medium uppercase text-black">Tags</div>
+        <input
+          v-model="tags"
+          type="text"
+          placeholder="Add tags (comma-separated)"
+          class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        />
+
+        <div class="md:hidden">
+          <button
+            @click="toggleMobileTab"
+            class="w-full rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white"
+          >
+            {{ mobileTab === 'notes' ? 'Switch to Evidence' : 'Switch to Notes' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="grid min-h-0 flex-1 gap-4 md:grid-cols-2">
+        <div v-show="mobileTab === 'notes' || isDesktop" class="flex flex-col gap-2">
+          <div class="text-xs font-medium uppercase text-black">Interview Notes</div>
+          <textarea
+            v-model="notes"
+            class="w-full flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          />
+          <SavedStatus v-if="savedDraft" />
+        </div>
+
+        <div v-show="mobileTab === 'evidence' || isDesktop" class="flex flex-col gap-2">
+          <div class="text-xs font-medium uppercase text-black">Evidence Logged</div>
+          <textarea
+            v-model="evidence"
+            class="w-full flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          />
+          <SavedStatus v-if="savedDraft" />
+        </div>
       </div>
     </div>
   </div>
