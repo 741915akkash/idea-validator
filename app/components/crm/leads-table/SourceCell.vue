@@ -2,7 +2,7 @@
   import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
   import { useSourcesStore } from '~/stores/sources'
   import { useLeadsStore } from '~/stores/leads'
-  import { crmFetch } from '~/composables/useCrmRequest'
+  import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
 
   const props = defineProps({
     lead: Object
@@ -28,7 +28,7 @@
     if (sourcesStore.sources.length > 0) return
 
     try {
-      const sources = await crmFetch('/api/crm/sources')
+      const sources = await crmGlobalFetch('/api/crm/sources')
       sourcesStore.setSources(sources)
     } catch {
       sourcesStore.setSources([])
@@ -87,7 +87,7 @@
     })
 
     try {
-      const updated = await crmFetch('/api/crm/leads/update', {
+      const updated = await crmQuizFetch('/api/crm/leads/update', {
         method: 'PATCH',
         body: {
           id: props.lead.id,

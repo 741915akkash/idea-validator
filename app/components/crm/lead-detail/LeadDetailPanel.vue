@@ -2,7 +2,7 @@
   import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
   import { useLeadsStore } from '~/stores/leads'
   import { useQuizSessionStore } from '~/stores/quizSession'
-  import { crmFetch } from '~/composables/useCrmRequest'
+  import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
 
   import LeadDetailHeader from './Header.vue'
   import FollowUpSection from './FollowUpSection.vue'
@@ -51,7 +51,7 @@
     editingField.value = null
 
     try {
-      const updated = await crmFetch('/api/crm/leads/update', {
+      const updated = await crmQuizFetch('/api/crm/leads/update', {
         method: 'PATCH',
         body: { id: props.leadId, field, value }
       })
@@ -80,7 +80,7 @@
   }
 
   onMounted(async () => {
-    const activities = await crmFetch('/api/crm/activities/get-by-lead', {
+    const activities = await crmQuizFetch('/api/crm/activities/get-by-lead', {
       query: { leadId: props.leadId }
     })
 

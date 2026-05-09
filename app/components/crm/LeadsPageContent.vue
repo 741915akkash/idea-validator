@@ -6,7 +6,7 @@
   import { useSourcesStore } from '~/stores/sources'
   import { useUsersStore } from '~/stores/users'
   import { useQuizSessionStore } from '~/stores/quizSession'
-  import { crmFetch } from '~/composables/useCrmRequest'
+  import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
   import { onMounted, ref, watch } from 'vue'
 
   const leadsStore = useLeadsStore()
@@ -14,30 +14,47 @@
   const sourcesStore = useSourcesStore()
   const usersStore = useUsersStore()
   const quizStore = useQuizSessionStore()
-
-  quizStore.hydrate()
-  if (!quizStore.quizId) {
-    await quizStore.loadQuizzes()
-    if (quizStore.quizzes.length) {
-      quizStore.setQuizId(quizStore.quizzes[0].id)
-    }
-  }
-
-  const [leads, stages, sources, users] = await Promise.all([
-    crmFetch('/api/crm/leads'),
-    crmFetch('/api/crm/pipeline/stages'),
-    crmFetch('/api/crm/sources'),
-    crmFetch('/api/crm/users')
-  ])
-
-  leadsStore.setLeads(leads)
-  stagesStore.setStages(stages)
-  sourcesStore.setSources(sources)
-  usersStore.setUsers(users)
-
   const viewMode = ref('table')
   const isCreatingStage = ref(false)
   const stageCreateError = ref('')
+
+  try {
+    quizStore.hydrate()
+
+    let quizId = quizStore.quizId
+
+    if (!quizId) {
+      await quizStore.loadQuizzes()
+
+      if (quizStore.quizzes.length) {
+        quizId = quizStore.quizzes[0].id
+        quizStore.setQuizId(quizId)
+      }
+    }
+
+    const [stages, sources, users] = await Promise.all([
+      crmGlobalFetch('/api/crm/pipeline/stages'),
+      crmGlobalFetch('/api/crm/sources'),
+      crmGlobalFetch('/api/crm/users')
+    ])
+
+    stagesStore.setStages(stages)
+    sourcesStore.setSources(sources)
+    usersStore.setUsers(users)
+
+    if (quizId) {
+      const leads = await crmQuizFetch('/api/crm/leads', { quizId })
+      leadsStore.setLeads(leads)
+    } else {
+      leadsStore.setLeads([])
+    }
+  } catch (error) {
+    if (String(error?.statusMessage || '').includes('quiz_id required')) {
+      leadsStore.setLeads([])
+    } else {
+      console.error(error)
+    }
+  }
 
   onMounted(() => {
     const savedViewMode = localStorage.getItem('crm-view-mode')
@@ -61,7 +78,7 @@
     isCreatingStage.value = true
 
     try {
-      await crmFetch('/api/crm/pipeline/create', {
+      await crmGlobalFetch('/api/crm/pipeline/create', {
         method: 'POST',
         body: {
           name: trimmedName,
@@ -69,7 +86,7 @@
         }
       })
 
-      const updatedStages = await crmFetch('/api/crm/pipeline/stages')
+      const updatedStages = await crmGlobalFetch('/api/crm/pipeline/stages')
       stagesStore.setStages(updatedStages)
     } catch {
       stageCreateError.value = 'Could not create stage. Please try again.'
@@ -80,7 +97,10 @@
 </script>
 
 <template>
-  <div class="mx-auto flex min-h-[calc(100vh-7rem)] w-full min-w-0 max-w-7xl flex-col gap-4">
+  <div
+    class="flex min-h-[calc(100vh-7rem)] w-full min-w-0 flex-col gap-4 overflow-hidden"
+    :class="viewMode === 'table' ? 'mx-auto max-w-7xl' : 'max-w-none'"
+  >
     <div class="grid grid-cols-3 items-center">
       <!-- LEFT -->
       <h1 class="text-2xl font-semibold">Leads</h1>
@@ -144,7 +164,9 @@
       {{ stageCreateError }}
     </p>
 
-    <LeadsTable v-if="viewMode === 'table'" class="min-h-0 flex-1" />
-    <KanbanBoard v-else class="min-h-0 flex-1" />
+    <ClientOnly>
+      <LeadsTable v-if="viewMode === 'table'" class="min-h-0 flex-1" />
+      <KanbanBoard v-else class="min-h-0 flex-1" />
+    </ClientOnly>
   </div>
 </template>

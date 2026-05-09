@@ -22,7 +22,7 @@
 
     <!-- Main Content Area -->
     <div
-      class="flex flex-1 flex-col overflow-x-visible"
+      class="flex flex-1 flex-col overflow-hidden"
       :class="{
         'md:ml-64': !$route.meta.fullWidth
       }"
@@ -41,7 +41,7 @@
 
       <!-- ✅ FIXED MAIN -->
       <main
-        class="w-full min-w-0 flex-1 overflow-x-visible pb-6 pt-2"
+        class="w-full min-w-0 flex-1 overflow-hidden pb-6 pt-2"
         :class="$route.meta.fullWidth ? 'px-0 sm:px-0' : 'px-4 sm:px-5'"
       >
         <slot />

@@ -1,17 +1,8 @@
 import { pool } from '../../../db/index.js'
 import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js'
-import { requireQuizAccess } from '../../../utils/quizAccess.js'
 
 export default defineEventHandler(async (event) => {
   const { userId } = await requireCrmEnabled(event)
-  const { quiz_id: quizIdRaw } = getQuery(event)
-  const quizId = typeof quizIdRaw === 'string' ? quizIdRaw.trim() : ''
-
-  if (!quizId) {
-    throw createError({ statusCode: 400, statusMessage: 'quiz_id required' })
-  }
-
-  await requireQuizAccess(pool, event, quizId)
 
   const result = await pool.query(
     `
@@ -38,11 +29,10 @@ export default defineEventHandler(async (event) => {
     LEFT JOIN sequence_steps
       ON sequence_steps.sequence_id = sequences.id
     WHERE sequences.user_id = $1
-      AND sequences.quiz_id = $2
     GROUP BY sequences.id
     ORDER BY sequences.updated_at DESC, sequences.id DESC
     `,
-    [userId, quizId]
+    [userId]
   )
 
   return result.rows

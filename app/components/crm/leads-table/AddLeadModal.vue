@@ -3,7 +3,7 @@
   import { useLeadsStore } from '~/stores/leads'
   import { useStagesStore } from '~/stores/stages'
   import { useUsersStore } from '~/stores/users'
-  import { crmFetch } from '~/composables/useCrmRequest'
+  import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
 
   const emit = defineEmits(['close'])
 
@@ -80,7 +80,7 @@
 
   onMounted(async () => {
     try {
-      sequences.value = await crmFetch('/api/crm/sequences')
+      sequences.value = await crmGlobalFetch('/api/crm/sequences')
     } catch {
       sequences.value = []
     }
@@ -88,7 +88,7 @@
     if (usersStore.users.length > 0) return
 
     try {
-      const users = await crmFetch('/api/crm/users')
+      const users = await crmGlobalFetch('/api/crm/users')
       usersStore.setUsers(users)
     } catch {
       usersStore.setUsers([])
@@ -108,7 +108,7 @@
     }
 
     try {
-      const lead = await crmFetch('/api/crm/leads/create', {
+      const lead = await crmQuizFetch('/api/crm/leads/create', {
         method: 'POST',
         body: {
           name: name.value,
@@ -122,7 +122,7 @@
       })
 
       leadsStore.addLead(lead)
-      console.log('STORE LEADS:', leadsStore.leads)
+      // console.log('STORE LEADS:', leadsStore.leads)
     } finally {
       emit('close')
     }

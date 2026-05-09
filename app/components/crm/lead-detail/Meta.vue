@@ -5,7 +5,7 @@
   import { useLeadsStore } from '~/stores/leads'
   import { onMounted, ref } from 'vue'
   import { onClickOutside } from '@vueuse/core'
-  import { crmFetch } from '~/composables/useCrmRequest'
+  import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
 
   const props = defineProps({
     lead: { type: Object, required: true },
@@ -37,7 +37,7 @@
   onMounted(async () => {
     if (usersStore.users.length === 0) {
       try {
-        const users = await crmFetch('/api/crm/users')
+        const users = await crmGlobalFetch('/api/crm/users')
         usersStore.setUsers(users)
       } catch {
         usersStore.setUsers([])
@@ -46,7 +46,7 @@
 
     if (sourcesStore.sources.length === 0) {
       try {
-        const sources = await crmFetch('/api/crm/sources')
+        const sources = await crmGlobalFetch('/api/crm/sources')
         sourcesStore.setSources(sources)
       } catch {
         sourcesStore.setSources([])
@@ -71,7 +71,7 @@
     showOwnerDropdown.value = false
 
     try {
-      const updated = await crmFetch('/api/crm/leads/update', {
+      const updated = await crmQuizFetch('/api/crm/leads/update', {
         method: 'PATCH',
         body: {
           id: props.lead.id,
@@ -99,7 +99,7 @@
     showSourceDropdown.value = false
 
     try {
-      const updated = await crmFetch('/api/crm/leads/update', {
+      const updated = await crmQuizFetch('/api/crm/leads/update', {
         method: 'PATCH',
         body: {
           id: props.lead.id,
@@ -118,7 +118,7 @@
     const name = newSource.value.trim()
     if (!name) return
 
-    const created = await crmFetch('/api/crm/sources/create', {
+    const created = await crmGlobalFetch('/api/crm/sources/create', {
       method: 'POST',
       body: { name }
     })

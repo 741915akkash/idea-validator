@@ -1,66 +1,59 @@
-import { pool } from '../../../db/index.js';
-import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js';
-import { requireQuizAccess } from '../../../utils/quizAccess.js';
+import { pool } from '../../../db/index.js'
+import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js'
 
 const DEFAULT_STAGES = [
   { name: 'New Lead', position: 1 },
   { name: 'Qualified', position: 2 },
   { name: 'Proposal Sent', position: 3 },
   { name: 'Negotiation', position: 4 },
-  { name: 'Closed Won', position: 5 },
-];
+  { name: 'Closed Won', position: 5 }
+]
+
+async function createDefaultStages(userId) {
+  const values = []
+  const placeholders = []
+
+  DEFAULT_STAGES.forEach((stage, index) => {
+    const offset = index * 3
+
+    placeholders.push(`($${offset + 1}, $${offset + 2}, $${offset + 3})`)
+
+    values.push(stage.name, stage.position, userId)
+  })
+
+  await pool.query(
+    `
+    INSERT INTO pipeline_stages (name, position, user_id)
+    VALUES ${placeholders.join(', ')}
+    ON CONFLICT DO NOTHING
+    `,
+    values
+  )
+}
+
+async function getStages(userId) {
+  const result = await pool.query(
+    `
+    SELECT *
+    FROM pipeline_stages
+    WHERE user_id = $1
+    ORDER BY position ASC
+    `,
+    [userId]
+  )
+
+  return result.rows
+}
 
 export default defineEventHandler(async (event) => {
-  const { userId } = await requireCrmEnabled(event);
-  const { quiz_id: quizIdRaw } = getQuery(event);
-  const quizId = typeof quizIdRaw === 'string' ? quizIdRaw.trim() : '';
+  const { userId } = await requireCrmEnabled(event)
 
-  if (!quizId) {
-    throw createError({ statusCode: 400, statusMessage: 'quiz_id required' });
+  let stages = await getStages(userId)
+
+  if (!stages.length) {
+    await createDefaultStages(userId)
+    stages = await getStages(userId)
   }
 
-  await requireQuizAccess(pool, event, quizId);
-
-  let result = await pool.query(`
-    SELECT * FROM pipeline_stages
-    WHERE user_id = $1
-      AND quiz_id = $2
-    ORDER BY position ASC
-  `, [userId, quizId]);
-
-  if (!result.rows.length) {
-    await pool.query(
-      `
-      INSERT INTO pipeline_stages (name, position, user_id, quiz_id)
-      VALUES
-        ($1, $2, $3, $4),
-        ($5, $6, $7, $8),
-        ($9, $10, $11, $12),
-        ($13, $14, $15, $16),
-        ($17, $18, $19, $20)
-      ON CONFLICT DO NOTHING
-      `,
-      [
-        DEFAULT_STAGES[0].name, DEFAULT_STAGES[0].position,
-        userId, quizId,
-        DEFAULT_STAGES[1].name, DEFAULT_STAGES[1].position,
-        userId, quizId,
-        DEFAULT_STAGES[2].name, DEFAULT_STAGES[2].position,
-        userId, quizId,
-        DEFAULT_STAGES[3].name, DEFAULT_STAGES[3].position,
-        userId, quizId,
-        DEFAULT_STAGES[4].name, DEFAULT_STAGES[4].position,
-        userId, quizId,
-      ],
-    );
-
-    result = await pool.query(`
-      SELECT * FROM pipeline_stages
-      WHERE user_id = $1
-        AND quiz_id = $2
-      ORDER BY position ASC
-    `, [userId, quizId]);
-  }
-
-  return result.rows;
-});
+  return stages
+})

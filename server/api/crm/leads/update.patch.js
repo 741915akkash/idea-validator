@@ -119,7 +119,6 @@ export default defineEventHandler(async (event) => {
         FROM sources
         WHERE id = $1
           AND user_id = $4
-          AND quiz_id = $5
         LIMIT 1
       ),
       updated AS (
@@ -180,7 +179,6 @@ export default defineEventHandler(async (event) => {
         FROM sequences
         WHERE id = $1
           AND user_id = $4
-          AND quiz_id = $5
         LIMIT 1
       ),
       updated AS (

@@ -157,10 +157,16 @@ WITH latest_quiz_per_user AS (
   ORDER BY q.user_id, q.started_at DESC NULLS LAST, q.id DESC
 )
 UPDATE public.leads l
-SET quiz_id = COALESCE(i.quiz_id, lu.quiz_id)
+SET quiz_id = COALESCE(
+  (
+    SELECT i.quiz_id
+    FROM public.interviews i
+    WHERE i.id = l.interview_id
+    LIMIT 1
+  ),
+  lu.quiz_id
+)
 FROM latest_quiz_per_user lu
-LEFT JOIN public.interviews i
-  ON i.id = l.interview_id
 WHERE l.user_id = lu.user_id
   AND l.quiz_id IS NULL;
 
@@ -216,12 +222,36 @@ WHERE ss.sequence_id = s.id
 
 -- Backfill lead_activities from interview lineage, fallback to linked lead.
 UPDATE public.lead_activities la
-SET quiz_id = COALESCE(i.quiz_id, l.quiz_id)
+SET quiz_id = COALESCE(
+  (
+    SELECT i.quiz_id
+    FROM public.interviews i
+    WHERE i.id = la.interview_id
+    LIMIT 1
+  ),
+  l.quiz_id
+)
 FROM public.leads l
-LEFT JOIN public.interviews i
-  ON i.id = la.interview_id
 WHERE la.lead_id = l.id
   AND la.quiz_id IS NULL;
+
+DELETE FROM public.leads
+WHERE quiz_id IS NULL;
+
+DELETE FROM public.pipeline_stages
+WHERE quiz_id IS NULL;
+
+DELETE FROM public.sources
+WHERE quiz_id IS NULL;
+
+DELETE FROM public.sequences
+WHERE quiz_id IS NULL;
+
+DELETE FROM public.sequence_steps
+WHERE quiz_id IS NULL;
+
+DELETE FROM public.lead_activities
+WHERE quiz_id IS NULL;
 
 -- Enforce NOT NULL after backfill.
 ALTER TABLE public.leads

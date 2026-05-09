@@ -26,10 +26,12 @@
 </script>
 
 <template>
-  <div class="flex h-[calc(100vh-140px)] flex-col">
+  <div class="flex h-[calc(100vh-140px)] flex-col overflow-hidden">
     <!-- Scroll area -->
-    <div class="custom-scrollbar flex flex-1 items-start gap-6 overflow-x-auto pb-4">
-      <KanbanColumn v-for="stage in stages" :key="stage.id" :stage="stage" @open-lead="openLead" />
+    <div class="custom-scrollbar flex flex-1 overflow-x-auto pb-4">
+      <div class="flex min-w-max items-start gap-6">
+        <KanbanColumn v-for="stage in stages" :key="stage.id" :stage="stage" @open-lead="openLead" />
+      </div>
     </div>
 
     <LeadDetailPanel v-if="showDetail" :leadId="selectedLeadId" @close="closeLead" />

@@ -86,7 +86,6 @@ export default defineEventHandler(async (event) => {
       FROM pipeline_stages
       WHERE id = $5
         AND user_id = $7
-        AND quiz_id = $9
       LIMIT 1
     ),
     selected_sequence AS (
@@ -94,7 +93,6 @@ export default defineEventHandler(async (event) => {
       FROM sequences
       WHERE id = $8
         AND user_id = $7
-        AND quiz_id = $9
       LIMIT 1
     ),
     first_sequence_step AS (

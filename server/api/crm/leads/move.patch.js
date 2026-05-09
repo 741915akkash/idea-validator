@@ -20,7 +20,6 @@ export default defineEventHandler(async (event) => {
       FROM pipeline_stages
       WHERE id = $1
         AND user_id = $4
-        AND quiz_id = $5
       LIMIT 1
     )
     UPDATE leads

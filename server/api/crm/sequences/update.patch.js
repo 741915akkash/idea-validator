@@ -1,6 +1,5 @@
 import { pool } from '../../../db/index.js'
 import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js'
-import { requireQuizAccess } from '../../../utils/quizAccess.js'
 
 const ALLOWED_STEP_TYPES = new Set(['call', 'email', 'note'])
 
@@ -30,18 +29,15 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const id = Number(body?.id)
   const title = typeof body?.title === 'string' ? body.title.trim() : ''
-  const quizId = typeof body?.quiz_id === 'string' ? body.quiz_id.trim() : ''
   const steps = normalizeSteps(body?.steps)
 
   if (!Number.isInteger(id)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid sequence id' })
   }
 
-  if (!title || !quizId) {
-    throw createError({ statusCode: 400, statusMessage: 'Title and quiz_id required' })
+  if (!title) {
+    throw createError({ statusCode: 400, statusMessage: 'Title required' })
   }
-
-  await requireQuizAccess(pool, event, quizId)
 
   const client = await pool.connect()
 
@@ -55,10 +51,9 @@ export default defineEventHandler(async (event) => {
           updated_at = NOW()
       WHERE id = $2
         AND user_id = $3
-        AND quiz_id = $4
       RETURNING id
       `,
-      [title, id, userId, quizId]
+      [title, id, userId]
     )
 
     if (!updated.rows.length) {
@@ -76,10 +71,10 @@ export default defineEventHandler(async (event) => {
     for (const step of steps) {
       await client.query(
         `
-        INSERT INTO sequence_steps (sequence_id, step_number, offset_days, type, title, description, quiz_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO sequence_steps (sequence_id, step_number, offset_days, type, title, description)
+        VALUES ($1, $2, $3, $4, $5, $6)
         `,
-        [id, step.stepNumber, step.offsetDays, step.type, step.title, step.description, quizId]
+        [id, step.stepNumber, step.offsetDays, step.type, step.title, step.description]
       )
     }
 
@@ -109,10 +104,9 @@ export default defineEventHandler(async (event) => {
         ON sequence_steps.sequence_id = sequences.id
       WHERE sequences.id = $1
         AND sequences.user_id = $2
-        AND sequences.quiz_id = $3
       GROUP BY sequences.id
       `,
-      [id, userId, quizId]
+      [id, userId]
     )
 
     await client.query('COMMIT')

@@ -3,7 +3,7 @@
   import { useRouter } from 'vue-router'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import { useSourcesStore } from '~/stores/sources'
-  import { crmFetch } from '~/composables/useCrmRequest'
+  import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
   import SettingsBar from '../../components/settings/SettingsBar.vue'
   import BaseModal from '~/components/ui/BaseModal.vue'
   import Button2 from '../../components/ui/Button2.vue'
@@ -40,6 +40,7 @@
   const sourcesError = ref('')
   const addingSource = ref(false)
   const deletingSourceId = ref('')
+  const canDeleteIdea = computed(() => quizStore.quizzes.length > 1)
 
   const normalizedTier = computed(() =>
     String(user.value?.plan_tier || 'free')
@@ -130,7 +131,7 @@
 
       // ✅ 1. Fetch users only if needed
       if (usersStore.users.length === 0) {
-        const users = await crmFetch('/api/crm/users')
+        const users = await crmGlobalFetch('/api/crm/users')
         usersStore.setUsers(users)
       }
 
@@ -141,7 +142,7 @@
       // ✅ 3. Other bootstraps
       if (sourcesStore.sources.length === 0) {
         try {
-          const sources = await crmFetch('/api/crm/sources')
+          const sources = await crmGlobalFetch('/api/crm/sources')
           sourcesStore.setSources(sources)
         } catch {
           sourcesStore.setSources([])
@@ -256,7 +257,7 @@
   }
 
   async function refreshSources() {
-    const sources = await crmFetch('/api/crm/sources')
+    const sources = await crmGlobalFetch('/api/crm/sources')
     sourcesStore.setSources(sources)
   }
 
@@ -287,7 +288,7 @@
     sourcesError.value = ''
 
     try {
-      const created = await crmFetch('/api/crm/sources/create', {
+      const created = await crmGlobalFetch('/api/crm/sources/create', {
         method: 'POST',
         body: { name }
       })
@@ -311,7 +312,7 @@
     sourcesError.value = ''
 
     try {
-      await crmFetch('/api/crm/sources/delete', {
+      await crmGlobalFetch('/api/crm/sources/delete', {
         method: 'POST',
         body: { id }
       })
@@ -373,7 +374,9 @@
 
       <!-- Delete -->
       <SettingsBar v-if="currentQuiz" title="Delete this idea" danger>
-        <Button2 size="sm" variant="danger" @click="openDeleteModal"> Delete </Button2>
+        <Button2 size="sm" variant="danger" :disabled="!canDeleteIdea" @click="openDeleteModal">
+          Delete
+        </Button2>
       </SettingsBar>
     </div>
 
@@ -513,7 +516,13 @@
         </p>
 
         <div class="mt-5 flex justify-end gap-2">
-          <Button2 class="rounded-md border px-4 py-2 text-sm" @click="closeSourcesModal(); close()">
+          <Button2
+            class="rounded-md border px-4 py-2 text-sm"
+            @click="
+              closeSourcesModal();
+              close()
+            "
+          >
             Close
           </Button2>
         </div>
