@@ -1,5 +1,6 @@
 import { pool } from '../../../db/index.js'
 import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js'
+import { requireQuizAccess } from '../../../utils/quizAccess.js'
 
 const UUID_V4_OR_V1_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
@@ -20,6 +21,7 @@ function normalizePhone(value) {
 export default defineEventHandler(async (event) => {
   const { userId } = await requireCrmEnabled(event)
   const body = await readBody(event)
+  const quizId = typeof body?.quiz_id === 'string' ? body.quiz_id.trim() : ''
   const allowedFields = new Set([
     'name',
     'company',
@@ -36,6 +38,12 @@ export default defineEventHandler(async (event) => {
   if (!allowedFields.has(body.field)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid field' })
   }
+
+  if (!quizId) {
+    throw createError({ statusCode: 400, statusMessage: 'quiz_id required' })
+  }
+
+  await requireQuizAccess(pool, event, quizId)
 
   let value
 
@@ -110,7 +118,8 @@ export default defineEventHandler(async (event) => {
         SELECT id
         FROM sources
         WHERE id = $1
-          AND user_id = $4 OR user_id IS NULL
+          AND user_id = $4
+          AND quiz_id = $5
         LIMIT 1
       ),
       updated AS (
@@ -119,6 +128,7 @@ export default defineEventHandler(async (event) => {
             updated_at = NOW()
         WHERE id = $2
           AND user_id = $3
+          AND quiz_id = $5
           AND ($1 IS NULL OR EXISTS (SELECT 1 FROM selected_source))
         RETURNING *
       )
@@ -160,7 +170,7 @@ export default defineEventHandler(async (event) => {
       LEFT JOIN sequences
         ON updated.sequence_id = sequences.id
       `,
-      [value, body.id, userId, userId]
+      [value, body.id, userId, userId, quizId]
     )
   } else if (body.field === 'sequence_id') {
     result = await pool.query(
@@ -169,7 +179,8 @@ export default defineEventHandler(async (event) => {
         SELECT id
         FROM sequences
         WHERE id = $1
-          AND user_id = $4 OR user_id IS NULL
+          AND user_id = $4
+          AND quiz_id = $5
         LIMIT 1
       ),
       updated AS (
@@ -178,6 +189,7 @@ export default defineEventHandler(async (event) => {
             updated_at = NOW()
         WHERE id = $2
           AND user_id = $3
+          AND quiz_id = $5
           AND ($1 IS NULL OR EXISTS (SELECT 1 FROM selected_sequence))
         RETURNING *
       )
@@ -219,7 +231,7 @@ export default defineEventHandler(async (event) => {
       LEFT JOIN sequences
         ON updated.sequence_id = sequences.id
       `,
-      [value, body.id, userId, userId]
+      [value, body.id, userId, userId, quizId]
     )
   } else {
     result = await pool.query(
@@ -230,6 +242,7 @@ export default defineEventHandler(async (event) => {
             updated_at = NOW()
         WHERE id = $2
           AND user_id = $3
+          AND quiz_id = $4
         RETURNING *
       )
       SELECT
@@ -270,7 +283,7 @@ export default defineEventHandler(async (event) => {
       LEFT JOIN sequences
         ON updated.sequence_id = sequences.id
       `,
-      [value, body.id, userId]
+      [value, body.id, userId, quizId]
     )
   }
 

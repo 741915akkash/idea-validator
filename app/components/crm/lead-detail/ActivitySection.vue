@@ -3,6 +3,7 @@
   import { MessageSquare, Phone, Mail, ChevronDown, X, Send, Mic } from 'lucide-vue-next'
   import { useLeadsStore } from '~/stores/leads'
   import { useRouter } from 'vue-router'
+  import { crmFetch } from '~/composables/useCrmRequest'
 
   const props = defineProps({
     leadId: { type: Number, required: true },
@@ -62,7 +63,7 @@
     console.log('SENDING', payload)
 
     try {
-      const activity = await $fetch('/api/crm/activities/create', {
+      const activity = await crmFetch('/api/crm/activities/create', {
         method: 'POST',
         body: payload
       })
@@ -95,7 +96,7 @@
         throw new Error('Missing interview id')
       }
 
-      const activity = await $fetch('/api/crm/activities/create', {
+      const activity = await crmFetch('/api/crm/activities/create', {
         method: 'POST',
         body: {
           leadId: props.leadId,

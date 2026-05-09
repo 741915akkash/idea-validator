@@ -1,6 +1,7 @@
 <script setup>
   import { ref, computed } from 'vue'
   import { useLeadsStore } from '~/stores/leads'
+  import { crmFetch } from '~/composables/useCrmRequest'
 
   const open = ref(false)
   const customDate = ref('')
@@ -56,7 +57,7 @@
     isSaving.value = true
 
     try {
-      const updated = await $fetch('/api/crm/leads/follow-up/reschedule', {
+      const updated = await crmFetch('/api/crm/leads/follow-up/reschedule', {
         method: 'POST',
         body: {
           id: props.leadId,
@@ -111,7 +112,7 @@
     isSaving.value = true
 
     try {
-      const updated = await $fetch('/api/crm/leads/follow-up/done', {
+      const updated = await crmFetch('/api/crm/leads/follow-up/done', {
         method: 'POST',
         body: { id: props.leadId }
       })

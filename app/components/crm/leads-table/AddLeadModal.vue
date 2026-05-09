@@ -3,6 +3,7 @@
   import { useLeadsStore } from '~/stores/leads'
   import { useStagesStore } from '~/stores/stages'
   import { useUsersStore } from '~/stores/users'
+  import { crmFetch } from '~/composables/useCrmRequest'
 
   const emit = defineEmits(['close'])
 
@@ -79,7 +80,7 @@
 
   onMounted(async () => {
     try {
-      sequences.value = await $fetch('/api/crm/sequences')
+      sequences.value = await crmFetch('/api/crm/sequences')
     } catch {
       sequences.value = []
     }
@@ -87,7 +88,7 @@
     if (usersStore.users.length > 0) return
 
     try {
-      const users = await $fetch('/api/crm/users')
+      const users = await crmFetch('/api/crm/users')
       usersStore.setUsers(users)
     } catch {
       usersStore.setUsers([])
@@ -107,7 +108,7 @@
     }
 
     try {
-      const lead = await $fetch('/api/crm/leads/create', {
+      const lead = await crmFetch('/api/crm/leads/create', {
         method: 'POST',
         body: {
           name: name.value,

@@ -1,5 +1,6 @@
 import { pool } from '../../../../db/index.js'
 import { requireCrmEnabled } from '../../../../utils/crm/crmAccess.js'
+import { requireQuizAccess } from '../../../../utils/quizAccess.js'
 
 const HYDRATED_LEAD_SELECT = `
   SELECT
@@ -41,17 +42,25 @@ const HYDRATED_LEAD_SELECT = `
     ON leads.sequence_id = sequences.id
   WHERE leads.id = $1
     AND leads.user_id = $2
+    AND leads.quiz_id = $3
   LIMIT 1
 `
 
 export default defineEventHandler(async (event) => {
   const { userId } = await requireCrmEnabled(event)
   const body = await readBody(event)
+  const quizId = typeof body?.quiz_id === 'string' ? body.quiz_id.trim() : ''
   const leadId = Number(body?.id ?? body?.leadId)
 
   if (!Number.isInteger(leadId)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid lead id' })
   }
+
+  if (!quizId) {
+    throw createError({ statusCode: 400, statusMessage: 'quiz_id required' })
+  }
+
+  await requireQuizAccess(pool, event, quizId)
 
   const client = await pool.connect()
 
@@ -64,9 +73,10 @@ export default defineEventHandler(async (event) => {
       FROM leads
       WHERE id = $1
         AND user_id = $2
+        AND quiz_id = $3
       FOR UPDATE
       `,
-      [leadId, userId]
+      [leadId, userId, quizId]
     )
 
     if (!leadResult.rows.length) {
@@ -85,9 +95,10 @@ export default defineEventHandler(async (event) => {
         FROM sequence_steps
         WHERE sequence_id = $1
           AND step_number = $2
+          AND quiz_id = $3
         LIMIT 1
         `,
-        [lead.sequence_id, lead.current_step]
+        [lead.sequence_id, lead.current_step, quizId]
       )
 
       if (currentStepResult.rows.length) {
@@ -99,9 +110,10 @@ export default defineEventHandler(async (event) => {
           FROM sequence_steps
           WHERE sequence_id = $1
             AND step_number = $2
+            AND quiz_id = $3
           LIMIT 1
           `,
-          [lead.sequence_id, lead.current_step + 1]
+          [lead.sequence_id, lead.current_step + 1, quizId]
         )
 
         if (nextStepResult.rows.length) {
@@ -129,8 +141,9 @@ export default defineEventHandler(async (event) => {
           updated_at = NOW()
       WHERE id = $3
         AND user_id = $4
+        AND quiz_id = $5
       `,
-      [nextStepNumber, nextFollowUpAt, leadId, userId]
+      [nextStepNumber, nextFollowUpAt, leadId, userId, quizId]
     )
 
     if (completedStep) {
@@ -143,22 +156,22 @@ export default defineEventHandler(async (event) => {
 
       await client.query(
         `
-        INSERT INTO lead_activities (lead_id, type, text, sequence_step_id)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO lead_activities (lead_id, type, text, sequence_step_id, quiz_id)
+        VALUES ($1, $2, $3, $4, $5)
         `,
-        [leadId, safeType, activityText, completedStep.id]
+        [leadId, safeType, activityText, completedStep.id, quizId]
       )
     } else {
       await client.query(
         `
-        INSERT INTO lead_activities (lead_id, type, text)
-        VALUES ($1, 'note', 'Follow-up marked done')
+        INSERT INTO lead_activities (lead_id, type, text, quiz_id)
+        VALUES ($1, 'note', 'Follow-up marked done', $2)
         `,
-        [leadId]
+        [leadId, quizId]
       )
     }
 
-    const hydrated = await client.query(HYDRATED_LEAD_SELECT, [leadId, userId])
+    const hydrated = await client.query(HYDRATED_LEAD_SELECT, [leadId, userId, quizId])
 
     await client.query('COMMIT')
     return hydrated.rows[0]

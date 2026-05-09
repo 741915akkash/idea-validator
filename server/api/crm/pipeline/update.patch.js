@@ -1,11 +1,13 @@
 import { pool } from '../../../db/index.js';
 import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js';
+import { requireQuizAccess } from '../../../utils/quizAccess.js';
 
 const HEX_COLOR_REGEX = /^#[0-9a-fA-F]{6}$/;
 
 export default defineEventHandler(async (event) => {
   const { userId } = await requireCrmEnabled(event);
   const body = await readBody(event);
+  const quizId = typeof body?.quiz_id === 'string' ? body.quiz_id.trim() : '';
 
   const stageId = Number(body?.id);
   const name = String(body?.name || '').trim();
@@ -18,6 +20,12 @@ export default defineEventHandler(async (event) => {
   if (!name) {
     throw createError({ statusCode: 400, statusMessage: 'Stage name is required' });
   }
+
+  if (!quizId) {
+    throw createError({ statusCode: 400, statusMessage: 'quiz_id required' });
+  }
+
+  await requireQuizAccess(pool, event, quizId);
 
   if (color && !HEX_COLOR_REGEX.test(color)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid color' });
@@ -32,9 +40,10 @@ export default defineEventHandler(async (event) => {
           color = $2
       WHERE id = $3
         AND user_id = $4
+        AND quiz_id = $5
       RETURNING *
       `,
-      [name, color || null, stageId, userId],
+      [name, color || null, stageId, userId, quizId],
     );
   } catch (error) {
     if (error?.code === '23505') {
@@ -53,9 +62,10 @@ export default defineEventHandler(async (event) => {
         SET name = $1
         WHERE id = $2
           AND user_id = $3
+          AND quiz_id = $4
         RETURNING *
         `,
-        [name, stageId, userId],
+        [name, stageId, userId, quizId],
       );
     } catch (fallbackError) {
       if (fallbackError?.code === '23505') {

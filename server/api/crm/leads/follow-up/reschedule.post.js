@@ -1,5 +1,6 @@
 import { pool } from '../../../../db/index.js'
 import { requireCrmEnabled } from '../../../../utils/crm/crmAccess.js'
+import { requireQuizAccess } from '../../../../utils/quizAccess.js'
 
 const HYDRATED_LEAD_SELECT = `
   SELECT
@@ -41,17 +42,25 @@ const HYDRATED_LEAD_SELECT = `
     ON leads.sequence_id = sequences.id
   WHERE leads.id = $1
     AND leads.user_id = $2
+    AND leads.quiz_id = $3
   LIMIT 1
 `
 
 export default defineEventHandler(async (event) => {
   const { userId } = await requireCrmEnabled(event)
   const body = await readBody(event)
+  const quizId = typeof body?.quiz_id === 'string' ? body.quiz_id.trim() : ''
   const leadId = Number(body?.id ?? body?.leadId)
 
   if (!Number.isInteger(leadId)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid lead id' })
   }
+
+  if (!quizId) {
+    throw createError({ statusCode: 400, statusMessage: 'quiz_id required' })
+  }
+
+  await requireQuizAccess(pool, event, quizId)
 
   if (body?.value === null || body?.value === undefined || body?.value === '') {
     throw createError({ statusCode: 400, statusMessage: 'Follow-up date required' })
@@ -70,15 +79,16 @@ export default defineEventHandler(async (event) => {
         updated_at = NOW()
     WHERE id = $2
       AND user_id = $3
+      AND quiz_id = $4
     RETURNING id
     `,
-    [parsed.toISOString(), leadId, userId]
+    [parsed.toISOString(), leadId, userId, quizId]
   )
 
   if (!updated.rows.length) {
     throw createError({ statusCode: 404, statusMessage: 'Lead not found' })
   }
 
-  const hydrated = await pool.query(HYDRATED_LEAD_SELECT, [leadId, userId])
+  const hydrated = await pool.query(HYDRATED_LEAD_SELECT, [leadId, userId, quizId])
   return hydrated.rows[0]
 })

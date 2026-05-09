@@ -50,12 +50,30 @@ export async function addInterviewToCrm({ client, interviewId, userId = null }) 
   const phone = s.phone?.trim() || null
   const company = s.company?.trim() || null
 
-  const stageRes = await client.query(`SELECT id FROM pipeline_stages ORDER BY id ASC LIMIT 1`)
+  const stageRes = await client.query(
+    `
+    SELECT id
+    FROM pipeline_stages
+    WHERE user_id = $1
+      AND quiz_id = $2
+    ORDER BY id ASC
+    LIMIT 1
+    `,
+    [userId, quizId]
+  )
   const stageId = stageRes.rows[0]?.id || null
 
   let sourceId = null
   const sourceRes = await client.query(
-    `SELECT id FROM sources WHERE lower(name) = 'interview' AND user_id IS NULL LIMIT 1`
+    `
+    SELECT id
+    FROM sources
+    WHERE lower(name) = 'interview'
+      AND user_id = $1
+      AND quiz_id = $2
+    LIMIT 1
+    `,
+    [userId, quizId]
   )
   if (sourceRes.rows.length) {
     sourceId = sourceRes.rows[0].id
@@ -72,12 +90,13 @@ export async function addInterviewToCrm({ client, interviewId, userId = null }) 
       user_id,
       source_id,
       interview_id,
+      quiz_id,
       created_at,
       updated_at
     )
-    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,NOW(),NOW())
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW(),NOW())
     `,
-    [name, email, phone, company, stageId, userId, sourceId, interviewId]
+    [name, email, phone, company, stageId, userId, sourceId, interviewId, quizId]
   )
 
   return { ok: true }
@@ -115,3 +134,16 @@ export default defineEventHandler(async (event) => {
     client.release()
   }
 })
+  const interviewRes = await client.query(
+    `
+    SELECT quiz_id
+    FROM interviews
+    WHERE id = $1
+    LIMIT 1
+    `,
+    [interviewId]
+  )
+  const quizId = interviewRes.rows[0]?.quiz_id || null
+  if (!quizId) {
+    return { ok: true, skipped: 'missing_quiz_id' }
+  }

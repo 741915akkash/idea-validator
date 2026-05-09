@@ -2,6 +2,7 @@
   import { ref } from 'vue'
   import { useLeadsStore } from '~/stores/leads'
   import { useStagesStore } from '~/stores/stages'
+  import { crmFetch } from '~/composables/useCrmRequest'
 
   const props = defineProps({
     stage: {
@@ -45,7 +46,7 @@
     saveError.value = ''
 
     try {
-      const updated = await $fetch('/api/crm/pipeline/update', {
+      const updated = await crmFetch('/api/crm/pipeline/update', {
         method: 'PATCH',
         body: {
           id: props.stage.id,

@@ -2,6 +2,7 @@
   import { ref, watch } from 'vue'
   import draggable from 'vuedraggable'
   import { useLeadsStore } from '~/stores/leads'
+  import { crmFetch } from '~/composables/useCrmRequest'
   import KanbanCard from './KanbanCard.vue'
   import EditStageModal from './EditStageModal.vue'
   import { MoreHorizontal, Plus } from 'lucide-vue-next'
@@ -60,7 +61,7 @@
       })
 
       try {
-        await $fetch('/api/crm/leads/update', {
+        await crmFetch('/api/crm/leads/update', {
           method: 'PATCH',
           body: {
             id: lead.id,

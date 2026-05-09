@@ -1,8 +1,17 @@
 import { pool } from '../../../db/index.js';
 import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js';
+import { requireQuizAccess } from '../../../utils/quizAccess.js';
 
 export default defineEventHandler(async (event) => {
   const { userId } = await requireCrmEnabled(event);
+  const { quiz_id: quizIdRaw } = getQuery(event);
+  const quizId = typeof quizIdRaw === 'string' ? quizIdRaw.trim() : '';
+
+  if (!quizId) {
+    throw createError({ statusCode: 400, statusMessage: 'quiz_id required' });
+  }
+
+  await requireQuizAccess(pool, event, quizId);
 
   const result = await pool.query(`
     SELECT
@@ -43,8 +52,9 @@ export default defineEventHandler(async (event) => {
     LEFT JOIN sequences
       ON leads.sequence_id = sequences.id
     WHERE leads.user_id = $1
+      AND leads.quiz_id = $2
     ORDER BY leads.created_at DESC
-  `, [userId]);
+  `, [userId, quizId]);
 
   return result.rows;
 });

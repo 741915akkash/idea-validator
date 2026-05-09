@@ -1,5 +1,6 @@
 import { pool } from '../../../db/index.js';
 import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js';
+import { requireQuizAccess } from '../../../utils/quizAccess.js';
 import {
   getEventEntitlementsFromDb,
   getUsageSnapshot,
@@ -26,6 +27,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const stageId = Number(body.stage_id);
   const ownerId = typeof body.user_id === 'string' && body.user_id.trim() ? body.user_id.trim() : authUserId;
+  const quizId = typeof body.quiz_id === 'string' ? body.quiz_id.trim() : '';
   const sequenceId = body.sequence_id === null || body.sequence_id === undefined || body.sequence_id === ''
     ? null
     : Number(body.sequence_id);
@@ -41,6 +43,12 @@ export default defineEventHandler(async (event) => {
   if (!UUID_V4_OR_V1_REGEX.test(ownerId)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid user_id' });
   }
+
+  if (!quizId) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid quiz_id' });
+  }
+
+  await requireQuizAccess(pool, event, quizId);
 
   const normalizedEmail = String(body.email || '').trim();
   if (!EMAIL_REGEX.test(normalizedEmail)) {
@@ -78,6 +86,7 @@ export default defineEventHandler(async (event) => {
       FROM pipeline_stages
       WHERE id = $5
         AND user_id = $7
+        AND quiz_id = $9
       LIMIT 1
     ),
     selected_sequence AS (
@@ -85,6 +94,7 @@ export default defineEventHandler(async (event) => {
       FROM sequences
       WHERE id = $8
         AND user_id = $7
+        AND quiz_id = $9
       LIMIT 1
     ),
     first_sequence_step AS (
@@ -95,7 +105,7 @@ export default defineEventHandler(async (event) => {
       LIMIT 1
     ),
     inserted AS (
-      INSERT INTO leads (name, company, email, phone, stage_id, user_id, sequence_id, current_step, next_follow_up_at)
+      INSERT INTO leads (name, company, email, phone, stage_id, user_id, sequence_id, current_step, next_follow_up_at, quiz_id)
       SELECT
         $1,
         $2,
@@ -108,7 +118,8 @@ export default defineEventHandler(async (event) => {
         CASE
           WHEN (SELECT id FROM selected_sequence) IS NULL THEN NULL
           ELSE NOW() + ((COALESCE((SELECT offset_days FROM first_sequence_step), 0))::text || ' days')::interval
-        END
+        END,
+        $9
       FROM selected_stage
       WHERE $8 IS NULL OR EXISTS (SELECT 1 FROM selected_sequence)
       RETURNING *
@@ -148,7 +159,7 @@ export default defineEventHandler(async (event) => {
     LEFT JOIN sequences
       ON inserted.sequence_id = sequences.id
     `,
-    [body.name, body.company, normalizedEmail, normalizedPhone, stageId, ownerId, authUserId, sequenceId],
+    [body.name, body.company, normalizedEmail, normalizedPhone, stageId, ownerId, authUserId, sequenceId, quizId],
   );
 
   if (!result.rows.length) {

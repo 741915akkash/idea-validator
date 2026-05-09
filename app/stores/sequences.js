@@ -1,8 +1,29 @@
 import { defineStore } from 'pinia'
+import { useQuizSessionStore } from './quizSession'
 
 function apiFetch(url, options = {}) {
   const requestFetch = import.meta.server ? useRequestFetch() : $fetch
-  return requestFetch(url, options)
+  const quizStore = useQuizSessionStore()
+  const quizId = String(quizStore.quizId || '').trim()
+  const method = String(options?.method || 'GET').toUpperCase()
+
+  if (method === 'GET') {
+    return requestFetch(url, {
+      ...options,
+      query: {
+        ...(options.query || {}),
+        quiz_id: quizId
+      }
+    })
+  }
+
+  return requestFetch(url, {
+    ...options,
+    body: {
+      ...(options.body || {}),
+      quiz_id: quizId
+    }
+  })
 }
 
 function normalizeSequence(sequence) {

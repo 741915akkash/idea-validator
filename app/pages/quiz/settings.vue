@@ -3,6 +3,7 @@
   import { useRouter } from 'vue-router'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import { useSourcesStore } from '~/stores/sources'
+  import { crmFetch } from '~/composables/useCrmRequest'
   import SettingsBar from '../../components/settings/SettingsBar.vue'
   import BaseModal from '~/components/ui/BaseModal.vue'
   import Button2 from '../../components/ui/Button2.vue'
@@ -121,9 +122,15 @@
 
   onMounted(async () => {
     try {
+      quizStore.hydrate()
+      await quizStore.loadQuizzes()
+      if (!quizStore.quizId && quizStore.quizzes.length) {
+        quizStore.setQuizId(quizStore.quizzes[0].id)
+      }
+
       // ✅ 1. Fetch users only if needed
       if (usersStore.users.length === 0) {
-        const users = await $fetch('/api/crm/users')
+        const users = await crmFetch('/api/crm/users')
         usersStore.setUsers(users)
       }
 
@@ -134,7 +141,7 @@
       // ✅ 3. Other bootstraps
       if (sourcesStore.sources.length === 0) {
         try {
-          const sources = await $fetch('/api/crm/sources')
+          const sources = await crmFetch('/api/crm/sources')
           sourcesStore.setSources(sources)
         } catch {
           sourcesStore.setSources([])
@@ -142,12 +149,8 @@
       }
 
       await refreshPlan(true)
-      quizStore.hydrate()
-      await quizStore.loadQuizzes()
-
-      // ✅ 4. Set default quiz
-      if (!quizStore.quizId && quizStore.quizzes.length) {
-        quizStore.setQuizId(quizStore.quizzes[0].id)
+      // ✅ 4. Load default quiz overview when missing in-memory state
+      if (quizStore.quizId && !quizStore.loaded) {
         await quizStore.loadOverview(quizStore.quizId)
       }
 
@@ -253,7 +256,7 @@
   }
 
   async function refreshSources() {
-    const sources = await $fetch('/api/crm/sources')
+    const sources = await crmFetch('/api/crm/sources')
     sourcesStore.setSources(sources)
   }
 
@@ -284,7 +287,7 @@
     sourcesError.value = ''
 
     try {
-      const created = await $fetch('/api/crm/sources/create', {
+      const created = await crmFetch('/api/crm/sources/create', {
         method: 'POST',
         body: { name }
       })
@@ -308,7 +311,7 @@
     sourcesError.value = ''
 
     try {
-      await $fetch('/api/crm/sources/delete', {
+      await crmFetch('/api/crm/sources/delete', {
         method: 'POST',
         body: { id }
       })

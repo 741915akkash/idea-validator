@@ -5,22 +5,35 @@
   import { useStagesStore } from '~/stores/stages'
   import { useSourcesStore } from '~/stores/sources'
   import { useUsersStore } from '~/stores/users'
+  import { useQuizSessionStore } from '~/stores/quizSession'
+  import { crmFetch } from '~/composables/useCrmRequest'
   import { onMounted, ref, watch } from 'vue'
 
   const leadsStore = useLeadsStore()
   const stagesStore = useStagesStore()
   const sourcesStore = useSourcesStore()
   const usersStore = useUsersStore()
+  const quizStore = useQuizSessionStore()
 
-  const { data: leads } = await useFetch('/api/crm/leads')
-  const { data: stages } = await useFetch('/api/crm/pipeline/stages')
-  const { data: sources } = await useFetch('/api/crm/sources')
-  const { data: users } = await useFetch('/api/crm/users')
+  quizStore.hydrate()
+  if (!quizStore.quizId) {
+    await quizStore.loadQuizzes()
+    if (quizStore.quizzes.length) {
+      quizStore.setQuizId(quizStore.quizzes[0].id)
+    }
+  }
 
-  leadsStore.setLeads(leads.value)
-  stagesStore.setStages(stages.value)
-  sourcesStore.setSources(sources.value)
-  usersStore.setUsers(users.value)
+  const [leads, stages, sources, users] = await Promise.all([
+    crmFetch('/api/crm/leads'),
+    crmFetch('/api/crm/pipeline/stages'),
+    crmFetch('/api/crm/sources'),
+    crmFetch('/api/crm/users')
+  ])
+
+  leadsStore.setLeads(leads)
+  stagesStore.setStages(stages)
+  sourcesStore.setSources(sources)
+  usersStore.setUsers(users)
 
   const viewMode = ref('table')
   const isCreatingStage = ref(false)
@@ -48,7 +61,7 @@
     isCreatingStage.value = true
 
     try {
-      await $fetch('/api/crm/pipeline/create', {
+      await crmFetch('/api/crm/pipeline/create', {
         method: 'POST',
         body: {
           name: trimmedName,
@@ -56,7 +69,7 @@
         }
       })
 
-      const updatedStages = await $fetch('/api/crm/pipeline/stages')
+      const updatedStages = await crmFetch('/api/crm/pipeline/stages')
       stagesStore.setStages(updatedStages)
     } catch {
       stageCreateError.value = 'Could not create stage. Please try again.'

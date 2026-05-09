@@ -1,14 +1,19 @@
 import { pool } from '../../../db/index.js'
 import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js'
+import { requireQuizAccess } from '../../../utils/quizAccess.js'
 
 export default defineEventHandler(async (event) => {
   const { userId } = await requireCrmEnabled(event)
+  const { quiz_id: quizIdRaw } = getQuery(event)
   const { id } = getQuery(event)
+  const quizId = typeof quizIdRaw === 'string' ? quizIdRaw.trim() : ''
   const sequenceId = Number(id)
 
-  if (!Number.isInteger(sequenceId)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid sequence id' })
+  if (!Number.isInteger(sequenceId) || !quizId) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid sequence id or quiz_id' })
   }
+
+  await requireQuizAccess(pool, event, quizId)
 
   const result = await pool.query(
     `
@@ -36,9 +41,10 @@ export default defineEventHandler(async (event) => {
       ON sequence_steps.sequence_id = sequences.id
     WHERE sequences.id = $1
       AND sequences.user_id = $2
+      AND sequences.quiz_id = $3
     GROUP BY sequences.id
     `,
-    [sequenceId, userId]
+    [sequenceId, userId, quizId]
   )
 
   if (!result.rows.length) {

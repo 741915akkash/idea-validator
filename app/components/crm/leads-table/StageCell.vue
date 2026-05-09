@@ -2,6 +2,7 @@
   import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
   import { useStagesStore } from '~/stores/stages'
   import { useLeadsStore } from '~/stores/leads'
+  import { crmFetch } from '~/composables/useCrmRequest'
 
   const props = defineProps({
     lead: Object
@@ -72,7 +73,7 @@
     })
 
     try {
-      const updated = await $fetch('/api/crm/leads/update', {
+      const updated = await crmFetch('/api/crm/leads/update', {
         method: 'PATCH',
         body: {
           id: props.lead.id,
