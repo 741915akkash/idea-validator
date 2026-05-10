@@ -1,8 +1,8 @@
 <script setup>
-import { ref } from 'vue'
-import { Menu, Target, X } from 'lucide-vue-next'
+  import { ref } from 'vue'
+  import { Menu, Target, Orbit, X } from 'lucide-vue-next'
 
-const mobileMenuOpen = ref(false)
+  const mobileMenuOpen = ref(false)
 </script>
 
 <template>
@@ -10,15 +10,19 @@ const mobileMenuOpen = ref(false)
     <header class="relative border-b border-slate-200">
       <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <NuxtLink to="/" class="flex items-center gap-2">
-          <Target class="h-6 w-6 text-emerald-600" />
+          <Orbit class="h-6 w-6 text-emerald-600" />
           <span class="text-lg font-semibold text-slate-900">GO Launch Scall</span>
         </NuxtLink>
 
         <nav class="hidden items-center gap-6 text-sm font-medium text-slate-700 md:flex">
-          <NuxtLink to="/general/how-it-works" class="transition hover:text-slate-900">How it works</NuxtLink>
+          <NuxtLink to="/general/how-it-works" class="transition hover:text-slate-900"
+            >How it works</NuxtLink
+          >
           <NuxtLink to="/general/pricing" class="transition hover:text-slate-900">Pricing</NuxtLink>
           <NuxtLink to="/blog" class="transition hover:text-slate-900">Blog</NuxtLink>
-          <NuxtLink to="/general/signup-login?mode=login" class="transition hover:text-slate-900">Login</NuxtLink>
+          <NuxtLink to="/general/signup-login?mode=login" class="transition hover:text-slate-900"
+            >Login</NuxtLink
+          >
           <NuxtLink
             to="/general/signup-login?mode=signup"
             class="rounded-md bg-emerald-600 px-3 py-2 text-white transition hover:bg-emerald-700"
@@ -39,16 +43,32 @@ const mobileMenuOpen = ref(false)
 
       <div v-if="mobileMenuOpen" class="border-t border-slate-200 bg-white px-4 py-3 md:hidden">
         <nav class="flex flex-col gap-2 text-sm font-medium text-slate-700">
-          <NuxtLink to="/general/how-it-works" class="rounded-md px-2 py-2 hover:bg-slate-100" @click="mobileMenuOpen = false">
+          <NuxtLink
+            to="/general/how-it-works"
+            class="rounded-md px-2 py-2 hover:bg-slate-100"
+            @click="mobileMenuOpen = false"
+          >
             How it works
           </NuxtLink>
-          <NuxtLink to="/general/pricing" class="rounded-md px-2 py-2 hover:bg-slate-100" @click="mobileMenuOpen = false">
+          <NuxtLink
+            to="/general/pricing"
+            class="rounded-md px-2 py-2 hover:bg-slate-100"
+            @click="mobileMenuOpen = false"
+          >
             Pricing
           </NuxtLink>
-          <NuxtLink to="/blog" class="rounded-md px-2 py-2 hover:bg-slate-100" @click="mobileMenuOpen = false">
+          <NuxtLink
+            to="/blog"
+            class="rounded-md px-2 py-2 hover:bg-slate-100"
+            @click="mobileMenuOpen = false"
+          >
             Blog
           </NuxtLink>
-          <NuxtLink to="/general/signup-login?mode=login" class="rounded-md px-2 py-2 hover:bg-slate-100" @click="mobileMenuOpen = false">
+          <NuxtLink
+            to="/general/signup-login?mode=login"
+            class="rounded-md px-2 py-2 hover:bg-slate-100"
+            @click="mobileMenuOpen = false"
+          >
             Login
           </NuxtLink>
           <NuxtLink

@@ -1,6 +1,6 @@
 <script setup>
   import { ref } from 'vue'
-  import { Menu, Target } from 'lucide-vue-next'
+  import { Menu, Target, Orbit } from 'lucide-vue-next'
   import Sidebar from '~/components/landing2/Sidebar.vue'
 
   const sidebarOpen = ref(false)
@@ -34,7 +34,7 @@
         </button>
 
         <NuxtLink to="/" class="flex items-center gap-2">
-          <Target class="h-6 w-6 text-emerald-600" />
+          <Orbit class="h-6 w-6 text-emerald-600" />
           <span class="text-lg font-semibold text-slate-900">GO Launch Scall</span>
         </NuxtLink>
       </div>

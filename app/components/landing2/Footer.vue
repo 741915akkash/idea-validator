@@ -6,7 +6,7 @@
       <!-- Left: Brand -->
       <div class="flex flex-col gap-3">
         <div class="flex items-center gap-2">
-          <Target class="h-5 w-5 text-emerald-600" />
+          <Orbit class="h-5 w-5 text-emerald-600" />
           <span class="text-lg font-bold text-slate-900">GO Launch Scall</span>
         </div>
         <p class="max-w-sm text-sm text-slate-400">
@@ -41,7 +41,7 @@
         </div>
       </div>
     </div>
-  
+
     <!-- Bottom -->
     <div
       class="mx-auto mt-10 max-w-5xl border-t border-slate-100 pt-6 text-center text-sm text-slate-400"
@@ -52,5 +52,5 @@
 </template>
 
 <script setup>
-  import { Target } from 'lucide-vue-next'
+  import { Target, Orbit } from 'lucide-vue-next'
 </script>
