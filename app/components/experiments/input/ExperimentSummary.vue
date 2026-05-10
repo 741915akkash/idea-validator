@@ -80,14 +80,14 @@
                 </td>
                 <td class="py-2 text-right">
                   <span
-                    class="rounded-md bg-purple-50 px-2 py-0.5 text-[10px] font-bold uppercase text-purple-600"
+                    class="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-600"
                     >{{ form.message.angle }}</span
                   >
                 </td>
               </tr>
             </tbody>
           </table>
-          <div class="rounded-xl border border-slate-100 bg-slate-50 p-3">
+          <div class="rounded-xl border border-slate-100 bg-white p-3">
             <p class="mb-1 text-[9px] font-bold uppercase text-slate-400">Hook Preview</p>
             <p class="text-[11px] font-medium italic leading-relaxed text-slate-700">
               "{{ form.message.hook }}"
@@ -139,13 +139,13 @@
             <tbody class="text-sm">
               <tr>
                 <td
-                  class="py-2 text-[11px] font-bold uppercase tracking-wider text-rose-500 text-slate-500"
+                  class="py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500"
                 >
                   Test Variable
                 </td>
                 <td class="py-2 text-right">
                   <span
-                    class="rounded-md bg-rose-50 px-2 py-1 text-[9px] font-extrabold uppercase text-rose-600 ring-1 ring-rose-200"
+                    class="rounded-md bg-slate-100 px-2 py-1 text-[9px] font-extrabold uppercase text-slate-600 ring-1 ring-slate-200"
                     >{{ form.variable }}</span
                   >
                 </td>
@@ -163,7 +163,7 @@
                   Volume
                 </td>
                 <td class="py-2 text-right font-bold text-slate-600">
-                  {{ form.distribution.volume }} leads
+                  {{ form.volume.actions_taken }} leads
                 </td>
               </tr>
             </tbody>

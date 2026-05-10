@@ -1,0 +1,1 @@
+SELECT count(*) FROM leads l LEFT JOIN sequences q ON q.id=l.sequence_id WHERE l.sequence_id IS NOT NULL AND q.id IS NULL;

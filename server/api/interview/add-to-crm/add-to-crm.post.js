@@ -49,6 +49,20 @@ export async function addInterviewToCrm({ client, interviewId, userId = null }) 
   const email = s.email?.trim() || null
   const phone = s.phone?.trim() || null
   const company = s.company?.trim() || null
+  const interviewRes = await client.query(
+    `
+    SELECT quiz_id
+    FROM interviews
+    WHERE id = $1
+    LIMIT 1
+    `,
+    [interviewId]
+  )
+  const quizId = interviewRes.rows[0]?.quiz_id || null
+
+  if (!quizId) {
+    return { ok: true, skipped: 'missing_quiz_id' }
+  }
 
   const stageRes = await client.query(
     `
@@ -134,16 +148,3 @@ export default defineEventHandler(async (event) => {
     client.release()
   }
 })
-  const interviewRes = await client.query(
-    `
-    SELECT quiz_id
-    FROM interviews
-    WHERE id = $1
-    LIMIT 1
-    `,
-    [interviewId]
-  )
-  const quizId = interviewRes.rows[0]?.quiz_id || null
-  if (!quizId) {
-    return { ok: true, skipped: 'missing_quiz_id' }
-  }

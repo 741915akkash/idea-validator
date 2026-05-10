@@ -1,5 +1,5 @@
 <script setup>
-  import { Briefcase, ChevronDown, ChevronRight } from 'lucide-vue-next'
+  import { ChevronDown, ChevronRight } from 'lucide-vue-next'
 
   const props = defineProps({
     modelValue: {
@@ -27,23 +27,17 @@
 <template>
   <div
     class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300"
-    :class="active ? 'ring-2 ring-orange-500/20' : ''"
+    :class="active ? 'border-slate-300' : ''"
   >
     <button
       @click="emit('toggle')"
-      class="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-slate-50/50"
+      class="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-white/50"
     >
       <div class="flex items-center gap-4">
-        <div
-          class="flex h-10 w-10 items-center justify-center rounded-2xl border border-orange-100 bg-orange-50 text-orange-500"
-        >
-          <Briefcase class="h-5 w-5" />
-        </div>
-
         <div>
           <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Section 03</p>
 
-          <h3 class="font-bold text-slate-900">Offer Dynamics</h3>
+          <h3 class="font-bold text-slate-900">Offer</h3>
         </div>
       </div>
 
@@ -56,8 +50,8 @@
           @click="updateType('Product')"
           :class="
             modelValue.type === 'Product'
-              ? 'bg-orange-600 text-white'
-              : 'bg-slate-50 font-bold text-slate-600'
+              ? 'bg-emerald-600 text-white'
+              : 'bg-white font-bold text-slate-600'
           "
           class="flex-1 rounded-xl border border-slate-100 py-3 text-xs font-bold uppercase tracking-wider shadow-sm transition-all"
         >
@@ -68,8 +62,8 @@
           @click="updateType('Service')"
           :class="
             modelValue.type === 'Service'
-              ? 'bg-orange-600 text-white'
-              : 'bg-slate-50 font-bold text-slate-600'
+              ? 'bg-emerald-600 text-white'
+              : 'bg-white font-bold text-slate-600'
           "
           class="flex-1 rounded-xl border border-slate-100 py-3 text-xs font-bold uppercase tracking-wider shadow-sm transition-all"
         >
@@ -87,7 +81,7 @@
             v-model="modelValue.price"
             type="number"
             @input="updateModel"
-            class="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-semibold"
+            class="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm font-semibold outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>
 
@@ -100,7 +94,7 @@
             v-model="modelValue.value"
             @input="updateModel"
             placeholder="e.g. Free Audit"
-            class="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-semibold"
+            class="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm font-semibold outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>
       </div>

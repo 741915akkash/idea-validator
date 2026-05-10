@@ -14,11 +14,7 @@ const winners = [
   { label: 'Best Offer', value: '₹1999 Audit', exp: 'EXP-12' },
 ]
 
-const experiments = [
-  { id: 'E12', audience: 'SaaS', msg: 'Fear', offer: '1999', channel: 'RD', revenue: '8k', cr: '12%', status: 'winning' },
-  { id: 'E11', audience: 'SaaS', msg: 'Speed', offer: '999', channel: 'LI', revenue: '3k', cr: '5%', status: 'neutral' },
-  { id: 'E10', audience: 'Marketers', msg: 'Logic', offer: '4999', channel: 'EM', revenue: '0', cr: '0%', status: 'failing' },
-]
+const experiments = []
 
 const insights = [
   'Fear angle performs 2x better',

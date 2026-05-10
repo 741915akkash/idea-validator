@@ -5,15 +5,24 @@ import AudienceForm from './AudienceForm.vue'
 import MessageForm from './MessageForm.vue'
 import OfferForm from './OfferForm.vue'
 import DistributionForm from './DistributionForm.vue'
+import VolumeForm from './VolumeForm.vue'
 import ExperimentSummary from './ExperimentSummary.vue'
 
 const emit = defineEmits(['back', 'save'])
 
 const form = ref({
-  audience: { persona: 'SaaS Founders', stage: 'Seed (0-5k MRR)', industry: 'Tech' },
+  audience: {
+    persona: 'SaaS Founders',
+    stage: 'beginner',
+    industry: 'Tech',
+    geography: '',
+    notes: '',
+    tags: ''
+  },
   message: { pain: 'High churn', angle: 'Fear', hook: 'Your users are leaving in the first 48 hours.' },
   offer: { type: 'Service', price: 1999, value: 'Churn audit & Fix' },
-  distribution: { platform: 'Reddit', format: 'Direct Message', volume: 50 },
+  distribution: { platform: 'Reddit', format: 'Direct Message' },
+  volume: { actions_taken: 50 },
   results: { leads: 0, conversions: 0, revenue: 0, cost: 0, notes: '' },
   variable: 'Message'
 })
@@ -69,6 +78,12 @@ const save = () => {
           v-model:variable="form.variable"
           :active="activeAccordion === 'dist'"
           @toggle="activeAccordion = 'dist'"
+        />
+
+        <VolumeForm
+          v-model="form.volume"
+          :active="activeAccordion === 'volume'"
+          @toggle="activeAccordion = 'volume'"
         />
       </div>
 

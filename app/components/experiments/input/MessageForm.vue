@@ -1,5 +1,5 @@
 <script setup>
-  import { MessageSquare, ChevronDown, ChevronRight } from 'lucide-vue-next'
+  import { ChevronDown, ChevronRight } from 'lucide-vue-next'
 
   defineProps({
     modelValue: {
@@ -18,21 +18,16 @@
 <template>
   <div
     class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300"
-    :class="active ? 'ring-2 ring-purple-500/20' : ''"
+    :class="active ? 'border-slate-300' : ''"
   >
     <button
       @click="emit('toggle')"
-      class="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-slate-50/50"
+      class="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-white/50"
     >
       <div class="flex items-center gap-4">
-        <div
-          class="flex h-10 w-10 items-center justify-center rounded-2xl border border-purple-100 bg-purple-50 text-purple-500"
-        >
-          <MessageSquare class="h-5 w-5" />
-        </div>
         <div>
           <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Section 02</p>
-          <h3 class="font-bold text-slate-900">Psychology & Angle</h3>
+          <h3 class="font-bold text-slate-900">Message</h3>
         </div>
       </div>
       <component :is="active ? ChevronDown : ChevronRight" class="h-5 w-5 text-slate-300" />
@@ -47,7 +42,7 @@
           v-model="modelValue.pain"
           @input="emit('update:modelValue', modelValue)"
           placeholder="e.g. High cost per lead"
-          class="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-semibold"
+          class="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm font-semibold outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
         />
       </div>
       <div class="space-y-3">
@@ -64,8 +59,8 @@
             "
             :class="
               modelValue.angle === a
-                ? 'border-purple-600 bg-purple-600 text-white'
-                : 'border-slate-200 bg-slate-50 text-slate-600'
+                ? 'border-emerald-600 bg-emerald-600 text-white'
+                : 'border-slate-200 bg-white text-slate-600'
             "
             class="rounded-xl border-2 py-3 text-xs font-bold uppercase tracking-wider transition-all"
           >
@@ -81,7 +76,7 @@
           v-model="modelValue.hook"
           @input="emit('update:modelValue', modelValue)"
           rows="2"
-          class="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-semibold"
+          class="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm font-semibold outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
           placeholder="Enter your first line..."
         ></textarea>
       </div>
