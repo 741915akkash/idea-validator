@@ -1,17 +1,43 @@
 <script setup>
   import { ChevronDown, ChevronUp } from 'lucide-vue-next'
+  import { ref } from 'vue'
 
   const faqs = [
-    { q: 'Can I cancel anytime?', a: "Yes, anytime. We don't believe in locking people in." },
+    {
+      q: 'Can I cancel anytime?',
+      a: 'Yes. You can cancel anytime with no lock-ins or cancellation fees.'
+    },
+    {
+      q: 'Do you offer a free trial?',
+      a: 'Yes. We offer a permanent Free plan for exploring and validating 1 idea.'
+    },
     {
       q: 'Is this for non-technical founders?',
-      a: 'Absolutely. It is designed around customer discovery, not code.'
+      a: 'Yes. The product is designed for founders focused on customer discovery, validation, and growth — not coding.'
     },
-    { q: 'Do you offer a free trial?', a: 'We have a permanent Free plan for 1 idea.' }
+    {
+      q: 'How do credits and usage limits work?',
+      a: 'AI actions and some workflows use credits depending on your plan and usage volume.'
+    },
+    {
+      q: 'Can I change plans later?',
+      a: 'Absolutely. You can upgrade or downgrade your plan anytime.'
+    },
+    {
+      q: 'Is this an all-in-one platform?',
+      a: 'Yes. Validation, interviews, notes, CRM, experiments, and research workflows are all connected in one system.'
+    },
+    {
+      q: 'What happens after I subscribe?',
+      a: 'You get immediate access to your workspace and all features included in your plan.'
+    }
   ]
 
   const openFaq = ref(null)
-  const toggleFaq = (i) => (openFaq.value === i ? null : i)
+
+  const toggleFaq = (i) => {
+    openFaq.value = openFaq.value === i ? null : i
+  }
 </script>
 
 <template>
@@ -30,7 +56,9 @@
           @click="toggleFaq(i)"
           class="flex w-full items-start justify-between gap-3 p-4 text-left transition-colors hover:bg-slate-50 sm:items-center sm:p-6"
         >
-          <span class="min-w-0 break-words font-sans text-base font-bold leading-6 text-slate-600 sm:text-lg sm:leading-7">
+          <span
+            class="min-w-0 break-words font-sans text-base font-bold leading-6 text-slate-600 sm:text-lg sm:leading-7"
+          >
             {{ faq.q }}
           </span>
 
