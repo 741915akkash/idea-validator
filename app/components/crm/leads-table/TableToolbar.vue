@@ -76,7 +76,7 @@
   }
 
   function labelFor(column) {
-    return typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id
+    return column.columnDef.meta?.label || column.id
   }
 
   function openFilterMenu() {

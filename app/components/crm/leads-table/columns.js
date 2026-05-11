@@ -15,6 +15,9 @@ function toDateKey(value) {
 export const columns = [
   {
     accessorKey: 'name',
+    meta: {
+      label: 'Name'
+    },
     header: () =>
       h('span', { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' }, 'Name'),
     enableHiding: false,
@@ -31,6 +34,9 @@ export const columns = [
 
   {
     accessorKey: 'company',
+    meta: {
+      label: 'Company'
+    },
     header: () =>
       h(
         'span',
@@ -50,6 +56,9 @@ export const columns = [
 
   {
     accessorKey: 'email',
+    meta: {
+      label: 'Email'
+    },
     header: () =>
       h('span', { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' }, 'Email'),
     enableSorting: true,
@@ -65,6 +74,9 @@ export const columns = [
 
   {
     accessorKey: 'stage_id',
+    meta: {
+      label: 'Stage'
+    },
     header: () =>
       h('span', { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' }, 'Stage'),
     enableSorting: true,
@@ -83,6 +95,9 @@ export const columns = [
 
   {
     accessorKey: 'user_id',
+    meta: {
+      label: 'Owner'
+    },
     header: () =>
       h('span', { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' }, 'Owner'),
     enableSorting: true,
@@ -98,12 +113,15 @@ export const columns = [
 
   {
     accessorKey: 'source_name',
+    meta: {
+      label: 'Source'
+    },
     header: () =>
       h(
         'span',
         { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' },
         'Source'
-    ),
+      ),
     enableSorting: true,
     filterFn: (row, columnId, selected) => {
       if (!Array.isArray(selected) || selected.length === 0) return true
@@ -117,12 +135,15 @@ export const columns = [
 
   {
     accessorKey: 'sequence_name',
+    meta: {
+      label: 'Sequence'
+    },
     header: () =>
       h(
         'span',
         { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' },
         'Sequence'
-    ),
+      ),
     enableSorting: true,
     filterFn: (row, columnId, selected) => {
       if (!Array.isArray(selected) || selected.length === 0) return true
@@ -136,12 +157,15 @@ export const columns = [
 
   {
     accessorKey: 'created_at',
+    meta: {
+      label: 'Created'
+    },
     header: () =>
       h(
         'span',
         { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' },
         'Created'
-    ),
+      ),
     enableSorting: true,
     filterFn: (row, columnId, selected) => {
       if (!Array.isArray(selected) || selected.length === 0) return true

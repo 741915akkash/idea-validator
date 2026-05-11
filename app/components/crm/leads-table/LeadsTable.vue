@@ -14,7 +14,9 @@
   import LeadDetailPanel from '../lead-detail/LeadDetailPanel.vue'
 
   const store = useLeadsStore()
-  const columnVisibility = ref({})
+  const columnVisibility = ref({
+    user_id: false
+  })
   const sorting = ref([])
   const searchQuery = ref('')
   const columnSizing = ref({})
@@ -46,7 +48,9 @@
       try {
         columnVisibility.value = JSON.parse(savedVisibility)
       } catch {
-        columnVisibility.value = {}
+        columnVisibility.value = {
+          user_id: false
+        }
       }
     }
 
@@ -74,16 +78,6 @@
     },
     { deep: true }
   )
-
-  // watch(
-  //   () => store.leads.length,
-  //   () => {
-  //     table.setOptions((prev) => ({
-  //       ...prev,
-  //       data: [...store.leads] // IMPORTANT: new reference
-  //     }))
-  //   }
-  // )
 
   const table = useVueTable({
     get data() {
@@ -124,7 +118,9 @@
     },
     columnResizeMode: 'onChange',
     globalFilterFn: (row, _columnId, filterValue) => {
-      const term = String(filterValue || '').toLowerCase().trim()
+      const term = String(filterValue || '')
+        .toLowerCase()
+        .trim()
       if (!term) return true
 
       const lead = row.original || {}
