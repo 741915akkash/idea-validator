@@ -2,6 +2,9 @@
   import { ref, computed } from 'vue'
   import { useLeadsStore } from '~/stores/leads'
   import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
+  import { useSequencesStore } from '~/stores/sequences'
+
+  const sequencesStore = useSequencesStore()
 
   const open = ref(false)
   const customDate = ref('')
@@ -9,10 +12,56 @@
 
   const props = defineProps({
     leadId: { type: Number, required: true },
-    followUp: String
+
+    followUp: String,
+
+    sequence: {
+      type: Object,
+      default: null
+    }
   })
 
   const leadsStore = useLeadsStore()
+
+  const stepType = computed(() => {
+    const type = props.sequence?.current_step_type
+
+    if (!type) return ''
+
+    if (type === 'email') return '✉️ Email'
+    if (type === 'note') return '📝 Note'
+    if (type === 'call') return '📞 Call'
+
+    return ''
+  })
+
+  const currentStep = computed(() => {
+    if (!props.sequence?.id || !props.sequence?.current_step) {
+      return null
+    }
+
+    const fullSequence = sequencesStore.sequences.find(
+      (s) => String(s.id) === String(props.sequence.id)
+    )
+
+    if (!fullSequence?.steps?.length) {
+      return null
+    }
+
+    return fullSequence.steps.find(
+      (step) => Number(step.step_number) === Number(props.sequence.current_step)
+    )
+  })
+
+  const stepTitle = computed(() => {
+    return currentStep.value?.title || 'Follow-up'
+  })
+
+  const stepText = computed(() => {
+    return (
+      currentStep.value?.text || currentStep.value?.content || currentStep.value?.description || ''
+    )
+  })
 
   /* ---------- FORMAT ---------- */
   const formatDate = (dateString) => {
@@ -48,7 +97,41 @@
     open.value = false
   }
 
-  async function rescheduleTo(date) {
+  function toWholeDaysLater(fromDate, toDate) {
+    const start = new Date(fromDate)
+    const end = new Date(toDate)
+    start.setHours(0, 0, 0, 0)
+    end.setHours(0, 0, 0, 0)
+    return Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+  }
+
+  function buildRescheduleActivityText({ selectedLabel, date }) {
+    const baseDate = props.followUp ? new Date(props.followUp) : new Date()
+    const daysLater = Math.max(0, toWholeDaysLater(baseDate, date))
+    const title = stepTitle.value || 'Follow-up'
+    const body = stepText.value ? ` | Step text: ${stepText.value}` : ''
+
+    return `Rescheduled | Step: ${title}${body} | ${selectedLabel} (${daysLater} days later)`
+  }
+
+  async function createRescheduleActivity(payload) {
+    try {
+      const activity = await crmQuizFetch('/api/crm/activities/create', {
+        method: 'POST',
+        body: {
+          leadId: props.leadId,
+          type: 'note',
+          text: buildRescheduleActivityText(payload)
+        }
+      })
+
+      leadsStore.addActivity(props.leadId, activity)
+    } catch (error) {
+      console.error('Failed to create reschedule activity', error)
+    }
+  }
+
+  async function rescheduleTo(date, selectedLabel) {
     if (!date || Number.isNaN(date.getTime()) || isSaving.value) return
 
     const previous = leadsStore.leads.find((l) => l.id === props.leadId)
@@ -66,6 +149,10 @@
       })
 
       leadsStore.updateLead(updated)
+      await createRescheduleActivity({
+        selectedLabel: selectedLabel || 'Custom',
+        date
+      })
       close()
     } catch {
       leadsStore.updateLead(previous)
@@ -87,7 +174,8 @@
       date.setDate(date.getDate() + 3)
     }
 
-    await rescheduleTo(date)
+    const label = type === 'today' ? 'Today' : type === 'tomorrow' ? 'Tomorrow' : '+3 days'
+    await rescheduleTo(date, label)
   }
 
   async function applyCustomDate() {
@@ -99,7 +187,7 @@
     const base = props.followUp ? new Date(props.followUp) : new Date()
     base.setFullYear(picked.getFullYear(), picked.getMonth(), picked.getDate())
 
-    await rescheduleTo(base)
+    await rescheduleTo(base, `Custom (${customDate.value})`)
   }
 
   /* ---------- MARK DONE ---------- */
@@ -118,6 +206,23 @@
       })
 
       leadsStore.updateLead(updated)
+      leadsStore.addActivity(props.leadId, {
+        type: 'note',
+        text: currentStep.value?.title
+          ? `Completed sequence step ${props.sequence?.current_step}: ${currentStep.value.title}`
+          : 'Follow-up marked done',
+        created_at: new Date().toISOString()
+      })
+
+      if (props.sequence?.id && !updated?.sequence) {
+        leadsStore.addActivity(props.leadId, {
+          type: 'note',
+          text: props.sequence?.name
+            ? `Sequence "${props.sequence.name}" completed`
+            : 'Sequence completed',
+          created_at: new Date().toISOString()
+        })
+      }
     } catch {
       leadsStore.updateLead(previous)
     } finally {
@@ -162,22 +267,25 @@
     </h3>
 
     <!-- CARD -->
-    <div class="relative rounded-xl border border-gray-200 bg-gray-50/30 p-4">
-      <!-- TOP ROW -->
-      <div class="mb-3 flex items-start justify-between">
+    <div class="relative rounded-xl border border-gray-200 bg-gray-50/30 p-5">
+      <!-- HEADER ROW -->
+      <div class="flex items-start justify-between gap-4">
         <!-- LEFT -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-1">
           <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">
             Next Action
           </span>
 
           <!-- TYPE + STATUS -->
-          <div class="flex items-center gap-2">
+          <div class="mt-1 flex items-center gap-2">
             <!-- TYPE -->
-            <span class="text-sm font-semibold text-gray-900"> 📞 Call </span>
+            <span v-if="stepType" class="text-sm font-semibold text-gray-900">
+              {{ stepType }}
+            </span>
 
-            <!-- STATUS BADGE -->
+            <!-- STATUS -->
             <span
+              v-if="status"
               class="rounded-md px-2 py-0.5 text-[10px] font-bold uppercase text-white"
               :class="{
                 'bg-emerald-600': status === 'today',
@@ -188,15 +296,10 @@
               {{ statusLabel() }}
             </span>
           </div>
-
-          <!-- DATE -->
-          <span class="text-xs text-gray-500">
-            {{ formatDate(followUp) }}
-          </span>
         </div>
 
         <!-- RIGHT ACTIONS -->
-        <div class="flex items-center gap-2">
+        <div class="flex shrink-0 items-center gap-2">
           <!-- RESCHEDULE -->
           <button
             @click="toggle"
@@ -217,10 +320,34 @@
         </div>
       </div>
 
+      <!-- STEP CARD -->
+      <div
+        v-if="stepTitle || stepText"
+        class="mt-5 w-full rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+      >
+        <!-- TITLE -->
+        <div
+          v-if="stepTitle"
+          class="mb-3 text-[11px] font-bold uppercase tracking-wide text-gray-500"
+        >
+          {{ stepTitle }}
+        </div>
+
+        <!-- BODY -->
+        <p v-if="stepText" class="whitespace-pre-wrap break-words text-sm leading-7 text-gray-700">
+          {{ stepText }}
+        </p>
+      </div>
+
+      <!-- DATE -->
+      <span class="mt-5 block text-xs text-gray-500">
+        {{ formatDate(followUp) }}
+      </span>
+
       <!-- DROPDOWN -->
       <div
         v-if="open"
-        class="absolute right-4 top-14 z-10 w-44 rounded-lg border border-gray-200 bg-white shadow-lg"
+        class="absolute right-5 top-14 z-10 w-44 rounded-lg border border-gray-200 bg-white shadow-lg"
       >
         <button
           @click="setFollowUp('today')"
@@ -249,6 +376,7 @@
             type="date"
             class="mb-2 w-full rounded border border-gray-200 px-2 py-1 text-xs text-gray-700"
           />
+
           <button
             @click="applyCustomDate"
             class="w-full rounded bg-gray-900 px-2 py-1.5 text-xs font-semibold text-white hover:bg-gray-800"

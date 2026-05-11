@@ -98,7 +98,7 @@
 </script>
 
 <template>
-  <div class="mx-auto max-w-2xl px-6 py-12">
+  <div class="mx-auto max-w-4xl px-6 py-12">
     <EditorHeader :is-edit="!!form.id" @back="$emit('back')" @save="save" />
 
     <div class="space-y-6 pb-40">

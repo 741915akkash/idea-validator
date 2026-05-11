@@ -87,18 +87,32 @@ export default defineEventHandler(async (event) => {
     let nextStepNumber = null
     let nextFollowUpAt = null
     let completedStep = null
+    let sequenceCompleted = false
+    let sequenceTitle = null
 
     if (lead.sequence_id && lead.current_step) {
+      const sequenceResult = await client.query(
+        `
+        SELECT title
+        FROM sequences
+        WHERE id = $1
+          AND user_id = $2
+        LIMIT 1
+        `,
+        [lead.sequence_id, userId]
+      )
+
+      sequenceTitle = sequenceResult.rows[0]?.title || null
+
       const currentStepResult = await client.query(
         `
         SELECT id, step_number, offset_days, type, title
         FROM sequence_steps
         WHERE sequence_id = $1
           AND step_number = $2
-          AND quiz_id = $3
         LIMIT 1
         `,
-        [lead.sequence_id, lead.current_step, quizId]
+        [lead.sequence_id, lead.current_step]
       )
 
       if (currentStepResult.rows.length) {
@@ -110,10 +124,9 @@ export default defineEventHandler(async (event) => {
           FROM sequence_steps
           WHERE sequence_id = $1
             AND step_number = $2
-            AND quiz_id = $3
           LIMIT 1
           `,
-          [lead.sequence_id, lead.current_step + 1, quizId]
+          [lead.sequence_id, lead.current_step + 1]
         )
 
         if (nextStepResult.rows.length) {
@@ -129,6 +142,8 @@ export default defineEventHandler(async (event) => {
 
           nextStepNumber = nextStep.step_number
           nextFollowUpAt = shiftedDate.toISOString()
+        } else {
+          sequenceCompleted = true
         }
       }
     }
@@ -136,14 +151,15 @@ export default defineEventHandler(async (event) => {
     await client.query(
       `
       UPDATE leads
-      SET current_step = $1,
+      SET sequence_id = CASE WHEN $6 THEN NULL ELSE sequence_id END,
+          current_step = $1,
           next_follow_up_at = $2,
           updated_at = NOW()
       WHERE id = $3
         AND user_id = $4
         AND quiz_id = $5
       `,
-      [nextStepNumber, nextFollowUpAt, leadId, userId, quizId]
+      [nextStepNumber, nextFollowUpAt, leadId, userId, quizId, sequenceCompleted]
     )
 
     if (completedStep) {
@@ -168,6 +184,20 @@ export default defineEventHandler(async (event) => {
         VALUES ($1, 'note', 'Follow-up marked done', $2)
         `,
         [leadId, quizId]
+      )
+    }
+
+    if (sequenceCompleted) {
+      const completionText = sequenceTitle
+        ? `Sequence "${sequenceTitle}" completed`
+        : 'Sequence completed'
+
+      await client.query(
+        `
+        INSERT INTO lead_activities (lead_id, type, text, quiz_id)
+        VALUES ($1, 'note', $2, $3)
+        `,
+        [leadId, completionText, quizId]
       )
     }
 

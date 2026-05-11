@@ -114,11 +114,19 @@
       />
 
       <div class="custom-scrollbar flex-1 overflow-y-auto">
-        <SequenceIndicator :sequence="lead.sequence" />
+        <SequenceIndicator
+          :lead-id="leadId"
+          :sequence-id="lead.sequence?.id"
+          :quiz-id="quizStore.quizId"
+        />
 
-        <FollowUpSection :lead-id="leadId" :follow-up="lead.follow_up" />
+        <FollowUpSection :lead-id="leadId" :follow-up="lead.follow_up" :sequence="lead.sequence" />
 
-        <ActivitySection :activities="lead?.activities || []" :leadId="leadId" :quiz-id="quizStore.quizId" />
+        <ActivitySection
+          :activities="lead?.activities || []"
+          :leadId="leadId"
+          :quiz-id="quizStore.quizId"
+        />
 
         <ActivityFeed :activities="lead.activities" />
 
