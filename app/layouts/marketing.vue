@@ -7,7 +7,7 @@
 
 <template>
   <div class="min-h-screen bg-white font-sans">
-    <header class="relative border-b border-slate-200">
+    <header class="sticky top-0 z-50 border-b border-slate-200 bg-white">
       <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <NuxtLink to="/" class="flex items-center gap-2">
           <Orbit class="h-6 w-6 text-emerald-600" />
