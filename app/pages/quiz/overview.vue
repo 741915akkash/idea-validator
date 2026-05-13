@@ -249,7 +249,7 @@
 <template>
   <main class="px-6 py-6">
     <div class="mx-auto max-w-2xl">
-      <h1 class="mb-2 text-2xl font-semibold">Quiz overview</h1>
+      <h1 class="mb-2 text-2xl font-semibold">Overview - Refine your idea</h1>
 
       <div class="mb-8 h-1 w-16 bg-emerald-500"></div>
 
