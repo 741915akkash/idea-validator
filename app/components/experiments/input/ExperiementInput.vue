@@ -20,7 +20,7 @@ const form = ref({
     tags: ''
   },
   message: { pain: 'High churn', angle: 'Fear', hook: 'Your users are leaving in the first 48 hours.' },
-  offer: { type: 'Service', price: 1999, value: 'Churn audit & Fix' },
+  offer: { type: 'Service', price: 99, value: 'Churn audit starter pack' },
   distribution: { platform: 'Reddit', format: 'Direct Message' },
   volume: { actions_taken: 50 },
   results: { leads: 0, conversions: 0, revenue: 0, cost: 0, notes: '' },

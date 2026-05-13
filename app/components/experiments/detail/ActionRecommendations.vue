@@ -10,7 +10,7 @@
         },
         {
           title: 'Test higher price point',
-          description: 'High CR suggests demand inelasticity. Try ₹2999.',
+          description: 'High CR suggests demand inelasticity. Try $79.',
           type: 'Optimize'
         }
       ]

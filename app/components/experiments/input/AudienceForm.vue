@@ -81,7 +81,7 @@
           <input
             v-model="modelValue.geography"
             @input="emit('update:modelValue', modelValue)"
-            placeholder="e.g. US, India"
+            placeholder="e.g. US, Canada"
             class="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm font-semibold outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>

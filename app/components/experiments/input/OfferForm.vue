@@ -74,7 +74,7 @@
       <div class="grid grid-cols-3 gap-4">
         <div class="col-span-1 space-y-1.5">
           <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            Price (₹)
+            Price ($)
           </label>
 
           <input

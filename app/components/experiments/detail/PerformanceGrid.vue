@@ -16,7 +16,7 @@
   <section class="grid grid-cols-1 gap-4 md:grid-cols-4">
     <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <p class="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Revenue</p>
-      <p class="text-2xl font-bold text-slate-900">₹{{ results.revenue }}</p>
+      <p class="text-2xl font-bold text-slate-900">${{ results.revenue }}</p>
     </div>
     <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       <p class="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Leads</p>

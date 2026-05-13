@@ -66,7 +66,7 @@
               class="px-8 py-6 font-bold"
               :class="exp.revenue !== '0' ? 'text-green-600' : 'text-slate-300'"
             >
-              ₹{{ exp.revenue }}
+              ${{ exp.revenue }}
             </td>
             <td class="px-8 py-6 text-right font-bold text-slate-900">{{ exp.cr }}</td>
           </tr>

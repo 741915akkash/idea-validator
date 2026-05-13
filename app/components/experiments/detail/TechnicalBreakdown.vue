@@ -30,7 +30,7 @@
       <div class="flex items-center justify-between border-b border-slate-50 py-2">
         <span class="text-xs font-bold uppercase text-slate-400">Rev per Lead</span>
         <span class="font-mono text-sm font-bold text-green-600 text-slate-900"
-          >₹{{ results.leads > 0 ? Math.round(results.revenue / results.leads) : 0 }}</span
+          >${{ results.leads > 0 ? Math.round(results.revenue / results.leads) : 0 }}</span
         >
       </div>
     </div>

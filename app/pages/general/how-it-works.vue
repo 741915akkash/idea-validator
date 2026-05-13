@@ -185,7 +185,7 @@
           step: '02',
           process: 'Urgency',
           detail:
-            'Confidence: 6/10. Risks: Is cleaning power good? Will they refill? Is ₹800/mo too high?'
+            'Confidence: 6/10. Risks: Is cleaning power good? Will they refill? Is $800/mo too high?'
         },
         {
           step: '03',
@@ -222,7 +222,7 @@
           step: '01',
           process: 'Problem',
           detail:
-            'The Idea: App-based detailing at your office. Target: Executives in tech hubs driving cars worth ₹50L+.'
+            'The Idea: App-based detailing at your office. Target: Executives in tech hubs driving cars worth $50L+.'
         },
         {
           step: '02',
@@ -330,7 +330,10 @@
             </ul>
           </div>
 
-          <div v-if="!isLoggedIn" class="rounded-xl bg-slate-900 p-4 text-white shadow-xl shadow-slate-200">
+          <div
+            v-if="!isLoggedIn"
+            class="rounded-xl bg-slate-900 p-4 text-white shadow-xl shadow-slate-200"
+          >
             <p class="mb-3 text-base font-black leading-tight text-white">
               Start validating your idea
             </p>
@@ -391,7 +394,9 @@
         <section id="overview" class="mb-16 scroll-mt-24 sm:mb-24 lg:mb-32">
           <div class="mb-8 flex items-end justify-between sm:mb-10">
             <div>
-              <h2 class="text-2xl font-black tracking-tight text-slate-900 sm:text-4xl">System Overview</h2>
+              <h2 class="text-2xl font-black tracking-tight text-slate-900 sm:text-4xl">
+                System Overview
+              </h2>
               <p class="mt-1 text-sm text-slate-600 sm:text-base">
                 The 6-step process from idea → evidence → decision.
               </p>
@@ -423,7 +428,14 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                   <tr
-                    v-for="(step, idx) in ['Problem', 'Urgency', 'Money', 'Customer', 'Edge', 'Reality']"
+                    v-for="(step, idx) in [
+                      'Problem',
+                      'Urgency',
+                      'Money',
+                      'Customer',
+                      'Edge',
+                      'Reality'
+                    ]"
                     :key="step"
                     class="group transition-colors hover:bg-slate-50/50"
                   >
@@ -559,7 +571,9 @@
                 <p class="text-2xl font-black tracking-tight text-slate-900">
                   {{ step.number }} - {{ step.title }}
                 </p>
-                <p class="mt-3 inline-flex rounded bg-slate-500 px-2 py-0.5 text-sm font-semibold text-white">
+                <p
+                  class="mt-3 inline-flex rounded bg-slate-500 px-2 py-0.5 text-sm font-semibold text-white"
+                >
                   {{ step.label }}
                 </p>
               </div>
@@ -577,7 +591,6 @@
               </p>
             </section>
           </div>
-
         </section>
 
         <!-- 7. FAILURE ANALYSIS -->

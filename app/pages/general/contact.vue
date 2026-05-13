@@ -14,7 +14,7 @@
 
     <div class="mb-10">
       <h2 class="text-lg font-semibold">Location</h2>
-      <p>Bahadurgarh, Haryana, India</p>
+      <p>Austin, Texas, United States</p>
     </div>
 
     <h2 class="mb-4 text-lg font-semibold">Send a Message</h2>

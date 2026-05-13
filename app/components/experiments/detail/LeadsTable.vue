@@ -50,7 +50,7 @@
                 {{ lead.stage }}
               </span>
             </td>
-            <td class="px-6 py-4 text-right text-slate-600">₹{{ lead.value || '-' }}</td>
+            <td class="px-6 py-4 text-right text-slate-600">${{ lead.value || '-' }}</td>
             <td class="px-6 py-4 text-slate-400">{{ lead.source }}</td>
           </tr>
         </tbody>

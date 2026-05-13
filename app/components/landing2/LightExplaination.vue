@@ -3,10 +3,22 @@
 
   const loopSteps = [
     { id: 1, name: 'Idea', example: 'Idea: AI fitness app for busy people' },
-    { id: 2, name: 'Confidence Score', example: 'Confidence Score: Low — not sure people will pay' },
-    { id: 3, name: 'Key assumptions', example: 'Assumption: Users will pay ₹500/month' },
-    { id: 4, name: 'Key uncertainties', example: 'Uncertainty: Are they already using alternatives?' },
-    { id: 5, name: 'Testable questions', example: 'Testable question: "Would you pay ₹500/month?" -> Yes / No' },
+    {
+      id: 2,
+      name: 'Confidence Score',
+      example: 'Confidence Score: Low — not sure people will pay'
+    },
+    { id: 3, name: 'Key assumptions', example: 'Assumption: Users will pay $50/month' },
+    {
+      id: 4,
+      name: 'Key uncertainties',
+      example: 'Uncertainty: Are they already using alternatives?'
+    },
+    {
+      id: 5,
+      name: 'Testable questions',
+      example: 'Testable question: "Would you pay $50/month?" -> Yes / No'
+    },
     { id: 6, name: 'Real user interviews', example: 'Interviews: Talked to 10 users' },
     { id: 7, name: 'Learnings & decision', example: 'Learnings: 7 said no.' }
   ]

@@ -114,7 +114,7 @@
                 <td class="py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">
                   Price
                 </td>
-                <td class="py-2 text-right font-bold text-emerald-600">₹{{ form.offer.price }}</td>
+                <td class="py-2 text-right font-bold text-emerald-600">${{ form.offer.price }}</td>
               </tr>
               <tr>
                 <td class="py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">
@@ -138,9 +138,7 @@
           <table class="w-full text-left">
             <tbody class="text-sm">
               <tr>
-                <td
-                  class="py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500"
-                >
+                <td class="py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">
                   Test Variable
                 </td>
                 <td class="py-2 text-right">

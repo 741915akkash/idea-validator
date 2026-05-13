@@ -125,7 +125,9 @@
         return
       }
 
-      const selectedIndex = interview.subUncertainties.findIndex((sub) => sub.id === selectedId.value)
+      const selectedIndex = interview.subUncertainties.findIndex(
+        (sub) => sub.id === selectedId.value
+      )
 
       const createRes = await api.createUncertainty({
         quizId: interview.quizId,
@@ -134,8 +136,8 @@
       })
 
       const persistedSubs = createRes.sub_uncertainties || []
-      const selectedSub =
-        persistedSubs[selectedIndex] || persistedSubs[0] || { id: null, title: subTitles[0] }
+      const selectedSub = persistedSubs[selectedIndex] ||
+        persistedSubs[0] || { id: null, title: subTitles[0] }
 
       interview.setUncertainty({
         uncertainty: {
@@ -184,7 +186,7 @@
         :maxlength="maxChars"
         rows="5"
         class="w-full resize-none rounded-md border border-neutral-300 px-4 py-3 text-sm focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900"
-        placeholder="Example: Will founders pay ₹3,000/month for this product?"
+        placeholder="Example: Will founders pay $50/month for this product?"
       ></textarea>
 
       <div class="mt-2 flex justify-between text-xs text-neutral-500">
