@@ -439,7 +439,11 @@
         'Use interviews to resolve unknowns early.',
         'Revisit notes before creating a new revision.'
       ]"
-      :related="['Interviews', 'Master Detail', 'History', 'Scoring']"
+      :related="[
+        { label: 'Interviews', to: '/quiz/interviews' },
+        { label: 'Master Detail', to: '/quiz/master-detail' },
+        { label: 'History', to: '/quiz/history' },
+      ]"
       @close="showHelpDrawer = false"
     />
   </main>

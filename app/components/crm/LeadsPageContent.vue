@@ -223,7 +223,11 @@
           'Update lead status immediately after each interaction.',
           'Use kanban for flow, table for detailed review.'
         ]"
-        :related="['Interviews', 'Sequences', 'Overview']"
+        :related="[
+          { label: 'Interviews', to: '/quiz/interviews' },
+          { label: 'Sequences', to: '/crm/sequences' },
+          { label: 'Overview', to: '/quiz/overview' }
+        ]"
         @close="showHelpDrawer = false"
       />
     </teleport>

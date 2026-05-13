@@ -57,7 +57,11 @@
       'Shorten long gaps if leads are going cold.',
       'Keep messaging consistent across adjacent steps.'
     ]"
-    :related="['Sequences', 'CRM', 'Leads']"
+    :related="[
+      { label: 'Sequences', to: '/crm/sequences' },
+      { label: 'CRM', to: '/crm' },
+      { label: 'Leads', to: '/crm' }
+    ]"
     @close="showHelpDrawer = false"
   />
 </template>

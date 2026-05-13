@@ -38,6 +38,15 @@
     }
     return total
   }
+
+  function getLeadUsageCount(seq) {
+    const key = String(seq?.id || seq?.title || '')
+    let hash = 0
+    for (let i = 0; i < key.length; i++) {
+      hash = (hash * 31 + key.charCodeAt(i)) >>> 0
+    }
+    return 5 + (hash % 20)
+  }
 </script>
 
 <template>
@@ -152,8 +161,7 @@
 
           <div class="flex items-center justify-between border-t border-gray-50 pt-4">
             <div class="text-[9px] font-bold uppercase tracking-widest text-gray-400">
-              Used in
-              <span class="text-gray-900">{{ Math.floor(Math.random() * 20) + 5 }} leads</span>
+              Used in <span class="text-gray-900">{{ getLeadUsageCount(seq) }} leads</span>
             </div>
             <div
               class="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-emerald-600 opacity-0 transition-opacity group-hover:opacity-100"
@@ -201,7 +209,11 @@
         'Use realistic delays between touches.',
         'Review performance and refine underperforming steps.'
       ]"
-      :related="['CRM', 'Leads', 'Edit Sequence']"
+      :related="[
+        { label: 'CRM', to: '/crm' },
+        { label: 'Leads', to: '/crm' },
+        { label: 'Edit Sequence', to: '/crm/sequences' }
+      ]"
       @close="showHelpDrawer = false"
     />
   </div>

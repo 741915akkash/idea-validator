@@ -815,7 +815,11 @@
         'Record exact phrasing for critical responses.',
         'Follow up on contradictory signals in later interviews.'
       ]"
-      :related="['Overview', 'Master Detail', 'Analytics']"
+      :related="[
+        { label: 'Overview', to: '/quiz/overview' },
+        { label: 'Master Detail', to: '/quiz/master-detail' },
+        { label: 'Analytics' }
+      ]"
       @close="showHelpDrawer = false"
     />
   </main>

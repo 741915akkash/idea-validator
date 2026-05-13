@@ -150,13 +150,23 @@
           </summary>
 
           <div class="flex flex-wrap gap-2 border-t border-gray-100 px-5 py-4">
-            <button
-              v-for="item in related"
-              :key="item"
-              class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
-            >
-              {{ item }}
-            </button>
+            <template v-for="item in relatedItems" :key="`${item.label}-${item.to || 'static'}`">
+              <NuxtLink
+                v-if="item.to"
+                :to="item.to"
+                class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
+                @click="emit('close')"
+              >
+                {{ item.label }}
+              </NuxtLink>
+              <button
+                v-else
+                type="button"
+                class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
+              >
+                {{ item.label }}
+              </button>
+            </template>
           </div>
         </details>
       </div>
@@ -165,9 +175,10 @@
 </template>
 
 <script setup>
+  import { computed } from 'vue'
   import { X, ChevronDown } from 'lucide-vue-next'
 
-  defineProps({
+  const props = defineProps({
     open: {
       type: Boolean,
       default: false
@@ -209,7 +220,17 @@
     }
   })
 
-  defineEmits(['close'])
+  const emit = defineEmits(['close'])
+
+  const relatedItems = computed(() =>
+    (props.related || []).map((item) => {
+      if (typeof item === 'string') return { label: item, to: null }
+      return {
+        label: String(item?.label || ''),
+        to: item?.to || null
+      }
+    })
+  )
 </script>
 
 <style scoped>

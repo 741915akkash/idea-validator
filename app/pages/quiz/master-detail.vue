@@ -559,7 +559,11 @@
           'Interview multiple respondents per sub-uncertainty.',
           'Use analytics once enough interviews are completed.'
         ]"
-        :related="['Interviews', 'Overview', 'Analytics']"
+        :related="[
+          { label: 'Interviews', to: '/quiz/interviews' },
+          { label: 'Overview', to: '/quiz/overview' },
+          { label: 'Analytics'}
+        ]"
         @close="showHelpDrawer = false"
       />
     </div>
