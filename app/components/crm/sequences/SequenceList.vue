@@ -160,9 +160,9 @@
           </div>
 
           <div class="flex items-center justify-between border-t border-gray-50 pt-4">
-            <div class="text-[9px] font-bold uppercase tracking-widest text-gray-400">
+            <!-- <div class="text-[9px] font-bold uppercase tracking-widest text-gray-400">
               Used in <span class="text-gray-900">{{ getLeadUsageCount(seq) }} leads</span>
-            </div>
+            </div> -->
             <div
               class="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-emerald-600 opacity-0 transition-opacity group-hover:opacity-100"
             >
