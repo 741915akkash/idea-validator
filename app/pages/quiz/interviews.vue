@@ -1,8 +1,10 @@
 <script setup>
   import { ref, onMounted, computed } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
+  import { Info } from 'lucide-vue-next'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import InterviewScreenFreeform from '~/components/interview/InterviewScreenFreeform.vue'
+  import HelpDrawer from '~/components/help/HelpDrawer.vue'
 
   definePageMeta({
     layout: 'app',
@@ -30,6 +32,7 @@
   const freeformConditionId = ref(null)
   const freeformScreenRef = ref(null)
   const closingFreeform = ref(false)
+  const showHelpDrawer = ref(false)
 
   async function loadInterviewData() {
     if (!quizStore.quizId) {
@@ -374,7 +377,13 @@
       <div class="mb-8 space-y-6">
         <!-- Page header -->
         <div>
-          <h1 class="text-2xl font-semibold">Interviews</h1>
+          <h1 class="flex items-center gap-2 text-2xl font-semibold">
+            <span>Interviews</span>
+            <Info
+              class="h-5 w-10 cursor-pointer text-gray-400 hover:text-gray-700"
+              @click="showHelpDrawer = true"
+            />
+          </h1>
           <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
         </div>
 
@@ -774,5 +783,24 @@
         </template>
       </div>
     </div>
+    <HelpDrawer
+      :open="showHelpDrawer"
+      title="Interviews"
+      subtitle="Capture evidence from real conversations."
+      what="This page manages both quick and structured interviews so you can collect and review user feedback."
+      why="Interview evidence reduces guesswork and helps you validate assumptions before investing more time."
+      :workflow="[
+        'Start a quick or structured interview.',
+        'Capture notes, evidence, and respondent context.',
+        'Review grouped interviews and continue unresolved ones.'
+      ]"
+      :tips="[
+        'Ask behavior-based questions, not leading questions.',
+        'Record exact phrasing for critical responses.',
+        'Follow up on contradictory signals in later interviews.'
+      ]"
+      :related="['Overview', 'Master Detail', 'Analytics']"
+      @close="showHelpDrawer = false"
+    />
   </main>
 </template>

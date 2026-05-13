@@ -1,4 +1,6 @@
 <script setup>
+  import { Info } from 'lucide-vue-next'
+  import HelpDrawer from '~/components/help/HelpDrawer.vue'
   import LeadsTable from '~/components/crm/leads-table/LeadsTable.vue'
   import KanbanBoard from '~/components/crm/kanban/KanbanBoard.vue'
   import { useLeadsStore } from '~/stores/leads'
@@ -15,6 +17,7 @@
   const usersStore = useUsersStore()
   const quizStore = useQuizSessionStore()
   const viewMode = ref('table')
+  const showHelpDrawer = ref(false)
   const isCreatingStage = ref(false)
   const stageCreateError = ref('')
 
@@ -67,6 +70,10 @@
     localStorage.setItem('crm-view-mode', value)
   })
 
+  function openHelpDrawer() {
+    showHelpDrawer.value = true
+  }
+
   async function addStage() {
     const stageName = window.prompt('Stage name')
     if (!stageName) return
@@ -103,7 +110,22 @@
   >
     <div class="grid grid-cols-3 items-center">
       <!-- LEFT -->
-      <h1 class="text-2xl font-semibold">Leads</h1>
+
+      <h1 class="flex items-center gap-2 text-2xl font-semibold">
+        <span>Leads</span>
+        <button
+          type="button"
+          class="inline-flex items-center text-gray-400 transition hover:text-gray-700"
+          @click="
+            () => {
+              openHelpDrawer()
+            }
+          "
+          aria-label="Open Leads help"
+        >
+          <Info class="h-5 w-5 pt-0.5" />
+        </button>
+      </h1>
 
       <!-- CENTER -->
       <div class="flex justify-center">
@@ -168,5 +190,26 @@
       <LeadsTable v-if="viewMode === 'table'" class="min-h-0 flex-1" />
       <KanbanBoard v-else class="min-h-0 flex-1" />
     </ClientOnly>
+    <teleport to="body">
+      <HelpDrawer
+        :open="showHelpDrawer"
+        title="CRM"
+        subtitle="Track leads, stages, and follow-up momentum."
+        what="This page centralizes lead management across table and kanban views, including stage progression."
+        why="A consistent CRM process helps you prioritize the right leads and avoid losing warm opportunities."
+        :workflow="[
+          'Capture leads from interviews and outreach.',
+          'Move leads through stages as signal quality improves.',
+          'Review pipeline regularly and follow up on stalled leads.'
+        ]"
+        :tips="[
+          'Keep stage definitions clear and objective.',
+          'Update lead status immediately after each interaction.',
+          'Use kanban for flow, table for detailed review.'
+        ]"
+        :related="['Interviews', 'Sequences', 'Overview']"
+        @close="showHelpDrawer = false"
+      />
+    </teleport>
   </div>
 </template>

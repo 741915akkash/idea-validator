@@ -7,12 +7,16 @@
     Phone,
     Mail,
     MessageSquare,
-    ChevronRight
+    ChevronRight,
+    Info
   } from 'lucide-vue-next'
+  import { ref } from 'vue'
   import { useSequencesStore } from '~/stores/sequences'
+  import HelpDrawer from '~/components/help/HelpDrawer.vue'
 
   const sequencesStore = useSequencesStore()
   const emit = defineEmits(['edit'])
+  const showHelpDrawer = ref(false)
 
   async function removeSequence(id) {
     try {
@@ -41,7 +45,13 @@
     <header class="mb-8 flex items-center justify-between">
       <!-- LEFT -->
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">Sequences</h1>
+        <h1 class="flex items-center gap-2 text-2xl font-bold text-gray-900">
+          <span>Sequences</span>
+          <Info
+            class="h-5 w-5 cursor-pointer text-gray-400 hover:text-gray-700"
+            @click="showHelpDrawer = true"
+          />
+        </h1>
         <p class="mt-0.5 text-xs text-gray-500">Automate your outreach workflows</p>
       </div>
 
@@ -175,5 +185,24 @@
         Create First Sequence
       </button>
     </div>
+    <HelpDrawer
+      :open="showHelpDrawer"
+      title="Sequences"
+      subtitle="Build repeatable outreach workflows."
+      what="Sequences define step-by-step actions like calls, emails, and follow-ups over time."
+      why="A clear sequence improves consistency, reduces manual effort, and helps leads move through your pipeline."
+      :workflow="[
+        'Create a sequence and add ordered steps.',
+        'Set timing offsets for each step.',
+        'Apply the sequence to relevant leads and track progress.'
+      ]"
+      :tips="[
+        'Keep steps short and outcome-focused.',
+        'Use realistic delays between touches.',
+        'Review performance and refine underperforming steps.'
+      ]"
+      :related="['CRM', 'Leads', 'Edit Sequence']"
+      @close="showHelpDrawer = false"
+    />
   </div>
 </template>

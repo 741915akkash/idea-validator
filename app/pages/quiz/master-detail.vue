@@ -1,7 +1,9 @@
 <script setup>
   import { computed, ref, onMounted } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
+  import { Info } from 'lucide-vue-next'
   import { useQuizSessionStore } from '~/stores/quizSession'
+  import HelpDrawer from '~/components/help/HelpDrawer.vue'
 
   definePageMeta({
     layout: 'app',
@@ -18,6 +20,7 @@
   const loadingInterviews = ref(false)
   const startingAnother = ref(false)
   const showUpgradeModal = ref(false)
+  const showHelpDrawer = ref(false)
   const error = ref(null)
 
   const uncertainties = ref([])
@@ -38,11 +41,19 @@
   }
 
   function isFreeformSubUncertainty(item) {
-    return String(item?.title || '').trim().toUpperCase() === 'FREEFORM'
+    return (
+      String(item?.title || '')
+        .trim()
+        .toUpperCase() === 'FREEFORM'
+    )
   }
 
   function isFreeformInterview(item) {
-    return String(item?.sub_uncertainty || '').trim().toUpperCase() === 'FREEFORM'
+    return (
+      String(item?.sub_uncertainty || '')
+        .trim()
+        .toUpperCase() === 'FREEFORM'
+    )
   }
 
   /* ---------------- MOBILE NAVIGATION ---------------- */
@@ -251,103 +262,231 @@
 </script>
 
 <template>
-  <div class="flex h-screen justify-center bg-neutral-50">
-    <div class="flex h-full w-full max-w-7xl flex-col bg-white shadow-sm">
-      <div class="flex min-h-0 flex-1">
-        <!-- ================= DESKTOP LAYOUT ================= -->
+  <div class="min-h-screen bg-neutral-50">
+    <!-- PAGE HEADER -->
+    <div class="px-10 py-6">
+      <h1 class="mb-2 flex items-center gap-2 text-2xl font-semibold">
+        <span>Resolve Doubts</span>
+        <Info
+          class="h-5 w-10 cursor-pointer text-gray-400 hover:text-gray-700"
+          @click="showHelpDrawer = true"
+        />
+      </h1>
 
-        <!-- UNCERTAINTIES -->
-        <div class="hidden w-80 flex-col border-r md:flex">
-          <div class="flex min-h-[104px] flex-col border-b px-4 py-3">
-            <span class="font-semibold">Uncertainties</span>
-            <div class="mt-3 min-h-[30px]">
-              <button
-                @click="startNewInterview"
-                class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+      <div class="h-1 w-16 bg-emerald-500"></div>
+    </div>
+
+    <!-- PAGE CONTENT -->
+    <div class="flex h-[calc(100vh-97px)] justify-center">
+      <div class="flex h-full w-full max-w-7xl flex-col bg-white shadow-sm">
+        <div class="flex min-h-0 flex-1">
+          <!-- ================= DESKTOP LAYOUT ================= -->
+
+          <!-- UNCERTAINTIES -->
+          <div class="hidden w-80 flex-col border-r md:flex">
+            <div class="flex min-h-[104px] flex-col border-b px-4 py-3">
+              <span class="font-semibold">Uncertainties</span>
+              <div class="mt-3 min-h-[30px]">
+                <button
+                  @click="startNewInterview"
+                  class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                >
+                  Resolve New Uncertainties
+                </button>
+              </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto">
+              <div
+                v-for="u in uncertainties"
+                :key="u.id"
+                @click="selectUncertainty(u)"
+                class="cursor-pointer border-b px-4 py-3 hover:bg-gray-50"
+                :class="{ 'bg-emerald-50': selectedUncertainty?.id === u.id }"
               >
-                Resolve New Uncertainties
-              </button>
-            </div>
-          </div>
-
-          <div class="flex-1 overflow-y-auto">
-            <div
-              v-for="u in uncertainties"
-              :key="u.id"
-              @click="selectUncertainty(u)"
-              class="cursor-pointer border-b px-4 py-3 hover:bg-gray-50"
-              :class="{ 'bg-emerald-50': selectedUncertainty?.id === u.id }"
-            >
-              <div class="font-medium">{{ u.text }}</div>
-              <div class="mt-1 text-xs text-gray-500">
-                {{ u.created_at ? new Date(u.created_at).toLocaleDateString() : '' }}
+                <div class="font-medium">{{ u.text }}</div>
+                <div class="mt-1 text-xs text-gray-500">
+                  {{ u.created_at ? new Date(u.created_at).toLocaleDateString() : '' }}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- SUB UNCERTAINTIES -->
-        <div class="hidden w-96 flex-col border-r md:flex">
-          <div class="flex min-h-[104px] flex-col border-b px-4 py-3">
-            <div class="font-semibold">Sub-uncertainties</div>
-            <div class="mt-3 min-h-[30px]"></div>
-          </div>
-
-          <div class="flex-1 overflow-y-auto">
-            <div v-if="!selectedUncertainty" class="p-4 text-sm text-gray-500">
-              Select an uncertainty
+          <!-- SUB UNCERTAINTIES -->
+          <div class="hidden w-96 flex-col border-r md:flex">
+            <div class="flex min-h-[104px] flex-col border-b px-4 py-3">
+              <div class="font-semibold">Sub-uncertainties</div>
+              <div class="mt-3 min-h-[30px]"></div>
             </div>
 
-            <div v-else-if="loadingSubs" class="p-4 text-sm text-gray-500">
-              Loading sub-uncertainties...
-            </div>
+            <div class="flex-1 overflow-y-auto">
+              <div v-if="!selectedUncertainty" class="p-4 text-sm text-gray-500">
+                Select an uncertainty
+              </div>
 
-            <div
-              v-for="sub in subUncertainties"
-              :key="sub.id"
-              @click="selectSub(sub)"
-              class="cursor-pointer border-b px-4 py-3 hover:bg-gray-50"
-              :class="{ 'bg-emerald-50': selectedSub?.id === sub.id }"
-            >
-              <div class="font-medium">{{ sub.title }}</div>
-              <div class="mt-1 text-xs text-gray-500">
-                {{ sub.interview_count || 0 }} interviews
+              <div v-else-if="loadingSubs" class="p-4 text-sm text-gray-500">
+                Loading sub-uncertainties...
+              </div>
+
+              <div
+                v-for="sub in subUncertainties"
+                :key="sub.id"
+                @click="selectSub(sub)"
+                class="cursor-pointer border-b px-4 py-3 hover:bg-gray-50"
+                :class="{ 'bg-emerald-50': selectedSub?.id === sub.id }"
+              >
+                <div class="font-medium">{{ sub.title }}</div>
+                <div class="mt-1 text-xs text-gray-500">
+                  {{ sub.interview_count || 0 }} interviews
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- INTERVIEWS -->
-        <div class="hidden flex-1 flex-col md:flex">
-          <div class="flex min-h-[104px] flex-col border-b px-4 py-3">
-            <span class="font-semibold">Interviews</span>
-            <div class="mt-3 min-h-[30px]">
-              <div v-if="selectedSub" class="flex items-center gap-2">
+          <!-- INTERVIEWS -->
+          <div class="hidden flex-1 flex-col md:flex">
+            <div class="flex min-h-[104px] flex-col border-b px-4 py-3">
+              <span class="font-semibold">Interviews</span>
+              <div class="mt-3 min-h-[30px]">
+                <div v-if="selectedSub" class="flex items-center gap-2">
+                  <button
+                    @click="interviewAnotherPerson"
+                    :disabled="startingAnother"
+                    class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:bg-neutral-300"
+                  >
+                    {{ startingAnother ? 'Starting...' : 'Interview Another Person' }}
+                  </button>
+
+                  <button
+                    @click="openAnalytics"
+                    class="rounded-md border border-emerald-300 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
+                  >
+                    Analytics
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto">
+              <div
+                v-for="interview in interviews"
+                :key="interview.id"
+                class="flex items-center justify-between border-b px-4 py-3"
+              >
+                <div>
+                  <div class="font-medium text-gray-900">
+                    {{ interview.respondent_info || 'Interview' }}
+                  </div>
+
+                  <div class="mt-1 text-xs text-gray-500">
+                    {{ new Date(interview.started_at).toLocaleDateString() }}
+                  </div>
+
+                  <div class="mt-1 text-xs">
+                    <span v-if="interview.finished_at" class="font-medium text-emerald-700">
+                      Completed
+                    </span>
+                    <span v-else class="font-medium text-amber-600"> In Progress </span>
+                  </div>
+                </div>
+
                 <button
-                  @click="interviewAnotherPerson"
-                  :disabled="startingAnother"
-                  class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:bg-neutral-300"
+                  class="text-sm text-emerald-600 hover:underline"
+                  @click="openInterview(interview.id)"
                 >
-                  {{ startingAnother ? 'Starting...' : 'Interview Another Person' }}
+                  {{ interview.finished_at ? 'View' : 'Resume' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= MOBILE LAYOUT ================= -->
+
+          <div class="flex w-full flex-col md:hidden">
+            <!-- UNCERTAINTIES -->
+            <div v-if="mobileView === 'uncertainties'">
+              <div class="border-b px-4 py-3">
+                <span class="font-semibold">Uncertainties</span>
+                <button
+                  @click="startNewInterview"
+                  class="mt-3 rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                >
+                  Resolve New Uncertainties
+                </button>
+              </div>
+
+              <div
+                v-for="u in uncertainties"
+                :key="u.id"
+                @click="selectUncertainty(u)"
+                class="border-b px-4 py-3"
+              >
+                <div class="font-medium">
+                  {{ u.text }}
+                </div>
+
+                <div class="mt-1 text-xs text-gray-500">
+                  {{ u.created_at ? new Date(u.created_at).toLocaleDateString() : '' }}
+                </div>
+              </div>
+            </div>
+
+            <!-- SUB UNCERTAINTIES -->
+            <div v-if="mobileView === 'subs'">
+              <div class="flex items-center border-b px-4 py-3">
+                <button class="mr-3 text-sm text-emerald-600" @click="mobileView = 'uncertainties'">
+                  ← Back
                 </button>
 
-                <button
-                  @click="openAnalytics"
-                  class="rounded-md border border-emerald-300 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
-                >
-                  Analytics
-                </button>
+                <span class="font-semibold">Sub-uncertainties</span>
+              </div>
+
+              <div
+                v-for="sub in subUncertainties"
+                :key="sub.id"
+                @click="selectSub(sub)"
+                class="border-b px-4 py-3"
+              >
+                <div class="font-medium">
+                  {{ sub.title }}
+                </div>
+
+                <div class="mt-1 text-xs text-gray-500">
+                  {{ sub.interview_count || 0 }} interviews
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="flex-1 overflow-y-auto">
-            <div
-              v-for="interview in interviews"
-              :key="interview.id"
-              class="flex items-center justify-between border-b px-4 py-3"
-            >
-              <div>
+            <!-- INTERVIEWS -->
+            <div v-if="mobileView === 'interviews'">
+              <div class="border-b px-4 py-3">
+                <div class="flex items-center">
+                  <button class="mr-3 text-sm text-emerald-600" @click="mobileView = 'subs'">
+                    ← Back
+                  </button>
+
+                  <span class="font-semibold">Interviews</span>
+                </div>
+
+                <div v-if="selectedSub" class="mt-3 flex items-center gap-2">
+                  <button
+                    @click="openAnalytics"
+                    class="rounded-md border border-emerald-300 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
+                  >
+                    Analytics
+                  </button>
+
+                  <button
+                    @click="interviewAnotherPerson"
+                    :disabled="startingAnother"
+                    class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:bg-neutral-300"
+                  >
+                    {{ startingAnother ? 'Starting...' : 'Interview Another Person' }}
+                  </button>
+                </div>
+              </div>
+
+              <div v-for="interview in interviews" :key="interview.id" class="border-b px-4 py-3">
                 <div class="font-medium text-gray-900">
                   {{ interview.respondent_info || 'Interview' }}
                 </div>
@@ -360,160 +499,69 @@
                   <span v-if="interview.finished_at" class="font-medium text-emerald-700">
                     Completed
                   </span>
+
                   <span v-else class="font-medium text-amber-600"> In Progress </span>
                 </div>
-              </div>
-
-              <button
-                class="text-sm text-emerald-600 hover:underline"
-                @click="openInterview(interview.id)"
-              >
-                {{ interview.finished_at ? 'View' : 'Resume' }}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- ================= MOBILE LAYOUT ================= -->
-
-        <div class="flex w-full flex-col md:hidden">
-          <!-- UNCERTAINTIES -->
-          <div v-if="mobileView === 'uncertainties'">
-            <div class="border-b px-4 py-3">
-              <span class="font-semibold">Uncertainties</span>
-              <button
-                @click="startNewInterview"
-                class="mt-3 rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
-              >
-                Resolve New Uncertainties
-              </button>
-            </div>
-
-            <div
-              v-for="u in uncertainties"
-              :key="u.id"
-              @click="selectUncertainty(u)"
-              class="border-b px-4 py-3"
-            >
-              <div class="font-medium">
-                {{ u.text }}
-              </div>
-
-              <div class="mt-1 text-xs text-gray-500">
-                {{ u.created_at ? new Date(u.created_at).toLocaleDateString() : '' }}
-              </div>
-            </div>
-          </div>
-
-          <!-- SUB UNCERTAINTIES -->
-          <div v-if="mobileView === 'subs'">
-            <div class="flex items-center border-b px-4 py-3">
-              <button class="mr-3 text-sm text-emerald-600" @click="mobileView = 'uncertainties'">
-                ← Back
-              </button>
-
-              <span class="font-semibold">Sub-uncertainties</span>
-            </div>
-
-            <div
-              v-for="sub in subUncertainties"
-              :key="sub.id"
-              @click="selectSub(sub)"
-              class="border-b px-4 py-3"
-            >
-              <div class="font-medium">
-                {{ sub.title }}
-              </div>
-
-              <div class="mt-1 text-xs text-gray-500">
-                {{ sub.interview_count || 0 }} interviews
-              </div>
-            </div>
-          </div>
-
-          <!-- INTERVIEWS -->
-          <div v-if="mobileView === 'interviews'">
-            <div class="border-b px-4 py-3">
-              <div class="flex items-center">
-                <button class="mr-3 text-sm text-emerald-600" @click="mobileView = 'subs'">
-                  ← Back
-                </button>
-
-                <span class="font-semibold">Interviews</span>
-              </div>
-
-              <div v-if="selectedSub" class="mt-3 flex items-center gap-2">
-                <button
-                  @click="openAnalytics"
-                  class="rounded-md border border-emerald-300 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
-                >
-                  Analytics
-                </button>
 
                 <button
-                  @click="interviewAnotherPerson"
-                  :disabled="startingAnother"
-                  class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:bg-neutral-300"
+                  class="mt-2 text-sm text-emerald-600 hover:underline"
+                  @click="openInterview(interview.id)"
                 >
-                  {{ startingAnother ? 'Starting...' : 'Interview Another Person' }}
+                  {{ interview.finished_at ? 'View' : 'Resume' }}
                 </button>
               </div>
-            </div>
-
-            <div v-for="interview in interviews" :key="interview.id" class="border-b px-4 py-3">
-              <div class="font-medium text-gray-900">
-                {{ interview.respondent_info || 'Interview' }}
-              </div>
-
-              <div class="mt-1 text-xs text-gray-500">
-                {{ new Date(interview.started_at).toLocaleDateString() }}
-              </div>
-
-              <div class="mt-1 text-xs">
-                <span v-if="interview.finished_at" class="font-medium text-emerald-700">
-                  Completed
-                </span>
-
-                <span v-else class="font-medium text-amber-600"> In Progress </span>
-              </div>
-
-              <button
-                class="mt-2 text-sm text-emerald-600 hover:underline"
-                @click="openInterview(interview.id)"
-              >
-                {{ interview.finished_at ? 'View' : 'Resume' }}
-              </button>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div v-if="showUpgradeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-slate-900/50" @click="closeUpgradeModal" />
+      <div v-if="showUpgradeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/50" @click="closeUpgradeModal" />
 
-      <div class="relative z-10 w-full max-w-md rounded-lg border border-slate-200 bg-white p-5 shadow-xl">
-        <h2 class="text-lg font-semibold text-slate-900">Upgrade required</h2>
-        <p class="mt-2 text-sm text-slate-600">
-          Move to a paid tier to access Resolve New Uncertainties.
-        </p>
+        <div
+          class="relative z-10 w-full max-w-md rounded-lg border border-slate-200 bg-white p-5 shadow-xl"
+        >
+          <h2 class="text-lg font-semibold text-slate-900">Upgrade required</h2>
+          <p class="mt-2 text-sm text-slate-600">
+            Move to a paid tier to access Resolve New Uncertainties.
+          </p>
 
-        <div class="mt-5 flex items-center justify-end gap-2">
-          <button
-            class="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-            @click="closeUpgradeModal"
-          >
-            Not now
-          </button>
-          <NuxtLink
-            to="/general/pricing"
-            class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
-            @click="closeUpgradeModal"
-          >
-            View pricing
-          </NuxtLink>
+          <div class="mt-5 flex items-center justify-end gap-2">
+            <button
+              class="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              @click="closeUpgradeModal"
+            >
+              Not now
+            </button>
+            <NuxtLink
+              to="/general/pricing"
+              class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+              @click="closeUpgradeModal"
+            >
+              View pricing
+            </NuxtLink>
+          </div>
         </div>
       </div>
+      <HelpDrawer
+        :open="showHelpDrawer"
+        title="Master Detail"
+        subtitle="Resolve uncertainties with structured interview loops."
+        what="This view breaks down uncertainty into sub-uncertainties and links each one to interview execution."
+        why="It helps you systematically resolve unknowns instead of relying on intuition."
+        :workflow="[
+          'Select an uncertainty and review its sub-uncertainties.',
+          'Run interviews for the selected sub-uncertainty.',
+          'Track completion and move to the next unresolved item.'
+        ]"
+        :tips="[
+          'Keep uncertainty statements specific and testable.',
+          'Interview multiple respondents per sub-uncertainty.',
+          'Use analytics once enough interviews are completed.'
+        ]"
+        :related="['Interviews', 'Overview', 'Analytics']"
+        @close="showHelpDrawer = false"
+      />
     </div>
   </div>
 </template>

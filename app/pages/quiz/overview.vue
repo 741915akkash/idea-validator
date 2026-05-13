@@ -1,8 +1,10 @@
 <script setup>
   import { ref, onMounted, computed, watch } from 'vue'
   import { useRouter } from 'vue-router'
+  import { Info } from 'lucide-vue-next'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import Button from '~/components/ui/Button.vue'
+  import HelpDrawer from '~/components/help/HelpDrawer.vue'
 
   definePageMeta({
     layout: 'app',
@@ -23,6 +25,7 @@
     inProgress: 0
   })
   const isMounted = ref(false)
+  const showHelpDrawer = ref(false)
 
   const currentQuiz = computed(() => quizzes.value.find((q) => q.id === quizStore.quizId))
 
@@ -249,7 +252,13 @@
 <template>
   <main class="px-6 py-6">
     <div class="mx-auto max-w-2xl">
-      <h1 class="mb-2 text-2xl font-semibold">Overview - Refine your idea</h1>
+      <h1 class="mb-2 flex items-center gap-2 text-2xl font-semibold">
+        <span>Overview - Refine your idea</span>
+        <Info
+          class="h-5 w-10 cursor-pointer text-gray-400 hover:text-gray-700"
+          @click="showHelpDrawer = true"
+        />
+      </h1>
 
       <div class="mb-8 h-1 w-16 bg-emerald-500"></div>
 
@@ -394,5 +403,24 @@
         </div>
       </div>
     </div>
+    <HelpDrawer
+      :open="showHelpDrawer"
+      title="Overview"
+      subtitle="Track idea progress and move through validation checkpoints."
+      what="This page summarizes your current idea, checkpoint completion, notes, and interview progress in one place."
+      why="A clear overview keeps you focused on the next highest-value step instead of guessing what to do next."
+      :workflow="[
+        'Review current idea status and interview progress.',
+        'Open the next checkpoint and answer remaining questions.',
+        'Use history to compare revisions over time.'
+      ]"
+      :tips="[
+        'Complete one checkpoint at a time before scoring.',
+        'Use interviews to resolve unknowns early.',
+        'Revisit notes before creating a new revision.'
+      ]"
+      :related="['Interviews', 'Master Detail', 'History', 'Scoring']"
+      @close="showHelpDrawer = false"
+    />
   </main>
 </template>
