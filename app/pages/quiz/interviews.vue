@@ -5,6 +5,7 @@
   import { useQuizSessionStore } from '~/stores/quizSession'
   import InterviewScreenFreeform from '~/components/interview/InterviewScreenFreeform.vue'
   import HelpDrawer from '~/components/help/HelpDrawer.vue'
+  import TopAlert from '~/components/ui/TopAlert.vue'
 
   definePageMeta({
     layout: 'app',
@@ -33,6 +34,7 @@
   const freeformScreenRef = ref(null)
   const closingFreeform = ref(false)
   const showHelpDrawer = ref(false)
+  const showFreeformLimitAlert = ref(false)
 
   async function loadInterviewData() {
     if (!quizStore.quizId) {
@@ -117,6 +119,7 @@
   function openFreeformInterview() {
     if (!quizStore.quizId) return
     actionError.value = null
+    showFreeformLimitAlert.value = false
 
     $fetch('/api/interview/freeform/start', {
       method: 'POST',
@@ -133,6 +136,12 @@
         showFreeformInterview.value = true
       })
       .catch((err) => {
+        const statusCode = Number(err?.statusCode || err?.data?.statusCode || 0)
+        const statusMessage = String(err?.statusMessage || err?.data?.statusMessage || '')
+        if (statusCode === 403 && statusMessage.includes('Freeform interview limit reached')) {
+          showFreeformLimitAlert.value = true
+          return
+        }
         actionError.value =
           err?.data?.statusMessage ||
           err?.statusMessage ||
@@ -358,6 +367,13 @@
 
 <template>
   <main class="px-6 py-6">
+    <TopAlert
+      :open="showFreeformLimitAlert"
+      title="Freeform interview limit reached"
+      variant="warning"
+      message="Upgrade your plan to run more quick interviews for this idea in the current period."
+      @close="showFreeformLimitAlert = false"
+    />
     <InterviewScreenFreeform
       v-if="showFreeformInterview"
       ref="freeformScreenRef"

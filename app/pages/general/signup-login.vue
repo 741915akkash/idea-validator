@@ -1,6 +1,7 @@
 <script setup>
   import { computed, ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import TopAlert from '~/components/ui/TopAlert.vue'
 
   definePageMeta({
     layout: 'auth'
@@ -16,6 +17,8 @@
   const loadingAction = ref('')
   const error = ref('')
   const info = ref('')
+  const showRateLimitAlert = ref(false)
+  const rateLimitMessage = ref('')
 
   const signupSource = computed(() => String(route.query.signup_source || ''))
   const scoreQuizId = computed(() => String(route.query.quiz_id || ''))
@@ -24,6 +27,8 @@
   async function requestOtp() {
     error.value = ''
     info.value = ''
+    showRateLimitAlert.value = false
+    rateLimitMessage.value = ''
     loadingAction.value = 'send'
 
     try {
@@ -35,7 +40,14 @@
       codeSent.value = true
       info.value = 'If that email is valid, we sent a 6-digit code.'
     } catch (e) {
-      error.value = e?.data?.statusMessage || e?.message || 'Failed to send code'
+      const statusCode = Number(e?.statusCode || e?.data?.statusCode || 0)
+      const statusMessage = String(e?.statusMessage || e?.data?.statusMessage || '')
+      if (statusCode === 429) {
+        rateLimitMessage.value = statusMessage || 'Too many requests. Please try again shortly.'
+        showRateLimitAlert.value = true
+      } else {
+        error.value = statusMessage || e?.message || 'Failed to send code'
+      }
     } finally {
       loadingAction.value = ''
     }
@@ -44,6 +56,8 @@
   async function verifyOtp() {
     error.value = ''
     info.value = ''
+    showRateLimitAlert.value = false
+    rateLimitMessage.value = ''
     loadingAction.value = 'verify'
 
     try {
@@ -71,7 +85,14 @@
 
       await router.push(redirectTo.value || '/quiz/overview')
     } catch (e) {
-      error.value = e?.data?.statusMessage || e?.message || 'Verification failed'
+      const statusCode = Number(e?.statusCode || e?.data?.statusCode || 0)
+      const statusMessage = String(e?.statusMessage || e?.data?.statusMessage || '')
+      if (statusCode === 429) {
+        rateLimitMessage.value = statusMessage || 'Too many attempts. Please try again shortly.'
+        showRateLimitAlert.value = true
+      } else {
+        error.value = statusMessage || e?.message || 'Verification failed'
+      }
     } finally {
       loadingAction.value = ''
     }
@@ -80,6 +101,13 @@
 
 <template>
   <main class="mx-auto max-w-md px-4 py-16">
+    <TopAlert
+      :open="showRateLimitAlert"
+      title="Please wait"
+      variant="warning"
+      :message="rateLimitMessage"
+      @close="showRateLimitAlert = false"
+    />
     <h1 class="text-2xl font-semibold text-slate-900">Continue to GO Launch Scall</h1>
     <p class="mt-2 text-sm text-slate-600">Enter your email to get a one-time code.</p>
 

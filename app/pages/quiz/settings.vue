@@ -7,6 +7,7 @@
   import SettingsBar from '../../components/settings/SettingsBar.vue'
   import BaseModal from '~/components/ui/BaseModal.vue'
   import Button2 from '../../components/ui/Button2.vue'
+  import TopAlert from '~/components/ui/TopAlert.vue'
 
   definePageMeta({
     layout: 'app',
@@ -27,6 +28,7 @@
   const deleteConfirmName = ref('')
   const deleteError = ref('')
   const refreshingPlan = ref(false)
+  const showActiveIdeasLimitAlert = ref(false)
 
   const currentQuiz = computed(() => quizStore.currentQuiz)
   const currentIdeaName = computed(() => String(currentQuiz.value?.name || 'Untitled idea'))
@@ -216,12 +218,22 @@
         quizStore.setQuizId(res.next_quiz_id)
         await quizStore.loadOverview(res.next_quiz_id)
       } else {
-        const fresh = await $fetch('/api/quiz/lifecycle/start?force=true', {
-          method: 'POST'
-        })
-        quizStore.startFreshQuiz(fresh.quiz_id)
-        await quizStore.loadQuizzes()
-        await quizStore.loadOverview(fresh.quiz_id)
+        try {
+          const fresh = await $fetch('/api/quiz/lifecycle/start?force=true', {
+            method: 'POST'
+          })
+          quizStore.startFreshQuiz(fresh.quiz_id)
+          await quizStore.loadQuizzes()
+          await quizStore.loadOverview(fresh.quiz_id)
+        } catch (error) {
+          const statusCode = Number(error?.statusCode || error?.data?.statusCode || 0)
+          const statusMessage = String(error?.statusMessage || error?.data?.statusMessage || '')
+          if (statusCode === 403 && statusMessage.includes('Active ideas limit reached')) {
+            showActiveIdeasLimitAlert.value = true
+            return
+          }
+          throw error
+        }
       }
 
       router.push('/quiz/overview')
@@ -327,6 +339,13 @@
 </script>
 
 <template>
+  <TopAlert
+    :open="showActiveIdeasLimitAlert"
+    title="Idea limit reached"
+    variant="warning"
+    message="Upgrade your plan to create a new idea, or delete or archive another idea to create space."
+    @close="showActiveIdeasLimitAlert = false"
+  />
   <main class="px-6 py-6">
     <div class="mx-auto max-w-4xl">
       <h1 class="mb-4 text-xl font-semibold text-slate-900">Settings</h1>

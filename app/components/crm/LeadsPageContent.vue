@@ -1,6 +1,7 @@
 <script setup>
   import { Info } from 'lucide-vue-next'
   import HelpDrawer from '~/components/help/HelpDrawer.vue'
+  import TopAlert from '~/components/ui/TopAlert.vue'
   import LeadsTable from '~/components/crm/leads-table/LeadsTable.vue'
   import KanbanBoard from '~/components/crm/kanban/KanbanBoard.vue'
   import { useLeadsStore } from '~/stores/leads'
@@ -18,6 +19,7 @@
   const quizStore = useQuizSessionStore()
   const viewMode = ref('table')
   const showHelpDrawer = ref(false)
+  const showPipelinesLimitAlert = ref(false)
   const isCreatingStage = ref(false)
   const stageCreateError = ref('')
 
@@ -82,6 +84,7 @@
     if (!trimmedName) return
 
     stageCreateError.value = ''
+    showPipelinesLimitAlert.value = false
     isCreatingStage.value = true
 
     try {
@@ -95,7 +98,13 @@
 
       const updatedStages = await crmGlobalFetch('/api/crm/pipeline/stages')
       stagesStore.setStages(updatedStages)
-    } catch {
+    } catch (error) {
+      const statusCode = Number(error?.statusCode || error?.data?.statusCode || 0)
+      const statusMessage = String(error?.statusMessage || error?.data?.statusMessage || '')
+      if (statusCode === 403 && statusMessage.includes('Pipelines limit reached')) {
+        showPipelinesLimitAlert.value = true
+        return
+      }
       stageCreateError.value = 'Could not create stage. Please try again.'
     } finally {
       isCreatingStage.value = false
@@ -108,6 +117,13 @@
     class="flex min-h-[calc(100vh-7rem)] w-full min-w-0 flex-col gap-4 overflow-hidden"
     :class="viewMode === 'table' ? 'mx-auto max-w-7xl' : 'max-w-none'"
   >
+    <TopAlert
+      :open="showPipelinesLimitAlert"
+      title="Pipelines limit reached"
+      variant="warning"
+      message="Upgrade your plan to create more pipelines."
+      @close="showPipelinesLimitAlert = false"
+    />
     <div class="grid grid-cols-3 items-center">
       <!-- LEFT -->
 

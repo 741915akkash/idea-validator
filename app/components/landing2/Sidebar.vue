@@ -15,6 +15,7 @@
   } from 'lucide-vue-next'
   import IdeaSelector from '~/components/landing2/sidebar/IdeaSelector.vue'
   import SidebarModals from '~/components/landing2/sidebar/SidebarModals.vue'
+  import TopAlert from '~/components/ui/TopAlert.vue'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import { useUser } from '~/composables/useUser'
   import { useExperiments } from '~/composables/useExperiments'
@@ -39,6 +40,7 @@
   const showRenameModal = ref(false)
   const showArchiveConfirmModal = ref(false)
   const showArchivedIdeasModal = ref(false)
+  const showPlanLimitAlert = ref(false)
   const renameDraft = ref('')
   const archiveTargetIdea = ref(null)
   const quizzes = computed(() => quizStore.quizzes)
@@ -107,15 +109,29 @@
 
   async function startNewQuiz() {
     closeIdeaActionsMenu()
-    const res = await $fetch('/api/quiz/lifecycle/start?force=true', {
-      method: 'POST'
-    })
+    showPlanLimitAlert.value = false
 
-    quizStore.startFreshQuiz(res.quiz_id)
-    await quizStore.loadQuizzes()
-    await quizStore.loadOverview(res.quiz_id)
+    try {
+      const res = await $fetch('/api/quiz/lifecycle/start?force=true', {
+        method: 'POST'
+      })
 
-    navigateTo('/quiz/overview')
+      quizStore.startFreshQuiz(res.quiz_id)
+      await quizStore.loadQuizzes()
+      await quizStore.loadOverview(res.quiz_id)
+
+      navigateTo('/quiz/overview')
+    } catch (error) {
+      const statusCode = Number(error?.statusCode || error?.data?.statusCode || 0)
+      const statusMessage = String(error?.statusMessage || error?.data?.statusMessage || '')
+
+      if (statusCode === 403 && statusMessage.includes('Active ideas limit reached')) {
+        showPlanLimitAlert.value = true
+        return
+      }
+
+      throw error
+    }
   }
 
   function archiveCurrentQuiz() {
@@ -149,11 +165,21 @@
         quizStore.setQuizId(res.next_quiz_id)
         await quizStore.loadOverview(res.next_quiz_id)
       } else {
-        const fresh = await $fetch('/api/quiz/lifecycle/start?force=true', {
-          method: 'POST'
-        })
-        quizStore.startFreshQuiz(fresh.quiz_id)
-        await quizStore.loadOverview(fresh.quiz_id)
+        try {
+          const fresh = await $fetch('/api/quiz/lifecycle/start?force=true', {
+            method: 'POST'
+          })
+          quizStore.startFreshQuiz(fresh.quiz_id)
+          await quizStore.loadOverview(fresh.quiz_id)
+        } catch (error) {
+          const statusCode = Number(error?.statusCode || error?.data?.statusCode || 0)
+          const statusMessage = String(error?.statusMessage || error?.data?.statusMessage || '')
+          if (statusCode === 403 && statusMessage.includes('Active ideas limit reached')) {
+            showPlanLimitAlert.value = true
+            return
+          }
+          throw error
+        }
       }
 
       await quizStore.loadQuizzes()
@@ -183,6 +209,14 @@
       if (!route.path.startsWith('/quiz/overview')) {
         navigateTo('/quiz/overview')
       }
+    } catch (error) {
+      const statusCode = Number(error?.statusCode || error?.data?.statusCode || 0)
+      const statusMessage = String(error?.statusMessage || error?.data?.statusMessage || '')
+      if (statusCode === 403 && statusMessage.includes('Active ideas limit reached')) {
+        showPlanLimitAlert.value = true
+        return
+      }
+      throw error
     } finally {
       isUnarchiving.value = false
     }
@@ -266,6 +300,14 @@
 
 <template>
   <nav class="flex min-h-screen w-64 flex-col border-r border-slate-200 bg-white px-6 pb-6 pt-10">
+    <TopAlert
+      :open="showPlanLimitAlert"
+      title="Idea limit reached"
+      variant="warning"
+      message="Upgrade your plan to create a new idea, or delete or archive this idea to create space for a new one."
+      @close="showPlanLimitAlert = false"
+    />
+
     <!-- Logo -->
     <NuxtLink v-if="props.showBrand" to="/" class="flex items-center gap-2">
       <Orbit class="h-6 w-6 text-emerald-600 md:h-8 md:w-8" />

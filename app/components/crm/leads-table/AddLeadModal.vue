@@ -4,6 +4,7 @@
   import { useStagesStore } from '~/stores/stages'
   import { useUsersStore } from '~/stores/users'
   import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
+  import TopAlert from '~/components/ui/TopAlert.vue'
 
   const emit = defineEmits(['close'])
 
@@ -21,6 +22,7 @@
   const sequences = ref([])
   const emailError = ref('')
   const phoneError = ref('')
+  const showContactsLimitAlert = ref(false)
 
   function isValidEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim())
@@ -107,6 +109,7 @@
       return
     }
 
+    showContactsLimitAlert.value = false
     try {
       const lead = await crmQuizFetch('/api/crm/leads/create', {
         method: 'POST',
@@ -123,13 +126,27 @@
 
       leadsStore.addLead(lead)
       // console.log('STORE LEADS:', leadsStore.leads)
-    } finally {
       emit('close')
+    } catch (error) {
+      const statusCode = Number(error?.statusCode || error?.data?.statusCode || 0)
+      const statusMessage = String(error?.statusMessage || error?.data?.statusMessage || '')
+      if (statusCode === 403 && statusMessage.includes('Contacts limit reached')) {
+        showContactsLimitAlert.value = true
+        return
+      }
+      console.error('Failed to create lead', error)
     }
   }
 </script>
 
 <template>
+  <TopAlert
+    :open="showContactsLimitAlert"
+    title="Contacts limit reached"
+    variant="warning"
+    message="Upgrade your plan to add more contacts, or archive/delete existing leads to free up capacity."
+    @close="showContactsLimitAlert = false"
+  />
   <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm">
     <div class="w-96 rounded-xl border border-gray-200 bg-white p-6 shadow-2xl">
       <h2 class="mb-6 text-xl font-bold text-gray-900">Add Lead</h2>

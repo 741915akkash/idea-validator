@@ -5,6 +5,7 @@
   import { useQuizSessionStore } from '~/stores/quizSession'
   import Button from '~/components/ui/Button.vue'
   import HelpDrawer from '~/components/help/HelpDrawer.vue'
+  import TopAlert from '~/components/ui/TopAlert.vue'
 
   definePageMeta({
     layout: 'app',
@@ -26,6 +27,7 @@
   })
   const isMounted = ref(false)
   const showHelpDrawer = ref(false)
+  const showRevisionLimitAlert = ref(false)
 
   const currentQuiz = computed(() => quizzes.value.find((q) => q.id === quizStore.quizId))
 
@@ -77,10 +79,21 @@
 
     if (!shouldAutoCreate) return
 
-    const res = await $fetch('/api/quiz/revision/create-revision', {
-      method: 'POST',
-      body: { quiz_id: latest.id }
-    })
+    let res
+    try {
+      res = await $fetch('/api/quiz/revision/create-revision', {
+        method: 'POST',
+        body: { quiz_id: latest.id }
+      })
+    } catch (error) {
+      const statusCode = Number(error?.statusCode || error?.data?.statusCode || 0)
+      const statusMessage = String(error?.statusMessage || error?.data?.statusMessage || '')
+      if (statusCode === 403 && statusMessage.includes('Revisions limit reached')) {
+        showRevisionLimitAlert.value = true
+        return
+      }
+      throw error
+    }
 
     quizStore.startFreshQuiz(res.quiz_id)
     await loadQuizzes()
@@ -251,6 +264,13 @@
 
 <template>
   <main class="px-6 py-6">
+    <TopAlert
+      :open="showRevisionLimitAlert"
+      title="Revision limit reached"
+      variant="warning"
+      message="Upgrade your plan to create another revision for this idea."
+      @close="showRevisionLimitAlert = false"
+    />
     <div class="mx-auto max-w-2xl">
       <h1 class="mb-2 flex items-center gap-2 text-2xl font-semibold">
         <span>Overview - Refine your idea</span>

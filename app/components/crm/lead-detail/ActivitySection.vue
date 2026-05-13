@@ -4,6 +4,7 @@
   import { useLeadsStore } from '~/stores/leads'
   import { useRouter } from 'vue-router'
   import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
+  import TopAlert from '~/components/ui/TopAlert.vue'
 
   const props = defineProps({
     leadId: { type: Number, required: true },
@@ -19,6 +20,7 @@
   const text = ref('')
   const callOutcome = ref('Connected')
   const modalInput = ref(null)
+  const showFreeformLimitAlert = ref(false)
 
   function openModal(type) {
     activeType.value = type
@@ -85,6 +87,7 @@
   async function startInterviewFromLead() {
     const quizId = props.quizId
     if (!quizId) return
+    showFreeformLimitAlert.value = false
 
     try {
       const started = await $fetch('/api/interview/freeform/start', {
@@ -116,12 +119,25 @@
         }
       })
     } catch (e) {
+      const statusCode = Number(e?.statusCode || e?.data?.statusCode || 0)
+      const statusMessage = String(e?.statusMessage || e?.data?.statusMessage || '')
+      if (statusCode === 403 && statusMessage.includes('Freeform interview limit reached')) {
+        showFreeformLimitAlert.value = true
+        return
+      }
       console.error('Failed to start quick interview', e)
     }
   }
 </script>
 
 <template>
+  <TopAlert
+    :open="showFreeformLimitAlert"
+    title="Freeform interview limit reached"
+    variant="warning"
+    message="Upgrade your plan to run more quick interviews for this idea in the current period."
+    @close="showFreeformLimitAlert = false"
+  />
   <div class="border-t border-gray-50 bg-white p-6">
     <h3
       class="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400"
