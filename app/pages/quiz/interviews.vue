@@ -817,8 +817,7 @@
       ]"
       :related="[
         { label: 'Overview', to: '/quiz/overview' },
-        { label: 'Master Detail', to: '/quiz/master-detail' },
-        { label: 'Analytics' }
+        { label: 'Master Detail', to: '/quiz/master-detail' }
       ]"
       @close="showHelpDrawer = false"
     />

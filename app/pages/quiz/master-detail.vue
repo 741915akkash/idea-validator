@@ -561,8 +561,7 @@
         ]"
         :related="[
           { label: 'Interviews', to: '/quiz/interviews' },
-          { label: 'Overview', to: '/quiz/overview' },
-          { label: 'Analytics'}
+          { label: 'Overview', to: '/quiz/overview' }
         ]"
         @close="showHelpDrawer = false"
       />
