@@ -8,7 +8,8 @@
 
   const props = defineProps({
     leadId: { type: Number, required: true },
-    quizId: { type: String, default: null }
+    quizId: { type: String, default: null },
+    activities: { type: Array, default: () => [] }
   })
 
   const leadsStore = useLeadsStore()
@@ -131,14 +132,15 @@
 </script>
 
 <template>
-  <TopAlert
-    :open="showFreeformLimitAlert"
-    title="Freeform interview limit reached"
-    variant="warning"
-    message="Upgrade your plan to run more quick interviews for this idea in the current period."
-    @close="showFreeformLimitAlert = false"
-  />
-  <div class="border-t border-gray-50 bg-white p-6">
+  <div>
+    <TopAlert
+      :open="showFreeformLimitAlert"
+      title="Freeform interview limit reached"
+      variant="warning"
+      message="Upgrade your plan to run more quick interviews for this idea in the current period."
+      @close="showFreeformLimitAlert = false"
+    />
+    <div class="border-t border-gray-50 bg-white p-6">
     <h3
       class="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400"
     >
@@ -334,5 +336,6 @@
         </div>
       </div>
     </Teleport>
+    </div>
   </div>
 </template>
