@@ -1,8 +1,10 @@
 <script setup>
   import { computed, onMounted, ref, watch } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { Info } from 'lucide-vue-next'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import ScoreComparison from '../../components/history/ScoreComparison.vue'
+  import HelpDrawer from '~/components/help/HelpDrawer.vue'
 
   definePageMeta({
     layout: 'app',
@@ -17,6 +19,7 @@
   const loading = ref(true)
   const comparisonScores = ref({})
   const revisionDiffs = ref({})
+  const showHelpDrawer = ref(false)
 
   const requestedQuizId = computed(() => String(route.query.quiz_id || quizStore.quizId || ''))
 
@@ -218,7 +221,13 @@
     <div class="mx-auto max-w-2xl">
       <div class="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div class="min-w-0">
-          <h1 class="text-2xl font-semibold text-slate-900 sm:text-3xl">History</h1>
+          <h1 class="flex items-center gap-2 text-2xl font-semibold text-slate-900 sm:text-3xl">
+            <span>History</span>
+            <Info
+              class="h-5 w-10 cursor-pointer text-gray-400 hover:text-gray-700"
+              @click="showHelpDrawer = true"
+            />
+          </h1>
 
           <p class="mt-1 truncate text-sm text-slate-600">
             {{ ideaName }}
@@ -409,5 +418,28 @@
         </div>
       </div>
     </div>
+    <HelpDrawer
+      :open="showHelpDrawer"
+      title="History"
+      subtitle="Compare revisions and track idea evolution."
+      what="This page shows score comparisons, answer changes, and revision progression over time."
+      why="It helps you see whether revisions are improving signal quality and overall confidence."
+      :workflow="[
+        'Review score comparison across recent revisions.',
+        'Inspect what changed in options, follow-ups, and notes.',
+        'Open a specific revision score page for deeper review.'
+      ]"
+      :tips="[
+        'Look for consistent score improvements, not one-off spikes.',
+        'Tie each revision to a clear hypothesis.',
+        'Use change details to avoid repeating weak edits.'
+      ]"
+      :related="[
+        { label: 'Overview', to: '/quiz/overview' },
+        { label: 'Score', to: `/quiz/score?quiz_id=${requestedQuizId}` },
+        { label: 'Interviews', to: '/quiz/interviews' }
+      ]"
+      @close="showHelpDrawer = false"
+    />
   </main>
 </template>

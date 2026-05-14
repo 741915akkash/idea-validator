@@ -1,9 +1,11 @@
 <script setup>
   import { ref, computed, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { Info } from 'lucide-vue-next'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import ScoreCircle from '~/components/ui/ScoreCircle.vue'
   import InsightBlock from '~/components/score/InsightBlock.vue'
+  import HelpDrawer from '~/components/help/HelpDrawer.vue'
 
   definePageMeta({
     layout: 'app',
@@ -35,6 +37,7 @@
   const loadingInsights = ref(true)
   const insightsError = ref(null)
   const insightsLocked = ref(false)
+  const showHelpDrawer = ref(false)
 
   const insights = ref({
     working: [],
@@ -116,6 +119,16 @@
 <template>
   <main class="px-6 py-12">
     <div class="mx-auto max-w-2xl">
+      <div class="mb-5">
+        <h1 class="flex items-center gap-2 text-2xl font-semibold text-slate-900">
+          <span>Score</span>
+          <Info
+            class="h-5 w-10 cursor-pointer text-gray-400 hover:text-gray-700"
+            @click="showHelpDrawer = true"
+          />
+        </h1>
+      </div>
+
       <!-- Loading -->
       <p v-if="loading" class="text-base text-gray-600">Loading your results…</p>
 
@@ -342,5 +355,28 @@
         </div>
       </div>
     </div>
+    <HelpDrawer
+      :open="showHelpDrawer"
+      title="Score"
+      subtitle="Understand your market and confidence results."
+      what="This page summarizes your idea score, checkpoint breakdowns, and revision-level changes."
+      why="It helps you decide whether to proceed, revise, or gather more evidence."
+      :workflow="[
+        'Review market and confidence scores.',
+        'Check breakdowns to identify weak checkpoints.',
+        'Use history and revisions to improve your next iteration.'
+      ]"
+      :tips="[
+        'Focus on lowest-scoring sections first.',
+        'Pair score changes with interview evidence.',
+        'Use revisions to test one major improvement at a time.'
+      ]"
+      :related="[
+        { label: 'Overview', to: '/quiz/overview' },
+        { label: 'History', to: `/quiz/history?quiz_id=${quizId}` },
+        { label: 'Interviews', to: '/quiz/interviews' }
+      ]"
+      @close="showHelpDrawer = false"
+    />
   </main>
 </template>
