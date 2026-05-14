@@ -1,5 +1,6 @@
 <script setup>
-  import { ref, watch, onMounted } from 'vue'
+  import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+  import SavedStatus from '~/components/ui/SavedStatus.vue'
 
   const props = defineProps({
     quizId: String,
@@ -9,6 +10,8 @@
 
   const noteText = ref('')
   const saved = ref(false)
+  let saveDebounceTimer = null
+  let savedBadgeTimer = null
 
   onMounted(async () => {
     const res = await $fetch('/api/quiz/notes/note', {
@@ -20,12 +23,12 @@
     noteText.value = res.note_text || ''
   })
 
-  watch(
-    noteText,
-    async (val) => {
-      if (props.readOnly) return
-      saved.value = false
+  watch(noteText, (val) => {
+    if (props.readOnly) return
+    saved.value = false
 
+    if (saveDebounceTimer) clearTimeout(saveDebounceTimer)
+    saveDebounceTimer = setTimeout(async () => {
       await $fetch('/api/quiz/notes/note', {
         method: 'POST',
         body: {
@@ -36,9 +39,17 @@
       })
 
       saved.value = true
-    },
-    { debounce: 700 }
-  )
+      if (savedBadgeTimer) clearTimeout(savedBadgeTimer)
+      savedBadgeTimer = setTimeout(() => {
+        saved.value = false
+      }, 1000)
+    }, 700)
+  })
+
+  onBeforeUnmount(() => {
+    if (saveDebounceTimer) clearTimeout(saveDebounceTimer)
+    if (savedBadgeTimer) clearTimeout(savedBadgeTimer)
+  })
 </script>
 
 <template>
