@@ -119,7 +119,7 @@
 </script>
 
 <template>
-  <div class="flex h-full overflow-hidden">
+  <div class="flex h-full overflow-hidden px-6 py-6">
     <FilterSidebar
       :filterGroups="filterGroups"
       :is-open="isSidebarOpen"
@@ -127,46 +127,70 @@
       @close="isSidebarOpen = false"
     />
 
-    <div class="flex min-w-0 flex-1 flex-col">
-      <!-- HEADER BAR -->
-      <div class="flex items-center justify-between px-6 py-4">
-        <!-- LEFT -->
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Knowledge Base</h1>
-          <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+    <!-- PAGE WRAPPER -->
+    <div class="mx-auto w-full max-w-2xl">
+      <!-- HEADER CARD -->
+      <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Knowledge Base</h1>
+
+            <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+          </div>
+
+          <button
+            @click="showQuickCapture = true"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+          >
+            <Plus class="h-5 w-5" />
+            Quick Capture
+          </button>
+        </div>
+      </div>
+      <!-- CONTENT -->
+      <div class="mx-auto grid w-full max-w-[700px] grid-cols-[44px_minmax(0,520px)] gap-4 px-6">
+        <!-- FILTER COLUMN -->
+        <div class="pt-5">
+          <button
+            @click="isSidebarOpen = !isSidebarOpen"
+            class="group relative rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm transition-all hover:bg-slate-50"
+            :class="{
+              'border-emerald-200 bg-white text-emerald-600 shadow-sm': isSidebarOpen
+            }"
+          >
+            <Filter class="h-4 w-4" />
+
+            <div
+              v-if="!isSidebarOpen"
+              class="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500"
+            ></div>
+          </button>
         </div>
 
-        <!-- RIGHT -->
-        <button
-          @click="showQuickCapture = true"
-          class="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 md:flex-none"
-        >
-          <Plus class="h-5 w-5" />
-          Quick Capture
-        </button>
-      </div>
-
-      <SearchBar
-        ref="headerRef"
-        v-model:searchQuery="searchQuery"
-        v-model:activeScope="activeScope"
-        :is-sidebar-open="isSidebarOpen"
-        :scopes="scopes"
-        @toggle-sidebar="isSidebarOpen = !isSidebarOpen"
-      />
-
-      <div class="custom-scrollbar flex-1 overflow-y-auto px-6 py-5">
-        <div class="mx-auto max-w-[520px]">
-          <SearchResults
-            v-if="searchQuery"
-            :searchResults="searchResults"
-            :searchQuery="searchQuery"
+        <!-- SEARCH + NOTES -->
+        <div class="min-w-0">
+          <SearchBar
+            ref="headerRef"
+            v-model:searchQuery="searchQuery"
+            v-model:activeScope="activeScope"
+            :scopes="scopes"
           />
-          <NotesFeed v-else :notes="notes" />
+
+          <div class="custom-scrollbar flex-1 overflow-y-auto py-5">
+            <SearchResults
+              v-if="searchQuery"
+              :searchResults="searchResults"
+              :searchQuery="searchQuery"
+            />
+
+            <NotesFeed v-else :notes="notes" />
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- QUICK CAPTURE MODAL -->
   <Teleport to="body">
     <Transition
       enter-active-class="transition duration-200 ease-out"
@@ -191,7 +215,6 @@
         >
           <div class="w-full max-w-[520px]">
             <QuickCapture
-              :standalone="false"
               @close="showQuickCapture = false"
               @save="
                 (note) => {

@@ -8,7 +8,7 @@
 
 <template>
   <!-- ✅ Allow horizontal overflow globally -->
-  <div class="flex min-h-screen overflow-x-visible bg-slate-50 font-sans">
+  <div class="flex min-h-screen overflow-x-visible bg-white font-sans">
     <!-- Desktop Sidebar -->
     <Sidebar class="fixed left-0 top-0 z-40 hidden h-screen w-64 md:flex md:pt-10" />
 

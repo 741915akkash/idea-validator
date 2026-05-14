@@ -60,7 +60,9 @@
     const openInterviewId = route.query?.open_interview_id
     if (!openInterviewId) return
 
-    const target = interviews.value.find((interview) => String(interview.id) === String(openInterviewId))
+    const target = interviews.value.find(
+      (interview) => String(interview.id) === String(openInterviewId)
+    )
     if (!target) return
 
     await openQuickInterview(target)
@@ -392,15 +394,23 @@
     <div class="mx-auto max-w-2xl">
       <div class="mb-8 space-y-6">
         <!-- Page header -->
-        <div>
-          <h1 class="flex items-center gap-2 text-2xl font-semibold">
-            <span>Interviews</span>
-            <Info
-              class="h-5 w-10 cursor-pointer text-gray-400 hover:text-gray-700"
-              @click="showHelpDrawer = true"
-            />
-          </h1>
-          <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+        <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h1
+                class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900"
+              >
+                <span>Interviews</span>
+
+                <Info
+                  class="h-5 w-5 cursor-pointer text-gray-400 transition hover:text-gray-700"
+                  @click="showHelpDrawer = true"
+                />
+              </h1>
+
+              <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+            </div>
+          </div>
         </div>
 
         <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

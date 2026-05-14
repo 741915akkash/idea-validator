@@ -272,16 +272,24 @@
       @close="showRevisionLimitAlert = false"
     />
     <div class="mx-auto max-w-2xl">
-      <h1 class="mb-2 flex items-center gap-2 text-2xl font-semibold">
-        <span>Overview - Refine your idea</span>
-        <Info
-          class="h-5 w-10 cursor-pointer text-gray-400 hover:text-gray-700"
-          @click="showHelpDrawer = true"
-        />
-      </h1>
+      <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h1
+              class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900"
+            >
+              <span>Overview - Refine your idea</span>
 
-      <div class="mb-8 h-1 w-16 bg-emerald-500"></div>
+              <Info
+                class="h-5 w-5 cursor-pointer text-gray-400 transition hover:text-gray-700"
+                @click="showHelpDrawer = true"
+              />
+            </h1>
 
+            <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+          </div>
+        </div>
+      </div>
       <div class="mb-6 flex items-start justify-between gap-3">
         <div v-if="currentQuiz" class="group min-w-0">
           <div
@@ -442,7 +450,7 @@
       :related="[
         { label: 'Interviews', to: '/quiz/interviews' },
         { label: 'Master Detail', to: '/quiz/master-detail' },
-        { label: 'History', to: '/quiz/history' },
+        { label: 'History', to: '/quiz/history' }
       ]"
       @close="showHelpDrawer = false"
     />

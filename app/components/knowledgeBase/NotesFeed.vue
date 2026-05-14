@@ -11,7 +11,7 @@
     <div
       v-for="note in notes"
       :key="note.id"
-      class="group cursor-pointer rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md"
+      class="group cursor-pointer rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md"
     >
       <div class="mb-2 flex items-start justify-between">
         <h3 class="text-lg font-bold text-slate-900 transition-colors group-hover:text-emerald-700">
@@ -35,7 +35,7 @@
         {{ note.content }}
       </p>
 
-      <div class="mb-6 flex flex-wrap items-center gap-2">
+      <div class="mb-4 flex flex-wrap items-center gap-2">
         <span
           v-for="tag in note.tags.slice(0, 3)"
           :key="tag"
