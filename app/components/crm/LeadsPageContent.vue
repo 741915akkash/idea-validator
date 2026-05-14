@@ -114,7 +114,7 @@
 
 <template>
   <div
-    class="flex min-h-[calc(100vh-7rem)] w-full min-w-0 flex-col gap-4 overflow-hidden"
+    class="flex min-h-[calc(100vh-7rem)] w-full min-w-0 flex-col gap-4  px-6 py-6 overflow-hidden"
     :class="viewMode === 'table' ? 'mx-auto max-w-7xl' : 'max-w-none'"
   >
     <TopAlert
@@ -124,68 +124,73 @@
       message="Upgrade your plan to create more pipelines."
       @close="showPipelinesLimitAlert = false"
     />
-    <div class="grid grid-cols-3 items-center">
-      <!-- LEFT -->
+    <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+      <div class="grid grid-cols-3 items-center gap-4">
+        <!-- LEFT -->
+        <div>
+          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900">
+            <span>Leads</span>
 
-      <h1 class="flex items-center gap-2 text-2xl font-semibold">
-        <span>Leads</span>
-        <button
-          type="button"
-          class="inline-flex items-center text-gray-400 transition hover:text-gray-700"
-          @click="
-            () => {
-              openHelpDrawer()
-            }
-          "
-          aria-label="Open Leads help"
-        >
-          <Info class="h-5 w-5 pt-0.5" />
-        </button>
-      </h1>
+            <button
+              type="button"
+              class="inline-flex items-center text-gray-400 transition hover:text-gray-700"
+              @click="
+                () => {
+                  openHelpDrawer()
+                }
+              "
+              aria-label="Open Leads help"
+            >
+              <Info class="h-5 w-5" />
+            </button>
+          </h1>
 
-      <!-- CENTER -->
-      <div class="flex justify-center">
-        <div
-          class="inline-flex items-center rounded-lg border border-gray-200 bg-white p-1 shadow-sm"
-        >
-          <!-- VIEW TOGGLES -->
-          <button
-            class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
-            :class="
-              viewMode === 'table' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'
-            "
-            @click="viewMode = 'table'"
-          >
-            Table
-          </button>
-
-          <button
-            class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
-            :class="
-              viewMode === 'kanban'
-                ? 'bg-emerald-600 text-white'
-                : 'text-gray-600 hover:bg-gray-100'
-            "
-            @click="viewMode = 'kanban'"
-          >
-            Kanban
-          </button>
-
-          <!-- DIVIDER -->
-          <div class="mx-1 h-5 w-px bg-gray-200"></div>
-
-          <!-- SEQUENCES (navigation) -->
-          <button
-            class="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
-            @click="$router.push('/crm/sequences')"
-          >
-            Sequences
-          </button>
+          <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
         </div>
-      </div>
 
-      <!-- RIGHT (empty for now / future CTA) -->
-      <div></div>
+        <!-- CENTER -->
+        <div class="flex justify-center">
+          <div
+            class="inline-flex items-center rounded-lg border border-gray-200 bg-white p-1 shadow-sm"
+          >
+            <button
+              class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+              :class="
+                viewMode === 'table'
+                  ? 'bg-emerald-600 text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+              "
+              @click="viewMode = 'table'"
+            >
+              Table
+            </button>
+
+            <button
+              class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+              :class="
+                viewMode === 'kanban'
+                  ? 'bg-emerald-600 text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+              "
+              @click="viewMode = 'kanban'"
+            >
+              Kanban
+            </button>
+
+            <div class="mx-1 h-5 w-px bg-gray-200"></div>
+
+            <button
+              class="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
+              @click="$router.push('/crm/sequences')"
+            >
+              Sequences
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT SPACER -->
+        <div></div>
+      </div>
     </div>
 
     <!-- KANBAN ACTION -->

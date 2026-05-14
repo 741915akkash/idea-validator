@@ -51,37 +51,41 @@
 
 <template>
   <div class="mx-auto max-w-3xl px-6 py-12">
-    <header class="mb-8 flex items-center justify-between">
-      <!-- LEFT -->
-      <div>
-        <h1 class="flex items-center gap-2 text-2xl font-bold text-gray-900">
-          <span>Sequences</span>
-          <Info
-            class="h-5 w-5 cursor-pointer text-gray-400 hover:text-gray-700"
-            @click="showHelpDrawer = true"
-          />
-        </h1>
-        <p class="mt-0.5 text-xs text-gray-500">Automate your outreach workflows</p>
-      </div>
+    <header class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <!-- LEFT -->
+        <div>
+          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900">
+            <span>Sequences</span>
 
-      <!-- RIGHT -->
-      <div class="flex items-center gap-2">
-        <!-- Back (your style) -->
-        <button
-          @click="$router.push('/crm/leads')"
-          class="inline-flex items-center justify-center rounded-lg bg-[#E5E4E2] px-4 py-2 text-sm font-medium text-black transition hover:bg-[#DAD8D4] active:scale-95"
-        >
-          Back To Leads
-        </button>
+            <Info
+              class="h-5 w-5 cursor-pointer text-gray-400 transition hover:text-gray-700"
+              @click="showHelpDrawer = true"
+            />
+          </h1>
 
-        <!-- Primary CTA -->
-        <button
-          @click="$emit('edit', null)"
-          class="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700 active:scale-95"
-        >
-          <Plus class="h-4 w-4" />
-          New Sequence
-        </button>
+          <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="flex items-center gap-2">
+          <!-- Back -->
+          <button
+            @click="$router.push('/crm/leads')"
+            class="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+          >
+            Back To Leads
+          </button>
+
+          <!-- Primary CTA -->
+          <button
+            @click="$emit('edit', null)"
+            class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
+          >
+            <Plus class="h-4 w-4" />
+            New Sequence
+          </button>
+        </div>
       </div>
     </header>
 
@@ -108,7 +112,7 @@
                   class="mt-1 flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-gray-400"
                 >
                   <span>{{ seq.steps.length }} steps</span>
-                  <span class="h-1 w-1 rounded-full bg-gray"></span>
+                  <span class="bg-gray h-1 w-1 rounded-full"></span>
                   <span>{{ getSequenceDuration(seq.steps) }} days total</span>
                 </div>
               </div>
@@ -155,7 +159,7 @@
                   >Day {{ getCumulativeDay(seq.steps, i) }}</span
                 >
               </div>
-              <div v-if="i < seq.steps.length - 1" class="h-px w-4 shrink-0 bg-gray"></div>
+              <div v-if="i < seq.steps.length - 1" class="bg-gray h-px w-4 shrink-0"></div>
             </template>
           </div>
 

@@ -1,60 +1,83 @@
 <script setup>
-import { ref } from 'vue'
-import { ArrowLeft, Copy } from 'lucide-vue-next'
-import AudienceForm from './AudienceForm.vue'
-import MessageForm from './MessageForm.vue'
-import OfferForm from './OfferForm.vue'
-import DistributionForm from './DistributionForm.vue'
-import VolumeForm from './VolumeForm.vue'
-import ExperimentSummary from './ExperimentSummary.vue'
+  import { ref } from 'vue'
+  import { ArrowLeft, Copy } from 'lucide-vue-next'
+  import AudienceForm from './AudienceForm.vue'
+  import MessageForm from './MessageForm.vue'
+  import OfferForm from './OfferForm.vue'
+  import DistributionForm from './DistributionForm.vue'
+  import VolumeForm from './VolumeForm.vue'
+  import ExperimentSummary from './ExperimentSummary.vue'
 
-const emit = defineEmits(['back', 'save'])
+  const emit = defineEmits(['back', 'save'])
 
-const form = ref({
-  audience: {
-    persona: 'SaaS Founders',
-    stage: 'beginner',
-    industry: 'Tech',
-    geography: '',
-    notes: '',
-    tags: ''
-  },
-  message: { pain: 'High churn', angle: 'Fear', hook: 'Your users are leaving in the first 48 hours.' },
-  offer: { type: 'Service', price: 99, value: 'Churn audit starter pack' },
-  distribution: { platform: 'Reddit', format: 'Direct Message' },
-  volume: { actions_taken: 50 },
-  results: { leads: 0, conversions: 0, revenue: 0, cost: 0, notes: '' },
-  variable: 'Message'
-})
+  const form = ref({
+    audience: {
+      persona: 'SaaS Founders',
+      stage: 'beginner',
+      industry: 'Tech',
+      geography: '',
+      notes: '',
+      tags: ''
+    },
+    message: {
+      pain: 'High churn',
+      angle: 'Fear',
+      hook: 'Your users are leaving in the first 48 hours.'
+    },
+    offer: { type: 'Service', price: 99, value: 'Churn audit starter pack' },
+    distribution: { platform: 'Reddit', format: 'Direct Message' },
+    volume: { actions_taken: 50 },
+    results: { leads: 0, conversions: 0, revenue: 0, cost: 0, notes: '' },
+    variable: 'Message'
+  })
 
-const activeAccordion = ref('audience')
+  const activeAccordion = ref('audience')
 
-const save = () => {
-  emit('save', { ...form.value, id: `EXP-${Math.floor(Math.random() * 1000)}`, date: new Date().toISOString() })
-}
+  const save = () => {
+    emit('save', {
+      ...form.value,
+      id: `EXP-${Math.floor(Math.random() * 1000)}`,
+      date: new Date().toISOString()
+    })
+  }
 </script>
 
 <template>
-  <div class="max-w-6xl mx-auto pb-20 px-4 md:px-8">
-    <div class="flex items-center justify-between mb-8">
-      <button @click="$emit('back')" class="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors">
+  <div class="mx-auto max-w-6xl px-4 pb-20 md:px-8">
+    <div class="mb-8 flex items-center justify-between">
+      <button
+        @click="$emit('back')"
+        class="flex items-center gap-2 text-slate-500 transition-colors hover:text-slate-900"
+      >
         <ArrowLeft class="h-4 w-4" />
         <span class="text-sm font-medium uppercase tracking-wider">Back to Dashboard</span>
       </button>
-      <button class="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors">
+      <button
+        class="flex items-center gap-2 rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-200"
+      >
         <Copy class="h-4 w-4" />
         DUPLICATE LAST
       </button>
     </div>
 
-    <header class="mb-12">
-      <h1 class="text-4xl font-extrabold tracking-tight text-slate-900">🧪 Create Experiment</h1>
-      <p class="text-slate-500 mt-2 text-lg font-medium">Configure your variables and strategy.</p>
+    <header class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <!-- LEFT -->
+        <div>
+          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900">
+            <span>Create Experiment</span>
+          </h1>
+
+          <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+
+          <p class="mt-3 text-sm text-slate-500">Configure your variables and strategy.</p>
+        </div>
+      </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-10 items-start">
+    <div class="grid grid-cols-1 items-start gap-10 lg:grid-cols-5">
       <!-- Left Column: Accordions -->
-      <div class="lg:col-span-3 space-y-4">
+      <div class="space-y-4 lg:col-span-3">
         <AudienceForm
           v-model="form.audience"
           :active="activeAccordion === 'audience'"

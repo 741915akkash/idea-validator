@@ -12,34 +12,41 @@
 </script>
 
 <template>
-  <header class="mb-10 flex items-center justify-between">
-    <div class="flex items-center gap-5">
-      <button
-        @click="$emit('back')"
-        class="rounded-2xl border border-gray-100 bg-white p-3 text-gray-400 shadow-sm transition-all hover:bg-gray-100 hover:text-gray-900 active:scale-95"
-      >
-        <ArrowLeft class="h-5 w-5" />
-      </button>
-      <div>
-        <h1 class="flex items-center gap-2 text-2xl font-black tracking-tight text-gray-900">
-          <span>{{ isEdit ? 'Edit Sequence' : 'Create Sequence' }}</span>
-          <Info
-            v-if="isEdit"
-            class="h-5 w-5 cursor-pointer text-gray-400 hover:text-gray-700"
-            @click="showHelpDrawer = true"
-          />
-        </h1>
-        <p class="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-          Workflow builder
-        </p>
+  <header class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <!-- LEFT -->
+      <div class="flex items-start gap-4">
+        <button
+          @click="$emit('back')"
+          class="rounded-lg border border-slate-200 bg-white p-2.5 text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
+        >
+          <ArrowLeft class="h-5 w-5" />
+        </button>
+
+        <div>
+          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900">
+            <span>{{ isEdit ? 'Edit Sequence' : 'Create Sequence' }}</span>
+
+            <Info
+              v-if="isEdit"
+              class="h-5 w-5 cursor-pointer text-gray-400 transition hover:text-gray-700"
+              @click="showHelpDrawer = true"
+            />
+          </h1>
+
+          <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+        </div>
       </div>
+
+      <!-- RIGHT -->
+      <button
+        @click="$emit('save')"
+        class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700"
+      >
+        <Save class="h-4 w-4" />
+        Save Sequence
+      </button>
     </div>
-    <button
-      @click="$emit('save')"
-      class="flex items-center gap-2 rounded-2xl bg-emerald-600 px-8 py-3 text-[10px] font-bold uppercase tracking-widest text-white shadow-xl shadow-emerald-500/20 transition-all hover:bg-emerald-700 active:scale-95"
-    >
-      <Save class="h-4 w-4" /> Save Sequence
-    </button>
   </header>
   <HelpDrawer
     :open="showHelpDrawer"

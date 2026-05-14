@@ -31,20 +31,30 @@
 
 <template>
   <div class="mx-auto max-w-6xl space-y-10 pb-20">
-    <header class="flex items-center justify-between">
-      <div>
-        <h1 class="flex items-center gap-3 text-3xl font-bold tracking-tight text-slate-900">
-          📊 Experiment Dashboard
-        </h1>
-        <p class="mt-1 text-slate-500">Aggregated feedback from your outreach operations.</p>
+    <header class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <!-- LEFT -->
+        <div>
+          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900">
+            <span>📊 Experiment Dashboard</span>
+          </h1>
+
+          <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+
+          <p class="mt-3 text-sm text-slate-500">
+            Aggregated feedback from your outreach operations.
+          </p>
+        </div>
+
+        <!-- RIGHT -->
+        <button
+          @click="emit('new')"
+          class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700"
+        >
+          <Plus class="h-4 w-4" />
+          New Experiment
+        </button>
       </div>
-      <button
-        @click="emit('new')"
-        class="flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white shadow-lg shadow-emerald-600/20 transition-transform hover:scale-[1.02] active:scale-[0.98]"
-      >
-        <Plus class="h-5 w-5" />
-        New Experiment
-      </button>
     </header>
 
     <!-- Winners Section -->

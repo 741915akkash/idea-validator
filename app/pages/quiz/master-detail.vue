@@ -262,23 +262,30 @@
 </script>
 
 <template>
-  <div class="min-h-screen bg-neutral-50">
+  <div class="mx-auto min-h-screen max-w-7xl px-6 py-6">
     <!-- PAGE HEADER -->
-    <div class="px-10 py-6">
-      <h1 class="mb-2 flex items-center gap-2 text-2xl font-semibold">
-        <span>Resolve Doubts</span>
-        <Info
-          class="h-5 w-10 cursor-pointer text-gray-400 hover:text-gray-700"
-          @click="showHelpDrawer = true"
-        />
-      </h1>
+    <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900">
+            <span>Resolve Doubts</span>
 
-      <div class="h-1 w-16 bg-emerald-500"></div>
+            <Info
+              class="h-5 w-5 cursor-pointer text-gray-400 transition hover:text-gray-700"
+              @click="showHelpDrawer = true"
+            />
+          </h1>
+
+          <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+        </div>
+      </div>
     </div>
 
     <!-- PAGE CONTENT -->
     <div class="flex h-[calc(100vh-97px)] justify-center">
-      <div class="flex h-full w-full max-w-7xl flex-col bg-white shadow-sm">
+      <div
+        class="flex h-full w-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white"
+      >
         <div class="flex min-h-0 flex-1">
           <!-- ================= DESKTOP LAYOUT ================= -->
 
