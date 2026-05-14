@@ -1,12 +1,14 @@
 <script setup>
   import { ref } from 'vue'
-  import { MessageSquare, User } from 'lucide-vue-next'
+  import { MessageSquare, User, Plus } from 'lucide-vue-next'
   import FilterSidebar from './FilterSidebar.vue'
   import SearchBar from './SearchBar.vue'
   import NotesFeed from './NotesFeed.vue'
   import SearchResults from './SearchResults.vue'
+  import QuickCapture from './QuickCapture.vue'
 
   const searchQuery = ref('')
+  const showQuickCapture = ref(false)
   const activeScope = ref('ALL')
   const isSidebarOpen = ref(false)
   const scopes = ['ALL', 'Notes', 'Interviews', 'CRM', 'Reddit']
@@ -117,7 +119,7 @@
 </script>
 
 <template>
-  <div class="flex h-full overflow-hidden bg-white">
+  <div class="flex h-full overflow-hidden">
     <FilterSidebar
       :filterGroups="filterGroups"
       :is-open="isSidebarOpen"
@@ -125,7 +127,25 @@
       @close="isSidebarOpen = false"
     />
 
-    <div class="flex min-w-0 flex-1 flex-col bg-slate-50">
+    <div class="flex min-w-0 flex-1 flex-col">
+      <!-- HEADER BAR -->
+      <div class="flex items-center justify-between px-6 py-4">
+        <!-- LEFT -->
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Knowledge Base</h1>
+          <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+        </div>
+
+        <!-- RIGHT -->
+        <button
+          @click="showQuickCapture = true"
+          class="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 md:flex-none"
+        >
+          <Plus class="h-5 w-5" />
+          Quick Capture
+        </button>
+      </div>
+
       <SearchBar
         ref="headerRef"
         v-model:searchQuery="searchQuery"
@@ -135,8 +155,8 @@
         @toggle-sidebar="isSidebarOpen = !isSidebarOpen"
       />
 
-      <div class="custom-scrollbar flex-1 overflow-y-auto px-8 py-6">
-        <div class="mx-auto max-w-4xl">
+      <div class="custom-scrollbar flex-1 overflow-y-auto px-6 py-5">
+        <div class="mx-auto max-w-[520px]">
           <SearchResults
             v-if="searchQuery"
             :searchResults="searchResults"
@@ -147,4 +167,42 @@
       </div>
     </div>
   </div>
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="showQuickCapture"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+        @click.self="showQuickCapture = false"
+      >
+        <Transition
+          enter-active-class="transition duration-300 ease-out"
+          enter-from-class="translate-y-4 scale-95 opacity-0"
+          enter-to-class="translate-y-0 scale-100 opacity-100"
+          leave-active-class="transition duration-200 ease-in"
+          leave-from-class="translate-y-0 scale-100 opacity-100"
+          leave-to-class="translate-y-4 scale-95 opacity-0"
+        >
+          <div class="w-full max-w-[520px]">
+            <QuickCapture
+              :standalone="false"
+              @close="showQuickCapture = false"
+              @save="
+                (note) => {
+                  console.log(note)
+                  showQuickCapture = false
+                }
+              "
+            />
+          </div>
+        </Transition>
+      </div>
+    </Transition>
+  </Teleport>
 </template>

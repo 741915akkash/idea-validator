@@ -8,8 +8,8 @@
 </script>
 
 <template>
-  <main class="h-[calc(100vh-2rem)] bg-slate-50">
-    <div class="h-full overflow-hidden text-slate-400">
+  <main class="h-[calc(100vh-2rem)]">
+    <div class="h-full overflow-hidden">
       <AllNotes />
     </div>
   </main>

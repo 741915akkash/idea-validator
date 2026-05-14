@@ -16,13 +16,13 @@
 </script>
 
 <template>
-  <div class="sticky top-0 z-10 shrink-0 space-y-6 border-b border-slate-200 bg-white p-8">
+  <div class="sticky top-0 z-10 shrink-0 space-y-4 border-b border-slate-200 px-6 py-4">
     <div class="flex flex-col gap-3">
       <div class="flex items-center gap-4">
         <button
           @click="emit('toggle-sidebar')"
-          class="group relative rounded-xl border border-slate-200 bg-slate-50 p-3 text-slate-500 transition-all hover:bg-slate-100"
-          :class="{ 'border-emerald-200 bg-emerald-50 text-emerald-600': isSidebarOpen }"
+          class="group relative rounded-xl border border-slate-200 bg-white p-2.5 text-slate-500 shadow-sm transition-all hover:bg-slate-100"
+          :class="{ 'border-emerald-200 bg-white text-emerald-600': isSidebarOpen }"
         >
           <Filter class="h-5 w-5" />
           <div
@@ -33,7 +33,7 @@
 
         <div class="group relative flex-1">
           <Search
-            class="absolute left-6 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-300 transition-colors group-focus-within:text-emerald-500"
+            class="absolute left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-300 transition-colors group-focus-within:text-emerald-500"
           />
           <input
             type="text"
@@ -41,7 +41,7 @@
             :value="searchQuery"
             @input="emit('update:searchQuery', $event.target.value)"
             placeholder="Search everything..."
-            class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-16 pr-6 text-lg font-light text-slate-900 shadow-sm transition-all focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/5"
+            class="w-full rounded-xl border border-slate-200 bg-white py-3 pl-14 pr-6 text-base shadow-sm text-slate-900 shadow-sm transition-all focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/5"
           />
 
           <div class="absolute right-6 top-1/2 flex -translate-y-1/2 items-center gap-2">

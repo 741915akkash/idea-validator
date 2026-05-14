@@ -9,14 +9,6 @@
 <template>
   <div class="space-y-6">
     <div
-      class="mb-4 flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-slate-400"
-    >
-      <div class="h-px flex-1 bg-slate-200"></div>
-      Notes Feed
-      <div class="h-px flex-1 bg-slate-200"></div>
-    </div>
-
-    <div
       v-for="note in notes"
       :key="note.id"
       class="group cursor-pointer rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-emerald-200 hover:shadow-md"
