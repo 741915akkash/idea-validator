@@ -274,10 +274,12 @@
 
   const isInterviews = computed(() => route.path.startsWith('/quiz/interviews'))
   const isCrm = computed(() => route.path.startsWith('/crm'))
+  const isKnowledgeBase = computed(() => route.path.startsWith('/knowledge-base'))
   const isSettings = computed(() => route.path.startsWith('/quiz/settings'))
   const isExperiments = computed(() => route.path.startsWith('/experiments'))
   const { enabled: experimentsEnabled } = useExperiments()
   const config = useRuntimeConfig()
+  const knowledgeBaseEnabled = computed(() => Boolean(config.public.knowledgeBaseEnabled))
   const showCRM = computed(() => {
     if (route.path.startsWith('/crm')) return true
     if (!user.value) return false
@@ -352,6 +354,20 @@
         </NuxtLink>
 
         <NuxtLink
+          v-if="knowledgeBaseEnabled"
+          to="/knowledge-base"
+          class="flex items-center gap-2 rounded-lg px-3 py-2 transition"
+          :class="
+            isKnowledgeBase
+              ? 'bg-emerald-50 font-medium text-emerald-700'
+              : 'text-slate-700 hover:bg-slate-100'
+          "
+        >
+          <BookOpen class="h-4 w-4" />
+          Knowledge Base
+        </NuxtLink>
+
+        <NuxtLink
           :to="interviewsLink"
           class="flex items-center gap-2 rounded-lg px-3 py-2 transition"
           :class="
@@ -405,6 +421,7 @@
           <FlaskConical class="h-4 w-4" />
           Experiments
         </NuxtLink>
+
       </div>
     </div>
 
