@@ -1,9 +1,34 @@
 <script setup>
-  import { ref } from 'vue'
+  import { onMounted, onBeforeUnmount, ref } from 'vue'
   import { Menu, Target, Orbit } from 'lucide-vue-next'
   import Sidebar from '~/components/landing2/Sidebar.vue'
 
+  import { useSearchStore } from '~/stores/search'
+
   const sidebarOpen = ref(false)
+  const searchStore = useSearchStore()
+
+  const handleKeydown = (e) => {
+    // CTRL + K
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault()
+
+      searchStore.isSearchOpen = true
+    }
+
+    // ESC
+    if (e.key === 'Escape') {
+      searchStore.isSearchOpen = false
+    }
+  }
+
+  onMounted(() => {
+    window.addEventListener('keydown', handleKeydown)
+  })
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('keydown', handleKeydown)
+  })
 </script>
 
 <template>
