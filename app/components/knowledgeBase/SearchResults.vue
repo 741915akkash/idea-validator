@@ -5,6 +5,8 @@
     searchResults: Array,
     searchQuery: String
   })
+
+  defineEmits(['open'])
 </script>
 
 <template>
@@ -30,6 +32,7 @@
           v-for="item in section.items"
           :key="item.title"
           class="group flex w-full items-start justify-between rounded-2xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-emerald-500 hover:shadow-xl hover:shadow-emerald-500/[0.04]"
+          @click="$emit('open', item)"
         >
           <div>
             <span

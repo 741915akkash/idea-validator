@@ -1,77 +1,154 @@
 <script setup>
-  import { ref } from 'vue'
-  import { MessageSquare, User, Plus } from 'lucide-vue-next'
+  import { ref, onMounted, computed, nextTick, watch } from 'vue'
+  import { MessageSquare, User, Plus, Filter } from 'lucide-vue-next'
+
   import FilterSidebar from './FilterSidebar.vue'
   import SearchBar from './SearchBar.vue'
-  import NotesFeed from './NotesFeed.vue'
+  import NotesFeed from './NotesFeed/NotesFeed.vue'
   import SearchResults from './SearchResults.vue'
   import QuickCapture from './QuickCapture.vue'
+  import NoteDetailsDrawer from './NotesFeed/NoteDetailsDrawer.vue'
+
+  import { useQuizSessionStore } from '~/stores/quizSession'
+  import { useSearchStore } from '~/stores/search'
+
+  const quizStore = useQuizSessionStore()
+  const searchStore = useSearchStore()
 
   const searchQuery = ref('')
   const showQuickCapture = ref(false)
   const activeScope = ref('ALL')
   const isSidebarOpen = ref(false)
-  const scopes = ['ALL', 'Notes', 'Interviews', 'CRM', 'Reddit']
 
-  const searchResults = [
-    {
-      category: 'Questions',
-      icon: MessageSquare,
-      color: 'text-emerald-500',
-      bg: 'bg-emerald-50',
-      items: [
-        {
-          title: 'How do users handle compliance panic?',
-          snippet: '"...panic usually starts 48h before the deadline"'
-        },
-        {
-          title: 'Why do accounting firms fail at LinkedIn ads?',
-          snippet: 'Targeting overlap with general business owners seen as primary cause.'
-        }
-      ]
-    },
-    {
-      category: 'Interviews',
-      icon: User,
-      color: 'text-blue-500',
-      bg: 'bg-blue-50',
-      items: [
-        {
-          title: 'Rahul Sharma interview #3',
-          snippet: '"...clients only care after govt warning... we need to lead with that."'
-        }
-      ]
-    }
-  ]
+  const selectedNote = ref(null)
 
-  const notes = [
-    {
-      id: 1,
-      title: 'What triggers someone to act?',
-      checkpoint: 'Checkpoint 2 · Urgency',
-      content:
-        '"Users only search after govt notice..." - This snippet from interview #3 changes our hypothesis about acquisition.',
-      tags: ['compliance', 'panic', 'b2b', 'urgency'],
-      date: '2h ago'
-    },
-    {
-      id: 2,
-      title: 'Pricing concerns from interviews',
-      checkpoint: 'Checkpoint 6 · Pricing',
-      content:
-        '"Agencies are compared against freelancers" - High price sensitivity in small agencies.',
-      tags: ['pricing', 'positioning'],
-      date: '5h ago'
-    },
-    {
-      id: 3,
-      title: 'Distribution Ideas',
-      checkpoint: 'Checkpoint 4 · Distribution',
-      content: 'LinkedIn ads worked for small law firms but failed for accounting agencies.',
-      tags: ['distribution', 'ads', 'legal'],
-      date: '1d ago'
+  const openNote = (note) => {
+    selectedNote.value = note
+  }
+
+  const scopes = ['ALL', 'Notes', 'Interviews', 'CRM']
+
+  const isSearchPinnedByScroll = ref(false)
+
+  const isSearchActive = computed(() => {
+    return searchQuery.value.length > 0 || searchStore.isSearchOpen
+  })
+
+  const shouldPinSearch = computed(() => {
+    return isSearchPinnedByScroll.value || isSearchActive.value
+  })
+
+  const notes = ref([])
+
+  const fetchNotes = async () => {
+    try {
+      quizStore.hydrate()
+
+      let quizId = quizStore.quizId
+
+      if (!quizId) {
+        await quizStore.loadQuizzes()
+
+        if (quizStore.quizzes.length) {
+          quizId = quizStore.quizzes[0].id
+          quizStore.setQuizId(quizId)
+        }
+      }
+
+      if (!quizId) return
+
+      const response = await $fetch('/api/knowledge-base/notes', {
+        query: {
+          quizId
+        }
+      })
+
+      console.log('Fetched notes:', response)
+
+      notes.value =
+        response.notes?.map((note) => ({
+          id: `${note.quiz_id}-${note.question_id}`,
+          title: `Question ${note.question_id}`,
+          checkpoint: `Question ${note.question_id}`,
+          content: note.note_text,
+          tags: [],
+          date: note.created_at
+        })) || []
+    } catch (error) {
+      console.error('Failed to load notes:', error)
     }
-  ]
+  }
+
+  watch(isSearchActive, async (active) => {
+    if (active) {
+      await nextTick()
+
+      headerRef.value?.focusInput?.()
+    }
+  })
+
+  watch(
+    () => searchStore.isSearchOpen,
+    async (open) => {
+      if (open) {
+        await nextTick()
+
+        headerRef.value?.focusInput?.()
+      }
+    }
+  )
+
+  let searchTimeout = null
+
+  watch(searchQuery, (val) => {
+    if (!val) {
+      searchResults.value = []
+
+      clearTimeout(searchTimeout)
+      return
+    }
+
+    clearTimeout(searchTimeout)
+
+    searchTimeout = setTimeout(() => {
+      fetchSearchResults()
+    }, 250)
+  })
+
+  onMounted(async () => {
+    await fetchNotes()
+    window.addEventListener('scroll', () => {
+      isSearchPinnedByScroll.value = window.scrollY > 140
+    })
+  })
+
+  const searchResults = ref([])
+  const isSearching = ref(false)
+
+  const fetchSearchResults = async () => {
+    if (!searchQuery.value.trim()) {
+      searchResults.value = []
+      return
+    }
+
+    try {
+      isSearching.value = true
+
+      const response = await $fetch('/api/knowledge-base/search', {
+        query: {
+          query: searchQuery.value,
+          quizId: quizStore.quizId
+        }
+      })
+
+      searchResults.value = response.results || []
+    } catch (error) {
+      console.error('Search failed:', error)
+      searchResults.value = []
+    } finally {
+      isSearching.value = false
+    }
+  }
 
   const filterGroups = ref([
     {
@@ -85,28 +162,15 @@
         'Checkpoint 6'
       ],
       isOpen: false
-    },
-    {
-      name: 'Tags',
-      items: ['urgency', 'pricing', 'leads', 'compliance', 'b2b', 'positioning'],
-      isOpen: false
-    },
-    {
-      name: 'Date',
-      items: ['Last 24h', 'Last 7 days', 'Last 30 days', 'Custom Range'],
-      isOpen: false
-    },
-    { name: 'Priority', items: ['High', 'Medium', 'Low'], isOpen: false },
-    {
-      name: 'AI Signals',
-      items: ['Strong Intent', 'Pain Point', 'Pricing Objection', 'Feature Request'],
-      isOpen: false
     }
   ])
 
   const toggleGroup = (groupName) => {
     const group = filterGroups.value.find((g) => g.name === groupName)
-    if (group) group.isOpen = !group.isOpen
+
+    if (group) {
+      group.isOpen = !group.isOpen
+    }
   }
 
   const headerRef = ref(null)
@@ -119,73 +183,156 @@
 </script>
 
 <template>
-  <div class="flex h-full overflow-hidden px-6 py-6">
-    <FilterSidebar
-      :filterGroups="filterGroups"
-      :is-open="isSidebarOpen"
-      @toggle-group="toggleGroup"
-      @close="isSidebarOpen = false"
-    />
+  <div class="flex w-full px-6 py-6">
+    <div class="pt-[172px]">
+      <FilterSidebar
+        :filterGroups="filterGroups"
+        :is-open="isSidebarOpen"
+        @toggle-group="toggleGroup"
+        @close="isSidebarOpen = false"
+      />
+    </div>
 
     <!-- PAGE WRAPPER -->
-    <div class="mx-auto w-full max-w-2xl">
-      <!-- HEADER CARD -->
-      <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
-        <div class="flex items-start justify-between gap-4">
-          <div>
-            <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Knowledge Base</h1>
+    <div class="flex w-full flex-1 flex-col">
+      <!-- CENTERED CONTENT -->
+      <div class="mx-auto flex h-full min-h-0 w-full max-w-5xl flex-col">
+        <!-- NORMAL BROWSE MODE -->
+        <template v-if="!isSearchActive">
+          <!-- HEADER CARD -->
+          <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Knowledge Base</h1>
 
-            <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+                <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+              </div>
+
+              <button
+                @click="showQuickCapture = true"
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+              >
+                <Plus class="h-5 w-5" />
+                Quick Capture
+              </button>
+            </div>
           </div>
 
-          <button
-            @click="showQuickCapture = true"
-            class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+          <!-- SEARCH -->
+          <div
+            class="mb-6"
+            :class="shouldPinSearch ? 'fixed top-6 z-30 w-[980px] max-w-[calc(100vw-6rem)]' : ''"
+            :style="
+              shouldPinSearch
+                ? {
+                    left: 'calc(50% + 120px)',
+                    transform: 'translateX(-50%)'
+                  }
+                : {}
+            "
           >
-            <Plus class="h-5 w-5" />
-            Quick Capture
-          </button>
-        </div>
-      </div>
-      <!-- CONTENT -->
-      <div class="mx-auto grid w-full max-w-[700px] grid-cols-[44px_minmax(0,520px)] gap-4 px-6">
-        <!-- FILTER COLUMN -->
-        <div class="pt-5">
-          <button
-            @click="isSidebarOpen = !isSidebarOpen"
-            class="group relative rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm transition-all hover:bg-slate-50"
-            :class="{
-              'border-emerald-200 bg-white text-emerald-600 shadow-sm': isSidebarOpen
+            <div
+              class="rounded-2xl border border-slate-200 bg-slate-50/90 px-3 py-2 shadow-sm backdrop-blur-md"
+            >
+              <SearchBar
+                ref="headerRef"
+                v-model:searchQuery="searchQuery"
+                v-model:activeScope="activeScope"
+                :scopes="scopes"
+              />
+            </div>
+          </div>
+
+          <!-- CONTENT -->
+          <div>
+            <!-- MAIN + DRAWER -->
+            <div
+              class="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_420px] gap-8"
+              :class="shouldPinSearch ? 'pt-24' : 'pt-5'"
+            >
+              <!-- NOTES -->
+              <div class="min-w-0">
+                <NotesFeed :notes="notes" @open="openNote" />
+              </div>
+
+              <!-- DRAWER -->
+
+              <div
+                class="fixed right-[120px] w-[420px] transition-all duration-200"
+                :class="shouldPinSearch ? 'top-[120px]' : 'top-[245px]'"
+              >
+                <NoteDetailsDrawer
+                  :note="selectedNote"
+                  :isOpen="!!selectedNote"
+                  @close="selectedNote = null"
+                />
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <!-- SEARCH MODE -->
+        <template v-else>
+          <!-- PINNED SEARCH -->
+          <div
+            class="fixed top-6 z-30 w-[min(1020px,calc(100vw-6rem))]"
+            :style="{
+              left: 'calc(50% + 110px)',
+              transform: 'translateX(-50%)'
             }"
           >
-            <Filter class="h-4 w-4" />
-
             <div
-              v-if="!isSidebarOpen"
-              class="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500"
-            ></div>
-          </button>
-        </div>
+              class="rounded-3xl border border-slate-200 bg-slate-50/90 px-3 py-2 shadow-sm backdrop-blur-md"
+            >
+              <div class="flex items-center gap-3">
+                <!-- FILTER -->
+                <button
+                  @click="isSidebarOpen = !isSidebarOpen"
+                  class="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm transition-all hover:border-emerald-200 hover:text-emerald-700"
+                >
+                  <Filter class="h-4 w-4" />
+                  Filters
+                </button>
 
-        <!-- SEARCH + NOTES -->
-        <div class="min-w-0">
-          <SearchBar
-            ref="headerRef"
-            v-model:searchQuery="searchQuery"
-            v-model:activeScope="activeScope"
-            :scopes="scopes"
-          />
-
-          <div class="custom-scrollbar flex-1 overflow-y-auto py-5">
-            <SearchResults
-              v-if="searchQuery"
-              :searchResults="searchResults"
-              :searchQuery="searchQuery"
-            />
-
-            <NotesFeed v-else :notes="notes" />
+                <!-- SEARCH -->
+                <div class="min-w-0 flex-1">
+                  <SearchBar
+                    ref="headerRef"
+                    v-model:searchQuery="searchQuery"
+                    v-model:activeScope="activeScope"
+                    :scopes="scopes"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+          <!-- RESULTS -->
+          <div
+            class="grid min-w-0 grid-cols-[minmax(0,1fr)_420px] items-start gap-8 pt-32 transition-all duration-200"
+            :class="isSidebarOpen ? 'pl-7' : ''"
+          >
+            <!-- RESULTS -->
+            <div class="min-w-0 mr-3 max-w-[700px]">
+              <SearchResults
+                :searchResults="searchResults"
+                :searchQuery="searchQuery"
+                @open="selectedNote = $event"
+              />
+            </div>
+
+            <!-- DRAWER -->
+            <div
+              class="fixed right-[120px] transition-all duration-200"
+              :class="shouldPinSearch ? 'top-[159px] w-[360px]' : 'top-[245px] w-[420px]'"
+            >
+              <NoteDetailsDrawer
+                :note="selectedNote"
+                :isOpen="!!selectedNote"
+                @close="selectedNote = null"
+              />
+            </div>
+          </div>
+        </template>
       </div>
     </div>
   </div>

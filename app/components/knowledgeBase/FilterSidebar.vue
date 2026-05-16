@@ -18,13 +18,17 @@
     leave-from-class="w-60 opacity-100"
     leave-to-class="w-0 opacity-0"
   >
-    <aside v-if="isOpen" class="w-60 shrink-0 overflow-hidden border-r border-slate-200 bg-white">
+    <aside
+      v-if="isOpen"
+      class="w-60 shrink-0 overflow-hidden rounded-r-2xl border border-slate-200 bg-gray-50 shadow-sm"
+    >
       <div class="custom-scrollbar h-full w-60 overflow-y-auto p-6">
         <div class="mb-8 flex items-center justify-between">
           <div class="flex items-center gap-2">
             <Filter class="h-3.5 w-3.5 text-slate-400" />
             <h3 class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Filters</h3>
           </div>
+
           <button
             @click="emit('close')"
             class="text-[10px] font-bold uppercase tracking-widest text-slate-400 transition-colors hover:text-slate-900"
@@ -43,14 +47,18 @@
                 v-if="!group.isOpen"
                 class="h-3.5 w-3.5 text-slate-300 group-hover:text-emerald-500"
               />
+
               <Minus v-else class="h-3.5 w-3.5 text-emerald-500" />
+
               <span>{{ group.name }}</span>
             </div>
+
             <span
               v-if="!group.isOpen && group.name === 'Checkpoints'"
               class="text-[10px] font-bold text-slate-300"
-              >6</span
             >
+              6
+            </span>
           </button>
 
           <Transition
@@ -69,9 +77,10 @@
                   checked
                   class="h-4 w-4 rounded border-slate-200 text-emerald-500 focus:ring-emerald-500/20"
                 />
-                <span class="text-xs text-slate-500 transition-colors group-hover:text-slate-900">{{
-                  item
-                }}</span>
+
+                <span class="text-xs text-slate-500 transition-colors group-hover:text-slate-900">
+                  {{ item }}
+                </span>
               </label>
             </div>
           </Transition>
