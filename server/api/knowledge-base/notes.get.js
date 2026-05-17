@@ -19,14 +19,17 @@ export default eventHandler(async (event) => {
     const { rows } = await client.query(
       `
       SELECT
-        quiz_id,
-        question_id,
-        note_text,
-        created_at,
-        updated_at
-      FROM quiz_question_notes
-      WHERE quiz_id = $1
-      ORDER BY created_at DESC
+        qqn.quiz_id,
+        qqn.question_id,
+        qqn.note_text,
+        qqn.created_at,
+        qqn.updated_at,
+        q.checkpoint
+      FROM quiz_question_notes qqn
+      LEFT JOIN questions q
+        ON qqn.question_id = q.id
+      WHERE qqn.quiz_id = $1
+      ORDER BY qqn.created_at DESC
       `,
       [quizId]
     )

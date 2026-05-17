@@ -19,7 +19,7 @@
 
 <template>
   <div
-    class="sticky top-6 flex max-h-[calc(100vh-3rem)] min-h-[700px] w-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white"
+    class="flex max-h-[calc(100vh-8rem)] min-h-[700px] w-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white"
   >
     <!-- CONTENT TRANSITION -->
     <Transition

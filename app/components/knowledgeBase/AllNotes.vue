@@ -69,7 +69,7 @@
         response.notes?.map((note) => ({
           id: `${note.quiz_id}-${note.question_id}`,
           title: `Question ${note.question_id}`,
-          checkpoint: `Question ${note.question_id}`,
+          checkpoint: `Checkpoint ${note.checkpoint}`,
           content: note.note_text,
           tags: [],
           date: note.created_at
@@ -115,6 +115,12 @@
     }, 250)
   })
 
+  watch(isSearchActive, (active) => {
+    if (!active) {
+      isSidebarOpen.value = false
+    }
+  })
+
   onMounted(async () => {
     await fetchNotes()
     window.addEventListener('scroll', () => {
@@ -141,6 +147,7 @@
         }
       })
 
+      console.log('Search response:', response)
       searchResults.value = response.results || []
     } catch (error) {
       console.error('Search failed:', error)
@@ -184,7 +191,8 @@
 
 <template>
   <div class="flex w-full px-6 py-6">
-    <div class="pt-[172px]">
+    <!-- DESKTOP / TABLET SIDEBAR -->
+    <div class="hidden pt-[172px] md:block">
       <FilterSidebar
         :filterGroups="filterGroups"
         :is-open="isSidebarOpen"
@@ -193,149 +201,198 @@
       />
     </div>
 
-    <!-- PAGE WRAPPER -->
-    <div class="flex w-full flex-1 flex-col">
-      <!-- CENTERED CONTENT -->
-      <div class="mx-auto flex h-full min-h-0 w-full max-w-5xl flex-col">
-        <!-- NORMAL BROWSE MODE -->
-        <template v-if="!isSearchActive">
-          <!-- HEADER CARD -->
-          <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
-            <div class="flex items-start justify-between gap-4">
-              <div>
-                <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Knowledge Base</h1>
+    <!-- ROOT PAGE LAYOUT -->
+    <div
+      class="grid w-full flex-1 grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_clamp(280px,28vw,380px)]"
+    >
+      <!-- LEFT MAIN AREA -->
+      <div class="min-w-0">
+        <!-- CENTERED CONTENT -->
+        <div class="ml-auto mr-4 flex w-full max-w-4xl flex-col max-xl:max-w-none">
+          <!-- NORMAL BROWSE MODE -->
+          <template v-if="!isSearchActive">
+            <!-- HEADER CARD -->
+            <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <h1 class="text-2xl font-semibold tracking-tight text-slate-900">
+                    Knowledge Base
+                  </h1>
 
-                <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+                  <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+                </div>
+
+                <button
+                  @click="showQuickCapture = true"
+                  class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+                >
+                  <Plus class="h-5 w-5" />
+                  Quick Capture
+                </button>
               </div>
-
-              <button
-                @click="showQuickCapture = true"
-                class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
-              >
-                <Plus class="h-5 w-5" />
-                Quick Capture
-              </button>
             </div>
-          </div>
 
-          <!-- SEARCH -->
-          <div
-            class="mb-6"
-            :class="shouldPinSearch ? 'fixed top-6 z-30 w-[980px] max-w-[calc(100vw-6rem)]' : ''"
-            :style="
-              shouldPinSearch
-                ? {
-                    left: 'calc(50% + 120px)',
-                    transform: 'translateX(-50%)'
-                  }
-                : {}
-            "
-          >
+            <!-- SEARCH -->
             <div
-              class="rounded-2xl border border-slate-200 bg-slate-50/90 px-3 py-2 shadow-sm backdrop-blur-md"
+              class="mb-6"
+              :class="
+                shouldPinSearch
+                  ? 'fixed left-[max(17rem,calc(50%-28rem))] right-[404px] top-6 z-30 max-w-5xl transition-all duration-200 max-md:left-4 max-md:right-4'
+                  : 'w-full'
+              "
             >
-              <SearchBar
-                ref="headerRef"
-                v-model:searchQuery="searchQuery"
-                v-model:activeScope="activeScope"
-                :scopes="scopes"
-              />
-            </div>
-          </div>
-
-          <!-- CONTENT -->
-          <div>
-            <!-- MAIN + DRAWER -->
-            <div
-              class="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_420px] gap-8"
-              :class="shouldPinSearch ? 'pt-24' : 'pt-5'"
-            >
-              <!-- NOTES -->
-              <div class="min-w-0">
-                <NotesFeed :notes="notes" @open="openNote" />
-              </div>
-
-              <!-- DRAWER -->
-
               <div
-                class="fixed right-[120px] w-[420px] transition-all duration-200"
-                :class="shouldPinSearch ? 'top-[120px]' : 'top-[245px]'"
+                class="rounded-2xl border border-slate-200 bg-gray-100 px-3 py-2 shadow-sm backdrop-blur-md"
               >
-                <NoteDetailsDrawer
-                  :note="selectedNote"
-                  :isOpen="!!selectedNote"
-                  @close="selectedNote = null"
+                <SearchBar
+                  ref="headerRef"
+                  v-model:searchQuery="searchQuery"
+                  v-model:activeScope="activeScope"
+                  :scopes="scopes"
                 />
               </div>
             </div>
-          </div>
-        </template>
 
-        <!-- SEARCH MODE -->
-        <template v-else>
-          <!-- PINNED SEARCH -->
-          <div
-            class="fixed top-6 z-30 w-[min(1020px,calc(100vw-6rem))]"
-            :style="{
-              left: 'calc(50% + 110px)',
-              transform: 'translateX(-50%)'
-            }"
-          >
+            <!-- CONTENT -->
+            <div :class="shouldPinSearch ? 'pt-24' : 'pt-5'">
+              <NotesFeed :notes="notes" @open="openNote" />
+            </div>
+          </template>
+
+          <!-- SEARCH MODE -->
+          <template v-else>
+            <!-- PINNED SEARCH -->
             <div
-              class="rounded-3xl border border-slate-200 bg-slate-50/90 px-3 py-2 shadow-sm backdrop-blur-md"
+              class="fixed left-[max(17rem,calc(50%-28rem))] right-[404px] top-4 z-30 max-w-5xl transition-all duration-200 max-md:left-4 max-md:right-4"
             >
-              <div class="flex items-center gap-3">
-                <!-- FILTER -->
-                <button
-                  @click="isSidebarOpen = !isSidebarOpen"
-                  class="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm transition-all hover:border-emerald-200 hover:text-emerald-700"
-                >
-                  <Filter class="h-4 w-4" />
-                  Filters
-                </button>
+              <div
+                class="rounded-3xl border border-slate-200 bg-gray-100 px-3 py-2 shadow-sm backdrop-blur-md"
+              >
+                <div class="flex items-center gap-3">
+                  <!-- FILTER -->
+                  <button
+                    @click="isSidebarOpen = !isSidebarOpen"
+                    class="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm transition-all hover:border-emerald-200 hover:text-emerald-700"
+                  >
+                    <Filter class="h-4 w-4" />
+                    <span class="hidden md:inline"> Filters </span>
+                  </button>
 
-                <!-- SEARCH -->
-                <div class="min-w-0 flex-1">
-                  <SearchBar
-                    ref="headerRef"
-                    v-model:searchQuery="searchQuery"
-                    v-model:activeScope="activeScope"
-                    :scopes="scopes"
-                  />
+                  <!-- SEARCH -->
+                  <div class="min-w-0 flex-1">
+                    <SearchBar
+                      ref="headerRef"
+                      v-model:searchQuery="searchQuery"
+                      v-model:activeScope="activeScope"
+                      :scopes="scopes"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <!-- RESULTS -->
-          <div
-            class="grid min-w-0 grid-cols-[minmax(0,1fr)_420px] items-start gap-8 pt-32 transition-all duration-200"
-            :class="isSidebarOpen ? 'pl-7' : ''"
-          >
+
             <!-- RESULTS -->
-            <div class="min-w-0 mr-3 max-w-[700px]">
+            <div
+              class="min-w-0 pt-32 transition-all duration-200"
+              :class="isSidebarOpen ? 'pl-7' : ''"
+            >
               <SearchResults
                 :searchResults="searchResults"
                 :searchQuery="searchQuery"
                 @open="selectedNote = $event"
               />
             </div>
+          </template>
+        </div>
+      </div>
 
-            <!-- DRAWER -->
-            <div
-              class="fixed right-[120px] transition-all duration-200"
-              :class="shouldPinSearch ? 'top-[159px] w-[360px]' : 'top-[245px] w-[420px]'"
-            >
-              <NoteDetailsDrawer
-                :note="selectedNote"
-                :isOpen="!!selectedNote"
-                @close="selectedNote = null"
-              />
-            </div>
-          </div>
-        </template>
+      <!-- RIGHT DRAWER AREA -->
+      <div class="relative hidden h-full bg-white md:block">
+        <div class="fixed right-0 top-0 flex h-screen w-[clamp(280px,28vw,380px)] items-center p-6">
+          <NoteDetailsDrawer
+            :note="selectedNote"
+            :isOpen="!!selectedNote"
+            @close="selectedNote = null"
+          />
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- MOBILE DRAWER MOBILE -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="translate-y-full opacity-0"
+      enter-to-class="translate-y-0 opacity-100"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="translate-y-0 opacity-100"
+      leave-to-class="translate-y-full opacity-0"
+    >
+      <div
+        v-if="selectedNote"
+        class="fixed inset-0 z-[90] flex items-end bg-black/40 backdrop-blur-sm lg:hidden"
+        @click.self="selectedNote = null"
+      >
+        <div class="max-h-[92vh] w-full overflow-hidden rounded-t-[28px] bg-white">
+          <NoteDetailsDrawer
+            :note="selectedNote"
+            :isOpen="!!selectedNote"
+            @close="selectedNote = null"
+          />
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
+  <!-- MOBILE FILTERS -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="translate-y-full opacity-0"
+      enter-to-class="translate-y-0 opacity-100"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="translate-y-0 opacity-100"
+      leave-to-class="translate-y-full opacity-0"
+    >
+      <div
+        v-if="isSidebarOpen"
+        class="fixed inset-0 z-[95] flex items-end bg-black/40 backdrop-blur-sm md:hidden"
+        @click.self="isSidebarOpen = false"
+      >
+        <div class="max-h-[88vh] w-full overflow-hidden rounded-t-[28px] bg-white">
+          <!-- HANDLE -->
+          <div class="flex justify-center py-3">
+            <div class="h-1.5 w-14 rounded-full bg-slate-200"></div>
+          </div>
+
+          <!-- HEADER -->
+          <div class="border-b border-slate-100 px-5 pb-4">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-slate-900">Filters</h2>
+
+              <button
+                @click="isSidebarOpen = false"
+                class="rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+              >
+                <X class="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+
+          <!-- CONTENT -->
+          <div class="max-h-[70vh] overflow-y-auto p-5">
+            <FilterSidebar
+              :filterGroups="filterGroups"
+              :is-open="true"
+              @toggle-group="toggleGroup"
+              @close="isSidebarOpen = false"
+            />
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 
   <!-- QUICK CAPTURE MODAL -->
   <Teleport to="body">

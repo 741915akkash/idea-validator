@@ -17,13 +17,16 @@ export default eventHandler(async (event) => {
 
     const notesQuery = `
       SELECT
-        question_id,
-        note_text,
-        created_at
-      FROM quiz_question_notes
-      WHERE quiz_id = $1
-      AND note_text ILIKE $2
-      ORDER BY created_at DESC
+        qqn.question_id,
+        qqn.note_text,
+        qqn.created_at,
+        q.checkpoint
+      FROM quiz_question_notes qqn
+      LEFT JOIN questions q
+        ON qqn.question_id = q.id
+      WHERE qqn.quiz_id = $1
+      AND qqn.note_text ILIKE $2
+      ORDER BY qqn.created_at DESC
       LIMIT 20
     `
 
@@ -37,7 +40,7 @@ export default eventHandler(async (event) => {
             id: row.question_id,
             question_id: row.question_id,
             title: `Question ${row.question_id}`,
-            checkpoint: `Question ${row.question_id}`,
+            checkpoint: `Checkpoint ${row.checkpoint}`,
             content: row.note_text,
             snippet: row.note_text.slice(0, 180),
             date: row.created_at
