@@ -6,6 +6,7 @@
   import InterviewScreenFreeform from '~/components/interview/InterviewScreenFreeform.vue'
   import HelpDrawer from '~/components/help/HelpDrawer.vue'
   import TopAlert from '~/components/ui/TopAlert.vue'
+  import { useHelpContent } from '~/composables/useHelpContent'
 
   definePageMeta({
     layout: 'app',
@@ -35,6 +36,7 @@
   const closingFreeform = ref(false)
   const showHelpDrawer = ref(false)
   const showFreeformLimitAlert = ref(false)
+  const help = useHelpContent('interviews')
 
   async function loadInterviewData() {
     if (!quizStore.quizId) {
@@ -809,27 +811,6 @@
         </template>
       </div>
     </div>
-    <HelpDrawer
-      :open="showHelpDrawer"
-      title="Interviews"
-      subtitle="Capture evidence from real conversations."
-      what="This page manages both quick and structured interviews so you can collect and review user feedback."
-      why="Interview evidence reduces guesswork and helps you validate assumptions before investing more time."
-      :workflow="[
-        'Start a quick or structured interview.',
-        'Capture notes, evidence, and respondent context.',
-        'Review grouped interviews and continue unresolved ones.'
-      ]"
-      :tips="[
-        'Ask behavior-based questions, not leading questions.',
-        'Record exact phrasing for critical responses.',
-        'Follow up on contradictory signals in later interviews.'
-      ]"
-      :related="[
-        { label: 'Overview', to: '/quiz/overview' },
-        { label: 'Master Detail', to: '/quiz/master-detail' }
-      ]"
-      @close="showHelpDrawer = false"
-    />
+    <HelpDrawer :open="showHelpDrawer" :content="help" @close="showHelpDrawer = false" />
   </main>
 </template>

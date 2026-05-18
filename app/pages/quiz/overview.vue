@@ -6,6 +6,7 @@
   import Button from '~/components/ui/Button.vue'
   import HelpDrawer from '~/components/help/HelpDrawer.vue'
   import TopAlert from '~/components/ui/TopAlert.vue'
+  import { useHelpContent } from '~/composables/useHelpContent'
 
   definePageMeta({
     layout: 'app',
@@ -28,6 +29,7 @@
   const isMounted = ref(false)
   const showHelpDrawer = ref(false)
   const showRevisionLimitAlert = ref(false)
+  const help = useHelpContent('overview')
 
   const currentQuiz = computed(() => quizzes.value.find((q) => q.id === quizStore.quizId))
 
@@ -431,28 +433,6 @@
         </div>
       </div>
     </div>
-    <HelpDrawer
-      :open="showHelpDrawer"
-      title="Overview"
-      subtitle="Track idea progress and move through validation checkpoints."
-      what="This page summarizes your current idea, checkpoint completion, notes, and interview progress in one place."
-      why="A clear overview keeps you focused on the next highest-value step instead of guessing what to do next."
-      :workflow="[
-        'Review current idea status and interview progress.',
-        'Open the next checkpoint and answer remaining questions.',
-        'Use history to compare revisions over time.'
-      ]"
-      :tips="[
-        'Complete one checkpoint at a time before scoring.',
-        'Use interviews to resolve unknowns early.',
-        'Revisit notes before creating a new revision.'
-      ]"
-      :related="[
-        { label: 'Interviews', to: '/quiz/interviews' },
-        { label: 'Master Detail', to: '/quiz/master-detail' },
-        { label: 'History', to: '/quiz/history' }
-      ]"
-      @close="showHelpDrawer = false"
-    />
+    <HelpDrawer :open="showHelpDrawer" :content="help" @close="showHelpDrawer = false" />
   </main>
 </template>

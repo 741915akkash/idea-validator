@@ -4,6 +4,7 @@
   import { Info } from 'lucide-vue-next'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import HelpDrawer from '~/components/help/HelpDrawer.vue'
+  import { useHelpContent } from '~/composables/useHelpContent'
 
   definePageMeta({
     layout: 'app',
@@ -21,6 +22,7 @@
   const startingAnother = ref(false)
   const showUpgradeModal = ref(false)
   const showHelpDrawer = ref(false)
+  const help = useHelpContent('master-detail')
   const error = ref(null)
 
   const uncertainties = ref([])
@@ -550,28 +552,7 @@
           </div>
         </div>
       </div>
-      <HelpDrawer
-        :open="showHelpDrawer"
-        title="Master Detail"
-        subtitle="Resolve uncertainties with structured interview loops."
-        what="This view breaks down uncertainty into sub-uncertainties and links each one to interview execution."
-        why="It helps you systematically resolve unknowns instead of relying on intuition."
-        :workflow="[
-          'Select an uncertainty and review its sub-uncertainties.',
-          'Run interviews for the selected sub-uncertainty.',
-          'Track completion and move to the next unresolved item.'
-        ]"
-        :tips="[
-          'Keep uncertainty statements specific and testable.',
-          'Interview multiple respondents per sub-uncertainty.',
-          'Use analytics once enough interviews are completed.'
-        ]"
-        :related="[
-          { label: 'Interviews', to: '/quiz/interviews' },
-          { label: 'Overview', to: '/quiz/overview' }
-        ]"
-        @close="showHelpDrawer = false"
-      />
+      <HelpDrawer :open="showHelpDrawer" :content="help" @close="showHelpDrawer = false" />
     </div>
   </div>
 </template>

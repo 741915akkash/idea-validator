@@ -5,6 +5,7 @@
   import { useQuizSessionStore } from '~/stores/quizSession'
   import ScoreComparison from '../../components/history/ScoreComparison.vue'
   import HelpDrawer from '~/components/help/HelpDrawer.vue'
+  import { useHelpContent } from '~/composables/useHelpContent'
 
   definePageMeta({
     layout: 'app',
@@ -20,6 +21,7 @@
   const comparisonScores = ref({})
   const revisionDiffs = ref({})
   const showHelpDrawer = ref(false)
+  const help = useHelpContent('history')
 
   const requestedQuizId = computed(() => String(route.query.quiz_id || quizStore.quizId || ''))
 
@@ -418,28 +420,6 @@
         </div>
       </div>
     </div>
-    <HelpDrawer
-      :open="showHelpDrawer"
-      title="History"
-      subtitle="Compare revisions and track idea evolution."
-      what="This page shows score comparisons, answer changes, and revision progression over time."
-      why="It helps you see whether revisions are improving signal quality and overall confidence."
-      :workflow="[
-        'Review score comparison across recent revisions.',
-        'Inspect what changed in options, follow-ups, and notes.',
-        'Open a specific revision score page for deeper review.'
-      ]"
-      :tips="[
-        'Look for consistent score improvements, not one-off spikes.',
-        'Tie each revision to a clear hypothesis.',
-        'Use change details to avoid repeating weak edits.'
-      ]"
-      :related="[
-        { label: 'Overview', to: '/quiz/overview' },
-        { label: 'Score', to: `/quiz/score?quiz_id=${requestedQuizId}` },
-        { label: 'Interviews', to: '/quiz/interviews' }
-      ]"
-      @close="showHelpDrawer = false"
-    />
+    <HelpDrawer :open="showHelpDrawer" :content="help" @close="showHelpDrawer = false" />
   </main>
 </template>

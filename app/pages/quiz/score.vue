@@ -6,6 +6,7 @@
   import ScoreCircle from '~/components/ui/ScoreCircle.vue'
   import InsightBlock from '~/components/score/InsightBlock.vue'
   import HelpDrawer from '~/components/help/HelpDrawer.vue'
+  import { useHelpContent } from '~/composables/useHelpContent'
 
   definePageMeta({
     layout: 'app',
@@ -38,6 +39,7 @@
   const insightsError = ref(null)
   const insightsLocked = ref(false)
   const showHelpDrawer = ref(false)
+  const help = useHelpContent('score')
 
   const insights = ref({
     working: [],
@@ -355,28 +357,6 @@
         </div>
       </div>
     </div>
-    <HelpDrawer
-      :open="showHelpDrawer"
-      title="Score"
-      subtitle="Understand your market and confidence results."
-      what="This page summarizes your idea score, checkpoint breakdowns, and revision-level changes."
-      why="It helps you decide whether to proceed, revise, or gather more evidence."
-      :workflow="[
-        'Review market and confidence scores.',
-        'Check breakdowns to identify weak checkpoints.',
-        'Use history and revisions to improve your next iteration.'
-      ]"
-      :tips="[
-        'Focus on lowest-scoring sections first.',
-        'Pair score changes with interview evidence.',
-        'Use revisions to test one major improvement at a time.'
-      ]"
-      :related="[
-        { label: 'Overview', to: '/quiz/overview' },
-        { label: 'History', to: `/quiz/history?quiz_id=${quizId}` },
-        { label: 'Interviews', to: '/quiz/interviews' }
-      ]"
-      @close="showHelpDrawer = false"
-    />
+    <HelpDrawer :open="showHelpDrawer" :content="help" @close="showHelpDrawer = false" />
   </main>
 </template>

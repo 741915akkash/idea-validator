@@ -11,9 +11,14 @@
   <!-- DRAWER -->
   <Transition name="slide">
     <aside
+      @touchstart="handleTouchStart"
+      @touchend="handleTouchEnd"
       v-if="open"
       class="fixed inset-0 z-50 flex h-[100dvh] w-full flex-col bg-white sm:left-auto sm:right-0 sm:w-full sm:max-w-md sm:border-l sm:border-gray-200 sm:shadow-2xl"
     >
+      <div class="mt-5 flex justify-center sm:hidden">
+        <div class="h-1.5 w-12 rounded-full bg-gray-300" />
+      </div>
       <!-- HEADER -->
       <div class="sticky top-0 z-10 border-b border-gray-100 bg-white px-5 py-4 sm:px-6">
         <div class="flex items-start justify-between gap-4">
@@ -21,11 +26,11 @@
             <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-600">Help</p>
 
             <h2 class="mt-1 text-2xl font-bold text-gray-900">
-              {{ title }}
+              {{ content.title }}
             </h2>
 
-            <p v-if="subtitle" class="mt-2 text-sm leading-relaxed text-gray-500">
-              {{ subtitle }}
+            <p v-if="content.subtitle" class="mt-2 text-sm leading-relaxed text-gray-500">
+              {{ content.subtitle }}
             </p>
           </div>
 
@@ -41,62 +46,40 @@
 
       <!-- CONTENT -->
       <div class="flex-1 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
-        <!-- WHAT THIS DOES -->
+        <!-- PURPOSE -->
         <details
+          v-if="content.purpose"
           open
           class="group mb-4 overflow-hidden rounded-2xl border border-gray-200 bg-white"
         >
           <summary class="flex cursor-pointer list-none items-center justify-between px-5 py-4">
-            <span class="text-sm font-bold uppercase tracking-wide text-gray-500">
-              What this does
-            </span>
+            <span class="text-sm font-bold uppercase tracking-wide text-gray-500"> Purpose </span>
 
             <ChevronDown class="h-4 w-4 text-gray-400 transition group-open:rotate-180" />
           </summary>
 
           <div class="border-t border-gray-100 px-5 py-4">
             <p class="text-sm leading-7 text-gray-700">
-              {{ what }}
-            </p>
-          </div>
-        </details>
-
-        <!-- WHY IT MATTERS -->
-        <details
-          open
-          class="group mb-4 overflow-hidden rounded-2xl border border-gray-200 bg-white"
-        >
-          <summary class="flex cursor-pointer list-none items-center justify-between px-5 py-4">
-            <span class="text-sm font-bold uppercase tracking-wide text-gray-500">
-              Why it matters
-            </span>
-
-            <ChevronDown class="h-4 w-4 text-gray-400 transition group-open:rotate-180" />
-          </summary>
-
-          <div class="border-t border-gray-100 px-5 py-4">
-            <p class="text-sm leading-7 text-gray-700">
-              {{ why }}
+              {{ content.purpose }}
             </p>
           </div>
         </details>
 
         <!-- WORKFLOW -->
         <details
+          v-if="content.workflow?.length"
           open
           class="group mb-4 overflow-hidden rounded-2xl border border-gray-200 bg-white"
         >
           <summary class="flex cursor-pointer list-none items-center justify-between px-5 py-4">
-            <span class="text-sm font-bold uppercase tracking-wide text-gray-500">
-              Typical workflow
-            </span>
+            <span class="text-sm font-bold uppercase tracking-wide text-gray-500"> Workflow </span>
 
             <ChevronDown class="h-4 w-4 text-gray-400 transition group-open:rotate-180" />
           </summary>
 
           <div class="space-y-3 border-t border-gray-100 px-5 py-4">
             <div
-              v-for="(step, index) in workflow"
+              v-for="(step, index) in content.workflow"
               :key="index"
               class="flex gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-4"
             >
@@ -115,12 +98,13 @@
 
         <!-- BEST PRACTICES -->
         <details
+          v-if="content.bestPractices?.length"
           open
           class="group mb-4 overflow-hidden rounded-2xl border border-gray-200 bg-white"
         >
           <summary class="flex cursor-pointer list-none items-center justify-between px-5 py-4">
             <span class="text-sm font-bold uppercase tracking-wide text-gray-500">
-              Best practices
+              Best Practices
             </span>
 
             <ChevronDown class="h-4 w-4 text-gray-400 transition group-open:rotate-180" />
@@ -128,7 +112,7 @@
 
           <div class="space-y-3 border-t border-gray-100 px-5 py-4">
             <div
-              v-for="(tip, index) in tips"
+              v-for="(tip, index) in content.bestPractices"
               :key="index"
               class="rounded-2xl border border-emerald-100 bg-emerald-50 p-4"
             >
@@ -140,10 +124,14 @@
         </details>
 
         <!-- RELATED -->
-        <details open class="group overflow-hidden rounded-2xl border border-gray-200 bg-white">
+        <details
+          v-if="relatedItems.length"
+          open
+          class="group overflow-hidden rounded-2xl border border-gray-200 bg-white"
+        >
           <summary class="flex cursor-pointer list-none items-center justify-between px-5 py-4">
             <span class="text-sm font-bold uppercase tracking-wide text-gray-500">
-              Related features
+              Related Features
             </span>
 
             <ChevronDown class="h-4 w-4 text-gray-400 transition group-open:rotate-180" />
@@ -159,6 +147,7 @@
               >
                 {{ item.label }}
               </NuxtLink>
+
               <button
                 v-else
                 type="button"
@@ -184,47 +173,41 @@
       default: false
     },
 
-    title: {
-      type: String,
-      default: ''
-    },
-
-    subtitle: {
-      type: String,
-      default: ''
-    },
-
-    what: {
-      type: String,
-      default: ''
-    },
-
-    why: {
-      type: String,
-      default: ''
-    },
-
-    workflow: {
-      type: Array,
-      default: () => []
-    },
-
-    tips: {
-      type: Array,
-      default: () => []
-    },
-
-    related: {
-      type: Array,
-      default: () => []
+    content: {
+      type: Object,
+      default: () => ({})
     }
   })
 
   const emit = defineEmits(['close'])
 
+  let touchStartY = 0
+  let touchEndY = 0
+
+  function handleTouchStart(event) {
+    touchStartY = event.changedTouches[0].clientY
+  }
+
+  function handleTouchEnd(event) {
+    touchEndY = event.changedTouches[0].clientY
+
+    const distance = touchEndY - touchStartY
+
+    // only close on meaningful downward swipe
+    if (distance > 120) {
+      emit('close')
+    }
+  }
+
   const relatedItems = computed(() =>
-    (props.related || []).map((item) => {
-      if (typeof item === 'string') return { label: item, to: null }
+    (props.content.related || []).map((item) => {
+      if (typeof item === 'string') {
+        return {
+          label: item,
+          to: null
+        }
+      }
+
       return {
         label: String(item?.label || ''),
         to: item?.to || null

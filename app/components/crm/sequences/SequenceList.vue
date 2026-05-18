@@ -13,10 +13,12 @@
   import { ref } from 'vue'
   import { useSequencesStore } from '~/stores/sequences'
   import HelpDrawer from '~/components/help/HelpDrawer.vue'
+  import { useHelpContent } from '~/composables/useHelpContent'
 
   const sequencesStore = useSequencesStore()
   const emit = defineEmits(['edit'])
   const showHelpDrawer = ref(false)
+  const help = useHelpContent('sequence-list')
 
   async function removeSequence(id) {
     try {
@@ -197,28 +199,6 @@
         Create First Sequence
       </button>
     </div>
-    <HelpDrawer
-      :open="showHelpDrawer"
-      title="Sequences"
-      subtitle="Build repeatable outreach workflows."
-      what="Sequences define step-by-step actions like calls, emails, and follow-ups over time."
-      why="A clear sequence improves consistency, reduces manual effort, and helps leads move through your pipeline."
-      :workflow="[
-        'Create a sequence and add ordered steps.',
-        'Set timing offsets for each step.',
-        'Apply the sequence to relevant leads and track progress.'
-      ]"
-      :tips="[
-        'Keep steps short and outcome-focused.',
-        'Use realistic delays between touches.',
-        'Review performance and refine underperforming steps.'
-      ]"
-      :related="[
-        { label: 'CRM', to: '/crm' },
-        { label: 'Leads', to: '/crm' },
-        { label: 'Edit Sequence', to: '/crm/sequences' }
-      ]"
-      @close="showHelpDrawer = false"
-    />
+    <HelpDrawer :open="showHelpDrawer" :content="help" @close="showHelpDrawer = false" />
   </div>
 </template>

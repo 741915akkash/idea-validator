@@ -10,6 +10,7 @@
   import { useUsersStore } from '~/stores/users'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
+  import { useHelpContent } from '~/composables/useHelpContent'
   import { onMounted, ref, watch } from 'vue'
 
   const leadsStore = useLeadsStore()
@@ -22,6 +23,7 @@
   const showPipelinesLimitAlert = ref(false)
   const isCreatingStage = ref(false)
   const stageCreateError = ref('')
+  const help = useHelpContent('leads-page-content')
 
   try {
     quizStore.hydrate()
@@ -212,29 +214,7 @@
       <KanbanBoard v-else class="min-h-0 flex-1" />
     </ClientOnly>
     <teleport to="body">
-      <HelpDrawer
-        :open="showHelpDrawer"
-        title="CRM"
-        subtitle="Track leads, stages, and follow-up momentum."
-        what="This page centralizes lead management across table and kanban views, including stage progression."
-        why="A consistent CRM process helps you prioritize the right leads and avoid losing warm opportunities."
-        :workflow="[
-          'Capture leads from interviews and outreach.',
-          'Move leads through stages as signal quality improves.',
-          'Review pipeline regularly and follow up on stalled leads.'
-        ]"
-        :tips="[
-          'Keep stage definitions clear and objective.',
-          'Update lead status immediately after each interaction.',
-          'Use kanban for flow, table for detailed review.'
-        ]"
-        :related="[
-          { label: 'Interviews', to: '/quiz/interviews' },
-          { label: 'Sequences', to: '/crm/sequences' },
-          { label: 'Overview', to: '/quiz/overview' }
-        ]"
-        @close="showHelpDrawer = false"
-      />
+      <HelpDrawer :open="showHelpDrawer" :content="help" @close="showHelpDrawer = false" />
     </teleport>
   </div>
 </template>
