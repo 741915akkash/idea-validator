@@ -301,7 +301,9 @@
 </script>
 
 <template>
-  <nav class="flex min-h-screen w-64 flex-col border-r border-slate-200 bg-white px-6 pb-6 pt-10">
+  <nav
+    class="flex h-screen w-64 flex-col overflow-y-auto overscroll-contain border-r border-slate-200 bg-white px-6 pb-6 pt-10"
+  >
     <TopAlert
       :open="showPlanLimitAlert"
       title="Idea limit reached"
@@ -421,7 +423,6 @@
           <FlaskConical class="h-4 w-4" />
           Experiments
         </NuxtLink>
-
       </div>
     </div>
 
