@@ -143,8 +143,10 @@
       class="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-gray-300 bg-white shadow-sm"
     >
       <!-- TOP BAR -->
-      <div class="flex items-center justify-between border-b border-gray-100 bg-gray-50/50 p-4">
-        <TableToolbar :table="table" />
+      <div class="overflow-x-auto border-b border-gray-100 bg-gray-50/50">
+        <div class="min-w-max p-4">
+          <TableToolbar :table="table" />
+        </div>
       </div>
 
       <!-- TABLE -->

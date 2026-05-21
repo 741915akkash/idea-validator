@@ -127,7 +127,7 @@
       @close="showPipelinesLimitAlert = false"
     />
     <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
-      <div class="grid grid-cols-3 items-center gap-4">
+      <div class="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:items-center">
         <!-- LEFT -->
         <div>
           <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900">
@@ -151,7 +151,7 @@
         </div>
 
         <!-- CENTER -->
-        <div class="flex justify-center">
+        <div class="flex justify-start lg:justify-center">
           <div
             class="inline-flex items-center rounded-lg border border-gray-200 bg-white p-1 shadow-sm"
           >
