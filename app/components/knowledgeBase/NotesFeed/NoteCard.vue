@@ -55,28 +55,7 @@
         {{ note.content }}
       </p>
 
-      <!-- FOOTER -->
-      <div class="mt-4 flex items-center justify-between">
-        <div class="flex items-center gap-4">
-          <button
-            class="flex items-center gap-1 text-[11px] font-semibold text-slate-400 transition-colors hover:text-emerald-600"
-          >
-            <MessageSquare class="h-3.5 w-3.5" />
-            Question
-          </button>
 
-          <button
-            class="flex items-center gap-1 text-[11px] font-semibold text-slate-400 transition-colors hover:text-emerald-600"
-          >
-            <ExternalLink class="h-3.5 w-3.5" />
-            Related
-          </button>
-        </div>
-
-        <button class="opacity-0 transition-opacity group-hover:opacity-100">
-          <MoreHorizontal class="h-4 w-4 text-slate-400 hover:text-slate-700" />
-        </button>
-      </div>
     </div>
   </div>
 </template>
