@@ -124,7 +124,7 @@
       if (!term) return true
 
       const lead = row.original || {}
-      const searchable = [lead.name, lead.email, lead.company, lead.phone, lead.notes]
+      const searchable = [lead.name, lead.email, lead.company, lead.phone, lead.activities_text]
         .map((value) => String(value || '').toLowerCase())
         .join(' ')
 

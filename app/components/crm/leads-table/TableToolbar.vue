@@ -273,7 +273,7 @@
       >
         <input
           type="text"
-          placeholder="Search name, email, company, phone, notes..."
+          placeholder="Search name, email, company, phone, activities..."
           class="w-72 rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 placeholder:text-gray-400 focus:border-emerald-500 focus:outline-none"
           :value="props.table.getState().globalFilter ?? ''"
           @input="props.table.setGlobalFilter($event.target.value)"

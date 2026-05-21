@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
       users.email AS owner_email,
       sources.name AS source_name,
       sequences.title AS sequence_name,
+      activity_search.activity_text AS activities_text,
       CASE
         WHEN leads.sequence_id IS NULL THEN NULL
         ELSE json_build_object(
@@ -51,6 +52,11 @@ export default defineEventHandler(async (event) => {
       ON leads.source_id = sources.id
     LEFT JOIN sequences
       ON leads.sequence_id = sequences.id
+    LEFT JOIN LATERAL (
+      SELECT string_agg(COALESCE(la.text, ''), ' ' ORDER BY la.created_at DESC) AS activity_text
+      FROM lead_activities la
+      WHERE la.lead_id = leads.id
+    ) AS activity_search ON true
     WHERE leads.user_id = $1
       AND leads.quiz_id = $2
     ORDER BY leads.created_at DESC
