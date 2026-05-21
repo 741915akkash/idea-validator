@@ -35,7 +35,7 @@ export default defineNuxtConfig({
     public: {
       isDev: process.env.NODE_ENV !== 'production',
       experimentsEnabled: process.env.NUXT_PUBLIC_EXPERIMENTS_ENABLED === 'true',
-      knowledgeBaseEnabled: process.env.NUXT_PUBLIC_KNOWLEDGE_BASE_ENABLED === 'true',
+      knowledgeBaseEnabled: process.env.NUXT_PUBLIC_KNOWLEDGE_BASE_ENABLED !== 'false',
       gaMeasurementId: process.env.NUXT_PUBLIC_GA_MEASUREMENT_ID || '',
       posthog: {
         enabled: posthogEnabled,

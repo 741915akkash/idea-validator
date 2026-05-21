@@ -1,5 +1,6 @@
 <script setup>
   import { onMounted, onBeforeUnmount, ref } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
   import { Menu, Target, Orbit } from 'lucide-vue-next'
   import Sidebar from '~/components/landing2/Sidebar.vue'
 
@@ -7,18 +8,35 @@
 
   const sidebarOpen = ref(false)
   const searchStore = useSearchStore()
+  const route = useRoute()
+  const router = useRouter()
 
-  const handleKeydown = (e) => {
+  const openKnowledgeBase = async () => {
+    if (route.path !== '/knowledge-base') {
+      await router.push('/knowledge-base')
+    }
+  }
+
+  const handleKeydown = async (e) => {
     // CTRL + K
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
       e.preventDefault()
-
+      await openKnowledgeBase()
       searchStore.isSearchOpen = true
+      return
     }
 
     // ESC
     if (e.key === 'Escape') {
       searchStore.isSearchOpen = false
+    }
+
+    // CTRL + Q (Knowledge Base Quick Capture)
+    if (e.ctrlKey && !e.metaKey && e.key.toLowerCase() === 'q') {
+      e.preventDefault()
+      sessionStorage.setItem('kb_open_quick_capture', '1')
+      await openKnowledgeBase()
+      window.dispatchEvent(new CustomEvent('kb:open-quick-capture'))
     }
   }
 

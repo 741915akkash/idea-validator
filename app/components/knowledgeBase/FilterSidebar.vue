@@ -1,12 +1,21 @@
 <script setup>
   import { Plus, Minus, Filter } from 'lucide-vue-next'
 
-  defineProps({
+  const props = defineProps({
     filterGroups: Array,
+    activeFilters: {
+      type: Object,
+      default: () => ({})
+    },
     isOpen: Boolean
   })
 
-  const emit = defineEmits(['toggle-group', 'close'])
+  const emit = defineEmits(['toggle-group', 'toggle-filter', 'close'])
+
+  const isChecked = (groupKey, item) => {
+    const selected = Array.isArray(props.activeFilters?.[groupKey]) ? props.activeFilters[groupKey] : []
+    return selected.includes(item)
+  }
 </script>
 
 <template>
@@ -57,7 +66,7 @@
               v-if="!group.isOpen && group.name === 'Checkpoints'"
               class="text-[10px] font-bold text-slate-300"
             >
-              6
+              {{ group.items?.length || 0 }}
             </span>
           </button>
 
@@ -74,7 +83,8 @@
               >
                 <input
                   type="checkbox"
-                  checked
+                  :checked="isChecked(group.key, item)"
+                  @change="emit('toggle-filter', group.key, item)"
                   class="h-4 w-4 rounded border-slate-200 text-emerald-500 focus:ring-emerald-500/20"
                 />
 

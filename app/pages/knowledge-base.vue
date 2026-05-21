@@ -8,8 +8,8 @@
 </script>
 
 <template>
-  <main class="min-h-screen">
-    <div class="flex flex-col">
+  <main class="h-full overflow-hidden">
+    <div class="flex h-full flex-col overflow-hidden">
       <AllNotes />
     </div>
   </main>

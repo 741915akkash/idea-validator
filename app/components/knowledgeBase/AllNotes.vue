@@ -1,5 +1,6 @@
 <script setup>
-  import { ref, onMounted, computed, nextTick, watch } from 'vue'
+  import { ref, onMounted, onBeforeUnmount, computed, nextTick, watch } from 'vue'
+  import { useRoute } from 'vue-router'
   import { MessageSquare, User, Plus, Filter } from 'lucide-vue-next'
 
   import FilterSidebar from './FilterSidebar.vue'
@@ -14,6 +15,7 @@
 
   const quizStore = useQuizSessionStore()
   const searchStore = useSearchStore()
+  const route = useRoute()
 
   const searchQuery = ref('')
   const showQuickCapture = ref(false)
@@ -24,11 +26,13 @@
 
   const openNote = (note) => {
     selectedNote.value = note
+    console.log('Opening note:', note)
   }
 
   const scopes = ['ALL', 'Notes', 'Interviews', 'CRM']
 
   const isSearchPinnedByScroll = ref(false)
+  const feedScrollRef = ref(null)
 
   const isSearchActive = computed(() => {
     return searchQuery.value.length > 0 || searchStore.isSearchOpen
@@ -39,23 +43,39 @@
   })
 
   const notes = ref([])
+  const currentQuizId = ref(null)
+
+  const resolveQuizId = async () => {
+    quizStore.hydrate()
+    const routeQuizId = String(route.query?.quiz_id || '').trim() || null
+
+    if (routeQuizId) {
+      if (quizStore.quizId !== routeQuizId) {
+        quizStore.setQuizId(routeQuizId)
+      }
+      return routeQuizId
+    }
+
+    if (quizStore.quizId) {
+      return quizStore.quizId
+    }
+
+    await quizStore.loadQuizzes()
+    if (quizStore.quizzes.length) {
+      const firstQuizId = quizStore.quizzes[0].id
+      quizStore.setQuizId(firstQuizId)
+      return firstQuizId
+    }
+
+    return null
+  }
 
   const fetchNotes = async () => {
     try {
-      quizStore.hydrate()
-
-      let quizId = quizStore.quizId
-
-      if (!quizId) {
-        await quizStore.loadQuizzes()
-
-        if (quizStore.quizzes.length) {
-          quizId = quizStore.quizzes[0].id
-          quizStore.setQuizId(quizId)
-        }
-      }
+      const quizId = await resolveQuizId()
 
       if (!quizId) return
+      currentQuizId.value = quizId
 
       const response = await $fetch('/api/knowledge-base/notes', {
         query: {
@@ -65,14 +85,20 @@
 
       console.log('Fetched notes:', response)
 
+      const rows = Array.isArray(response) ? response : response?.notes || []
+
       notes.value =
-        response.notes?.map((note) => ({
-          id: `${note.quiz_id}-${note.question_id}`,
-          title: `Question ${note.question_id}`,
-          checkpoint: `Checkpoint ${note.checkpoint}`,
-          content: note.note_text,
-          tags: [],
-          date: note.created_at
+        rows.map((note) => ({
+          id: note.question_id ? `${note.quiz_id}-${note.question_id}` : note.id,
+          title:
+            note.source === 'question_note'
+              ? note.title || `Question ${note.question_id}`
+              : note.title || '',
+          checkpoint: note.checkpoint ? `Checkpoint ${note.checkpoint}` : 'Quick Capture',
+          content: note.content,
+          tags: note.tags || [],
+          created_at: note.created_at,
+          type: 'Notes'
         })) || []
     } catch (error) {
       console.error('Failed to load notes:', error)
@@ -121,12 +147,54 @@
     }
   })
 
+  const isMobileViewport = () => window.matchMedia('(max-width: 767px)').matches
+  const pushedSearchHistory = ref(false)
+
+  watch(isSearchActive, (active) => {
+    if (!isMobileViewport()) return
+
+    if (active && !pushedSearchHistory.value) {
+      window.history.pushState({ kbSearchMode: true }, '')
+      pushedSearchHistory.value = true
+      return
+    }
+
+    if (!active) {
+      pushedSearchHistory.value = false
+    }
+  })
+
+  watch(
+    () => !!selectedNote.value || isSidebarOpen.value,
+    (open) => {
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+      const shouldLockBody = isMobile && open
+      document.body.style.overflow = shouldLockBody ? 'hidden' : ''
+      document.body.style.touchAction = shouldLockBody ? 'none' : ''
+    }
+  )
+
   onMounted(async () => {
     await fetchNotes()
-    window.addEventListener('scroll', () => {
-      isSearchPinnedByScroll.value = window.scrollY > 140
-    })
+    window.addEventListener('keydown', handleEscape)
+    window.addEventListener('popstate', handleMobileBack)
+    window.addEventListener('kb:open-quick-capture', handleQuickCaptureShortcut)
+    if (sessionStorage.getItem('kb_open_quick_capture') === '1') {
+      sessionStorage.removeItem('kb_open_quick_capture')
+      handleQuickCaptureShortcut()
+    }
   })
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('keydown', handleEscape)
+    window.removeEventListener('popstate', handleMobileBack)
+    window.removeEventListener('kb:open-quick-capture', handleQuickCaptureShortcut)
+  })
+
+  const handleFeedScroll = (event) => {
+    const scrollTop = event?.target?.scrollTop || 0
+    isSearchPinnedByScroll.value = scrollTop > 140
+  }
 
   const searchResults = ref([])
   const isSearching = ref(false)
@@ -143,12 +211,15 @@
       const response = await $fetch('/api/knowledge-base/search', {
         query: {
           query: searchQuery.value,
-          quizId: quizStore.quizId
+          quizId: currentQuizId.value || (await resolveQuizId())
         }
       })
 
       console.log('Search response:', response)
-      searchResults.value = response.results || []
+      const categories = Array.isArray(response?.results) ? response.results : []
+      searchResults.value = categories.flatMap((group) =>
+        Array.isArray(group?.items) ? group.items : []
+      )
     } catch (error) {
       console.error('Search failed:', error)
       searchResults.value = []
@@ -157,18 +228,73 @@
     }
   }
 
+  const activeFilters = ref({
+    checkpoints: [],
+    types: [],
+    dateRanges: [],
+    questionTypes: [],
+    status: []
+  })
+
+  const toggleFilter = (group, value) => {
+    const current = activeFilters.value[group]
+
+    if (current.includes(value)) {
+      activeFilters.value[group] = current.filter((v) => v !== value)
+    } else {
+      activeFilters.value[group].push(value)
+    }
+  }
+
+  const filteredNotes = computed(() => {
+    const useServerSearch = !!searchQuery.value?.trim()
+    let result = [...(useServerSearch ? searchResults.value : notes.value)]
+    const normalize = (value) => String(value || '').trim().toLowerCase()
+
+    // SEARCH (fallback local filtering when server search not active)
+    if (!useServerSearch && searchQuery.value?.trim()) {
+      const query = searchQuery.value.toLowerCase()
+
+      result = result.filter((note) => {
+        return (
+          note.title?.toLowerCase().includes(query) ||
+          note.content?.toLowerCase().includes(query) ||
+          note.checkpoint?.toLowerCase().includes(query) ||
+          note.tags?.some((tag) => tag.toLowerCase().includes(query))
+        )
+      })
+    }
+
+    // SEARCH SCOPE / CONTENT TYPE
+    if (activeScope.value && !['all', 'ALL'].includes(activeScope.value)) {
+      result = result.filter((note) => note.type?.toLowerCase() === activeScope.value.toLowerCase())
+    }
+
+    // CHECKPOINTS
+    if (activeFilters.value.checkpoints.length) {
+      const selectedCheckpoints = activeFilters.value.checkpoints.map(normalize)
+      result = result.filter((note) => selectedCheckpoints.includes(normalize(note.checkpoint)))
+    }
+
+    return result
+  })
+
   const filterGroups = ref([
     {
+      key: 'checkpoints',
       name: 'Checkpoints',
+      isOpen: true,
       items: [
         'Checkpoint 1',
         'Checkpoint 2',
         'Checkpoint 3',
         'Checkpoint 4',
         'Checkpoint 5',
-        'Checkpoint 6'
-      ],
-      isOpen: false
+        'Checkpoint 6',
+        'Checkpoint 7',
+        'Checkpoint 8',
+        'Checkpoint 9'
+      ]
     }
   ])
 
@@ -180,6 +306,32 @@
     }
   }
 
+  // quick capture save
+  const saveQuickCapture = async (note) => {
+    try {
+      const quizId = currentQuizId.value || (await resolveQuizId())
+
+      if (!quizId) {
+        throw new Error('No quiz selected')
+      }
+
+      await $fetch('/api/knowledge-base/quick-capture', {
+        method: 'POST',
+        body: {
+          quizId,
+          title: note?.title || '',
+          content: note?.content || '',
+          tags: Array.isArray(note?.tags) ? note.tags : []
+        }
+      })
+
+      await fetchNotes()
+      showQuickCapture.value = false
+    } catch (error) {
+      console.error('Failed to save quick capture:', error)
+    }
+  }
+
   const headerRef = ref(null)
 
   defineEmits(['open-quick-capture'])
@@ -187,30 +339,91 @@
   defineExpose({
     focusSearch: () => headerRef.value?.focusSearch()
   })
+
+  // mobile drawer swipe handling
+  const touchStartY = ref(0)
+  const touchEndY = ref(0)
+
+  const handleTouchStart = (e) => {
+    touchStartY.value = e.touches[0].clientY
+  }
+
+  const handleTouchMove = (e) => {
+    touchEndY.value = e.touches[0].clientY
+  }
+
+  const handleDrawerClose = () => {
+    const distance = touchEndY.value - touchStartY.value
+
+    if (distance > 120) {
+      selectedNote.value = null
+    }
+  }
+
+  const handleFilterClose = () => {
+    const distance = touchEndY.value - touchStartY.value
+
+    if (distance > 120) {
+      isSidebarOpen.value = false
+    }
+  }
+
+  const resetSearchMode = () => {
+    searchQuery.value = ''
+    activeScope.value = 'ALL'
+    searchStore.isSearchOpen = false
+    isSidebarOpen.value = false
+    isSearchPinnedByScroll.value = false
+  }
+
+  const handleEscape = (e) => {
+    if (e.key !== 'Escape') return
+    if (!isSearchActive.value) return
+    resetSearchMode()
+  }
+
+  const handleMobileBack = () => {
+    if (!isMobileViewport()) return
+    if (!isSearchActive.value) return
+    resetSearchMode()
+    pushedSearchHistory.value = false
+  }
+
+  const handleQuickCaptureShortcut = () => {
+    showQuickCapture.value = true
+  }
+
 </script>
 
 <template>
-  <div class="flex w-full px-6 py-6">
+  <div class="flex h-full w-full overflow-hidden px-6 py-6">
     <!-- DESKTOP / TABLET SIDEBAR -->
     <div class="hidden pt-[172px] md:block">
       <FilterSidebar
         :filterGroups="filterGroups"
-        :is-open="isSidebarOpen"
+        :activeFilters="activeFilters"
         @toggle-group="toggleGroup"
+        @toggle-filter="toggleFilter"
+        :is-open="isSidebarOpen"
         @close="isSidebarOpen = false"
       />
     </div>
 
     <!-- ROOT PAGE LAYOUT -->
     <div
-      class="grid w-full flex-1 grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_clamp(280px,28vw,380px)]"
+      class="grid h-full w-full flex-1 grid-cols-1 gap-2 overflow-hidden md:grid-cols-[minmax(0,1fr)_clamp(280px,28vw,380px)]"
     >
       <!-- LEFT MAIN AREA -->
-      <div class="min-w-0">
+      <div class="min-w-0 overflow-hidden">
         <!-- CENTERED CONTENT -->
-        <div class="ml-auto mr-4 flex w-full max-w-4xl flex-col max-xl:max-w-none">
+        <div class="ml-auto mr-4 flex h-full w-full max-w-4xl flex-col overflow-hidden max-xl:max-w-none">
           <!-- NORMAL BROWSE MODE -->
-          <template v-if="!isSearchActive">
+          <div
+            v-if="!isSearchActive"
+            ref="feedScrollRef"
+            class="custom-scrollbar h-full overflow-y-auto"
+            @scroll="handleFeedScroll"
+          >
             <!-- HEADER CARD -->
             <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
               <div class="flex items-start justify-between gap-4">
@@ -227,7 +440,7 @@
                   class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
                 >
                   <Plus class="h-5 w-5" />
-                  Quick Capture
+                  Quick Capture (CTRL + Q)
                 </button>
               </div>
             </div>
@@ -257,10 +470,15 @@
             <div :class="shouldPinSearch ? 'pt-24' : 'pt-5'">
               <NotesFeed :notes="notes" @open="openNote" />
             </div>
-          </template>
+          </div>
 
           <!-- SEARCH MODE -->
-          <template v-else>
+          <div
+            v-else
+            ref="feedScrollRef"
+            class="custom-scrollbar h-full overflow-y-auto"
+            @scroll="handleFeedScroll"
+          >
             <!-- PINNED SEARCH -->
             <div
               class="fixed left-[max(17rem,calc(50%-28rem))] right-[404px] top-4 z-30 max-w-5xl transition-all duration-200 max-md:left-4 max-md:right-4"
@@ -286,6 +504,13 @@
                       v-model:activeScope="activeScope"
                       :scopes="scopes"
                     />
+                    <p class="mt-2 hidden text-xs text-slate-500 md:block">
+                      Hint: Press <kbd class="rounded border border-slate-300 bg-white px-1.5 py-0.5 text-[11px]">Esc</kbd>
+                      to return to normal mode.
+                    </p>
+                    <p class="mt-2 text-xs text-slate-500 md:hidden">
+                      Hint: Use your phone back button to clear search and return to normal mode.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -297,12 +522,12 @@
               :class="isSidebarOpen ? 'pl-7' : ''"
             >
               <SearchResults
-                :searchResults="searchResults"
+                :items="filteredNotes"
                 :searchQuery="searchQuery"
                 @open="selectedNote = $event"
               />
             </div>
-          </template>
+          </div>
         </div>
       </div>
 
@@ -319,7 +544,7 @@
     </div>
   </div>
 
-  <!-- MOBILE DRAWER MOBILE -->
+  <!-- MOBILE DRAWER -->
   <Teleport to="body">
     <Transition
       enter-active-class="transition duration-300 ease-out"
@@ -334,7 +559,17 @@
         class="fixed inset-0 z-[90] flex items-end bg-black/40 backdrop-blur-sm lg:hidden"
         @click.self="selectedNote = null"
       >
-        <div class="max-h-[92vh] w-full overflow-hidden rounded-t-[28px] bg-white">
+        <div
+          class="max-h-[92vh] w-full overflow-hidden overscroll-contain rounded-t-[28px] bg-white"
+          @touchstart="handleTouchStart"
+          @touchmove="handleTouchMove"
+          @touchend="handleDrawerClose"
+        >
+          <!-- HANDLE -->
+          <div class="flex justify-center py-3">
+            <div class="h-1.5 w-14 rounded-full bg-slate-200"></div>
+          </div>
+
           <NoteDetailsDrawer
             :note="selectedNote"
             :isOpen="!!selectedNote"
@@ -360,7 +595,12 @@
         class="fixed inset-0 z-[95] flex items-end bg-black/40 backdrop-blur-sm md:hidden"
         @click.self="isSidebarOpen = false"
       >
-        <div class="max-h-[88vh] w-full overflow-hidden rounded-t-[28px] bg-white">
+        <div
+          class="max-h-[88vh] w-full overflow-hidden overscroll-contain rounded-t-[28px] bg-white"
+          @touchstart="handleTouchStart"
+          @touchmove="handleTouchMove"
+          @touchend="handleFilterClose"
+        >
           <!-- HANDLE -->
           <div class="flex justify-center py-3">
             <div class="h-1.5 w-14 rounded-full bg-slate-200"></div>
@@ -381,11 +621,13 @@
           </div>
 
           <!-- CONTENT -->
-          <div class="max-h-[70vh] overflow-y-auto p-5">
+          <div class="max-h-[70vh] overflow-y-auto overscroll-contain p-5">
             <FilterSidebar
               :filterGroups="filterGroups"
-              :is-open="true"
+              :activeFilters="activeFilters"
               @toggle-group="toggleGroup"
+              @toggle-filter="toggleFilter"
+              :is-open="true"
               @close="isSidebarOpen = false"
             />
           </div>
@@ -418,15 +660,7 @@
           leave-to-class="translate-y-4 scale-95 opacity-0"
         >
           <div class="w-full max-w-[520px]">
-            <QuickCapture
-              @close="showQuickCapture = false"
-              @save="
-                (note) => {
-                  console.log(note)
-                  showQuickCapture = false
-                }
-              "
-            />
+            <QuickCapture @close="showQuickCapture = false" @save="saveQuickCapture" />
           </div>
         </Transition>
       </div>

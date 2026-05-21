@@ -42,7 +42,7 @@
         <div class="absolute right-6 top-1/2 flex -translate-y-1/2 items-center gap-2">
           <div
             v-if="!searchQuery"
-            class="rounded-lg border border-slate-200 bg-white px-2 py-1 text-[9px] font-bold uppercase tracking-widest text-slate-400"
+            class="rounded-lg border border-slate-400 bg-white px-2 py-1 text-[9px] font-bold uppercase tracking-widest text-black/90"
           >
             Ctrl + K
           </div>

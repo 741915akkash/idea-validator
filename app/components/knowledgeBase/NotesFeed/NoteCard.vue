@@ -45,7 +45,7 @@
 
         <div class="shrink-0">
           <p class="text-[11px] font-medium text-slate-400">
-            {{ formatDate(note.date) }}
+            {{ formatDate(note.created_at) }}
           </p>
         </div>
       </div>

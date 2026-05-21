@@ -1,12 +1,12 @@
 <template>
   <div class="py-2">
-    <div class="mx-auto flex flex-col gap-24 px-6 py-10 lg:px-14 lg:py-16">
+    <div class="mx-auto flex flex-col gap-12 px-4 py-6 lg:gap-24 lg:px-14 lg:py-16">
       <!-- GRAPH GROUPS -->
       <div v-for="(group, groupIndex) in graphGroups" :key="groupIndex" class="flex flex-col gap-5">
         <!-- ROWS OF 3 -->
         <template v-for="(row, rowIndex) in chunkNodes(group.nodes, 3)" :key="rowIndex">
           <!-- ROW -->
-          <div class="flex flex-col items-center gap-8 lg:flex-row lg:justify-start lg:gap-0">
+          <div class="flex flex-col items-center gap-3 lg:flex-row lg:justify-start lg:gap-0">
             <template v-for="(node, index) in row" :key="node.id">
               <!-- NODE -->
               <div
@@ -41,15 +41,18 @@
 
               <!-- MOBILE CONNECTOR -->
               <div
-                v-if="index !== row.length - 1"
+                v-if="
+                  isMobile &&
+                  !(rowIndex === chunkNodes(group.nodes, 3).length - 1 && index === row.length - 1)
+                "
                 class="relative flex h-10 w-4 items-center justify-center overflow-visible lg:hidden"
               >
                 <!-- line -->
                 <div class="h-full w-[2px] bg-emerald-500" />
 
-                <!-- arrow -->
+                <!-- filled triangle -->
                 <div
-                  class="absolute -bottom-[1px] h-2 w-2 rotate-45 border-b-2 border-r-2 border-emerald-500"
+                  class="absolute -bottom-[2px] h-0 w-0 border-x-[6px] border-t-[10px] border-x-transparent border-t-emerald-500"
                 />
               </div>
             </template>
