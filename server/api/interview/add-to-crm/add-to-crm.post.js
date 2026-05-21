@@ -51,17 +51,23 @@ export async function addInterviewToCrm({ client, interviewId, userId = null }) 
   const company = s.company?.trim() || null
   const interviewRes = await client.query(
     `
-    SELECT quiz_id
-    FROM interviews
-    WHERE id = $1
+    SELECT i.quiz_id, q.user_id AS quiz_user_id
+    FROM interviews i
+    LEFT JOIN quizzes q
+      ON q.id = i.quiz_id
+    WHERE i.id = $1
     LIMIT 1
     `,
     [interviewId]
   )
   const quizId = interviewRes.rows[0]?.quiz_id || null
+  const ownerUserId = userId || interviewRes.rows[0]?.quiz_user_id || null
 
   if (!quizId) {
     return { ok: true, skipped: 'missing_quiz_id' }
+  }
+  if (!ownerUserId) {
+    return { ok: true, skipped: 'missing_user_id' }
   }
 
   const stageRes = await client.query(
@@ -69,11 +75,10 @@ export async function addInterviewToCrm({ client, interviewId, userId = null }) 
     SELECT id
     FROM pipeline_stages
     WHERE user_id = $1
-      AND quiz_id = $2
     ORDER BY id ASC
     LIMIT 1
     `,
-    [userId, quizId]
+    [ownerUserId]
   )
   const stageId = stageRes.rows[0]?.id || null
 
@@ -84,10 +89,9 @@ export async function addInterviewToCrm({ client, interviewId, userId = null }) 
     FROM sources
     WHERE lower(name) = 'interview'
       AND user_id = $1
-      AND quiz_id = $2
     LIMIT 1
     `,
-    [userId, quizId]
+    [ownerUserId]
   )
   if (sourceRes.rows.length) {
     sourceId = sourceRes.rows[0].id
@@ -110,7 +114,7 @@ export async function addInterviewToCrm({ client, interviewId, userId = null }) 
     )
     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW(),NOW())
     `,
-    [name, email, phone, company, stageId, userId, sourceId, interviewId, quizId]
+    [name, email, phone, company, stageId, ownerUserId, sourceId, interviewId, quizId]
   )
 
   return { ok: true }
