@@ -1,3 +1,4 @@
+// sequence-list.js
 export default {
   title: 'Sequences',
 
@@ -6,11 +7,32 @@ export default {
   purpose:
     'Sequences help you automate and standardize outreach through timed calls, emails, and follow-up actions across the lead lifecycle.',
 
-  workflow: [
-    'Create a sequence and define ordered steps.',
-    'Set timing delays and communication channels.',
-    'Apply sequences to leads and monitor progression.'
-  ],
+  workflow: {
+    nodes: [
+      {
+        id: 'create',
+        label: 'Create sequence'
+      },
+      {
+        id: 'define',
+        label: 'Define steps'
+      },
+      {
+        id: 'schedule',
+        label: 'Set timing'
+      },
+      {
+        id: 'apply',
+        label: 'Apply to leads'
+      }
+    ],
+
+    edges: [
+      ['create', 'define'],
+      ['define', 'schedule'],
+      ['schedule', 'apply']
+    ]
+  },
 
   bestPractices: [
     'Keep steps concise and outcome-focused.',

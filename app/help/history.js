@@ -1,3 +1,4 @@
+// history.js
 export default {
   title: 'History',
 
@@ -6,11 +7,32 @@ export default {
   purpose:
     'This page compares revisions, score changes, and answer updates so you can measure whether your validation quality is improving over time.',
 
-  workflow: [
-    'Compare score trends across revisions.',
-    'Review changes in answers, notes, and follow-ups.',
-    'Open specific revisions for deeper evaluation.'
-  ],
+  workflow: {
+    nodes: [
+      {
+        id: 'compare',
+        label: 'Compare revisions'
+      },
+      {
+        id: 'review',
+        label: 'Review changes'
+      },
+      {
+        id: 'evaluate',
+        label: 'Evaluate trends'
+      },
+      {
+        id: 'inspect',
+        label: 'Inspect revision'
+      }
+    ],
+
+    edges: [
+      ['compare', 'review'],
+      ['review', 'evaluate'],
+      ['evaluate', 'inspect']
+    ]
+  },
 
   bestPractices: [
     'Look for consistent improvement patterns over time.',

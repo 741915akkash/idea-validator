@@ -11,14 +11,16 @@
   <!-- DRAWER -->
   <Transition name="slide">
     <aside
+      v-if="open"
       @touchstart="handleTouchStart"
       @touchend="handleTouchEnd"
-      v-if="open"
       class="fixed inset-0 z-50 flex h-[100dvh] w-full flex-col bg-white sm:left-auto sm:right-0 sm:w-full sm:max-w-md sm:border-l sm:border-gray-200 sm:shadow-2xl"
     >
+      <!-- MOBILE HANDLE -->
       <div class="mt-5 flex justify-center sm:hidden">
         <div class="h-1.5 w-12 rounded-full bg-gray-300" />
       </div>
+
       <!-- HEADER -->
       <div class="sticky top-0 z-10 border-b border-gray-100 bg-white px-5 py-4 sm:px-6">
         <div class="flex items-start justify-between gap-4">
@@ -59,37 +61,54 @@
           </summary>
 
           <div class="border-t border-gray-100 px-5 py-4">
-            <p class="text-sm leading-7 text-gray-700">
+            <p class="whitespace-pre-line text-sm leading-6 text-slate-700">
               {{ content.purpose }}
             </p>
           </div>
         </details>
 
         <!-- WORKFLOW -->
+        <!-- WORKFLOW -->
+        <button
+          v-if="content.workflow"
+          type="button"
+          class="mb-4 flex w-full items-center justify-between rounded-2xl border border-gray-200 bg-white px-5 py-4 text-left transition hover:border-emerald-200 hover:bg-emerald-50"
+          @click="showWorkflowModal = true"
+        >
+          <div>
+            <div class="text-sm font-bold uppercase tracking-wide text-gray-500">Workflow</div>
+
+            <div class="mt-1 text-sm text-gray-600">View validation flow diagram</div>
+          </div>
+
+          <ChevronRight class="h-5 w-5 text-gray-400" />
+        </button>
+
+        <!-- STEPS -->
         <details
-          v-if="content.workflow?.length"
+          v-if="content.steps?.length"
           open
           class="group mb-4 overflow-hidden rounded-2xl border border-gray-200 bg-white"
         >
           <summary class="flex cursor-pointer list-none items-center justify-between px-5 py-4">
-            <span class="text-sm font-bold uppercase tracking-wide text-gray-500"> Workflow </span>
+            <span class="text-sm font-bold uppercase tracking-wide text-gray-500"> Steps </span>
 
             <ChevronDown class="h-4 w-4 text-gray-400 transition group-open:rotate-180" />
           </summary>
 
           <div class="space-y-3 border-t border-gray-100 px-5 py-4">
             <div
-              v-for="(step, index) in content.workflow"
+              v-for="(step, index) in content.steps"
               :key="index"
-              class="flex gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-4"
+              class="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4"
             >
               <div
-                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white"
+                class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-[10px] font-semibold text-white"
               >
                 {{ index + 1 }}
               </div>
 
-              <p class="text-sm leading-6 text-gray-700">
+              <p class="text-sm leading-6 text-slate-700">
                 {{ step }}
               </p>
             </div>
@@ -114,9 +133,9 @@
             <div
               v-for="(tip, index) in content.bestPractices"
               :key="index"
-              class="rounded-2xl border border-emerald-100 bg-emerald-50 p-4"
+              class="rounded-2xl border border-gray-100 bg-gray-50 p-4"
             >
-              <p class="text-sm leading-6 text-emerald-900">
+              <p class="whitespace-pre-line text-sm leading-6 text-slate-700">
                 {{ tip }}
               </p>
             </div>
@@ -159,13 +178,51 @@
           </div>
         </details>
       </div>
+
+      <!-- WORKFLOW MODAL -->
+      <Transition name="fade">
+        <div
+          v-if="showWorkflowModal"
+          class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4"
+          @click.self="showWorkflowModal = false"
+        >
+          <div
+            class="relative flex w-fit max-w-[95vw] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl"
+          >
+            <!-- HEADER -->
+            <div class="flex items-center justify-between border-b border-gray-100 px-6 py-5">
+              <div>
+                <div class="text-xs font-bold uppercase tracking-[0.2em] text-emerald-600">
+                  Workflow
+                </div>
+
+                <h3 class="mt-1 text-2xl font-bold text-gray-900">{{ content.title }} Flow</h3>
+              </div>
+
+              <button
+                class="flex h-11 w-11 items-center justify-center rounded-xl text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                @click="showWorkflowModal = false"
+              >
+                <X class="h-5 w-5" />
+              </button>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="max-h-[85vh] overflow-y-auto overflow-x-hidden bg-slate-50 px-10 py-12">
+              <WorkflowDiagram :workflow="content.workflow" />
+            </div>
+          </div>
+        </div>
+      </Transition>
     </aside>
   </Transition>
 </template>
 
 <script setup>
-  import { computed } from 'vue'
-  import { X, ChevronDown } from 'lucide-vue-next'
+  import { computed, ref } from 'vue'
+  import { X, ChevronDown, ChevronRight } from 'lucide-vue-next'
+
+  import WorkflowDiagram from '~/components/help/WorkflowDiagram.vue'
 
   const props = defineProps({
     open: {
@@ -181,6 +238,8 @@
 
   const emit = defineEmits(['close'])
 
+  const showWorkflowModal = ref(false)
+
   let touchStartY = 0
   let touchEndY = 0
 
@@ -193,7 +252,7 @@
 
     const distance = touchEndY - touchStartY
 
-    // only close on meaningful downward swipe
+    // meaningful downward swipe
     if (distance > 120) {
       emit('close')
     }

@@ -1,3 +1,4 @@
+// score.js
 export default {
   title: 'Score',
 
@@ -6,11 +7,34 @@ export default {
   purpose:
     'This page summarizes your idea score, checkpoint performance, and revision-level improvements so you can evaluate whether your idea is strengthening over time.',
 
-  workflow: [
-    'Review market and confidence scores.',
-    'Identify weak checkpoints and low-signal areas.',
-    'Compare revisions to evaluate whether changes improved results.'
-  ],
+  workflow: {
+    nodes: [
+      {
+        id: 'review',
+        label: 'Review scores'
+      },
+      {
+        id: 'identify',
+        label: 'Identify weak areas'
+      },
+      {
+        id: 'compare',
+        label: 'Compare revisions'
+      },
+      {
+        id: 'improve',
+        label: 'Improve validation'
+      }
+    ],
+
+    edges: [
+      ['review', 'identify'],
+      ['identify', 'compare'],
+      ['compare', 'improve'],
+      ['improve', 'review']
+    ]
+  },
+
 
   bestPractices: [
     'Focus on the weakest checkpoint before optimizing strong areas.',

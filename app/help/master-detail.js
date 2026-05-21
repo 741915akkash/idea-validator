@@ -1,3 +1,4 @@
+// master-detail.js
 export default {
   title: 'Master Detail',
 
@@ -6,11 +7,32 @@ export default {
   purpose:
     'This page breaks large uncertainties into smaller, testable sub-uncertainties and connects them directly to interview execution and evidence collection.',
 
-  workflow: [
-    'Select an uncertainty and review related sub-uncertainties.',
-    'Run interviews focused on the selected unknown.',
-    'Track progress and continue resolving unresolved areas.'
-  ],
+  workflow: {
+    nodes: [
+      {
+        id: '1',
+        label: 'Select uncertainty'
+      },
+      {
+        id: '2',
+        label: 'Review sub-uncertainties'
+      },
+      {
+        id: '3',
+        label: 'Run interviews'
+      },
+      {
+        id: '4',
+        label: 'See interview analytics'
+      }
+    ],
+
+    edges: [
+      ['1', '2'],
+      ['2', '3'],
+      ['3', '4']
+    ]
+  },
 
   bestPractices: [
     'Keep uncertainty statements clear and testable.',

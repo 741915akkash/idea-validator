@@ -1,3 +1,4 @@
+// interviews.js
 export default {
   title: 'Interviews',
 
@@ -6,11 +7,42 @@ export default {
   purpose:
     'This page helps you conduct, organize, and review interviews so you can validate assumptions using direct user feedback instead of intuition.',
 
-  workflow: [
-    'Start a quick or structured interview.',
-    'Capture evidence, notes, and respondent context.',
-    'Review completed interviews and continue unresolved discussions.'
-  ],
+  workflow: {
+    nodes: [
+      {
+        id: '1',
+        label: 'Click Quick interview'
+      },
+      {
+        id: '2',
+        label: 'Interview Screen appears'
+      },
+      {
+        id: '3',
+        label: 'Fill the respondent info, hide or view with button'
+      },
+      {
+        id: '4',
+        label: 'Fill the title, tags'
+      },
+      {
+        id: '5',
+        label: 'Record the notes in interview notes panel'
+      },
+      {
+        id: '6',
+        label: 'Record the evidence in evidence panel'
+      }
+    ],
+
+    edges: [
+      ['1', '2'],
+      ['2', '3'],
+      ['3', '4'],
+      ['4', '5'],
+      ['5', '6']
+    ]
+  },
 
   bestPractices: [
     'Ask about real past behavior instead of hypothetical actions.',

@@ -10,7 +10,7 @@
 
   defineEmits(['back', 'save'])
   const showHelpDrawer = ref(false)
-  const help = useHelpContent('editor-header')
+  const help = useHelpContent('sequence-editor-header')
 </script>
 
 <template>
@@ -30,7 +30,6 @@
             <span>{{ isEdit ? 'Edit Sequence' : 'Create Sequence' }}</span>
 
             <Info
-              v-if="isEdit"
               class="h-5 w-5 cursor-pointer text-gray-400 transition hover:text-gray-700"
               @click="showHelpDrawer = true"
             />
