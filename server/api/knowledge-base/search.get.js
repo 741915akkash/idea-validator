@@ -137,6 +137,7 @@ export default eventHandler(async (event) => {
       const interviewBody = row.interview_text || ''
       const respondentLine = row.respondent_info ? `Respondent: ${row.respondent_info}` : ''
       const content = [respondentLine, interviewBody].filter(Boolean).join('\n\n').trim()
+      const createdAt = row.finished_at || row.started_at
 
       return {
         id: row.id,
@@ -146,33 +147,40 @@ export default eventHandler(async (event) => {
         checkpoint: 'Interview',
         content,
         snippet: content.slice(0, 180),
-        date: row.finished_at || row.started_at,
+        date: createdAt,
+        created_at: createdAt,
         type: 'Interviews',
         tags: [],
         source: 'interview'
       }
     })
 
-    const noteItems = notesResult.rows.map((row) => ({
-      id: row.id,
-      title:
-        row.source === 'question_note' && row.question_id
-          ? row.title || `Question ${row.question_id}`
-          : row.title || '',
-      question_id: row.question_id,
-      checkpoint: row.checkpoint ? `Checkpoint ${row.checkpoint}` : 'Quick Capture',
-      content: row.note_text,
-      snippet: row.note_text.slice(0, 180),
-      date: row.created_at,
-      type: 'Notes',
-      tags: row.tags || [],
-      source: row.source
-    }))
+    const noteItems = notesResult.rows.map((row) => {
+      const createdAt = row.created_at
+
+      return {
+        id: row.id,
+        title:
+          row.source === 'question_note' && row.question_id
+            ? row.title || `Question ${row.question_id}`
+            : row.title || '',
+        question_id: row.question_id,
+        checkpoint: row.checkpoint ? `Checkpoint ${row.checkpoint}` : 'Quick Capture',
+        content: row.note_text,
+        snippet: row.note_text.slice(0, 180),
+        date: createdAt,
+        created_at: createdAt,
+        type: 'Notes',
+        tags: row.tags || [],
+        source: row.source
+      }
+    })
     const crmItems = crmResult.rows.map((row) => {
       const leadLabel = row.lead_name || row.lead_company || `Lead #${row.lead_id}`
       const typeLabel = row.type ? String(row.type).replaceAll('_', ' ') : 'activity'
       const title = `${leadLabel} - ${typeLabel}`
       const content = row.text || ''
+      const createdAt = row.created_at
 
       return {
         id: row.id,
@@ -183,7 +191,8 @@ export default eventHandler(async (event) => {
         checkpoint: 'CRM',
         content,
         snippet: content.slice(0, 180),
-        date: row.created_at,
+        date: createdAt,
+        created_at: createdAt,
         type: 'CRM',
         tags: [],
         source: 'lead_activity'

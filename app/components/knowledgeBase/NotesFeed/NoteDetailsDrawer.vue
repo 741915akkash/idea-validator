@@ -89,7 +89,7 @@
               <div class="mt-4 flex items-center gap-4">
                 <div class="flex items-center gap-1 text-sm text-slate-400">
                   <Calendar class="h-4 w-4" />
-                  {{ note.created_at ? formatDate(note.created_at) : '' }}
+                  {{ note.created_at || note.date ? formatDate(note.created_at || note.date) : '' }}
                 </div>
               </div>
             </div>
