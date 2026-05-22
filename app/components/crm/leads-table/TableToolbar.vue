@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+  import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
   import { useUser } from '~/composables/useUser'
   import { useSequencesStore } from '~/stores/sequences'
   import { useSourcesStore } from '~/stores/sources'
@@ -18,6 +18,12 @@
   const activeFilterType = ref('')
   const filterMenuRef = ref(null)
   const viewMenuRef = ref(null)
+  const filterButtonRef = ref(null)
+  const viewButtonRef = ref(null)
+  const filterPanelRef = ref(null)
+  const viewPanelRef = ref(null)
+  const filterDropdownStyle = ref({})
+  const viewDropdownStyle = ref({})
   const stagesStore = useStagesStore()
   const usersStore = useUsersStore()
   const sourcesStore = useSourcesStore()
@@ -79,9 +85,39 @@
     return column.columnDef.meta?.label || column.id
   }
 
+  function updateFilterDropdownPosition() {
+    const trigger = filterButtonRef.value
+    if (!trigger) return
+    const rect = trigger.getBoundingClientRect()
+    filterDropdownStyle.value = {
+      position: 'fixed',
+      top: `${Math.round(rect.bottom + 8)}px`,
+      left: `${Math.round(rect.left)}px`,
+      zIndex: 200
+    }
+  }
+
+  function updateViewDropdownPosition() {
+    const trigger = viewButtonRef.value
+    if (!trigger) return
+    const rect = trigger.getBoundingClientRect()
+    viewDropdownStyle.value = {
+      position: 'fixed',
+      top: `${Math.round(rect.bottom + 8)}px`,
+      left: `${Math.round(rect.left)}px`,
+      zIndex: 200
+    }
+  }
+
   function openFilterMenu() {
     showFilters.value = !showFilters.value
-    if (!showFilters.value) activeFilterType.value = ''
+    if (!showFilters.value) {
+      activeFilterType.value = ''
+      return
+    }
+    nextTick(() => {
+      updateFilterDropdownPosition()
+    })
   }
 
   function openFilterType(typeId) {
@@ -240,7 +276,8 @@
 
     if (showFilters.value) {
       const filterRoot = filterMenuRef.value
-      if (filterRoot && !filterRoot.contains(target)) {
+      const filterPanel = filterPanelRef.value
+      if (filterRoot && !filterRoot.contains(target) && (!filterPanel || !filterPanel.contains(target))) {
         showFilters.value = false
         activeFilterType.value = ''
         activeFilterOptions.value = []
@@ -249,18 +286,28 @@
 
     if (showColumns.value) {
       const viewRoot = viewMenuRef.value
-      if (viewRoot && !viewRoot.contains(target)) {
+      const viewPanel = viewPanelRef.value
+      if (viewRoot && !viewRoot.contains(target) && (!viewPanel || !viewPanel.contains(target))) {
         showColumns.value = false
       }
     }
   }
 
+  function handleViewportChange() {
+    if (showFilters.value) updateFilterDropdownPosition()
+    if (showColumns.value) updateViewDropdownPosition()
+  }
+
   onMounted(() => {
     document.addEventListener('click', handleDocumentClick)
+    window.addEventListener('resize', handleViewportChange)
+    window.addEventListener('scroll', handleViewportChange, true)
   })
 
   onBeforeUnmount(() => {
     document.removeEventListener('click', handleDocumentClick)
+    window.removeEventListener('resize', handleViewportChange)
+    window.removeEventListener('scroll', handleViewportChange, true)
   })
 </script>
 
@@ -282,126 +329,34 @@
         <!-- FILTER BUTTON -->
         <div ref="filterMenuRef" class="relative" @click.stop>
           <button
+            ref="filterButtonRef"
             class="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
             @click="openFilterMenu"
           >
             <Filter class="h-4 w-4" />
             Filters
           </button>
-
-          <Transition
-            enter-active-class="transition duration-100 ease-out"
-            enter-from-class="transform scale-95 opacity-0"
-            enter-to-class="transform scale-100 opacity-100"
-            leave-active-class="transition duration-75 ease-in"
-            leave-from-class="transform scale-100 opacity-100"
-            leave-to-class="transform scale-95 opacity-0"
-          >
-            <div
-              v-if="showFilters"
-              class="absolute left-0 top-full z-[70] mt-2 w-64 rounded-xl border border-gray-200 bg-white p-2 shadow-xl ring-1 ring-black ring-opacity-5"
-            >
-              <template v-if="!activeFilterType">
-                <div class="mb-2 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700">
-                  Add Filter
-                </div>
-
-                <button
-                  v-for="item in filterTypes"
-                  :key="item.id"
-                  class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-                  @click="openFilterType(item.id)"
-                >
-                  <span>{{ item.label }}</span>
-                  <ChevronRight class="h-4 w-4 text-gray-400" />
-                </button>
-              </template>
-
-              <template v-else>
-                <button
-                  class="mb-2 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-                  @click="backToFilterList"
-                >
-                  <ChevronLeft class="h-4 w-4 text-gray-500" />
-                  <span>{{ activeFilterLabel }}</span>
-                </button>
-
-                <div class="max-h-56 space-y-1 overflow-auto">
-                  <label
-                    v-for="option in activeFilterOptions"
-                    :key="option"
-                    class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
-                  >
-                    <input
-                      type="checkbox"
-                      class="h-4 w-4 rounded border-gray-300 text-emerald-600"
-                      :checked="isOptionSelected(option)"
-                      @change="toggleOption(option, $event.target.checked)"
-                    />
-                    <span>{{ formatFilterOption(option) }}</span>
-                  </label>
-                </div>
-              </template>
-            </div>
-          </Transition>
         </div>
 
         <!-- COLUMN TOGGLE -->
         <div ref="viewMenuRef" class="relative" @click.stop>
           <button
+            ref="viewButtonRef"
             class="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
-            @click="showColumns = !showColumns"
+            @click="
+              () => {
+                showColumns = !showColumns
+                if (showColumns) {
+                  nextTick(() => {
+                    updateViewDropdownPosition()
+                  })
+                }
+              }
+            "
           >
             <Columns class="h-4 w-4" />
             View
           </button>
-
-          <!-- DROPDOWN -->
-          <Transition
-            enter-active-class="transition duration-100 ease-out"
-            enter-from-class="transform scale-95 opacity-0"
-            enter-to-class="transform scale-100 opacity-100"
-            leave-active-class="transition duration-75 ease-in"
-            leave-from-class="transform scale-100 opacity-100"
-            leave-to-class="transform scale-95 opacity-0"
-          >
-            <div
-              v-if="showColumns"
-              class="absolute left-0 top-full z-[70] mt-2 w-56 rounded-xl border border-gray-200 bg-white p-3 shadow-xl ring-1 ring-black ring-opacity-5"
-            >
-              <h3 class="mb-3 px-1 text-xs font-bold uppercase tracking-widest text-gray-400">
-                Display Columns
-              </h3>
-
-              <div class="space-y-1">
-                <label
-                  v-for="column in props.table.getAllLeafColumns()"
-                  :key="column.id"
-                  class="group flex cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5 transition-colors hover:bg-gray-50"
-                >
-                  <input
-                    type="checkbox"
-                    :checked="column.getIsVisible()"
-                    :disabled="!column.getCanHide()"
-                    @change="column.toggleVisibility($event.target.checked)"
-                    class="h-4 w-4 cursor-pointer rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  />
-
-                  <span
-                    class="text-sm font-medium text-gray-700 transition-colors group-hover:text-emerald-600"
-                  >
-                    {{ labelFor(column) }}
-                  </span>
-                </label>
-              </div>
-
-              <div
-                class="mt-3 border-t border-gray-100 pt-3 text-center text-[10px] italic text-gray-400"
-              >
-                Changes auto-save to browser
-              </div>
-            </div>
-          </Transition>
         </div>
 
         <!-- RESET SORT -->
@@ -450,5 +405,115 @@
     </div>
 
     <AddLeadModal v-if="showModal" @close="showModal = false" />
+
+    <teleport to="body">
+      <Transition
+        enter-active-class="transition duration-100 ease-out"
+        enter-from-class="transform scale-95 opacity-0"
+        enter-to-class="transform scale-100 opacity-100"
+        leave-active-class="transition duration-75 ease-in"
+        leave-from-class="transform scale-100 opacity-100"
+        leave-to-class="transform scale-95 opacity-0"
+      >
+        <div
+          v-if="showFilters"
+          ref="filterPanelRef"
+          :style="filterDropdownStyle"
+          class="w-64 rounded-xl border border-gray-200 bg-white p-2 shadow-xl ring-1 ring-black ring-opacity-5"
+          @click.stop
+        >
+          <template v-if="!activeFilterType">
+            <div class="mb-2 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700">Add Filter</div>
+
+            <button
+              v-for="item in filterTypes"
+              :key="item.id"
+              class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+              @click="openFilterType(item.id)"
+            >
+              <span>{{ item.label }}</span>
+              <ChevronRight class="h-4 w-4 text-gray-400" />
+            </button>
+          </template>
+
+          <template v-else>
+            <button
+              class="mb-2 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+              @click="backToFilterList"
+            >
+              <ChevronLeft class="h-4 w-4 text-gray-500" />
+              <span>{{ activeFilterLabel }}</span>
+            </button>
+
+            <div class="max-h-56 space-y-1 overflow-auto">
+              <label
+                v-for="option in activeFilterOptions"
+                :key="option"
+                class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+              >
+                <input
+                  type="checkbox"
+                  class="h-4 w-4 rounded border-gray-300 text-emerald-600"
+                  :checked="isOptionSelected(option)"
+                  @change="toggleOption(option, $event.target.checked)"
+                />
+                <span>{{ formatFilterOption(option) }}</span>
+              </label>
+            </div>
+          </template>
+        </div>
+      </Transition>
+    </teleport>
+
+    <teleport to="body">
+      <Transition
+        enter-active-class="transition duration-100 ease-out"
+        enter-from-class="transform scale-95 opacity-0"
+        enter-to-class="transform scale-100 opacity-100"
+        leave-active-class="transition duration-75 ease-in"
+        leave-from-class="transform scale-100 opacity-100"
+        leave-to-class="transform scale-95 opacity-0"
+      >
+        <div
+          v-if="showColumns"
+          ref="viewPanelRef"
+          :style="viewDropdownStyle"
+          class="w-56 rounded-xl border border-gray-200 bg-white p-3 shadow-xl ring-1 ring-black ring-opacity-5"
+          @click.stop
+        >
+          <h3 class="mb-3 px-1 text-xs font-bold uppercase tracking-widest text-gray-400">
+            Display Columns
+          </h3>
+
+          <div class="space-y-1">
+            <label
+              v-for="column in props.table.getAllLeafColumns()"
+              :key="column.id"
+              class="group flex cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5 transition-colors hover:bg-gray-50"
+            >
+              <input
+                type="checkbox"
+                :checked="column.getIsVisible()"
+                :disabled="!column.getCanHide()"
+                @change="column.toggleVisibility($event.target.checked)"
+                class="h-4 w-4 cursor-pointer rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+              />
+
+              <span
+                class="text-sm font-medium text-gray-700 transition-colors group-hover:text-emerald-600"
+              >
+                {{ labelFor(column) }}
+              </span>
+            </label>
+          </div>
+
+          <div
+            class="mt-3 border-t border-gray-100 pt-3 text-center text-[10px] italic text-gray-400"
+          >
+            Changes auto-save to browser
+          </div>
+        </div>
+      </Transition>
+    </teleport>
   </div>
 </template>
