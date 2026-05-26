@@ -327,45 +327,7 @@
             <button @click="renaming = false" class="text-sm text-gray-500">Cancel</button>
           </div>
         </div>
-
-        <button
-          class="shrink-0 rounded-lg bg-[#E5E4E2] px-4 py-2 text-sm font-medium text-black transition hover:bg-[#DAD8D4] disabled:cursor-not-allowed disabled:opacity-50"
-          :disabled="!canViewHistory"
-          @click="openHistory"
-        >
-          🕘 History
-        </button>
       </div>
-
-      <!-- Deterministic Interview Section -->
-      <section
-        v-if="isMounted && quizStore.quizId"
-        class="mb-10 rounded-lg border border-neutral-300 bg-gray-50 p-6"
-      >
-        <div class="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-          <!-- Left Content -->
-          <div class="flex-1">
-            <div class="text-xs font-medium uppercase text-neutral-500">
-              Deterministic Validation
-            </div>
-
-            <h2 class="mt-2 text-lg font-semibold text-neutral-900">Resolve Uncertainties</h2>
-
-            <div class="mt-3 max-w-md text-sm text-neutral-600">
-              Reduce risk by systematically resolving specific unknowns.
-            </div>
-
-            <div v-if="interviewSummary.total > 0" class="mt-4 space-y-1 text-sm text-neutral-700">
-              <div class="font-medium">Interviews</div>
-              <div>{{ interviewSummary.total }} total</div>
-              <div>• {{ interviewSummary.completed }} completed</div>
-              <div>• {{ interviewSummary.inProgress }} in progress</div>
-            </div>
-
-            <div v-else class="mt-4 text-sm text-neutral-600">No uncertainties resolved yet.</div>
-          </div>
-        </div>
-      </section>
 
       <!-- Checkpoints list -->
       <section v-if="isMounted && quizStore.checkpoints.length" class="space-y-4">
@@ -408,15 +370,25 @@
         <!-- Error message -->
         <div
           v-if="scoreError"
-          class="mb-4 rounded border border-amber-300 bg-amber-50 px-4 py-3 text-base text-amber-700"
+          class="mb-4 whitespace-pre-line rounded border border-amber-300 bg-amber-50 px-4 py-3 text-base text-amber-700"
         >
           {{ scoreError }}
         </div>
 
         <div class="flex items-center gap-4">
+          <!-- History button -->
+          <button
+            class="rounded bg-emerald-600 px-6 py-3 text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+            :disabled="!canViewHistory"
+            @click="openHistory"
+          >
+            🕘 History
+          </button>
+
           <!-- Score button (before completion) -->
           <Button
             v-if="quizStore.checkpoints.length && !quizStore.isCompleted"
+            class="rounded border border-emerald-600 bg-white px-6 py-3 !text-black hover:bg-white hover:!text-black"
             @click="handleScoreClick()"
           >
             Score My Idea
@@ -426,7 +398,7 @@
           <NuxtLink
             v-else-if="quizStore.isCompleted"
             :to="`/quiz/score?quiz_id=${quizStore.quizId}`"
-            class="inline-flex items-center rounded bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
+            class="rounded border border-emerald-600 bg-white px-6 py-3 text-black hover:bg-white hover:text-black"
           >
             View Score
           </NuxtLink>
