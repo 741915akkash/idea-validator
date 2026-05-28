@@ -1,6 +1,6 @@
 // master-detail.js
 export default {
-  title: 'Master Detail',
+  title: 'Structured Validation',
 
   subtitle: 'Resolve uncertainties through structured validation workflows.',
 

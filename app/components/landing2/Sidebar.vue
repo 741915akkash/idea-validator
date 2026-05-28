@@ -382,7 +382,7 @@
           Interviews
         </NuxtLink>
 
-        <!-- Master Detail -->
+        <!-- Structured Validation -->
         <NuxtLink
           :to="masterDetailLink"
           class="flex items-center gap-2 rounded-lg px-3 py-2 transition"
@@ -393,7 +393,7 @@
           "
         >
           <Columns3 class="h-4 w-4" />
-          Master Detail
+          Structured Validation
         </NuxtLink>
 
         <NuxtLink
@@ -429,15 +429,7 @@
     <!-- PRIMARY CTA -->
     <div class="mt-6">
       <NuxtLink
-        v-if="isClientReady && quizStore.hasQuiz"
-        to="/quiz"
-        class="block w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-center font-medium text-white transition hover:bg-emerald-700"
-      >
-        Continue
-      </NuxtLink>
-
-      <NuxtLink
-        v-else
+        v-if="!isClientReady || !quizStore.hasQuiz"
         to="/general/signup-login"
         class="block w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-center font-medium text-white transition hover:bg-emerald-700"
       >

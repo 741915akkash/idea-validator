@@ -56,7 +56,7 @@ export default {
       to: '/quiz/overview'
     },
     {
-      label: 'Master Detail',
+      label: 'Structured Validation',
       to: '/quiz/master-detail'
     }
   ]

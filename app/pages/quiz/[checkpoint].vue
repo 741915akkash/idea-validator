@@ -24,6 +24,11 @@
     router.replace('/quiz/overview')
   }
 
+  // Guard invalid dynamic route params (e.g. /quiz/interview-templates).
+  if (!Number.isInteger(checkpoint) || checkpoint < 1 || checkpoint > 9) {
+    router.replace('/quiz/overview')
+  }
+
   // Load checkpoint state
   const {
     data: state,

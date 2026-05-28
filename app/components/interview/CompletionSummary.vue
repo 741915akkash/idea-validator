@@ -196,7 +196,7 @@
         :disabled="loading"
         class="rounded-md border border-neutral-900 px-6 py-2 text-sm font-medium text-neutral-900"
       >
-        Return to Master Detail
+        Return to Structured Validation
       </button>
     </div>
 
