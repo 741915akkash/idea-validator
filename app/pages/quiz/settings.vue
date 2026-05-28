@@ -336,6 +336,10 @@
       deletingSourceId.value = ''
     }
   }
+
+  function contactSupport() {
+    window.location.href = 'mailto:support@golaunchscall.com'
+  }
 </script>
 
 <template>
@@ -395,6 +399,13 @@
       <SettingsBar v-if="currentQuiz" title="Delete this idea" danger>
         <Button2 size="sm" variant="danger" :disabled="!canDeleteIdea" @click="openDeleteModal">
           Delete
+        </Button2>
+      </SettingsBar>
+
+      <!-- Support -->
+      <SettingsBar title="Contact support" subtitle="support@golaunchscall.com">
+        <Button2 size="sm" variant="primary" @click="contactSupport">
+          Email us
         </Button2>
       </SettingsBar>
     </div>
