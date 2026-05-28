@@ -50,7 +50,10 @@ export default defineEventHandler(async (event) => {
     if (unanswered.rows.length) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Answer all questions before scoring'
+        statusMessage: `Answer all questions before scoring
+
+                            First from assumptions
+                            Then update from research`
       })
     }
 
