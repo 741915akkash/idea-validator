@@ -1,6 +1,8 @@
 <script setup>
   import { ArrowDown, ArrowRight, RefreshCw } from 'lucide-vue-next'
 
+  defineEmits(['start'])
+
   const loopSteps = [
     { id: 1, name: 'Idea', example: 'Idea: AI fitness app for busy people' },
     {
@@ -8,7 +10,11 @@
       name: 'Confidence Score',
       example: 'Confidence Score: Low — not sure people will pay'
     },
-    { id: 3, name: 'Key assumptions', example: 'Assumption: Users will pay $50/month' },
+    {
+      id: 3,
+      name: 'Key assumptions',
+      example: 'Assumption: Users will pay $50/month'
+    },
     {
       id: 4,
       name: 'Key uncertainties',
@@ -17,32 +23,41 @@
     {
       id: 5,
       name: 'Testable questions',
-      example: 'Testable question: "Would you pay $50/month?" -> Yes / No'
+      example: 'Testable question: "Would you pay $50/month?" → Yes / No'
     },
-    { id: 6, name: 'Real user interviews', example: 'Interviews: Talked to 10 users' },
-    { id: 7, name: 'Learnings & decision', example: 'Learnings: 7 said no.' }
+    {
+      id: 6,
+      name: 'Real user interviews',
+      example: 'Interviews: Talked to 10 users'
+    },
+    {
+      id: 7,
+      name: 'Learnings & decision',
+      example: 'Learnings: 7 said no.'
+    }
   ]
 </script>
 
 <template>
-  <section class="mx-auto mt-20 max-w-4xl px-6 pb-24">
-    <h2 class="mb-8 text-center text-3xl font-extrabold text-slate-900">
-      Here's what validating an idea actually looks like
+  <section id="light-explanation-section" class="mx-auto max-w-4xl px-6 py-20">
+    <h2 class="mb-10 text-center text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+      How Validation Works
     </h2>
     <div
-      class="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm sm:p-12"
+      class="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-12"
     >
       <!-- Header -->
       <div
         class="mb-12 flex flex-col gap-2 border-b border-slate-100 pb-6 sm:grid sm:grid-cols-2 sm:gap-12"
       >
-        <h3 class="text-center text-sm font-black uppercase tracking-[0.3em] text-emerald-600">
-          Process
+        <h3 class="text-center text-sm font-bold uppercase tracking-[0.3em] text-emerald-600">
+          Process Step
         </h3>
+
         <h3
-          class="text-center text-sm font-black uppercase tracking-[0.3em] text-slate-400 sm:pl-6 sm:text-left"
+          class="text-center text-sm font-bold uppercase tracking-[0.3em] text-slate-400 sm:pl-6 sm:text-left"
         >
-          Example
+          Real Example
         </h3>
       </div>
 
@@ -51,30 +66,32 @@
         <div v-for="(step, index) in loopSteps" :key="step.id" class="group/row flex flex-col">
           <!-- Step Row -->
           <div
-            class="-mx-4 grid grid-cols-1 items-stretch gap-1 rounded-xl px-4 transition-colors duration-300 group-hover/row:bg-slate-50/50 sm:grid-cols-2 sm:gap-12"
+            class="-mx-4 grid grid-cols-1 items-stretch gap-1 rounded-xl px-4 transition-colors duration-300 hover:bg-slate-50/50 sm:grid-cols-2 sm:gap-12"
           >
-            <!-- Left Side: Process -->
-            <div class="relative flex items-center justify-center py-2 text-center sm:py-3">
-              <p class="text-base font-bold text-slate-900">{{ step.name }}</p>
-              <!-- Horizontal Connector (Desktop) -->
+            <!-- Left -->
+            <div class="relative flex items-center justify-center py-3 text-center sm:py-4">
+              <p class="text-lg font-semibold text-slate-900">
+                {{ step.name }}
+              </p>
+
               <div
-                class="absolute -right-12 top-1/2 hidden w-12 -translate-y-1/2 border-t border-slate-100 sm:block"
-              ></div>
+                class="absolute -right-12 top-1/2 hidden w-12 -translate-y-1/2 border-t border-slate-200 sm:block"
+              />
             </div>
 
-            <!-- Right Side: Example -->
+            <!-- Right -->
             <div
-              class="relative flex flex-col items-center justify-center border-l-0 border-slate-100 py-1 text-center text-sm leading-relaxed text-slate-900 sm:items-start sm:border-l sm:border-emerald-100/50 sm:py-3 sm:pl-6 sm:text-left sm:text-base"
+              class="relative flex flex-col items-center justify-center border-l-0 border-slate-100 py-1.5 text-center text-sm font-medium leading-relaxed text-slate-700 sm:items-start sm:border-l sm:border-emerald-200 sm:py-3.5 sm:pl-6 sm:text-left sm:text-base"
             >
-              <!-- Connection Dot (Desktop) -->
               <div
-                class="absolute -left-[2.5px] top-1/2 hidden h-[5px] w-[5px] -translate-y-1/2 rounded-full bg-emerald-300 sm:block"
-              ></div>
+                class="absolute -left-[3px] top-1/2 hidden h-[6px] w-[6px] -translate-y-1/2 rounded-full bg-emerald-500 sm:block"
+              />
+
               {{ step.example }}
             </div>
           </div>
 
-          <!-- Arrow Row (Between Steps) -->
+          <!-- Arrow -->
           <div
             v-if="index < loopSteps.length - 1"
             class="grid grid-cols-1 gap-1 sm:grid-cols-2 sm:gap-12"
@@ -82,31 +99,36 @@
             <div class="flex justify-center py-1">
               <ArrowDown class="h-4 w-4 stroke-[3] text-emerald-500" />
             </div>
+
             <div
               class="hidden border-l border-slate-100 sm:ml-6 sm:block sm:border-emerald-100/50"
-            ></div>
+            />
           </div>
         </div>
 
-        <!-- FINAL DECISION ROW -->
+        <!-- Final Decision -->
         <div
           class="relative mt-8 grid grid-cols-1 items-stretch gap-4 border-t border-dashed border-slate-200 pt-8 sm:mt-12 sm:grid-cols-2 sm:gap-12 sm:pt-12"
         >
-          <div class="flex items-center justify-center font-black text-emerald-600">
+          <div class="flex items-center justify-center text-emerald-600">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-emerald-50 p-2">
+              <div class="rounded-lg bg-emerald-50 p-2 text-emerald-600">
                 <RefreshCw class="h-4 w-4" />
               </div>
-              <span class="text-[10px] uppercase tracking-widest">Iterate or pivot</span>
+
+              <span class="text-xs font-bold uppercase tracking-widest"> Iterate or pivot </span>
             </div>
           </div>
 
           <div
-            class="flex items-center justify-center gap-3 rounded-xl border border-emerald-100/50 bg-emerald-50/50 p-4 text-sm font-bold text-emerald-700"
+            class="flex items-center justify-center gap-3 rounded-xl border border-emerald-100/50 bg-emerald-50/50 p-4 text-sm font-semibold text-emerald-700"
           >
-            <div class="flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-sm">
+            <div
+              class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white shadow-sm"
+            >
               <ArrowRight class="h-3 w-3 text-emerald-500" />
             </div>
+
             <span>Decision: Pivot pricing & positioning</span>
           </div>
         </div>
@@ -114,15 +136,17 @@
     </div>
 
     <div class="mt-10 text-center">
-      <p class="text-sm font-medium text-slate-700">
+      <p class="text-base font-semibold text-slate-800 sm:text-lg">
         Want to see exactly how this works step-by-step?
       </p>
-      <NuxtLink
-        to="/general/how-it-works"
-        class="mt-3 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-base font-semibold leading-6 text-white shadow-sm transition-all hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
+
+      <button
+        @click="$emit('start')"
+        class="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3.5 text-base font-semibold text-white transition-all hover:bg-emerald-700"
       >
-        View full system <ArrowRight class="h-5 w-5" />
-      </NuxtLink>
+        View full system
+        <ArrowRight class="h-5 w-5" />
+      </button>
     </div>
   </section>
 </template>
