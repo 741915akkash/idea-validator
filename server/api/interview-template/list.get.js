@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
         t.title,
         t.description,
         t.tags,
+        t.version,
         t.created_at,
         t.updated_at,
 

@@ -1,6 +1,6 @@
 import { pool } from '../../../db/index.js'
 import { createError } from 'h3'
-import { requireUserIdentity } from '../../../utils/quizAccess'
+import { requireInterviewAccess } from '../../../utils/interviewAccess'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
@@ -18,39 +18,12 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { userId } = requireUserIdentity(event)
-
   const client = await pool.connect()
 
   try {
-    // --------------------------------------------------
-    // Validate interview ownership
-    // --------------------------------------------------
-
-    const interviewRes = await client.query(
-      `
-      SELECT
-        i.id,
-        i.template_id
-      FROM interviews i
-      WHERE i.id = $1
-      AND EXISTS (
-        SELECT 1
-        FROM interview_templates t
-        WHERE t.id = i.template_id
-        AND t.user_id = $2
-      )
-      LIMIT 1
-      `,
-      [interview_id, userId]
-    )
-
-    if (interviewRes.rows.length === 0) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Interview not found'
-      })
-    }
+    await requireInterviewAccess(client, event, interview_id, {
+      select: 'i.id'
+    })
 
     // --------------------------------------------------
     // Fetch answers + snapshot question data

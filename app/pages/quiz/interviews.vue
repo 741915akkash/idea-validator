@@ -451,7 +451,12 @@
   }
 
   function quickRespondent(interview) {
-    return (interview.respondent_info || '').trim() || 'Unknown respondent'
+    const structured = interview.latest_structured_responses || {}
+    return (
+      structured.name?.trim() ||
+      interview.respondent_info?.trim() ||
+      'Unknown respondent'
+    )
   }
 </script>
 

@@ -307,8 +307,13 @@ export default defineEventHandler(async (event) => {
       // OPEN TEXT
       // ==================================================
       else if (question_type === 'open_text') {
+        const responses = answers
+          .map((a) => a.answer_text?.trim())
+          .filter((value) => Boolean(value))
+
         analytics = {
-          total_answers: answers.filter((a) => a.answer_text?.trim()).length,
+          total_answers: responses.length,
+          responses,
 
           status: 'open_text_analysis_pending'
         }

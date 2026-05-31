@@ -243,7 +243,9 @@
 
   function openAnalytics(id) {
     if (!id) return
-    navigateTo(`/quiz/interview-templates/analytics?template_id=${encodeURIComponent(id)}`)
+    const template = templates.value.find((item) => item.id === id)
+    const version = template?.version ? `&version=${encodeURIComponent(template.version)}` : ''
+    navigateTo(`/quiz/interview-templates/analytics?template_id=${encodeURIComponent(id)}${version}`)
   }
 
   function openVersions(id) {
@@ -289,6 +291,7 @@
         description: row.description || 'No description',
         questions: Number(row.question_count || 0),
         interviews: Number(row.interview_count || 0),
+        version: Number(row.version || 0) || null,
         updated: formatUpdated(row.updated_at),
         tags: normalizeTags(row.tags)
       }))

@@ -26,6 +26,8 @@
   const answers = ref({})
   const savedDraft = ref(false)
   const isHydratingDraft = ref(false)
+  const pendingAnswerSaves = new Map()
+  const answerSaveTimers = new Map()
 
   // ✅ NEW structured fields
   const name = ref('')
@@ -67,6 +69,8 @@
       autosaveTimer = null
       saveDraft().catch(() => {})
     }
+
+    flushPendingAnswerSaves().catch(() => {})
   })
 
   function toggleMobileTab() {
@@ -142,6 +146,9 @@
   async function saveAnswer(question, value) {
     if (!props.interviewId) return
 
+    const answerText =
+      typeof value === 'number' || typeof value === 'boolean' ? String(value) : value
+
     try {
       await $fetch('/api/interview-template/answers/upsert', {
         method: 'POST',
@@ -151,14 +158,52 @@
 
           snapshot_question_id: question.id,
 
-          answer_text: typeof value === 'string' ? value : null,
+          answer_text: typeof answerText === 'string' ? answerText : null,
 
-          answer_json: typeof value === 'object' ? value : null
+          answer_json: Array.isArray(value) || (value && typeof value === 'object') ? value : null
         }
       })
     } catch (err) {
       console.error(err)
     }
+  }
+
+  function queueAnswerSave(question, value) {
+    if (!props.interviewId || !question?.id) return
+
+    pendingAnswerSaves.set(question.id, {
+      question,
+      value
+    })
+
+    if (answerSaveTimers.has(question.id)) {
+      clearTimeout(answerSaveTimers.get(question.id))
+    }
+
+    answerSaveTimers.set(
+      question.id,
+      setTimeout(() => {
+        flushQueuedAnswerSave(question.id).catch(() => {})
+      }, 250)
+    )
+  }
+
+  async function flushQueuedAnswerSave(questionId) {
+    const queued = pendingAnswerSaves.get(questionId)
+    if (!queued) return
+
+    pendingAnswerSaves.delete(questionId)
+
+    if (answerSaveTimers.has(questionId)) {
+      clearTimeout(answerSaveTimers.get(questionId))
+      answerSaveTimers.delete(questionId)
+    }
+
+    await saveAnswer(queued.question, queued.value)
+  }
+
+  async function flushPendingAnswerSaves() {
+    await Promise.all([...pendingAnswerSaves.keys()].map((questionId) => flushQueuedAnswerSave(questionId)))
   }
 
   function toggleMulti(question, option) {
@@ -174,7 +219,23 @@
       answers.value[question.id] = [...existing, option]
     }
 
-    saveAnswer(question, answers.value[question.id])
+    queueAnswerSave(question, answers.value[question.id])
+  }
+
+  function getRatingValues(question) {
+    const min = Number(question?.options_json?.min ?? 1)
+    const max = Number(question?.options_json?.max ?? 5)
+
+    if (!Number.isFinite(min) || !Number.isFinite(max) || max < min) {
+      return [1, 2, 3, 4, 5]
+    }
+
+    return Array.from({ length: max - min + 1 }, (_, index) => min + index)
+  }
+
+  function selectRating(question, value) {
+    answers.value[question.id] = value
+    queueAnswerSave(question, value)
   }
 
   async function hydrateDraft() {
@@ -182,6 +243,12 @@
 
     try {
       isHydratingDraft.value = true
+      pendingAnswerSaves.clear()
+      for (const timer of answerSaveTimers.values()) {
+        clearTimeout(timer)
+      }
+      answerSaveTimers.clear()
+      answers.value = {}
 
       const res = await $fetch('/api/interview/freeform/get', {
         query: { interview_id: props.interviewId }
@@ -207,7 +274,17 @@
       })
 
       for (const answer of answersRes.answers || []) {
-        answers.value[answer.snapshot_question_id] = answer.answer_json ?? answer.answer_text
+        if (answer.question_type === 'rating') {
+          const parsedRating = Number(answer.answer_text)
+          answers.value[answer.snapshot_question_id] = Number.isFinite(parsedRating)
+            ? parsedRating
+            : ''
+        } else {
+          answers.value[answer.snapshot_question_id] =
+            answer.answer_json !== null && answer.answer_json !== undefined
+              ? answer.answer_json
+              : answer.answer_text || ''
+        }
       }
 
       lastSavedSnapshot.value = currentSnapshot()
@@ -228,6 +305,7 @@
     }
 
     await saveDraft()
+    await flushPendingAnswerSaves()
 
     // 🔥 trigger CRM creation
     await $fetch('/api/interview/add-to-crm/add-to-crm', {
@@ -366,7 +444,7 @@
           </div>
 
           <div class="flex-1 space-y-2 overflow-y-auto p-3">
-            <button
+            <div
               v-for="(question, index) in questions"
               :key="question.id"
               class="w-full rounded-lg border border-neutral-200 bg-white p-3 text-left transition hover:border-emerald-300 hover:bg-emerald-50"
@@ -391,17 +469,17 @@
                   <textarea
                     v-if="question.question_type === 'open_text'"
                     v-model="answers[question.id]"
-                    @input="saveAnswer(question, answers[question.id])"
+                    @input="queueAnswerSave(question, answers[question.id])"
                     placeholder="Type answer..."
                     class="mt-3 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
                   />
 
                   <!-- YES / NO -->
                   <div v-else-if="question.question_type === 'yes_no'" class="mt-3 flex gap-2">
-                    <button
+                      <button
                       @click="
                         answers[question.id] = 'yes';
-                        saveAnswer(question, 'yes')
+                        queueAnswerSave(question, 'yes')
                       "
                       :class="
                         answers[question.id] === 'yes'
@@ -416,7 +494,7 @@
                     <button
                       @click="
                         answers[question.id] = 'no';
-                        saveAnswer(question, 'no')
+                        queueAnswerSave(question, 'no')
                       "
                       :class="
                         answers[question.id] === 'no'
@@ -439,7 +517,7 @@
                       :key="option"
                       @click="
                         answers[question.id] = option;
-                        saveAnswer(question, option)
+                        queueAnswerSave(question, option)
                       "
                       :class="
                         answers[question.id] === option
@@ -471,9 +549,36 @@
                       {{ option }}
                     </button>
                   </div>
+
+                  <!-- RATING -->
+                  <div
+                    v-else-if="question.question_type === 'rating'"
+                    class="mt-3 space-y-3"
+                  >
+                    <div class="flex flex-wrap gap-2">
+                      <button
+                        v-for="value in getRatingValues(question)"
+                        :key="value"
+                        @click="selectRating(question, value)"
+                        :class="
+                          answers[question.id] === value
+                            ? 'border-emerald-500 bg-emerald-100 text-emerald-900'
+                            : 'border-neutral-300 bg-white text-neutral-700'
+                        "
+                        class="min-w-[2.5rem] rounded-full border px-4 py-2 text-xs font-medium transition"
+                      >
+                        {{ value }}
+                      </button>
+                    </div>
+
+                    <div class="text-xs text-neutral-500">
+                      Choose a rating from {{ getRatingValues(question)[0] }} to
+                      {{ getRatingValues(question)[getRatingValues(question).length - 1] }}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </button>
+            </div>
           </div>
         </div>
 
