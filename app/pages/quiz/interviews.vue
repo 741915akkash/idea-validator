@@ -1,7 +1,7 @@
 <script setup>
   import { ref, onMounted, computed } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
-  import { Info } from 'lucide-vue-next'
+  import { Info, Trash2 } from 'lucide-vue-next'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import InterviewScreenFreeform from '~/components/interview/InterviewScreenFreeform.vue'
   import HelpDrawer from '~/components/help/HelpDrawer.vue'
@@ -24,6 +24,7 @@
   const renamingId = ref(null)
   const nameDraft = ref('')
   const cloningInterviewId = ref(null)
+  const deletingInterviewId = ref(null)
   const actionError = ref(null)
 
   const selectedFilter = ref('all')
@@ -36,12 +37,33 @@
   const closingFreeform = ref(false)
   const showHelpDrawer = ref(false)
   const showFreeformLimitAlert = ref(false)
+  const showStartInterviewModal = ref(false)
+  const templateSearchQuery = ref('')
+  const selectedStartTemplateId = ref(null)
+  const startModalError = ref('')
+  const interviewTemplates = ref([])
   const help = useHelpContent('interviews')
+
+  async function loadInterviewTemplates() {
+    const templatesRes = await $fetch('/api/interview-template/list').catch(() => ({ templates: [] }))
+    const rows = Array.isArray(templatesRes?.templates)
+      ? templatesRes.templates
+      : Array.isArray(templatesRes)
+        ? templatesRes
+        : []
+
+    interviewTemplates.value = rows.map((row) => ({
+      ...row,
+      title: row?.title || 'Untitled template',
+      description: row?.description || 'No description'
+    }))
+  }
 
   async function loadInterviewData() {
     if (!quizStore.quizId) {
       interviews.value = []
       quizName.value = ''
+      interviewTemplates.value = []
       return
     }
 
@@ -56,6 +78,7 @@
 
     interviews.value = interviewRows
     quizName.value = quiz?.name || ''
+    await loadInterviewTemplates()
   }
 
   async function maybeOpenInterviewFromQuery() {
@@ -87,6 +110,7 @@
 
     try {
       await loadInterviewData()
+      await loadInterviewTemplates()
       await maybeOpenInterviewFromQuery()
     } finally {
       loading.value = false
@@ -120,14 +144,42 @@
     }
   }
 
-  function openFreeformInterview() {
+  async function openFreeformInterview() {
+    await loadInterviewTemplates()
+    showStartInterviewModal.value = true
+    templateSearchQuery.value = ''
+    selectedStartTemplateId.value = null
+    startModalError.value =
+      interviewTemplates.value.length === 0 ? 'No templates found. Create one first.' : ''
+  }
+
+  function closeStartInterviewModal() {
+    showStartInterviewModal.value = false
+    templateSearchQuery.value = ''
+    selectedStartTemplateId.value = null
+    startModalError.value = ''
+  }
+
+  function selectTemplateForStart(id) {
+    selectedStartTemplateId.value = selectedStartTemplateId.value === id ? null : id
+    startModalError.value = ''
+  }
+
+  async function startInterviewFromModal() {
     if (!quizStore.quizId) return
+    if (!selectedStartTemplateId.value) {
+      startModalError.value = 'Please select a template to start the interview.'
+      return
+    }
     actionError.value = null
     showFreeformLimitAlert.value = false
 
-    $fetch('/api/interview/freeform/start', {
+    await $fetch('/api/interview/freeform/start', {
       method: 'POST',
-      body: { quiz_id: quizStore.quizId }
+      body: {
+        quiz_id: quizStore.quizId,
+        template_id: selectedStartTemplateId.value
+      }
     })
       .then((res) => {
         freeformInterviewId.value = res?.interview_id || null
@@ -137,6 +189,7 @@
           throw new Error('Missing freeform context')
         }
 
+        closeStartInterviewModal()
         showFreeformInterview.value = true
       })
       .catch((err) => {
@@ -185,6 +238,28 @@
     }
 
     closingFreeform.value = false
+  }
+
+  async function deleteQuickInterview(interviewId) {
+    if (!interviewId || deletingInterviewId.value) return
+    const confirmed = window.confirm('Delete this quick interview? This cannot be undone.')
+    if (!confirmed) return
+
+    actionError.value = null
+    deletingInterviewId.value = interviewId
+
+    try {
+      await $fetch('/api/interview/freeform/delete', {
+        method: 'POST',
+        body: { interview_id: interviewId }
+      })
+      await loadInterviewData()
+    } catch (err) {
+      actionError.value =
+        err?.data?.statusMessage || err?.statusMessage || 'Unable to delete quick interview.'
+    } finally {
+      deletingInterviewId.value = null
+    }
   }
 
   function startRename(interview) {
@@ -291,6 +366,17 @@
   })
 
   const quickPreviewInterviews = computed(() => quickInterviews.value.slice(0, 5))
+  const templatePreviewItems = computed(() => interviewTemplates.value.slice(0, 5))
+  const modalFilteredTemplates = computed(() => {
+    const q = templateSearchQuery.value.trim().toLowerCase()
+    if (!q) return interviewTemplates.value
+    return interviewTemplates.value.filter((template) => {
+      const title = String(template?.title || '').toLowerCase()
+      const description = String(template?.description || '').toLowerCase()
+      const tags = String(template?.tags || '').toLowerCase()
+      return title.includes(q) || description.includes(q) || tags.includes(q)
+    })
+  })
 
   const structuredInterviews = computed(() => interviews.value.filter((i) => !isQuickInterview(i)))
 
@@ -393,6 +479,69 @@
       {{ closingFreeform ? 'Closing...' : 'Close' }}
     </button>
 
+    <div
+      v-if="showStartInterviewModal"
+      class="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 p-4"
+    >
+      <div class="w-full max-w-2xl rounded-xl border border-slate-200 bg-white p-5 shadow-xl">
+        <div class="mb-4 flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-slate-900">Start Interview</h3>
+          <button class="text-sm font-medium text-slate-500 hover:text-slate-800" @click="closeStartInterviewModal">
+            Close
+          </button>
+        </div>
+
+        <div class="mb-4">
+          <input
+            v-model="templateSearchQuery"
+            type="text"
+            placeholder="Search interview templates..."
+            class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          />
+        </div>
+
+        <div class="max-h-80 space-y-2 overflow-y-auto">
+          <button
+            v-for="templateItem in modalFilteredTemplates"
+            :key="templateItem.id"
+            class="w-full rounded-lg border px-3 py-3 text-left transition"
+            :class="
+              selectedStartTemplateId === templateItem.id
+                ? 'border-emerald-500 bg-emerald-50'
+                : 'border-neutral-200 bg-white hover:border-neutral-300'
+            "
+            @click="selectTemplateForStart(templateItem.id)"
+          >
+            <div class="text-sm font-semibold text-slate-900">{{ templateItem.title }}</div>
+            <div class="mt-1 text-xs text-slate-600">{{ templateItem.description || 'No description' }}</div>
+          </button>
+        </div>
+
+        <div v-if="modalFilteredTemplates.length === 0" class="mt-3 text-sm text-slate-500">
+          No templates found.
+        </div>
+        <div v-if="startModalError" class="mt-3 text-sm text-red-600">
+          {{ startModalError }}
+        </div>
+
+        <div class="mt-5 flex justify-end gap-2">
+          <button
+            class="rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100"
+            @click="closeStartInterviewModal"
+          >
+            Cancel
+          </button>
+          <button
+            :disabled="!selectedStartTemplateId"
+            class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+            @click="startInterviewFromModal"
+          >
+            Start Interview
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="mx-auto max-w-2xl">
       <div class="mb-8 space-y-6">
         <!-- Page header -->
@@ -466,7 +615,7 @@
               class="inline-flex flex-1 items-center justify-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700 md:flex-none"
               @click="openFreeformInterview"
             >
-              + Quick Interview
+              + Start Interview
             </button>
           </div>
         </div>
@@ -480,17 +629,44 @@
           {{ actionError }}
         </div>
 
-        <!-- Empty State -->
-        <div
-          v-if="interviews.length === 0"
-          class="mb-6 rounded border border-gray-300 bg-gray-50 px-4 py-4 text-base text-gray-700"
-        >
-          No interviews yet.
-        </div>
+        <!-- ALL TAB DASHBOARD -->
+        <template v-if="selectedFilter === 'all'">
+            <section class="mb-8">
+              <div class="mb-4 flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-900">
+                  Templates ({{ interviewTemplates.length }})
+                </h2>
+                <NuxtLink
+                  to="/quiz/interview-templates"
+                  class="inline-flex items-center rounded-md border-2 border-emerald-600 bg-white px-3 py-2 text-sm font-medium text-neutral-800 transition hover:bg-neutral-100"
+                >
+                  Go to Templates
+                </NuxtLink>
+              </div>
 
-        <template v-if="interviews.length > 0">
-          <!-- ALL TAB DASHBOARD -->
-          <template v-if="selectedFilter === 'all'">
+              <div v-if="interviewTemplates.length > 0" class="grid gap-3 sm:grid-cols-2">
+                <div
+                  v-for="templateItem in templatePreviewItems"
+                  :key="templateItem.id"
+                  class="rounded-lg border border-neutral-300 bg-white p-4 text-left transition hover:border-neutral-300 hover:bg-neutral-50"
+                >
+                  <div class="text-base font-semibold text-neutral-900">
+                    {{ templateItem.title }}
+                  </div>
+                  <div class="mt-2 text-sm text-neutral-600">
+                    {{ templateItem.description }}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                v-else
+                class="rounded border border-gray-300 bg-gray-50 px-4 py-4 text-sm text-gray-700"
+              >
+                No templates yet.
+              </div>
+            </section>
+
             <section class="mb-8">
               <div class="mb-4 flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900">
@@ -505,12 +681,26 @@
               </div>
 
               <div v-if="quickInterviews.length > 0" class="grid gap-3 sm:grid-cols-2">
-                <button
+                <div
                   v-for="interview in quickPreviewInterviews"
                   :key="interview.id"
                   class="rounded-lg border border-neutral-300 bg-white p-4 text-left transition hover:border-neutral-300 hover:bg-neutral-50"
+                  role="button"
+                  tabindex="0"
                   @click="openQuickInterview(interview)"
                 >
+                  <div class="mb-2 flex justify-end">
+                    <button
+                      class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      aria-label="Delete quick interview"
+                      title="Delete"
+                      :disabled="deletingInterviewId === interview.id"
+                      @click.stop="deleteQuickInterview(interview.id)"
+                    >
+                      <Trash2 v-if="deletingInterviewId !== interview.id" class="h-4 w-4" />
+                      <span v-else class="text-[10px] font-medium">...</span>
+                    </button>
+                  </div>
                   <div class="text-base font-semibold text-neutral-900">
                     🧠 {{ quickTitle(interview) }}
                   </div>
@@ -518,7 +708,7 @@
                     Respondent: {{ quickRespondent(interview) }}
                   </div>
                   <div class="mt-1 text-sm text-neutral-600">"{{ quickSnippet(interview) }}"</div>
-                </button>
+                </div>
               </div>
 
               <div
@@ -538,7 +728,7 @@
                   to="/quiz/master-detail"
                   class="inline-flex items-center rounded-md border-2 border-emerald-600 bg-white px-3 py-2 text-sm font-medium text-neutral-800 transition hover:bg-neutral-100"
                 >
-                  Go to Master Detail
+                  Go to Structured Validation
                 </NuxtLink>
               </div>
               <div
@@ -658,12 +848,26 @@
             </div>
 
             <div v-if="filteredQuickInterviews.length > 0" class="grid gap-3 sm:grid-cols-2">
-              <button
+              <div
                 v-for="interview in filteredQuickInterviews"
                 :key="interview.id"
                 class="rounded-lg border border-neutral-300 bg-white p-4 text-left transition hover:border-neutral-300 hover:bg-neutral-50"
+                role="button"
+                tabindex="0"
                 @click="openQuickInterview(interview)"
               >
+                <div class="mb-2 flex justify-end">
+                  <button
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    aria-label="Delete quick interview"
+                    title="Delete"
+                    :disabled="deletingInterviewId === interview.id"
+                    @click.stop="deleteQuickInterview(interview.id)"
+                  >
+                    <Trash2 v-if="deletingInterviewId !== interview.id" class="h-4 w-4" />
+                    <span v-else class="text-[10px] font-medium">...</span>
+                  </button>
+                </div>
                 <div class="text-base font-semibold text-neutral-900">
                   🧠 {{ quickTitle(interview) }}
                 </div>
@@ -671,7 +875,7 @@
                   Respondent: {{ quickRespondent(interview) }}
                 </div>
                 <div class="mt-1 text-sm text-neutral-600">"{{ quickSnippet(interview) }}"</div>
-              </button>
+              </div>
             </div>
 
             <div
@@ -692,7 +896,7 @@
                 to="/quiz/master-detail"
                 class="inline-flex items-center rounded-md border-2 border-emerald-600 bg-white px-3 py-2 text-sm font-medium text-neutral-800 transition hover:bg-neutral-100"
               >
-                Go to Master Detail
+                Go to Structured Validation
               </NuxtLink>
             </div>
 
@@ -808,7 +1012,6 @@
               </div>
             </template>
           </section>
-        </template>
       </div>
     </div>
     <HelpDrawer :open="showHelpDrawer" :content="help" @close="showHelpDrawer = false" />

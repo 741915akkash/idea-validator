@@ -5,15 +5,27 @@ export default defineEventHandler(async (event) => {
   const { interview_id } = getQuery(event)
 
   if (!interview_id) {
-    throw createError({ statusCode: 400, statusMessage: 'interview_id required' })
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'interview_id required'
+    })
   }
 
   const client = await pool.connect()
 
   try {
+    // --------------------------------------------------
+    // Validate access
+    // --------------------------------------------------
+
     const interview = await requireInterviewAccess(client, event, interview_id, {
-      select: 'i.id, i.quiz_id, i.sub_uncertainty_id, i.respondent_info, i.started_at, i.finished_at'
+      select:
+        'i.id, i.quiz_id, i.sub_uncertainty_id, i.template_id, i.respondent_info, i.started_at, i.finished_at'
     })
+
+    // --------------------------------------------------
+    // Latest condition
+    // --------------------------------------------------
 
     const conditionRes = await client.query(
       `
@@ -25,6 +37,10 @@ export default defineEventHandler(async (event) => {
       `,
       [interview_id]
     )
+
+    // --------------------------------------------------
+    // Latest evidence
+    // --------------------------------------------------
 
     const latestEvidenceRes = await client.query(
       `
@@ -45,10 +61,34 @@ export default defineEventHandler(async (event) => {
       [interview_id]
     )
 
+    // --------------------------------------------------
+    // Snapshot questions
+    // --------------------------------------------------
+
+    const snapshotQuestionsRes = await client.query(
+      `
+      SELECT
+        id,
+        original_question_id,
+        text,
+        question_type,
+        options_json,
+        order_index
+      FROM interview_question_snapshots
+      WHERE interview_id = $1
+      ORDER BY order_index ASC
+      `,
+      [interview_id]
+    )
+
     return {
       interview,
+
       condition_id: conditionRes.rows[0]?.condition_id || null,
-      evidence: latestEvidenceRes.rows[0] || null
+
+      evidence: latestEvidenceRes.rows[0] || null,
+
+      template_questions: snapshotQuestionsRes.rows
     }
   } finally {
     client.release()
