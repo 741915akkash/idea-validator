@@ -1,5 +1,5 @@
 import { createError, getHeader, getQuery } from 'h3'
-import { pool } from '../../../db'
+import { pool } from '../../../db/index.js'
 import { getRecentCreditEventsAdmin } from '../../../db/queries/credits.js'
 
 function isAuthorized(event) {
