@@ -92,17 +92,17 @@
         <div class="mt-6 h-20">
           <div v-if="billing === 'monthly'">
             <p class="flex items-baseline gap-x-1">
-              <span class="text-3xl font-bold sm:text-4xl">$15</span>
+              <span class="text-3xl font-bold sm:text-4xl">$19</span>
               <span class="text-sm font-semibold text-slate-400">/mo</span>
             </p>
             <p class="mt-1 text-xs text-slate-400">Billed monthly</p>
           </div>
           <div v-else>
             <p class="flex items-baseline gap-x-1">
-              <span class="text-3xl font-bold sm:text-4xl">$155</span>
+              <span class="text-3xl font-bold sm:text-4xl">$190</span>
               <span class="text-sm font-semibold text-slate-400">/year</span>
             </p>
-            <p class="mt-1 text-sm font-bold text-emerald-600">$6/month billed yearly</p>
+            <p class="mt-1 text-sm font-bold text-emerald-600">$15/month billed yearly</p>
           </div>
         </div>
 
