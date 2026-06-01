@@ -80,12 +80,6 @@
                 Yearly
               </button>
             </div>
-            <p
-              v-if="billing === 'yearly'"
-              class="mt-2 text-right text-xs font-semibold text-emerald-600"
-            >
-              Save 33%
-            </p>
           </div>
         </div>
 
