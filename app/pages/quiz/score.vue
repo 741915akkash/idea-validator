@@ -7,6 +7,7 @@
   import InsightBlock from '~/components/score/InsightBlock.vue'
   import HelpDrawer from '~/components/help/HelpDrawer.vue'
   import { useHelpContent } from '~/composables/useHelpContent'
+  import { CHECKPOINT_NAMES } from '~/utils/checkpoint-names'
 
   definePageMeta({
     layout: 'app',
@@ -181,7 +182,7 @@
               :key="checkpoint"
               class="flex justify-between rounded border px-4 py-2"
             >
-              <span>Checkpoint {{ checkpoint }}</span>
+              <span> {{ checkpoint }}) {{ CHECKPOINT_NAMES[checkpoint] }} </span>
               <span class="text-gray-600">{{ value }}</span>
             </li>
           </ul>
@@ -215,7 +216,9 @@
             class="mb-6 rounded border p-4"
           >
             <!-- Checkpoint -->
-            <p class="mb-1 text-xs text-gray-500">Checkpoint {{ change.checkpoint }}</p>
+            <p class="mb-1 text-xs text-gray-500">
+              Checkpoint {{ change.checkpoint }}) {{ CHECKPOINT_NAMES[change.checkpoint] }}
+            </p>
 
             <!-- Question -->
             <p class="mb-3 text-base font-medium">
@@ -283,12 +286,15 @@
 
             <!-- Notes -->
             <div
-              v-if="(change.notes?.previous?.length || 0) > 0 || (change.notes?.current?.length || 0) > 0"
+              v-if="
+                (change.notes?.previous?.length || 0) > 0 ||
+                (change.notes?.current?.length || 0) > 0
+              "
               class="mb-2"
             >
-              <p class="mb-1 text-md font-medium text-gray-600">Notes</p>
+              <p class="text-md mb-1 font-medium text-gray-600">Notes</p>
 
-              <div class="grid grid-cols-2 gap-6 text-md">
+              <div class="text-md grid grid-cols-2 gap-6">
                 <!-- Previous -->
                 <div class="whitespace-pre-wrap text-gray-400">
                   {{ change.notes?.previous?.join('; ') || '—' }}
@@ -303,7 +309,7 @@
           </div>
         </section>
 
-                <!--
+        <!--
         <template>
           <section v-if="!loadingInsights && !insightsError && !insightsLocked" class="mt-10 space-y-10">
             <InsightBlock title="What’s working" tone="positive" :items="insights.working" />

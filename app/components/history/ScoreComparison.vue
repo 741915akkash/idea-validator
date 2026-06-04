@@ -1,49 +1,47 @@
 <template>
   <div>
     <!-- MOBILE CARDS -->
-<div class="space-y-3 md:hidden">
-  <div
-    v-for="(entry, index) in latestThreeEntries"
-    :key="entry.id"
-    class="rounded-lg border border-slate-200 bg-white p-3 shadow-sm"
-  >
-    <!-- Header -->
-    <div class="mb-2 flex items-center justify-between">
-      <div class="text-sm font-semibold text-slate-900">
-        {{ versionLabel(entry, index) }}
-      </div>
+    <div class="space-y-3 md:hidden">
+      <div
+        v-for="(entry, index) in latestThreeEntries"
+        :key="entry.id"
+        class="rounded-lg border border-slate-200 bg-white p-3 shadow-sm"
+      >
+        <!-- Header -->
+        <div class="mb-2 flex items-center justify-between">
+          <div class="text-sm font-semibold text-slate-900">
+            {{ versionLabel(entry, index) }}
+          </div>
 
-      <div class="text-xs text-slate-500">
-        v{{ entry.revision_number }}
+          <div class="text-xs text-slate-500">v{{ entry.revision_number }}</div>
+        </div>
+
+        <!-- STACKED SCORES -->
+        <div class="space-y-2 text-sm">
+          <!-- Market -->
+          <div class="flex items-center justify-between">
+            <span class="text-slate-500">Market</span>
+            <span class="font-medium">
+              {{ scoreFor(entry, 'market_score') }}
+              <span class="ml-1 text-emerald-600">
+                {{ deltaText(entry, index, 'market_score') }}
+              </span>
+            </span>
+          </div>
+
+          <!-- Confidence -->
+          <div class="flex items-center justify-between">
+            <span class="text-slate-500">Confidence</span>
+            <span class="font-medium">
+              {{ scoreFor(entry, 'confidence_score') }}
+              <span class="ml-1 text-emerald-600">
+                {{ deltaText(entry, index, 'confidence_score') }}
+              </span>
+            </span>
+          </div>
+        </div>
       </div>
     </div>
-
-    <!-- STACKED SCORES -->
-    <div class="space-y-2 text-sm">
-      <!-- Market -->
-      <div class="flex items-center justify-between">
-        <span class="text-slate-500">Market</span>
-        <span class="font-medium">
-          {{ scoreFor(entry, 'market_score') }}
-          <span class="ml-1 text-emerald-600">
-            {{ deltaText(entry, index, 'market_score') }}
-          </span>
-        </span>
-      </div>
-
-      <!-- Confidence -->
-      <div class="flex items-center justify-between">
-        <span class="text-slate-500">Confidence</span>
-        <span class="font-medium">
-          {{ scoreFor(entry, 'confidence_score') }}
-          <span class="ml-1 text-emerald-600">
-            {{ deltaText(entry, index, 'confidence_score') }}
-          </span>
-        </span>
-      </div>
-    </div>
-  </div>
-</div>
 
     <!-- DESKTOP TABLE -->
     <div class="hidden w-full overflow-x-auto md:block">
@@ -66,7 +64,7 @@
               <th
                 v-for="(entry, index) in latestThreeEntries"
                 :key="entry.id"
-                class="px-3 py-2 align-top font-medium whitespace-normal break-words leading-tight"
+                class="whitespace-normal break-words px-3 py-2 align-top font-medium leading-tight"
               >
                 {{ versionLabel(entry, index) }}
               </th>
@@ -122,7 +120,7 @@
 
             <tr v-for="cpKey in marketBreakdownKeys" :key="cpKey">
               <td class="sticky left-0 bg-white px-3 py-2.5 text-slate-700">
-                Checkpoint {{ cpKey }}
+                {{ cpKey }}) {{ CHECKPOINT_NAMES[cpKey] }}
               </td>
 
               <td
@@ -171,6 +169,8 @@
 </template>
 
 <script setup>
+  import { CHECKPOINT_NAMES } from '~/utils/checkpoint-names'
+
   const props = defineProps({
     latestThreeEntries: Array,
     marketBreakdownKeys: Array,

@@ -6,6 +6,7 @@
   import ScoreComparison from '../../components/history/ScoreComparison.vue'
   import HelpDrawer from '~/components/help/HelpDrawer.vue'
   import { useHelpContent } from '~/composables/useHelpContent'
+  import { CHECKPOINT_NAMES } from '~/utils/checkpoint-names'
 
   definePageMeta({
     layout: 'app',
@@ -266,9 +267,7 @@
     <div v-else class="space-y-6">
       <!-- SCORE COMPARISON -->
       <div class="mx-auto max-w-2xl">
-        <h2 class="mb-3 text-2xl font-semibold text-slate-900">
-          Score comparison
-        </h2>
+        <h2 class="mb-3 text-2xl font-semibold text-slate-900">Score comparison</h2>
         <ScoreComparison
           :latestThreeEntries="latestThreeEntries"
           :marketBreakdownKeys="marketBreakdownKeys"
@@ -284,10 +283,11 @@
       </div>
 
       <!-- WHAT CHANGED -->
-      <section v-if="latestThreeEntries.length" class="mx-auto mt-10 max-w-2xl border-t pt-6 sm:mt-12 sm:pt-8">
-        <h2 class="mb-4 text-2xl font-semibold text-slate-900">
-          What changed
-        </h2>
+      <section
+        v-if="latestThreeEntries.length"
+        class="mx-auto mt-10 max-w-2xl border-t pt-6 sm:mt-12 sm:pt-8"
+      >
+        <h2 class="mb-4 text-2xl font-semibold text-slate-900">What changed</h2>
 
         <div class="space-y-4">
           <div
@@ -314,7 +314,7 @@
             >
               <!-- Checkpoint -->
               <p class="mb-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-600">
-                Checkpoint {{ change.checkpoint }}
+                Checkpoint {{ change.checkpoint }}) {{ CHECKPOINT_NAMES[change.checkpoint] }}
               </p>
 
               <!-- Question -->
@@ -341,7 +341,9 @@
 
               <!-- ASQs -->
               <div v-if="change.asqs.previous.length || change.asqs.current.length" class="mb-4">
-                <p class="mb-1 text-[11px] font-medium uppercase text-slate-500">Follow-up answers</p>
+                <p class="mb-1 text-[11px] font-medium uppercase text-slate-500">
+                  Follow-up answers
+                </p>
 
                 <ul class="space-y-3">
                   <li v-for="(prev, i) in change.asqs.previous" :key="i">
@@ -381,8 +383,12 @@
 
               <!-- NOTES -->
               <div v-if="change.notes.previous.length || change.notes.current.length">
-                <div class="mt-2 rounded-md border-l-4 border-l-emerald-500 border border-emerald-200 bg-emerald-50 px-3 py-2.5">
-                  <div class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+                <div
+                  class="mt-2 rounded-md border border-l-4 border-emerald-200 border-l-emerald-500 bg-emerald-50 px-3 py-2.5"
+                >
+                  <div
+                    class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-700"
+                  >
                     Note
                   </div>
                   <div class="whitespace-pre-wrap text-sm italic text-emerald-900">
@@ -397,9 +403,7 @@
 
       <!-- HISTORY LIST -->
       <div class="mx-auto max-w-2xl">
-        <h2 class="mb-3 text-2xl font-semibold text-slate-900">
-          All Revisions
-        </h2>
+        <h2 class="mb-3 text-2xl font-semibold text-slate-900">All Revisions</h2>
         <div class="space-y-2">
           <button
             v-for="entry in displayedHistoryEntries"

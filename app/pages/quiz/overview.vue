@@ -7,23 +7,12 @@
   import HelpDrawer from '~/components/help/HelpDrawer.vue'
   import TopAlert from '~/components/ui/TopAlert.vue'
   import { useHelpContent } from '~/composables/useHelpContent'
+  import { CHECKPOINT_NAMES } from '~/utils/checkpoint-names'
 
   definePageMeta({
     layout: 'app',
     middleware: 'auth'
   })
-
-  const checkpointNames = {
-    1: 'Problem Strength',
-    2: 'Buying Urgency',
-    3: 'Monetization Potential',
-    4: 'ICP Clarity',
-    5: 'Competitive Positioning',
-    6: 'Distribution Channels',
-    7: 'Founder-Market Fit',
-    8: 'Execution Capacity',
-    9: 'Founder Conviction'
-  }
 
   // Lightweight per-session cache for overview side-panels by quiz.
   const overviewCache = new Map()
@@ -396,10 +385,7 @@
         >
           <div>
             <div class="flex items-center gap-2 text-base font-medium">
-
-              <span>
-                {{ cp.checkpoint }}) {{ checkpointNames[cp.checkpoint] }}
-              </span>
+              <span> {{ cp.checkpoint }}) {{ CHECKPOINT_NAMES[cp.checkpoint] }} </span>
 
               <!-- 📝 Notes indicator -->
               <span
