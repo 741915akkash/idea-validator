@@ -13,6 +13,18 @@
     middleware: 'auth'
   })
 
+  const checkpointNames = {
+    1: 'Problem Strength',
+    2: 'Buying Urgency',
+    3: 'Monetization Potential',
+    4: 'ICP Clarity',
+    5: 'Competitive Positioning',
+    6: 'Distribution Channels',
+    7: 'Founder-Market Fit',
+    8: 'Execution Capacity',
+    9: 'Founder Conviction'
+  }
+
   // Lightweight per-session cache for overview side-panels by quiz.
   const overviewCache = new Map()
 
@@ -31,12 +43,21 @@
   const showRevisionLimitAlert = ref(false)
   const help = useHelpContent('overview')
 
-  const currentQuiz = computed(() => quizzes.value.find((q) => q.id === quizStore.quizId))
+  const currentQuiz = computed(() =>
+    quizzes.value.find((q) => String(q.id) === String(quizStore.quizId))
+  )
 
   // 📝 checkpoint → hasNotes
   const checkpointHasNotes = ref({})
 
   const scoreError = ref('')
+  function syncWorkspaceFromQuizId(quizId) {
+    const selected = quizzes.value.find((q) => String(q.id) === String(quizId))
+    if (selected?.workspace_id) {
+      quizStore.setCurrentWorkspace({ id: selected.workspace_id })
+    }
+  }
+
   const historyEntries = computed(() => {
     if (!currentQuiz.value) return []
 
@@ -99,6 +120,7 @@
 
     quizStore.startFreshQuiz(res.quiz_id)
     await loadQuizzes()
+    syncWorkspaceFromQuizId(res.quiz_id)
   }
 
   async function loadOverviewSideData(quizId, { force = false } = {}) {
@@ -181,6 +203,7 @@
     if (quizStore.quizId && !availableQuizIds.has(String(quizStore.quizId))) {
       quizStore.quizId = null
       quizStore.loaded = false
+      quizStore.setCurrentWorkspace(null)
       if (import.meta.client) {
         localStorage.removeItem('quiz_id')
       }
@@ -190,6 +213,15 @@
       quizStore.setQuizId(quizzes.value[0].id)
     }
 
+    if (quizStore.quizId) {
+      syncWorkspaceFromQuizId(quizStore.quizId)
+    } else if (quizzes.value.length && !quizStore.currentWorkspaceId) {
+      const firstWorkspaceId = quizzes.value[0]?.workspace_id || null
+      if (firstWorkspaceId) {
+        quizStore.setWorkspaceId(firstWorkspaceId)
+      }
+    }
+
     // Always resolve overview to latest revision in the selected idea family.
     if (quizStore.quizId) {
       const selected = quizzes.value.find((q) => String(q.id) === String(quizStore.quizId))
@@ -197,6 +229,7 @@
       const latestId = latestQuizIdForIdeaRoot(rootId)
       if (latestId && String(latestId) !== String(quizStore.quizId)) {
         quizStore.setQuizId(latestId)
+        syncWorkspaceFromQuizId(latestId)
       }
     }
 
@@ -204,17 +237,42 @@
 
     // 1️⃣ Ensure quiz exists (or recover if session/store is stale)
     if (!quizStore.quizId) {
-      const res = await $fetch('/api/quiz/lifecycle/start', { method: 'POST' })
+      const workspace = await $fetch('/api/workspace/create', {
+        method: 'POST'
+      })
+
+      const res = await $fetch('/api/quiz/lifecycle/start?force=true', {
+        method: 'POST',
+        body: {
+          workspace_id: workspace.workspace_id
+        }
+      })
+
       quizStore.startFreshQuiz(res.quiz_id)
+
       await loadQuizzes()
+      syncWorkspaceFromQuizId(res.quiz_id)
     }
 
     try {
       await quizStore.loadOverview(quizStore.quizId)
     } catch {
-      const res = await $fetch('/api/quiz/lifecycle/start', { method: 'POST' })
+      const workspace = await $fetch('/api/workspace/create', {
+        method: 'POST'
+      })
+
+      const res = await $fetch('/api/quiz/lifecycle/start?force=true', {
+        method: 'POST',
+        body: {
+          workspace_id: workspace.workspace_id
+        }
+      })
+
       quizStore.startFreshQuiz(res.quiz_id)
+
       await loadQuizzes()
+      syncWorkspaceFromQuizId(res.quiz_id)
+
       await quizStore.loadOverview(quizStore.quizId)
     }
 
@@ -338,7 +396,10 @@
         >
           <div>
             <div class="flex items-center gap-2 text-base font-medium">
-              <span>Checkpoint {{ cp.checkpoint }}</span>
+
+              <span>
+                {{ cp.checkpoint }}) {{ checkpointNames[cp.checkpoint] }}
+              </span>
 
               <!-- 📝 Notes indicator -->
               <span
