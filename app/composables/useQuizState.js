@@ -1,12 +1,19 @@
+import { useQuizSessionStore } from '~/stores/quizSession'
+
 export function useQuizState(checkpoint) {
   const quiz = ref(null)
   const questions = ref([])
+  const quizStore = useQuizSessionStore()
 
   async function load() {
     if (!checkpoint) return // guard
     const res = await $fetch(`/api/quiz/lifecycle/state?checkpoint=${checkpoint}`)
     quiz.value = res.quiz
     questions.value = res.questions
+
+    if (res?.quiz?.workspace_id) {
+      quizStore.setCurrentWorkspace({ id: res.quiz.workspace_id })
+    }
   }
 
   async function saveAnswer({ questionId, value }) {

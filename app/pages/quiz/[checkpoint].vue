@@ -62,6 +62,13 @@
     // 1️⃣ detect mobile
     isMobile.value = window.innerWidth < 768
 
+    const quizMeta = await $fetch('/api/quiz/by-id', {
+      query: { quiz_id: quizId }
+    }).catch(() => null)
+    if (quizMeta?.workspace_id) {
+      quizStore.setCurrentWorkspace({ id: quizMeta.workspace_id })
+    }
+
     // 2️⃣ auto-open notes for questions that already have saved notes
     const res = await $fetch('/api/quiz/notes/summary', {
       query: { quiz_id: quizId }

@@ -1,6 +1,10 @@
 import { eventHandler, readBody, createError } from 'h3'
 import { pool } from '../../db'
-import { requireQuizAccess, requireUserIdentity } from '../../utils/quizAccess'
+import {
+  requireQuizAccess,
+  requireUserIdentity,
+  requireWorkspaceAccess
+} from '../../utils/quizAccess'
 
 export default eventHandler(async (event) => {
   const { quiz_id } = await readBody(event)
@@ -18,7 +22,13 @@ export default eventHandler(async (event) => {
   try {
     await client.query('BEGIN')
 
-    await requireQuizAccess(client, event, quiz_id)
+    const selectedQuiz = await requireQuizAccess(client, event, quiz_id, {
+      select: 'id, workspace_id'
+    })
+
+    await requireWorkspaceAccess(client, event, selectedQuiz.workspace_id, {
+      select: 'id'
+    })
 
     await client.query(
       `
@@ -26,24 +36,31 @@ export default eventHandler(async (event) => {
       SET archived_at = now()
       WHERE id = $1
         AND user_id = $2
+        AND workspace_id = $3
         AND archived_at IS NULL
       `,
-      [quiz_id, userId]
+      [quiz_id, userId, selectedQuiz.workspace_id]
     )
 
+    // Find next active quiz across ALL workspaces
     const nextQuiz = await client.query(
       `
-      SELECT id
+      SELECT
+        id,
+        workspace_id
       FROM quizzes
       WHERE user_id = $1
         AND archived_at IS NULL
-      ORDER BY COALESCE(parent_quiz_id, id), revision_number
+      ORDER BY
+        COALESCE(parent_quiz_id, id),
+        revision_number
       LIMIT 1
       `,
       [userId]
     )
 
     const nextQuizId = nextQuiz.rows[0]?.id || null
+    const nextWorkspaceId = nextQuiz.rows[0]?.workspace_id || null
 
     await client.query(
       `
@@ -58,7 +75,8 @@ export default eventHandler(async (event) => {
 
     return {
       success: true,
-      next_quiz_id: nextQuizId
+      next_quiz_id: nextQuizId,
+      next_workspace_id: nextWorkspaceId
     }
   } catch (error) {
     await client.query('ROLLBACK')

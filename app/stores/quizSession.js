@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 
 export const useQuizSessionStore = defineStore('quizSession', {
   state: () => ({
+    currentWorkspaceId: null,
+    currentWorkspace: null,
     quizId: null,
     isCompleted: false,
 
@@ -16,6 +18,10 @@ export const useQuizSessionStore = defineStore('quizSession', {
   }),
 
   getters: {
+    hasWorkspace(state) {
+      return !!state.currentWorkspaceId
+    },
+
     hasQuiz(state) {
       return !!state.quizId
     },
@@ -30,7 +36,7 @@ export const useQuizSessionStore = defineStore('quizSession', {
 
     // ✅ convenient getter
     currentQuiz(state) {
-      return state.quizzes.find((q) => q.id === state.quizId)
+      return state.quizzes.find((q) => String(q.id) === String(state.quizId))
     }
   },
 
@@ -50,7 +56,7 @@ export const useQuizSessionStore = defineStore('quizSession', {
      * Update quiz name locally after rename
      */
     renameQuiz(id, name) {
-      const target = this.quizzes.find((q) => q.id === id)
+      const target = this.quizzes.find((q) => String(q.id) === String(id))
       if (!target) return
 
       const rootId = target.parent_quiz_id || target.id
@@ -64,7 +70,41 @@ export const useQuizSessionStore = defineStore('quizSession', {
     },
 
     removeQuiz(id) {
-      this.quizzes = this.quizzes.filter((q) => q.id !== id)
+      this.quizzes = this.quizzes.filter((q) => String(q.id) !== String(id))
+    },
+
+    setWorkspaceId(id) {
+      this.currentWorkspaceId = id || null
+      if (!id) {
+        this.currentWorkspace = null
+      } else if (
+        this.currentWorkspace &&
+        String(this.currentWorkspace.id || this.currentWorkspace.workspace_id) !== String(id)
+      ) {
+        this.currentWorkspace = {
+          ...(this.currentWorkspace || {}),
+          id
+        }
+      }
+
+      if (import.meta.client) {
+        if (id) {
+          localStorage.setItem('workspace_id', id)
+        } else {
+          localStorage.removeItem('workspace_id')
+        }
+      }
+    },
+
+    setCurrentWorkspace(workspace) {
+      if (!workspace) {
+        this.currentWorkspace = null
+        this.setWorkspaceId(null)
+        return
+      }
+
+      this.currentWorkspace = workspace
+      this.setWorkspaceId(workspace.id || workspace.workspace_id || null)
     },
 
     /**
@@ -99,7 +139,8 @@ export const useQuizSessionStore = defineStore('quizSession', {
 
     async loadOverview(quizId) {
       // prevent unnecessary reloads
-      if (this.loaded && this.quizId === quizId && this.checkpoints.length > 0) return
+      if (this.loaded && String(this.quizId) === String(quizId) && this.checkpoints.length > 0)
+        return
 
       const res = await $fetch('/api/quiz/lifecycle/overview', {
         query: { quiz_id: quizId }
@@ -154,10 +195,19 @@ export const useQuizSessionStore = defineStore('quizSession', {
      * ONLY if we don't already have one in memory
      */
     hydrate() {
-      if (import.meta.client && !this.quizId) {
-        const saved = localStorage.getItem('quiz_id')
-        if (saved) {
-          this.quizId = saved
+      if (import.meta.client) {
+        if (!this.currentWorkspaceId) {
+          const savedWorkspace = localStorage.getItem('workspace_id')
+          if (savedWorkspace) {
+            this.currentWorkspaceId = savedWorkspace
+          }
+        }
+
+        if (!this.quizId) {
+          const saved = localStorage.getItem('quiz_id')
+          if (saved) {
+            this.quizId = saved
+          }
         }
       }
     },
@@ -166,6 +216,8 @@ export const useQuizSessionStore = defineStore('quizSession', {
      * Hard reset (logout, debug, full wipe)
      */
     reset() {
+      this.currentWorkspaceId = null
+      this.currentWorkspace = null
       this.quizId = null
       this.isCompleted = false
       this.checkpoints = []
@@ -173,6 +225,7 @@ export const useQuizSessionStore = defineStore('quizSession', {
       this.quizzes = []
 
       if (import.meta.client) {
+        localStorage.removeItem('workspace_id')
         localStorage.removeItem('quiz_id')
       }
     }

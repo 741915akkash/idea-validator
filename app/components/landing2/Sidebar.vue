@@ -48,7 +48,10 @@
     quizzes.value.filter((q) => Number(q.revision_number ?? 0) === 0)
   )
   const activeRootIdeas = computed(() => rootIdeas.value.filter((q) => !q.archived_at))
-  const archivedRootIdeas = computed(() => rootIdeas.value.filter((q) => !!q.archived_at))
+  const archivedRootIdeas = computed(() => {
+    const ideas = rootIdeas.value.filter((q) => !!q.archived_at)
+    return ideas
+  })
   const hasArchivedIdeas = computed(() => archivedRootIdeas.value.length > 0)
   const currentQuiz = computed(() => quizzes.value.find((q) => q.id === quizStore.quizId) || null)
   const activeIdea = computed(() => {
@@ -63,6 +66,12 @@
 
     try {
       await quizStore.loadQuizzes()
+      if (!quizStore.currentWorkspaceId && quizzes.value.length) {
+        const firstWorkspaceId = quizzes.value[0]?.workspace_id || null
+        if (firstWorkspaceId) {
+          quizStore.setWorkspaceId(firstWorkspaceId)
+        }
+      }
     } catch {
       quizStore.quizzes = []
     }
@@ -94,10 +103,14 @@
     if (!id) return
 
     const targetId = latestQuizIdForIdeaRoot(id) || id
+    const targetQuiz = quizzes.value.find((q) => String(q.id) === String(targetId)) || null
     if (targetId === quizStore.quizId) return
 
     closeIdeaActionsMenu()
     showArchivedIdeasModal.value = false
+    if (targetQuiz?.workspace_id) {
+      quizStore.setCurrentWorkspace({ id: targetQuiz.workspace_id })
+    }
     quizStore.loaded = false
     quizStore.setQuizId(targetId)
     await quizStore.loadOverview(targetId)
@@ -112,13 +125,25 @@
     showPlanLimitAlert.value = false
 
     try {
-      const res = await $fetch('/api/quiz/lifecycle/start?force=true', {
+      const workspace = await $fetch('/api/workspace/create', {
         method: 'POST'
       })
 
+      const res = await $fetch('/api/quiz/lifecycle/start?force=true', {
+        method: 'POST',
+        body: {
+          workspace_id: workspace.workspace_id
+        }
+      })
+
       quizStore.startFreshQuiz(res.quiz_id)
+
       await quizStore.loadQuizzes()
       await quizStore.loadOverview(res.quiz_id)
+
+      quizStore.setCurrentWorkspace({
+        id: workspace.workspace_id
+      })
 
       navigateTo('/quiz/overview')
     } catch (error) {
@@ -142,7 +167,6 @@
   }
 
   function closeArchiveConfirmModal() {
-    if (isArchiving.value) return
     showArchiveConfirmModal.value = false
     archiveTargetIdea.value = null
   }
@@ -159,33 +183,24 @@
         body: { quiz_id: targetQuiz.id }
       })
 
-      quizStore.removeQuiz(targetQuiz.id)
+      await quizStore.loadQuizzes()
 
       if (res?.next_quiz_id) {
+        quizStore.setCurrentWorkspace({
+          id: res.next_workspace_id
+        })
+
         quizStore.setQuizId(res.next_quiz_id)
         await quizStore.loadOverview(res.next_quiz_id)
-      } else {
-        try {
-          const fresh = await $fetch('/api/quiz/lifecycle/start?force=true', {
-            method: 'POST'
-          })
-          quizStore.startFreshQuiz(fresh.quiz_id)
-          await quizStore.loadOverview(fresh.quiz_id)
-        } catch (error) {
-          const statusCode = Number(error?.statusCode || error?.data?.statusCode || 0)
-          const statusMessage = String(error?.statusMessage || error?.data?.statusMessage || '')
-          if (statusCode === 403 && statusMessage.includes('Active ideas limit reached')) {
-            showPlanLimitAlert.value = true
-            return
-          }
-          throw error
-        }
-      }
 
-      await quizStore.loadQuizzes()
-      closeArchiveConfirmModal()
-      navigateTo('/quiz/overview')
+        navigateTo('/quiz/overview')
+      } else {
+        // No active ideas left
+        quizStore.setQuizId(null)
+        quizStore.setCurrentWorkspace(null)
+      }
     } finally {
+      closeArchiveConfirmModal()
       isArchiving.value = false
     }
   }
@@ -203,6 +218,9 @@
       })
 
       await quizStore.loadQuizzes()
+      if (activeIdea.value.workspace_id) {
+        quizStore.setCurrentWorkspace({ id: activeIdea.value.workspace_id })
+      }
       showArchivedIdeasModal.value = false
       await quizStore.loadOverview(quizStore.quizId)
 

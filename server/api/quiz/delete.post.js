@@ -1,6 +1,6 @@
 import { eventHandler, readBody, createError } from 'h3'
 import { pool } from '../../db'
-import { requireQuizAccess, requireUserIdentity } from '../../utils/quizAccess'
+import { requireQuizAccess, requireUserIdentity, requireWorkspaceAccess } from '../../utils/quizAccess'
 
 export default eventHandler(async (event) => {
   const { quiz_id, confirm_name } = await readBody(event)
@@ -26,20 +26,24 @@ export default eventHandler(async (event) => {
     await client.query('BEGIN')
 
     const selectedQuiz = await requireQuizAccess(client, event, quiz_id, {
-      select: 'id, name, parent_quiz_id'
+      select: 'id, name, parent_quiz_id, workspace_id'
+    })
+    await requireWorkspaceAccess(client, event, selectedQuiz.workspace_id, {
+      select: 'id'
     })
 
     const rootQuizId = selectedQuiz.parent_quiz_id || selectedQuiz.id
+    const workspaceId = selectedQuiz.workspace_id
 
     const familyRes = await client.query(
       `
       SELECT id, name, parent_quiz_id, revision_number
       FROM quizzes
-      WHERE user_id = $1
+      WHERE workspace_id = $1
         AND (id = $2 OR parent_quiz_id = $2)
       ORDER BY revision_number ASC, started_at ASC NULLS LAST
       `,
-      [userId, rootQuizId]
+      [workspaceId, rootQuizId]
     )
 
     if (!familyRes.rowCount) {
@@ -137,17 +141,19 @@ export default eventHandler(async (event) => {
     await client.query(
       `
       DELETE FROM quizzes
-      WHERE parent_quiz_id = $1
+      WHERE workspace_id = $1
+        AND parent_quiz_id = $2
       `,
-      [rootQuizId]
+      [workspaceId, rootQuizId]
     )
 
     await client.query(
       `
       DELETE FROM quizzes
-      WHERE id = $1
+      WHERE workspace_id = $1
+        AND id = $2
       `,
-      [rootQuizId]
+      [workspaceId, rootQuizId]
     )
 
     await client.query('COMMIT')
@@ -164,4 +170,3 @@ export default eventHandler(async (event) => {
     client.release()
   }
 })
-

@@ -1,6 +1,6 @@
 import { pool } from '../../../db'
 import { createError } from 'h3'
-import { requireQuizAccess } from '../../../utils/quizAccess'
+import { requireQuizAccess, requireWorkspaceAccess } from '../../../utils/quizAccess'
 import {
   getEventEntitlementsFromDb,
   getUsageSnapshot,
@@ -24,6 +24,9 @@ export default defineEventHandler(async (event) => {
 
     // 1️⃣ Fetch quiz
     const quiz = await requireQuizAccess(client, event, quiz_id, { select: '*' })
+    await requireWorkspaceAccess(client, event, quiz.workspace_id, {
+      select: 'id'
+    })
 
     if (quiz.status !== 'COMPLETED') {
       throw createError({
@@ -70,16 +73,17 @@ export default defineEventHandler(async (event) => {
       `
       INSERT INTO quizzes (
         user_id,
+        workspace_id,
         status,
         parent_quiz_id,
         revision_number,
         name,
         started_at
       )
-      VALUES ($1, 'IN_PROGRESS', $2, $3, $4, now())
+      VALUES ($1, $2, 'IN_PROGRESS', $3, $4, $5, now())
       RETURNING id
       `,
-      [quiz.user_id, parentQuizId, revisionNumber, quiz.name]
+      [quiz.user_id, quiz.workspace_id, parentQuizId, revisionNumber, quiz.name]
     )
 
     const newQuizId = insertRes.rows[0].id

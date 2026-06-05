@@ -7,6 +7,7 @@
 dist
 .claude
 .agents
+supabase/snippets/
 
 # Node dependencies
 node_modules

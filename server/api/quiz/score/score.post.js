@@ -2,7 +2,7 @@ import { pool } from '../../../db'
 import { calculateScores } from '../../../services/scoring'
 import { deriveCheckpointSignals } from '../../../services/deriveCheckpointSignals'
 import { createError } from 'h3'
-import { requireQuizAccess } from '../../../utils/quizAccess'
+import { requireQuizAccess, requireWorkspaceAccess } from '../../../utils/quizAccess'
 
 export default defineEventHandler(async (event) => {
   const { quiz_id } = await readBody(event)
@@ -13,7 +13,10 @@ export default defineEventHandler(async (event) => {
 
     // 1️⃣ Fetch quiz
     const quiz = await requireQuizAccess(client, event, quiz_id, {
-      select: 'id, status, parent_quiz_id, revision_number'
+      select: 'id, status, parent_quiz_id, revision_number, workspace_id'
+    })
+    await requireWorkspaceAccess(client, event, quiz.workspace_id, {
+      select: 'id'
     })
 
     if (quiz.status !== 'IN_PROGRESS') {

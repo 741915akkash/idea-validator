@@ -1,6 +1,6 @@
 import { pool } from '../../../db'
 import { getQuery, createError } from 'h3'
-import { requireQuizAccess } from '../../../utils/quizAccess'
+import { requireQuizAccess, requireWorkspaceAccess } from '../../../utils/quizAccess'
 
 export default defineEventHandler(async (event) => {
   const { quiz_id } = getQuery(event)
@@ -13,8 +13,11 @@ export default defineEventHandler(async (event) => {
   try {
     // 1️⃣ Fetch quiz + revision info
     const quiz = await requireQuizAccess(client, event, quiz_id, {
-      select: 'id, parent_quiz_id, revision_number, user_id, visitor_id',
+      select: 'id, parent_quiz_id, revision_number, workspace_id',
       includeArchived: true
+    })
+    await requireWorkspaceAccess(client, event, quiz.workspace_id, {
+      select: 'id'
     })
 
     if (quiz.revision_number === 0) {
@@ -22,27 +25,16 @@ export default defineEventHandler(async (event) => {
     }
 
     // 2️⃣ Get previous revision
-    const prevRes = quiz.user_id
-      ? await client.query(
-          `
-          SELECT id
-          FROM quizzes
-          WHERE parent_quiz_id = $1
-            AND revision_number = $2
-            AND user_id = $3
-          `,
-          [quiz.parent_quiz_id, quiz.revision_number - 1, quiz.user_id]
-        )
-      : await client.query(
-          `
-          SELECT id
-          FROM quizzes
-          WHERE parent_quiz_id = $1
-            AND revision_number = $2
-            AND visitor_id = $3
-          `,
-          [quiz.parent_quiz_id, quiz.revision_number - 1, quiz.visitor_id]
-        )
+    const prevRes = await client.query(
+      `
+      SELECT id
+      FROM quizzes
+      WHERE workspace_id = $1
+        AND parent_quiz_id = $2
+        AND revision_number = $3
+      `,
+      [quiz.workspace_id, quiz.parent_quiz_id, quiz.revision_number - 1]
+    )
 
     const prevQuizId = prevRes.rows[0]?.id
     if (!prevQuizId) {

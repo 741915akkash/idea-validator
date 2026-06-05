@@ -4,7 +4,7 @@ function getCrmFetch() {
   return import.meta.server ? useRequestFetch() : $fetch
 }
 
-function resolveQuizId() {
+async function resolveQuizId() {
   const quizStore = useQuizSessionStore()
 
   quizStore.hydrate()
@@ -16,6 +16,17 @@ function resolveQuizId() {
       statusCode: 400,
       statusMessage: 'quiz_id required'
     })
+  }
+
+  if (!quizStore.currentWorkspaceId) {
+    if (!quizStore.quizzes.length) {
+      await quizStore.loadQuizzes()
+    }
+
+    const currentQuiz = quizStore.quizzes.find((q) => String(q.id) === quizId)
+    if (currentQuiz?.workspace_id) {
+      quizStore.setCurrentWorkspace({ id: currentQuiz.workspace_id })
+    }
   }
 
   return quizId
@@ -46,8 +57,8 @@ export function crmGlobalFetch(url, options = {}) {
  *
  * Automatically injects quiz_id.
  */
-export function crmQuizFetch(url, options = {}) {
-  const quizId = String(options.quizId || resolveQuizId()).trim()
+export async function crmQuizFetch(url, options = {}) {
+  const quizId = String(options.quizId || (await resolveQuizId())).trim()
 
   const method = String(options?.method || 'GET').toUpperCase()
 

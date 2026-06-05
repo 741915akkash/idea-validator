@@ -32,6 +32,38 @@ export function requireUserIdentity(event) {
   return { userId }
 }
 
+export async function requireWorkspaceAccess(client, event, workspaceId, options = {}) {
+  if (!workspaceId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'workspace_id required'
+    })
+  }
+
+  const { select = 'id, name, user_id' } = options
+  const { userId } = requireUserIdentity(event)
+
+  const { rows } = await client.query(
+    `
+    SELECT ${select}
+    FROM workspaces
+    WHERE id = $1
+      AND user_id = $2
+    LIMIT 1
+    `,
+    [workspaceId, userId]
+  )
+
+  if (!rows.length) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Workspace not found'
+    })
+  }
+
+  return rows[0]
+}
+
 export async function requireQuizAccess(client, event, quizId, options = {}) {
   if (!quizId) {
     throw createError({
@@ -40,8 +72,35 @@ export async function requireQuizAccess(client, event, quizId, options = {}) {
     })
   }
 
-  const { select = 'id, user_id, visitor_id', includeArchived = false } = options
+  const {
+    select = 'id, user_id, visitor_id, workspace_id',
+    includeArchived = false,
+    workspaceId = null
+  } = options
   const { userId, visitorId } = requireIdentity(event)
+
+  if (workspaceId) {
+    const { rows } = await client.query(
+      `
+      SELECT ${select}
+      FROM quizzes
+      WHERE id = $1
+        AND workspace_id = $2
+        ${includeArchived ? '' : 'AND archived_at IS NULL'}
+      LIMIT 1
+      `,
+      [quizId, workspaceId]
+    )
+
+    if (!rows.length) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Quiz not found'
+      })
+    }
+
+    return rows[0]
+  }
 
   let query
   let params
@@ -78,4 +137,20 @@ export async function requireQuizAccess(client, event, quizId, options = {}) {
   }
 
   return rows[0]
+}
+
+export async function requireWorkspaceQuizAccess(client, event, quizId, workspaceId, options = {}) {
+  if (!workspaceId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'workspace_id required'
+    })
+  }
+
+  await requireWorkspaceAccess(client, event, workspaceId)
+
+  return requireQuizAccess(client, event, quizId, {
+    ...options,
+    workspaceId
+  })
 }

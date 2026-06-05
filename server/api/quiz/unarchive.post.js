@@ -1,6 +1,6 @@
 import { eventHandler, readBody, createError } from 'h3'
 import { pool } from '../../db'
-import { requireQuizAccess, requireUserIdentity } from '../../utils/quizAccess'
+import { requireQuizAccess, requireUserIdentity, requireWorkspaceAccess } from '../../utils/quizAccess'
 import {
   getEventEntitlementsFromDb,
   getUsageSnapshot,
@@ -23,7 +23,13 @@ export default eventHandler(async (event) => {
   try {
     await client.query('BEGIN')
 
-    await requireQuizAccess(client, event, quiz_id, { includeArchived: true })
+    const selectedQuiz = await requireQuizAccess(client, event, quiz_id, {
+      includeArchived: true,
+      select: 'id, workspace_id'
+    })
+    await requireWorkspaceAccess(client, event, selectedQuiz.workspace_id, {
+      select: 'id'
+    })
     const { tier, limits } = await getEventEntitlementsFromDb({ event, client })
     const usage = await getUsageSnapshot(client, event, { quizId: quiz_id })
 
@@ -50,9 +56,10 @@ export default eventHandler(async (event) => {
       SET archived_at = NULL
       WHERE id = $1
         AND user_id = $2
+        AND workspace_id = $3
       RETURNING id
       `,
-      [quiz_id, userId]
+      [quiz_id, userId, selectedQuiz.workspace_id]
     )
 
     if (!updateResult.rowCount) {
