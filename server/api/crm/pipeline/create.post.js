@@ -1,47 +1,62 @@
 import { pool } from '../../../db/index.js'
 import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js'
-import {
-  getEventEntitlementsFromDb,
-  getUsageSnapshot,
-  observeCountLimit
-} from '../../../utils/track-usage.js'
+
+const DEFAULT_STAGES = ['New Lead', 'Qualified', 'Proposal Sent', 'Negotiation', 'Closed Won']
 
 export default defineEventHandler(async (event) => {
   const { userId } = await requireCrmEnabled(event)
   const body = await readBody(event)
-  const position = Number(body.position)
 
-  if (!body?.name || !Number.isInteger(position)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid name or position' })
-  }
+  const name = String(body?.name || '').trim()
 
-  const { tier, limits } = await getEventEntitlementsFromDb({ event, client: pool })
-  const usage = await getUsageSnapshot(pool, event)
-  const pipelinesLimitCheck = observeCountLimit(event, {
-    mode: 'enforce',
-    checkpoint: 'crm.pipeline.create',
-    key: 'pipelines',
-    tier,
-    used: usage.pipelines ?? 0,
-    limit: limits.pipelines,
-    increment: 1
-  })
-
-  if (pipelinesLimitCheck.wouldBlock) {
+  if (!name) {
     throw createError({
-      statusCode: 403,
-      statusMessage: 'Pipelines limit reached for your current plan'
+      statusCode: 400,
+      statusMessage: 'Pipeline name is required'
     })
   }
 
-  const result = await pool.query(
-    `
-    INSERT INTO pipeline_stages (name, position, user_id)
-    VALUES ($1, $2, $3)
-    RETURNING *
-    `,
-    [body.name, position, userId]
-  )
+  const client = await pool.connect()
 
-  return result.rows[0]
+  try {
+    await client.query('BEGIN')
+
+    const pipelineResult = await client.query(
+      `
+      INSERT INTO pipelines (
+        user_id,
+        name
+      )
+      VALUES ($1, $2)
+      RETURNING *
+      `,
+      [userId, name]
+    )
+
+    const pipeline = pipelineResult.rows[0]
+
+    for (let i = 0; i < DEFAULT_STAGES.length; i++) {
+      await client.query(
+        `
+        INSERT INTO pipeline_stages (
+          pipeline_id,
+          name,
+          position,
+          user_id
+        )
+        VALUES ($1, $2, $3, $4)
+        `,
+        [pipeline.id, DEFAULT_STAGES[i], i + 1, userId]
+      )
+    }
+
+    await client.query('COMMIT')
+
+    return pipeline
+  } catch (error) {
+    await client.query('ROLLBACK')
+    throw error
+  } finally {
+    client.release()
+  }
 })

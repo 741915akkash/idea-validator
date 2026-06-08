@@ -5,6 +5,7 @@
   import { useSourcesStore } from '~/stores/sources'
   import { useStagesStore } from '~/stores/stages'
   import { useUsersStore } from '~/stores/users'
+  import { usePipelinesStore } from '~/stores/pipelines'
   import AddLeadModal from './AddLeadModal.vue'
   import { ChevronLeft, ChevronRight, Columns, Filter, Plus, RotateCcw } from 'lucide-vue-next'
 
@@ -24,6 +25,7 @@
   const viewPanelRef = ref(null)
   const filterDropdownStyle = ref({})
   const viewDropdownStyle = ref({})
+  const pipelinesStore = usePipelinesStore()
   const stagesStore = useStagesStore()
   const usersStore = useUsersStore()
   const sourcesStore = useSourcesStore()
@@ -31,6 +33,7 @@
   const user = useUser()
 
   const filterTypes = [
+    { id: 'pipeline_name', label: 'Pipeline' },
     { id: 'stage_id', label: 'Stage' },
     { id: 'user_id', label: 'Owner' },
     { id: 'source_name', label: 'Source' },
@@ -39,6 +42,7 @@
   ]
 
   const filterLabelMap = {
+    pipeline_name: 'Pipeline',
     stage_id: 'Stage',
     user_id: 'Owner',
     source_name: 'Source',
@@ -49,6 +53,7 @@
   const activeFilterLabel = computed(() => filterLabelMap[activeFilterType.value] || '')
   const activeFilterOptions = ref([])
   const selectedFilterOptions = ref({
+    pipeline_name: [],
     stage_id: [],
     user_id: [],
     source_name: [],
@@ -122,6 +127,15 @@
 
   function openFilterType(typeId) {
     activeFilterType.value = typeId
+
+    if (typeId === 'pipeline_name') {
+      activeFilterOptions.value = pipelinesStore.pipelines
+        .map((pipeline) => pipeline?.name)
+        .filter((value) => value !== null && value !== undefined && String(value).trim() !== '')
+        .map((value) => String(value))
+
+      return
+    }
 
     if (typeId === 'stage_id') {
       activeFilterOptions.value = stagesStore.stages
@@ -263,6 +277,7 @@
   function clearAllFilters() {
     props.table?.resetColumnFilters?.()
     selectedFilterOptions.value = {
+      pipeline_name: [],
       stage_id: [],
       user_id: [],
       source_name: [],
@@ -277,7 +292,11 @@
     if (showFilters.value) {
       const filterRoot = filterMenuRef.value
       const filterPanel = filterPanelRef.value
-      if (filterRoot && !filterRoot.contains(target) && (!filterPanel || !filterPanel.contains(target))) {
+      if (
+        filterRoot &&
+        !filterRoot.contains(target) &&
+        (!filterPanel || !filterPanel.contains(target))
+      ) {
         showFilters.value = false
         activeFilterType.value = ''
         activeFilterOptions.value = []
@@ -423,7 +442,9 @@
           @click.stop
         >
           <template v-if="!activeFilterType">
-            <div class="mb-2 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700">Add Filter</div>
+            <div class="mb-2 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700">
+              Add Filter
+            </div>
 
             <button
               v-for="item in filterTypes"

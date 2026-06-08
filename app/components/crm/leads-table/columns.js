@@ -73,6 +73,28 @@ export const columns = [
   },
 
   {
+    accessorKey: 'pipeline_name',
+    meta: {
+      label: 'Pipeline'
+    },
+    header: () =>
+      h(
+        'span',
+        { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' },
+        'Pipeline'
+      ),
+    enableSorting: true,
+    filterFn: (row, columnId, selected) => {
+      if (!Array.isArray(selected) || selected.length === 0) return true
+      const value = String(row.getValue(columnId) || '').trim()
+      return selected.includes(value)
+    },
+    size: 180,
+    minSize: 150,
+    cell: (info) => info.getValue() || '—'
+  },
+
+  {
     accessorKey: 'stage_id',
     meta: {
       label: 'Stage'

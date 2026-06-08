@@ -134,6 +134,7 @@ export default defineEventHandler(async (event) => {
       SELECT
         updated.*,
         pipeline_stages.name AS stage,
+        pipelines.name AS pipeline_name,
         users.name AS owner_name,
         users.email AS owner_email,
         sources.name AS source_name,
@@ -162,13 +163,14 @@ export default defineEventHandler(async (event) => {
       FROM updated
       LEFT JOIN pipeline_stages
         ON updated.stage_id = pipeline_stages.id
+      LEFT JOIN pipelines
+        ON updated.pipeline_id = pipelines.id
       LEFT JOIN users
         ON updated.user_id = users.id
       LEFT JOIN sources
         ON updated.source_id = sources.id
       LEFT JOIN sequences
-        ON updated.sequence_id = sequences.id
-      `,
+        ON updated.sequence_id = sequences.id      `,
       [value, body.id, userId, userId, quizId]
     )
   } else if (body.field === 'sequence_id') {
@@ -191,9 +193,10 @@ export default defineEventHandler(async (event) => {
           AND ($1 IS NULL OR EXISTS (SELECT 1 FROM selected_sequence))
         RETURNING *
       )
-      SELECT
+            SELECT
         updated.*,
         pipeline_stages.name AS stage,
+        pipelines.name AS pipeline_name,
         users.name AS owner_name,
         users.email AS owner_email,
         sources.name AS source_name,
@@ -222,6 +225,8 @@ export default defineEventHandler(async (event) => {
       FROM updated
       LEFT JOIN pipeline_stages
         ON updated.stage_id = pipeline_stages.id
+      LEFT JOIN pipelines
+        ON updated.pipeline_id = pipelines.id
       LEFT JOIN users
         ON updated.user_id = users.id
       LEFT JOIN sources
@@ -229,6 +234,57 @@ export default defineEventHandler(async (event) => {
       LEFT JOIN sequences
         ON updated.sequence_id = sequences.id
       `,
+      [value, body.id, userId, userId, quizId]
+    )
+  } else if (body.field === 'stage_id') {
+    result = await pool.query(
+      `
+    WITH selected_stage AS (
+      SELECT
+        s.id,
+        s.pipeline_id
+      FROM pipeline_stages s
+      JOIN pipelines p
+        ON p.id = s.pipeline_id
+      WHERE s.id = $1
+        AND p.user_id = $4
+      LIMIT 1
+    ),
+    updated AS (
+      UPDATE leads
+      SET
+        stage_id = (SELECT id FROM selected_stage),
+        pipeline_id = (SELECT pipeline_id FROM selected_stage),
+        updated_at = NOW()
+      WHERE id = $2
+        AND user_id = $3
+        AND quiz_id = $5
+        AND EXISTS (
+          SELECT 1
+          FROM selected_stage
+        )
+      RETURNING *
+    )
+      SELECT
+        updated.*,
+        pipeline_stages.name AS stage,
+        pipelines.name AS pipeline_name,
+        users.name AS owner_name,
+        users.email AS owner_email,
+        sources.name AS source_name,
+        sequences.title AS sequence_name
+      FROM updated
+      LEFT JOIN pipeline_stages
+        ON updated.stage_id = pipeline_stages.id
+      LEFT JOIN pipelines
+        ON updated.pipeline_id = pipelines.id
+      LEFT JOIN users
+        ON updated.user_id = users.id
+      LEFT JOIN sources
+        ON updated.source_id = sources.id
+      LEFT JOIN sequences
+        ON updated.sequence_id = sequences.id
+    `,
       [value, body.id, userId, userId, quizId]
     )
   } else {
@@ -243,9 +299,10 @@ export default defineEventHandler(async (event) => {
           AND quiz_id = $4
         RETURNING *
       )
-      SELECT
+            SELECT
         updated.*,
         pipeline_stages.name AS stage,
+        pipelines.name AS pipeline_name,
         users.name AS owner_name,
         users.email AS owner_email,
         sources.name AS source_name,
@@ -274,6 +331,8 @@ export default defineEventHandler(async (event) => {
       FROM updated
       LEFT JOIN pipeline_stages
         ON updated.stage_id = pipeline_stages.id
+      LEFT JOIN pipelines
+        ON updated.pipeline_id = pipelines.id
       LEFT JOIN users
         ON updated.user_id = users.id
       LEFT JOIN sources

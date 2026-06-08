@@ -46,7 +46,7 @@
     saveError.value = ''
 
     try {
-      const updated = await crmGlobalFetch('/api/crm/pipeline/update', {
+      const updated = await crmGlobalFetch('/api/crm/pipeline/stages/update', {
         method: 'PATCH',
         body: {
           id: props.stage.id,

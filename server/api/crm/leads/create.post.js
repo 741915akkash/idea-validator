@@ -1,67 +1,70 @@
-import { pool } from '../../../db/index.js';
-import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js';
-import { requireQuizAccess } from '../../../utils/quizAccess.js';
+import { pool } from '../../../db/index.js'
+import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js'
+import { requireQuizAccess } from '../../../utils/quizAccess.js'
 import {
   getEventEntitlementsFromDb,
   getUsageSnapshot,
   observeCountLimit
-} from '../../../utils/track-usage.js';
+} from '../../../utils/track-usage.js'
 
-const UUID_V4_OR_V1_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_REGEX = /^\+?[1-9]\d{7,14}$/;
+const UUID_V4_OR_V1_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const PHONE_REGEX = /^\+?[1-9]\d{7,14}$/
 
 function normalizePhone(value) {
-  const raw = String(value || '').trim();
-  if (!raw) return null;
+  const raw = String(value || '').trim()
+  if (!raw) return null
 
-  const hasPlusPrefix = raw.startsWith('+');
-  const digitsOnly = raw.replace(/\D/g, '');
-  if (!digitsOnly) return null;
+  const hasPlusPrefix = raw.startsWith('+')
+  const digitsOnly = raw.replace(/\D/g, '')
+  if (!digitsOnly) return null
 
-  return hasPlusPrefix ? `+${digitsOnly}` : digitsOnly;
+  return hasPlusPrefix ? `+${digitsOnly}` : digitsOnly
 }
 
 export default defineEventHandler(async (event) => {
-  const { userId: authUserId } = await requireCrmEnabled(event);
-  const body = await readBody(event);
-  const stageId = Number(body.stage_id);
-  const ownerId = typeof body.user_id === 'string' && body.user_id.trim() ? body.user_id.trim() : authUserId;
-  const quizId = typeof body.quiz_id === 'string' ? body.quiz_id.trim() : '';
-  const sequenceId = body.sequence_id === null || body.sequence_id === undefined || body.sequence_id === ''
-    ? null
-    : Number(body.sequence_id);
+  const { userId: authUserId } = await requireCrmEnabled(event)
+  const body = await readBody(event)
+  const stageId = Number(body.stage_id)
+  const ownerId =
+    typeof body.user_id === 'string' && body.user_id.trim() ? body.user_id.trim() : authUserId
+  const quizId = typeof body.quiz_id === 'string' ? body.quiz_id.trim() : ''
+  const sequenceId =
+    body.sequence_id === null || body.sequence_id === undefined || body.sequence_id === ''
+      ? null
+      : Number(body.sequence_id)
 
   if (!Number.isInteger(stageId)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid stage_id' });
+    throw createError({ statusCode: 400, statusMessage: 'Invalid stage_id' })
   }
 
   if (sequenceId !== null && !Number.isInteger(sequenceId)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid sequence_id' });
+    throw createError({ statusCode: 400, statusMessage: 'Invalid sequence_id' })
   }
 
   if (!UUID_V4_OR_V1_REGEX.test(ownerId)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid user_id' });
+    throw createError({ statusCode: 400, statusMessage: 'Invalid user_id' })
   }
 
   if (!quizId) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid quiz_id' });
+    throw createError({ statusCode: 400, statusMessage: 'Invalid quiz_id' })
   }
 
-  await requireQuizAccess(pool, event, quizId);
+  await requireQuizAccess(pool, event, quizId)
 
-  const normalizedEmail = String(body.email || '').trim();
+  const normalizedEmail = String(body.email || '').trim()
   if (!EMAIL_REGEX.test(normalizedEmail)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid email' });
+    throw createError({ statusCode: 400, statusMessage: 'Invalid email' })
   }
 
-  const normalizedPhone = normalizePhone(body.phone);
+  const normalizedPhone = normalizePhone(body.phone)
   if (normalizedPhone && !PHONE_REGEX.test(normalizedPhone)) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid phone' });
+    throw createError({ statusCode: 400, statusMessage: 'Invalid phone' })
   }
 
-  const { tier, limits } = await getEventEntitlementsFromDb({ event, client: pool });
-  const usage = await getUsageSnapshot(pool, event);
+  const { tier, limits } = await getEventEntitlementsFromDb({ event, client: pool })
+  const usage = await getUsageSnapshot(pool, event)
   const contactsLimitCheck = observeCountLimit(event, {
     mode: 'enforce',
     checkpoint: 'crm.leads.create',
@@ -70,22 +73,26 @@ export default defineEventHandler(async (event) => {
     used: usage.contacts ?? 0,
     limit: limits.contacts,
     increment: 1
-  });
+  })
 
   if (contactsLimitCheck.wouldBlock) {
     throw createError({
       statusCode: 403,
       statusMessage: 'Contacts limit reached for your current plan'
-    });
+    })
   }
 
   const result = await pool.query(
     `
     WITH selected_stage AS (
-      SELECT id
-      FROM pipeline_stages
-      WHERE id = $5
-        AND user_id = $7
+      SELECT
+        s.id,
+        s.pipeline_id
+      FROM pipeline_stages s
+      JOIN pipelines p
+        ON p.id = s.pipeline_id
+      WHERE s.id = $5
+        AND p.user_id = $7
       LIMIT 1
     ),
     selected_sequence AS (
@@ -103,12 +110,13 @@ export default defineEventHandler(async (event) => {
       LIMIT 1
     ),
     inserted AS (
-      INSERT INTO leads (name, company, email, phone, stage_id, user_id, sequence_id, current_step, next_follow_up_at, quiz_id)
+      INSERT INTO leads (name, company, email, phone, pipeline_id, stage_id, user_id, sequence_id, current_step, next_follow_up_at, quiz_id)
       SELECT
         $1,
         $2,
         $3,
         $4,
+        selected_stage.pipeline_id,
         selected_stage.id,
         $6,
         (SELECT id FROM selected_sequence),
@@ -125,6 +133,7 @@ export default defineEventHandler(async (event) => {
     SELECT
       inserted.*,
       pipeline_stages.name AS stage,
+      pipelines.name AS pipeline_name,
       users.name AS owner_name,
       users.email AS owner_email,
       sequences.title AS sequence_name,
@@ -152,17 +161,29 @@ export default defineEventHandler(async (event) => {
     FROM inserted
     LEFT JOIN pipeline_stages
       ON inserted.stage_id = pipeline_stages.id
+    LEFT JOIN pipelines
+      ON inserted.pipeline_id = pipelines.id
     LEFT JOIN users
       ON inserted.user_id = users.id
     LEFT JOIN sequences
       ON inserted.sequence_id = sequences.id
     `,
-    [body.name, body.company, normalizedEmail, normalizedPhone, stageId, ownerId, authUserId, sequenceId, quizId],
-  );
+    [
+      body.name,
+      body.company,
+      normalizedEmail,
+      normalizedPhone,
+      stageId,
+      ownerId,
+      authUserId,
+      sequenceId,
+      quizId
+    ]
+  )
 
   if (!result.rows.length) {
-    throw createError({ statusCode: 400, statusMessage: 'Invalid stage_id or sequence_id' });
+    throw createError({ statusCode: 400, statusMessage: 'Invalid stage_id or sequence_id' })
   }
 
-  return result.rows[0];
-});
+  return result.rows[0]
+})

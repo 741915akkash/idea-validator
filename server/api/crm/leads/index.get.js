@@ -1,22 +1,24 @@
-import { pool } from '../../../db/index.js';
-import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js';
-import { requireQuizAccess } from '../../../utils/quizAccess.js';
+import { pool } from '../../../db/index.js'
+import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js'
+import { requireQuizAccess } from '../../../utils/quizAccess.js'
 
 export default defineEventHandler(async (event) => {
-  const { userId } = await requireCrmEnabled(event);
-  const { quiz_id: quizIdRaw } = getQuery(event);
-  const quizId = typeof quizIdRaw === 'string' ? quizIdRaw.trim() : '';
+  const { userId } = await requireCrmEnabled(event)
+  const { quiz_id: quizIdRaw } = getQuery(event)
+  const quizId = typeof quizIdRaw === 'string' ? quizIdRaw.trim() : ''
 
   if (!quizId) {
-    throw createError({ statusCode: 400, statusMessage: 'quiz_id required' });
+    throw createError({ statusCode: 400, statusMessage: 'quiz_id required' })
   }
 
-  await requireQuizAccess(pool, event, quizId);
+  await requireQuizAccess(pool, event, quizId)
 
-  const result = await pool.query(`
+  const result = await pool.query(
+    `
     SELECT
       leads.*,
       pipeline_stages.name AS stage,
+      pipelines.name AS pipeline_name,
       users.name AS owner_name,
       users.email AS owner_email,
       sources.name AS source_name,
@@ -46,6 +48,8 @@ export default defineEventHandler(async (event) => {
     FROM leads
     LEFT JOIN pipeline_stages
       ON leads.stage_id = pipeline_stages.id
+    LEFT JOIN pipelines
+      ON leads.pipeline_id = pipelines.id
     LEFT JOIN users
       ON leads.user_id = users.id
     LEFT JOIN sources
@@ -60,7 +64,9 @@ export default defineEventHandler(async (event) => {
     WHERE leads.user_id = $1
       AND leads.quiz_id = $2
     ORDER BY leads.created_at DESC
-  `, [userId, quizId]);
+  `,
+    [userId, quizId]
+  )
 
-  return result.rows;
-});
+  return result.rows
+})

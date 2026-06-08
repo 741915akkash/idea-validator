@@ -5,32 +5,39 @@ export default defineEventHandler(async (event) => {
   const { userId } = await requireCrmEnabled(event)
   const body = await readBody(event)
 
-  const id = Number(body?.id)
-  const name = String(body?.name || '').trim()
+  const pipelineId = Number(body?.id)
 
-  if (!Number.isInteger(id)) {
+  if (!Number.isInteger(pipelineId)) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Invalid pipeline id'
     })
   }
 
-  if (!name) {
+  const leadCheck = await pool.query(
+    `
+    SELECT COUNT(*)::int AS count
+    FROM leads
+    WHERE pipeline_id = $1
+    `,
+    [pipelineId]
+  )
+
+  if (leadCheck.rows[0].count > 0) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Pipeline name required'
+      statusMessage: 'Pipeline contains leads'
     })
   }
 
   const result = await pool.query(
     `
-    UPDATE pipelines
-    SET name = $1
-    WHERE id = $2
-      AND user_id = $3
+    DELETE FROM pipelines
+    WHERE id = $1
+      AND user_id = $2
     RETURNING *
     `,
-    [name, id, userId]
+    [pipelineId, userId]
   )
 
   if (!result.rows.length) {
@@ -40,5 +47,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  return result.rows[0]
+  return {
+    success: true
+  }
 })
