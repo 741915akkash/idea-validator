@@ -140,29 +140,29 @@
   <div class="h-full overflow-auto">
     <!-- TABLE WRAPPER -->
     <div
-      class="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-gray-300 bg-white shadow-sm"
+      class="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-app-border text-app-text shadow-sm"
     >
       <!-- TOP BAR -->
-      <div class="overflow-x-auto border-b border-gray-100 bg-gray-50/50">
+      <div class="bg-app-panel/50 overflow-x-auto border-b border-app-border">
         <div class="min-w-max p-4">
           <TableToolbar :table="table" />
         </div>
       </div>
 
       <!-- TABLE -->
-      <div class="custom-scrollbar flex-1 overflow-auto bg-white">
+      <div class="custom-scrollbar flex-1 overflow-auto text-app-text">
         <table
           class="w-full table-fixed border-separate border-spacing-0 text-sm"
           :style="{ width: `${table.getTotalSize()}px` }"
         >
           <!-- HEADER -->
-          <thead class="bg-gray-50">
+          <thead class="bg-app-panel">
             <tr v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
               <th
                 v-for="(header, index) in headerGroup.headers"
                 :key="header.id"
                 :style="{ width: `${header.getSize()}px`, minWidth: `${header.getSize()}px` }"
-                class="group sticky top-0 z-20 overflow-hidden border-b border-gray-200 px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wider text-gray-500"
+                class="group sticky top-0 z-20 overflow-hidden border-b border-app-border px-5 py-2.5 text-left text-[10px] font-semibold uppercase tracking-wider text-app-muted"
               >
                 <div
                   class="group/header flex items-center gap-1.5"
@@ -199,13 +199,13 @@
                 <!-- RESIZER -->
                 <div
                   v-if="header.column.getCanResize()"
-                  class="absolute -right-[1px] top-0 z-40 h-full w-[4px] cursor-col-resize transition-colors hover:bg-emerald-500/30"
+                  class="hover:bg-emerald-500/10/30 absolute -right-[1px] top-0 z-40 h-full w-[4px] cursor-col-resize transition-colors"
                   @mousedown.stop="header.getResizeHandler()($event)"
                   @touchstart.stop="header.getResizeHandler()($event)"
                 >
                   <div
                     class="absolute right-0 top-0 h-full w-[1px] bg-gray-200 transition-colors"
-                    :class="header.column.getIsResizing() ? 'w-[2px] bg-emerald-500' : ''"
+                    :class="header.column.getIsResizing() ? 'w-[2px] bg-emerald-500/10' : ''"
                   />
                 </div>
               </th>
@@ -227,7 +227,7 @@
                   width: `${cell.column.getSize()}px`,
                   minWidth: `${cell.column.getSize()}px`
                 }"
-                class="overflow-hidden border-b border-slate-100 px-5 py-2 text-gray-700 transition-colors duration-150"
+                class="overflow-hidden border-b border-app-border px-5 py-2 text-app-muted transition-colors duration-150"
               >
                 <FlexRender
                   v-if="cell.column.columnDef.cell"
@@ -247,7 +247,7 @@
                 v-for="(column, index) in table.getVisibleLeafColumns()"
                 :key="`empty-${rowIndex}-${column.id}`"
                 :style="{ width: `${column.getSize()}px`, minWidth: `${column.getSize()}px` }"
-                class="overflow-hidden border-b border-slate-100 px-5 py-2"
+                class="overflow-hidden border-b border-app-border px-5 py-2"
               >
                 &nbsp;
               </td>

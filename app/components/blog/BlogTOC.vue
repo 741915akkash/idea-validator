@@ -3,7 +3,11 @@
 
   const props = defineProps(['content'])
 
-  const stripTags = (value = '') => value.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
+  const stripTags = (value = '') =>
+    value
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
 
   const decodeEntities = (value = '') =>
     value
@@ -54,8 +58,10 @@
 
 <template>
   <div v-if="headings.length > 0" class="mx-auto mb-12 max-w-3xl px-4">
-    <div class="border-y border-slate-200 py-8">
-      <h3 class="mb-4 text-base font-bold uppercase tracking-wide text-slate-900">Table of contents</h3>
+    <div class="border-y border-app-border py-8">
+      <h3 class="mb-4 text-base font-bold uppercase tracking-wide text-app-text">
+        Table of contents
+      </h3>
 
       <ul class="space-y-2">
         <li

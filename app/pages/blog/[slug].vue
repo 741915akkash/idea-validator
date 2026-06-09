@@ -97,13 +97,13 @@
 <template>
   <!-- Loading -->
   <div v-if="pending" class="flex h-64 items-center justify-center">
-    <div class="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-black"></div>
+    <div class="h-8 w-8 animate-spin rounded-full border-4 border-app-border border-t-black"></div>
   </div>
 
   <!-- Error -->
   <div v-else-if="error" class="mx-auto max-w-3xl px-4 py-20 text-center">
-    <h2 class="text-2xl font-bold text-gray-900">Error loading post</h2>
-    <p class="mt-2 text-gray-600">Please try again later.</p>
+    <h2 class="text-2xl font-bold text-app-text">Error loading post</h2>
+    <p class="mt-2 text-app-muted">Please try again later.</p>
   </div>
 
   <!-- Success -->
@@ -121,7 +121,7 @@
 
   <!-- Not found -->
   <div v-else class="mx-auto max-w-3xl px-4 py-20 text-center">
-    <h2 class="text-2xl font-bold text-gray-900">Post not found</h2>
+    <h2 class="text-2xl font-bold text-app-text">Post not found</h2>
     <NuxtLink to="/" class="mt-4 inline-block font-medium text-black hover:underline">
       Back to home
     </NuxtLink>

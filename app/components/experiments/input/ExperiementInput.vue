@@ -43,34 +43,36 @@
 </script>
 
 <template>
-  <div class="mx-auto max-w-6xl px-4 pb-20 md:px-8">
+  <div class="mx-auto max-w-6xl px-6 pb-20">
     <div class="mb-8 flex items-center justify-between">
       <button
         @click="$emit('back')"
-        class="flex items-center gap-2 text-slate-500 transition-colors hover:text-slate-900"
+        class="flex items-center gap-2 text-app-muted transition-colors hover:text-app-text"
       >
         <ArrowLeft class="h-4 w-4" />
         <span class="text-sm font-medium uppercase tracking-wider">Back to Dashboard</span>
       </button>
       <button
-        class="flex items-center gap-2 rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-200"
+        class="flex items-center gap-2 rounded-xl border border-app-border bg-app-panel px-4 py-2 text-xs font-bold text-app-muted transition-colors hover:bg-app-hover hover:text-app-text"
       >
         <Copy class="h-4 w-4" />
         DUPLICATE LAST
       </button>
     </div>
 
-    <header class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+    <header
+  class="mb-6 rounded-lg border border-app-border bg-app-panel px-6 py-5 text-app-text"
+>
       <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <!-- LEFT -->
         <div>
-          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-app-text">
             <span>Create Experiment</span>
           </h1>
 
           <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
 
-          <p class="mt-3 text-sm text-slate-500">Configure your variables and strategy.</p>
+          <p class="mt-3 text-sm text-app-muted">Configure your variables and strategy.</p>
         </div>
       </div>
     </header>

@@ -7,7 +7,7 @@
 
       <NuxtLink
         to="/"
-        class="inline-block rounded border-4 border-white bg-emerald-600 px-6 py-3 font-medium text-white transition-colors hover:bg-emerald-500"
+        class="inline-block rounded border-4 border-white bg-emerald-600 px-6 py-3 font-medium text-white transition-colors hover:bg-emerald-500/10"
       >
         Try it free →
       </NuxtLink>

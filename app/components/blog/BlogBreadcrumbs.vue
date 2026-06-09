@@ -10,7 +10,7 @@
 
 <template>
   <nav
-    class="mx-auto flex max-w-3xl items-center gap-2 px-4 py-6 text-xs font-medium text-gray-400"
+    class="mx-auto flex max-w-3xl items-center gap-2 px-4 py-6 text-xs font-medium text-app-muted"
   >
     <NuxtLink to="/blog" class="transition-colors hover:text-black">Blog</NuxtLink>
 
@@ -21,7 +21,7 @@
         :to="'/' + segments.slice(0, i + 1).join('/')"
         :class="[
           'capitalize transition-colors hover:text-black',
-          i === segments.length - 1 ? 'pointer-events-none text-gray-900' : ''
+          i === segments.length - 1 ? 'pointer-events-none text-app-text' : ''
         ]"
       >
         {{ seg.replace(/-/g, ' ') }}

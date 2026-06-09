@@ -5,22 +5,22 @@
       <div
         v-for="(entry, index) in latestThreeEntries"
         :key="entry.id"
-        class="rounded-lg border border-slate-200 bg-white p-3 shadow-sm"
+        class="rounded-lg border border-app-border p-3 text-app-text shadow-sm"
       >
         <!-- Header -->
         <div class="mb-2 flex items-center justify-between">
-          <div class="text-sm font-semibold text-slate-900">
+          <div class="text-sm font-semibold text-app-text">
             {{ versionLabel(entry, index) }}
           </div>
 
-          <div class="text-xs text-slate-500">v{{ entry.revision_number }}</div>
+          <div class="text-xs text-app-muted">v{{ entry.revision_number }}</div>
         </div>
 
         <!-- STACKED SCORES -->
         <div class="space-y-2 text-sm">
           <!-- Market -->
           <div class="flex items-center justify-between">
-            <span class="text-slate-500">Market</span>
+            <span class="text-app-muted">Market</span>
             <span class="font-medium">
               {{ scoreFor(entry, 'market_score') }}
               <span class="ml-1 text-emerald-600">
@@ -31,7 +31,7 @@
 
           <!-- Confidence -->
           <div class="flex items-center justify-between">
-            <span class="text-slate-500">Confidence</span>
+            <span class="text-app-muted">Confidence</span>
             <span class="font-medium">
               {{ scoreFor(entry, 'confidence_score') }}
               <span class="ml-1 text-emerald-600">
@@ -58,8 +58,8 @@
             />
           </colgroup>
           <thead>
-            <tr class="border-b border-slate-200 text-left text-slate-600">
-              <th class="sticky left-0 z-10 bg-white px-3 py-2 font-medium"></th>
+            <tr class="border-b border-app-border text-left text-app-muted">
+              <th class="sticky left-0 z-10 px-3 py-2 font-medium text-app-text"></th>
 
               <th
                 v-for="(entry, index) in latestThreeEntries"
@@ -73,10 +73,8 @@
 
           <tbody>
             <!-- Market Score -->
-            <tr class="border-b border-slate-100">
-              <td class="sticky left-0 z-10 bg-white px-3 py-2.5 font-medium text-slate-700">
-                Market Score
-              </td>
+            <tr class="border-b border-app-border">
+              <td class="sticky left-0 z-10 px-3 py-2.5 font-medium text-app-text">Market Score</td>
 
               <td
                 v-for="(entry, index) in latestThreeEntries"
@@ -84,7 +82,7 @@
                 class="px-3 py-2.5 align-top"
               >
                 {{ scoreFor(entry, 'market_score') }}
-                <span class="ml-1 text-emerald-700">
+                <span class="ml-1 text-emerald-500">
                   {{ deltaText(entry, index, 'market_score') }}
                 </span>
               </td>
@@ -92,7 +90,7 @@
 
             <!-- Confidence -->
             <tr>
-              <td class="sticky left-0 z-10 bg-white px-3 py-2.5 font-medium text-slate-700">
+              <td class="sticky left-0 z-10 px-3 py-2.5 font-medium text-app-text">
                 Confidence Score
               </td>
 
@@ -102,7 +100,7 @@
                 class="px-3 py-2.5 align-top"
               >
                 {{ scoreFor(entry, 'confidence_score') }}
-                <span class="ml-1 text-emerald-700">
+                <span class="ml-1 text-emerald-500">
                   {{ deltaText(entry, index, 'confidence_score') }}
                 </span>
               </td>
@@ -111,7 +109,7 @@
             <!-- Market Breakdown -->
             <tr v-if="marketBreakdownKeys.length">
               <td
-                class="sticky left-0 bg-white px-3 py-3 text-xs font-semibold uppercase text-slate-500"
+                class="sticky left-0 px-3 py-3 text-xs font-semibold uppercase text-app-muted text-app-text"
               >
                 Market Breakdown
               </td>
@@ -119,7 +117,7 @@
             </tr>
 
             <tr v-for="cpKey in marketBreakdownKeys" :key="cpKey">
-              <td class="sticky left-0 bg-white px-3 py-2.5 text-slate-700">
+              <td class="sticky left-0 px-3 py-2.5 text-app-text">
                 {{ cpKey }}) {{ CHECKPOINT_NAMES[cpKey] }}
               </td>
 
@@ -129,7 +127,7 @@
                 class="px-3 py-2.5 align-top"
               >
                 {{ marketBreakdownValue(entry, cpKey) }}
-                <span class="ml-1 text-emerald-700">
+                <span class="ml-1 text-emerald-500">
                   {{ marketBreakdownDelta(entry, index, cpKey) }}
                 </span>
               </td>
@@ -138,7 +136,7 @@
             <!-- Confidence Breakdown -->
             <tr v-if="confidenceBreakdownKeys.length">
               <td
-                class="sticky left-0 bg-white px-3 py-3 text-xs font-semibold uppercase text-slate-500"
+                class="sticky left-0 px-3 py-3 text-xs font-semibold uppercase text-app-muted text-app-text"
               >
                 Confidence Breakdown
               </td>
@@ -146,7 +144,7 @@
             </tr>
 
             <tr v-for="cbKey in confidenceBreakdownKeys" :key="cbKey">
-              <td class="sticky left-0 bg-white px-3 py-2.5 text-slate-700">
+              <td class="sticky left-0 px-3 py-2.5 text-app-text">
                 {{ cbKey.replaceAll('_', ' ') }}
               </td>
 
@@ -156,7 +154,7 @@
                 class="px-3 py-2.5 align-top"
               >
                 {{ confidenceBreakdownValue(entry, cbKey) }}
-                <span class="ml-1 text-emerald-700">
+                <span class="ml-1 text-emerald-500">
                   {{ confidenceBreakdownDelta(entry, index, cbKey) }}
                 </span>
               </td>

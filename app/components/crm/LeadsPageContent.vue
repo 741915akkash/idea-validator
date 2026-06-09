@@ -116,16 +116,16 @@
       @close="showPipelinesLimitAlert = false"
     />
 
-    <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+    <div class="mb-6 rounded-lg border border-app-border px-6 py-5 text-app-text">
       <div class="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:items-center">
         <!-- LEFT -->
         <div>
-          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-app-text">
             <span>Leads</span>
 
             <button
               type="button"
-              class="inline-flex items-center text-gray-400 transition hover:text-gray-700"
+              class="inline-flex items-center text-app-muted transition hover:text-app-muted"
               aria-label="Open Leads help"
               @click="
                 () => {
@@ -142,12 +142,14 @@
 
         <!-- CENTER -->
         <div
-          class="inline-flex items-center rounded-lg border border-gray-200 bg-white p-1 shadow-sm"
+          class="inline-flex items-center rounded-lg border border-app-border bg-app-panel p-1 text-app-text"
         >
           <button
             class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
             :class="
-              viewMode === 'table' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+              viewMode === 'table'
+                ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/30'
+                : 'text-app-muted hover:bg-app-hover hover:text-app-text'
             "
             @click="viewMode = 'table'"
           >
@@ -158,8 +160,8 @@
             class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
             :class="
               viewMode === 'kanban'
-                ? 'bg-emerald-600 text-white'
-                : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/30'
+                : 'text-app-muted hover:bg-app-hover hover:text-app-text'
             "
             @click="viewMode = 'kanban'"
           >
@@ -167,16 +169,16 @@
           </button>
 
           <button
-            class="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
+            class="rounded-md px-3 py-1.5 text-sm font-medium text-app-muted transition-colors hover:bg-app-hover hover:text-app-text"
             @click="$router.push('/crm/pipelines')"
           >
             Pipelines
           </button>
 
-          <div class="mx-1 h-5 w-px bg-gray-200"></div>
+          <div class="mx-1 h-5 w-px bg-app-border"></div>
 
           <button
-            class="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100"
+            class="inline-flex items-center text-app-muted transition hover:text-app-text"
             @click="$router.push('/crm/sequences')"
           >
             Sequences

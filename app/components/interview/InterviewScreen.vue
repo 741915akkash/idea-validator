@@ -215,14 +215,14 @@
     v-if="current"
     :class="[
       isFullscreen
-        ? 'fixed inset-0 z-50 flex flex-col gap-4 overflow-hidden bg-white p-4 md:p-6'
+        ? 'fixed inset-0 z-50 flex flex-col gap-4 overflow-hidden p-4 text-app-text md:p-6'
         : 'mx-auto max-w-6xl space-y-6 px-4 py-4 md:px-6 md:py-6'
     ]"
   >
     <!-- FULLSCREEN -->
     <button
       @click="toggleFullscreen"
-      class="rounded-md bg-neutral-100 px-3 py-2 text-xs font-medium uppercase text-neutral-700 hover:bg-neutral-200"
+      class="rounded-md bg-app-hover px-3 py-2 text-xs font-medium uppercase text-app-muted hover:bg-neutral-200"
     >
       {{ isFullscreen ? 'Exit Fullscreen' : 'Fullscreen' }}
     </button>
@@ -230,23 +230,23 @@
     <!-- RESPONDENT -->
     <button
       @click="showRespondent = !showRespondent"
-      class="rounded-md bg-neutral-100 px-3 py-2 text-xs font-medium uppercase text-neutral-700"
+      class="rounded-md bg-app-hover px-3 py-2 text-xs font-medium uppercase text-app-muted"
     >
       {{ showRespondent ? 'Hide respondent' : 'Show respondent' }}
     </button>
 
     <div v-if="showRespondent">
-      <div class="text-xs font-medium uppercase text-neutral-500">Respondent</div>
+      <div class="text-xs font-medium uppercase text-app-muted">Respondent</div>
 
       <textarea
         v-model="respondentName"
-        class="mt-1 h-20 w-full resize-none overflow-y-auto rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        class="mt-1 h-20 w-full resize-none overflow-y-auto rounded-md border border-app-border px-3 py-2 text-sm"
       />
     </div>
 
     <!-- CONDITION -->
     <div>
-      <div class="text-xs font-medium uppercase text-neutral-500">Condition</div>
+      <div class="text-xs font-medium uppercase text-app-muted">Condition</div>
 
       <div class="mt-1 text-lg font-semibold md:text-xl">
         {{ current.description }}
@@ -255,7 +255,7 @@
 
     <!-- QUESTIONS -->
     <div>
-      <div class="text-xs font-medium uppercase text-neutral-500">Questions</div>
+      <div class="text-xs font-medium uppercase text-app-muted">Questions</div>
 
       <ul class="mt-2 space-y-1 text-base md:text-lg">
         <li v-for="q in questionsForCurrent" :key="q.id">• {{ q.text }}</li>
@@ -280,14 +280,12 @@
     >
       <!-- NOTES -->
       <div v-show="mobileTab === 'notes' || isDesktop" class="flex min-h-0 flex-col gap-2">
-        <div class="text-xs font-medium uppercase text-neutral-500">
-          Interview Notes
-        </div>
+        <div class="text-xs font-medium uppercase text-app-muted">Interview Notes</div>
 
         <textarea
           v-model="notes"
           :class="[
-            'w-full resize-none overflow-y-auto rounded-md border border-neutral-300 px-3 py-2 text-sm',
+            'w-full resize-none overflow-y-auto rounded-md border border-app-border px-3 py-2 text-sm',
             isFullscreen ? 'flex-1' : 'h-56 md:h-64'
           ]"
         />
@@ -297,14 +295,12 @@
 
       <!-- EVIDENCE -->
       <div v-show="mobileTab === 'evidence' || isDesktop" class="flex min-h-0 flex-col gap-2">
-        <div class="text-xs font-medium uppercase text-neutral-500">
-          Evidence Logged
-        </div>
+        <div class="text-xs font-medium uppercase text-app-muted">Evidence Logged</div>
 
         <textarea
           v-model="evidence"
           :class="[
-            'w-full resize-none overflow-y-auto rounded-md border border-neutral-300 px-3 py-2 text-sm',
+            'w-full resize-none overflow-y-auto rounded-md border border-app-border px-3 py-2 text-sm',
             isFullscreen ? 'flex-1' : 'h-56 md:h-64'
           ]"
         />
@@ -315,20 +311,20 @@
 
     <!-- DECISION -->
     <div :class="isFullscreen ? 'mt-auto border-t pt-4' : 'border-t pt-6'">
-      <div class="text-xs font-medium uppercase text-neutral-500">Decision</div>
+      <div class="text-xs font-medium uppercase text-app-muted">Decision</div>
 
       <div class="mt-3 flex flex-col gap-3 md:flex-row md:justify-between">
         <div class="flex gap-2">
           <button
             @click="interview.goToPreviousPhase()"
-            class="rounded-md border border-neutral-300 px-4 py-2 text-sm"
+            class="rounded-md border border-app-border px-4 py-2 text-sm"
           >
             ← Previous
           </button>
 
           <button
             @click="interview.goToNextPhase()"
-            class="rounded-md border border-neutral-300 px-4 py-2 text-sm"
+            class="rounded-md border border-app-border px-4 py-2 text-sm"
           >
             Next →
           </button>
@@ -337,7 +333,7 @@
         <div class="flex gap-2">
           <button
             @click="resolve('failed')"
-            class="rounded-md border border-neutral-400 px-4 py-2 text-sm"
+            class="rounded-md border border-app-border px-4 py-2 text-sm"
           >
             Condition Failed
           </button>

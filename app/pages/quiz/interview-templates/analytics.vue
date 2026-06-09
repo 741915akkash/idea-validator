@@ -1,27 +1,27 @@
 <template>
-  <div class="min-h-screen bg-white p-6">
+  <div class="min-h-screen p-6 text-app-text">
     <!-- HEADER -->
     <div class="mb-8 flex items-start justify-between">
       <div>
-        <h1 class="text-3xl font-semibold text-slate-900">
+        <h1 class="text-3xl font-semibold text-app-text">
           {{ analytics?.template?.title || 'Analytics' }}
         </h1>
 
-        <p v-if="selectedVersion !== null" class="mt-1 text-sm font-medium text-slate-600">
+        <p v-if="selectedVersion !== null" class="mt-1 text-sm font-medium text-app-muted">
           Version {{ selectedVersion }}
         </p>
 
-        <p class="mt-2 text-sm text-slate-500">
+        <p class="mt-2 text-sm text-app-muted">
           {{ analytics?.template?.description }}
         </p>
       </div>
 
-      <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
-        <div class="text-xs font-medium uppercase tracking-wide text-slate-500">
+      <div class="rounded-2xl border border-app-border bg-app-panel px-5 py-4 text-app-text">
+        <div class="text-xs font-medium uppercase tracking-wide text-app-muted">
           Total Interviews
         </div>
 
-        <div class="mt-1 text-3xl font-semibold text-slate-900">
+        <div class="mt-1 text-3xl font-semibold text-app-text">
           {{ analytics?.total_interviews || 0 }}
         </div>
       </div>
@@ -30,14 +30,14 @@
     <!-- LOADING -->
     <div
       v-if="loading"
-      class="rounded-2xl border border-slate-200 bg-white p-10 text-center text-sm text-slate-500"
+      class="rounded-2xl border border-app-border bg-app-panel p-10 text-center text-sm text-app-muted"
     >
       Loading analytics...
     </div>
 
     <div
       v-else-if="error"
-      class="rounded-2xl border border-red-200 bg-red-50 p-10 text-center text-sm text-red-700"
+      class="rounded-2xl border border-red-500/20 bg-red-500/5 p-10 text-center text-sm text-red-500"
     >
       {{ error }}
     </div>
@@ -47,13 +47,13 @@
       <div
         v-for="(question, index) in analytics.questions"
         :key="index"
-        class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:p-5"
+        class="rounded-2xl border border-app-border bg-app-panel p-4 text-app-text md:p-5"
       >
         <div class="grid grid-cols-[56px_1fr] gap-4">
           <!-- LEFT COLUMN -->
           <div class="flex justify-center">
             <div
-              class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-sm font-semibold text-slate-700"
+              class="flex h-10 w-10 items-center justify-center rounded-full border border-app-border text-sm font-semibold text-app-text"
             >
               {{ index + 1 }}
             </div>
@@ -63,12 +63,12 @@
           <div class="space-y-4">
             <div>
               <div class="flex items-start justify-between gap-4">
-                <h2 class="text-base font-semibold text-slate-900 md:text-lg">
+                <h2 class="text-base font-semibold text-app-text md:text-lg">
                   {{ question.text }}
                 </h2>
 
                 <span
-                  class="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-slate-900"
+                  class="shrink-0 rounded-full bg-app-hover px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-app-text"
                 >
                   {{ question.question_type }}
                 </span>
@@ -76,14 +76,12 @@
             </div>
 
             <!-- PRIMARY INSIGHT -->
-            <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <div class="text-xl font-semibold text-slate-900">
+            <div class="rounded-xl border border-app-border bg-app-hover px-4 py-3">
+              <div class="text-xl font-semibold text-app-text">
                 {{ getPrimaryInsight(question) }}
               </div>
 
-              <div class="mt-1 text-sm text-slate-500">
-                n = {{ getResponseCount(question) }}
-              </div>
+              <div class="mt-1 text-sm text-app-muted">n = {{ getResponseCount(question) }}</div>
             </div>
 
             <!-- UNIFORM ANALYTICS LAYOUT -->
@@ -143,18 +141,18 @@
               <!-- NUMBER -->
               <template v-else-if="question.question_type === 'number'">
                 <div class="grid grid-cols-2 gap-4">
-                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                    <div class="text-xs uppercase tracking-wide text-slate-500">Minimum</div>
+                  <div class="rounded-xl border border-app-border bg-app-hover p-3">
+                    <div class="text-xs uppercase tracking-wide text-app-muted">Minimum</div>
 
-                    <div class="mt-1.5 text-xl font-semibold text-slate-900">
+                    <div class="mt-1.5 text-xl font-semibold text-app-text">
                       {{ question.analytics.min }}
                     </div>
                   </div>
 
-                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                    <div class="text-xs uppercase tracking-wide text-slate-500">Maximum</div>
+                  <div class="rounded-xl border border-app-border bg-app-hover p-3">
+                    <div class="text-xs uppercase tracking-wide text-app-muted">Maximum</div>
 
-                    <div class="mt-1.5 text-xl font-semibold text-slate-900">
+                    <div class="mt-1.5 text-xl font-semibold text-app-text">
                       {{ question.analytics.max }}
                     </div>
                   </div>
@@ -163,25 +161,25 @@
 
               <!-- OPEN TEXT -->
               <template v-else-if="question.question_type === 'open_text'">
-                <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                  <div class="text-xs font-medium uppercase tracking-wide text-slate-500">
+                <div class="rounded-xl border border-app-border bg-app-hover p-3">
+                  <div class="text-xs font-medium uppercase tracking-wide text-app-muted">
                     Responses
                   </div>
 
                   <ul
                     v-if="question.analytics.responses?.length"
-                    class="mt-2 space-y-2 text-sm text-slate-600"
+                    class="mt-2 space-y-2 text-sm text-app-muted"
                   >
                     <li
                       v-for="(response, responseIndex) in question.analytics.responses"
                       :key="responseIndex"
-                      class="rounded-lg border border-slate-200 bg-white px-3 py-1.5"
+                      class="rounded-lg border border-app-border bg-app-panel px-3 py-1.5 text-app-text"
                     >
                       {{ response }}
                     </li>
                   </ul>
 
-                  <div v-else class="mt-2 text-sm text-slate-500">No responses yet</div>
+                  <div v-else class="mt-2 text-sm text-app-muted">No responses yet</div>
                 </div>
               </template>
             </div>
@@ -239,12 +237,12 @@
       return () =>
         h('div', null, [
           h('div', { class: 'mb-2 flex items-center justify-between' }, [
-            h('div', { class: 'text-sm font-medium text-slate-700' }, props.label),
-            h('div', { class: 'text-sm text-slate-500' }, `${props.count} • ${props.percentage}%`)
+            h('div', { class: 'text-sm font-medium text-app-text' }, props.label),
+            h('div', { class: 'text-sm text-app-muted' }, `${props.count} • ${props.percentage}%`)
           ]),
-          h('div', { class: 'h-3 overflow-hidden rounded-full bg-slate-100' }, [
+          h('div', { class: 'h-3 overflow-hidden rounded-full bg-app-hover' }, [
             h('div', {
-              class: 'h-full rounded-full bg-emerald-500 transition-all',
+              class: 'h-full rounded-full bg-emerald-500/10 transition-all',
               style: { width: `${props.percentage}%` }
             })
           ])

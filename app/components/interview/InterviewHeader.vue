@@ -29,11 +29,11 @@
 <template>
   <div>
     <!-- Section Label -->
-    <div class="text-lg font-medium uppercase text-neutral-500 sm:text-2xl">
+    <div class="text-lg font-medium uppercase text-app-muted sm:text-2xl">
       Deterministic Interview
     </div>
 
     <!-- Divider -->
-    <div class="mt-4 border-t border-neutral-200 sm:mt-6"></div>
+    <div class="mt-4 border-t border-app-border sm:mt-6"></div>
   </div>
 </template>

@@ -30,7 +30,7 @@
   let hideTimer = null
 
   const variantClasses = computed(() => {
-    if (props.variant === 'success') return 'border-emerald-200 bg-emerald-50 text-emerald-900'
+    if (props.variant === 'success') return 'border-emerald-200 bg-emerald-500/10 text-emerald-900'
     if (props.variant === 'warning') return 'border-amber-200 bg-amber-50 text-amber-900'
     if (props.variant === 'error') return 'border-red-200 bg-red-50 text-red-900'
     return 'border-sky-200 bg-sky-50 text-sky-900'

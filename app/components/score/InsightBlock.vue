@@ -32,7 +32,7 @@
     }
     return {
       label: 'Low',
-      classes: 'bg-slate-100 text-slate-600 border-slate-200'
+      classes: 'bg-slate-100 text-app-muted border-app-border'
     }
   }
 
@@ -42,9 +42,9 @@
 
   const toneClasses = {
     positive: {
-      title: 'text-emerald-700',
+      title: 'text-emerald-500',
       bullet: 'text-emerald-900',
-      dot: 'bg-emerald-500'
+      dot: 'bg-emerald-500/10'
     },
     negative: {
       title: 'text-rose-700',
@@ -52,9 +52,9 @@
       dot: 'bg-rose-500'
     },
     neutral: {
-      title: 'text-slate-700',
-      bullet: 'text-slate-900',
-      dot: 'bg-slate-500'
+      title: 'text-app-text',
+      bullet: 'text-app-text',
+      dot: 'bg-app-card0'
     }
   }
 </script>
@@ -68,7 +68,7 @@
       </h3>
 
       <!-- Section priority (plain text, no badge) -->
-      <span class="text-s font-medium text-gray-900"> Priority </span>
+      <span class="text-s font-medium text-app-text"> Priority </span>
     </div>
 
     <!-- Items -->
@@ -77,12 +77,12 @@
         v-for="(item, idx) in items"
         :key="item.id"
         class="flex items-start gap-3 pb-2"
-        :class="idx !== items.length - 1 ? 'border-b border-gray-200' : ''"
+        :class="idx !== items.length - 1 ? 'border-b border-app-border' : ''"
       >
         <!-- content row -->
         <div class="flex w-full items-start justify-between gap-4">
           <!-- insight text -->
-          <p class="text-base leading-relaxed text-gray-900">
+          <p class="text-base leading-relaxed text-app-text">
             {{ item.copy }}
           </p>
 
@@ -98,6 +98,6 @@
     </ul>
 
     <!-- Empty state -->
-    <p v-else class="text-base italic text-gray-400">No strong signals here.</p>
+    <p v-else class="text-base italic text-app-muted">No strong signals here.</p>
   </div>
 </template>

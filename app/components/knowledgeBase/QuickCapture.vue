@@ -84,14 +84,16 @@
 
 <template>
   <div class="w-full">
-    <div class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+    <div
+      class="relative overflow-hidden rounded-2xl border border-app-border bg-app-panel text-app-text shadow-xl"
+    >
       <!-- Title Section -->
       <div class="px-5 pb-1 pt-4">
         <input
           v-model="title"
           type="text"
           placeholder="Title (optional)"
-          class="w-full bg-transparent text-base font-semibold text-slate-900 placeholder:text-slate-200 focus:outline-none"
+          class="w-full bg-transparent text-base font-semibold text-app-text placeholder:text-app-muted focus:outline-none"
         />
       </div>
 
@@ -100,16 +102,16 @@
         <textarea
           v-model="content"
           placeholder="Write note..."
-          class="min-h-[240px] w-full resize-none bg-transparent text-lg leading-relaxed text-slate-700 placeholder:text-slate-300 focus:outline-none"
+          class="min-h-[240px] w-full resize-none bg-transparent text-lg leading-relaxed text-app-text placeholder:text-app-muted focus:outline-none"
           autofocus
         ></textarea>
       </div>
 
       <!-- Tags -->
-      <div class="border-t border-slate-100 bg-slate-50/50 px-5 py-4">
+      <div class="border-t border-app-border bg-app-card px-5 py-4">
         <div class="relative space-y-3">
           <label
-            class="flex items-center gap-2 pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-400"
+            class="flex items-center gap-2 pl-1 text-[10px] font-bold uppercase tracking-widest text-app-muted"
           >
             <TagIcon class="h-3 w-3" />
             Tags (optional)
@@ -121,16 +123,16 @@
             @focus="showSuggestions = true"
             @blur="setTimeout(() => (showSuggestions = false), 200)"
             placeholder="urgency, pricing, b2b..."
-            class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm shadow-sm transition-all focus:border-emerald-500 focus:outline-none"
+            class="w-full rounded-xl border border-app-border bg-app-panel px-4 py-2.5 text-sm text-app-text shadow-sm transition-all placeholder:text-app-muted focus:border-emerald-500 focus:outline-none"
           />
 
           <!-- Suggestions Dropdown -->
           <div
             v-if="showSuggestions && tagSuggestions.length > 0"
-            class="absolute bottom-full left-0 right-0 z-50 mb-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl"
+            class="absolute bottom-full left-0 right-0 z-50 mb-2 overflow-hidden rounded-xl border border-app-border bg-app-panel text-app-text shadow-xl"
           >
-            <div class="border-b border-slate-50 bg-slate-50/50 p-2">
-              <span class="px-2 text-[9px] font-bold uppercase tracking-widest text-slate-400">
+            <div class="border-b border-app-border bg-app-card p-2">
+              <span class="px-2 text-[9px] font-bold uppercase tracking-widest text-app-muted">
                 Suggestions
               </span>
             </div>
@@ -140,7 +142,7 @@
                 v-for="tag in tagSuggestions"
                 :key="tag"
                 @click="addTag(tag)"
-                class="group flex w-full items-center justify-between px-4 py-2 text-left text-xs font-bold text-slate-600 transition-colors hover:bg-emerald-50 hover:text-emerald-700"
+                class="group flex w-full items-center justify-between px-4 py-2 text-left text-xs font-bold text-app-muted transition-colors hover:bg-emerald-500/10 hover:text-emerald-500"
               >
                 <span>#{{ tag }}</span>
 
@@ -152,18 +154,18 @@
       </div>
 
       <!-- Footer -->
-      <div class="flex items-center justify-end border-t border-slate-100 px-5 py-3">
+      <div class="flex items-center justify-end border-t border-app-border px-5 py-3">
         <div class="flex items-center gap-3">
           <button
             @click="close"
-            class="px-6 py-2 text-sm font-bold text-slate-400 transition-all hover:text-slate-600 focus:outline-none"
+            class="px-6 py-2 text-sm font-bold text-app-muted transition-all hover:text-app-muted focus:outline-none"
           >
             Cancel
           </button>
 
           <button
             @click="save"
-            class="rounded-lg bg-slate-900 px-5 py-2 text-sm font-bold text-white transition-all hover:bg-emerald-600"
+            class="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-bold text-white transition-all hover:bg-emerald-600"
           >
             Save Note
           </button>

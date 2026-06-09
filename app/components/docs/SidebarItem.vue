@@ -7,8 +7,8 @@
   <li>
     <NuxtLink
       :to="item._path"
-      class="block rounded px-2 py-1 hover:bg-emerald-50"
-      active-class="bg-emerald-100 text-emerald-700"
+      class="block rounded px-2 py-1 hover:bg-emerald-500/10"
+      active-class="bg-emerald-100 text-emerald-500"
     >
       {{ item.title }}
     </NuxtLink>

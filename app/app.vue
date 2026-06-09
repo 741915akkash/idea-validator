@@ -6,6 +6,10 @@
     quizStore.hydrate()
   }
 
+  onMounted(() => {
+    document.documentElement.classList.add('dark')
+  })
+
   useHead({
     script: [
       // Google Analytics (gtag)

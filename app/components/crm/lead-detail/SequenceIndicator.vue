@@ -116,18 +116,18 @@
 </script>
 
 <template>
-  <div class="bg-white p-6">
+  <div class="p-6 text-app-text">
     <!-- HEADER -->
     <div class="mb-4 flex items-center justify-between">
       <h3
-        class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400"
+        class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-app-muted"
       >
         🤖 SEQUENCE
       </h3>
 
       <button
         @click="open = !open"
-        class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-[10px] font-bold uppercase text-gray-600 shadow-sm transition-all hover:border-emerald-500 hover:text-emerald-600"
+        class="rounded-lg border border-app-border px-3 py-1.5 text-[10px] font-bold uppercase text-app-muted text-app-text shadow-sm transition-all hover:border-emerald-500 hover:text-emerald-600"
       >
         {{ open ? 'Close' : sequence ? 'Change' : 'Add Sequence' }}
       </button>
@@ -137,26 +137,26 @@
     <div
       v-if="sequence"
       @click="openSequence"
-      class="group cursor-pointer rounded-xl border border-gray-200 bg-gray-50/30 p-4 transition-all hover:bg-gray-100"
+      class="bg-app-panel/30 group cursor-pointer rounded-xl border border-app-border p-4 transition-all hover:bg-gray-100"
     >
       <div class="flex items-start justify-between">
         <div class="flex flex-col gap-1">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-app-muted">
             Active Sequence
           </span>
 
-          <span class="text-sm font-semibold text-gray-900">
+          <span class="text-sm font-semibold text-app-text">
             {{ sequence.name || sequence.title }}
           </span>
 
-          <span v-if="sequence.current_step || sequence.total_steps" class="text-xs text-gray-500">
+          <span v-if="sequence.current_step || sequence.total_steps" class="text-xs text-app-muted">
             Step {{ sequence.current_step || 0 }} of
             {{ sequence.total_steps || sequence.steps?.length || 0 }}
           </span>
         </div>
 
         <div
-          class="mt-1 text-xs text-gray-400 transition group-hover:translate-x-0.5 group-hover:text-gray-700"
+          class="mt-1 text-xs text-app-muted transition group-hover:translate-x-0.5 group-hover:text-app-muted"
         >
           →
         </div>
@@ -164,14 +164,14 @@
     </div>
 
     <!-- EMPTY -->
-    <div v-else class="rounded-xl border border-dashed border-gray-200 bg-gray-50/30 p-4">
-      <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+    <div v-else class="bg-app-panel/30 rounded-xl border border-dashed border-app-border p-4">
+      <span class="text-[11px] font-bold uppercase tracking-wider text-app-muted">
         No sequence assigned
       </span>
     </div>
 
     <!-- DROPDOWN -->
-    <div v-if="open" class="mt-4 overflow-hidden rounded-xl border border-gray-200 bg-white">
+    <div v-if="open" class="mt-4 overflow-hidden rounded-xl border border-app-border text-app-text">
       <!-- REMOVE SEQUENCE -->
       <button
         v-if="sequence"
@@ -194,20 +194,20 @@
         :key="item.id"
         :disabled="loading"
         @click="assignSequence(item.id)"
-        class="flex w-full items-center justify-between border-b border-gray-100 px-4 py-3 text-left transition-all last:border-b-0 hover:bg-gray-50"
+        class="flex w-full items-center justify-between border-b border-app-border px-4 py-3 text-left transition-all last:border-b-0 hover:bg-app-panel"
       >
         <div class="flex flex-col">
-          <span class="text-sm font-medium text-gray-800">
+          <span class="text-sm font-medium text-app-text">
             {{ item.name || item.title }}
           </span>
 
-          <span class="text-xs text-gray-400"> {{ item.steps?.length || 0 }} steps </span>
+          <span class="text-xs text-app-muted"> {{ item.steps?.length || 0 }} steps </span>
         </div>
 
         <div class="flex items-center gap-2">
           <span
             v-if="String(sequence?.id) === String(item.id)"
-            class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase text-emerald-700"
+            class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase text-emerald-500"
           >
             Active
           </span>
@@ -217,7 +217,7 @@
       </button>
 
       <!-- EMPTY STATE -->
-      <div v-if="!sequencesStore.sequences.length" class="px-4 py-3 text-xs text-gray-400">
+      <div v-if="!sequencesStore.sequences.length" class="px-4 py-3 text-xs text-app-muted">
         No sequences found
       </div>
     </div>

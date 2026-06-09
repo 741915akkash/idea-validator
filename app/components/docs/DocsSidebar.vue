@@ -46,24 +46,25 @@
   <!-- 🔥 single handler instead of adding click everywhere -->
   <div @click="emit('navigate')">
     <div class="mb-4">
-      <input placeholder="Search..." class="w-full rounded-md border px-3 py-2 text-sm" />
+      <input
+        placeholder="Search..."
+        class="w-full rounded-md border border-app-border bg-app-card px-3 py-2 text-sm text-app-text placeholder:text-app-muted focus:border-emerald-500 focus:outline-none"
+      />
     </div>
 
     <div class="space-y-4">
       <NuxtLink
         v-if="rootPage"
         :to="rootPage.path"
-        class="block rounded px-2 py-1 text-sm hover:bg-emerald-50"
-        active-class="bg-emerald-100 text-emerald-700"
-        exact-active-class="bg-emerald-100 text-emerald-700"
+        class="block rounded px-2 py-1 text-sm text-app-muted transition hover:bg-emerald-500/10 hover:text-app-text"
+        active-class="bg-emerald-500/10 text-emerald-500"
+        exact-active-class="bg-emerald-500/10 text-emerald-500"
       >
         {{ rootPage.title || 'Docs' }}
       </NuxtLink>
 
       <div v-for="section in sections" :key="section.slug">
-        <p
-          class="mb-1 rounded bg-slate-700 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-slate-100"
-        >
+        <p class="mb-1 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-app-muted">
           {{ section.title }}
         </p>
 
@@ -71,9 +72,9 @@
           <li v-for="item in section.items" :key="item.path">
             <NuxtLink
               :to="item.path"
-              class="block rounded px-2 py-1 text-sm hover:bg-emerald-50"
-              active-class="bg-emerald-100 text-emerald-700"
-              exact-active-class="bg-emerald-100 text-emerald-700"
+              class="block rounded px-2 py-1 text-sm text-app-muted transition hover:bg-emerald-500/10 hover:text-app-text"
+              active-class="bg-emerald-500/10 text-emerald-500"
+              exact-active-class="bg-emerald-500/10 text-emerald-500"
             >
               {{ item.title }}
             </NuxtLink>

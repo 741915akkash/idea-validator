@@ -56,9 +56,9 @@
   <div>
     <!-- Title -->
     <div>
-      <h2 class="text-xl font-semibold text-neutral-900">Decomposition</h2>
+      <h2 class="text-xl font-semibold text-app-text">Decomposition</h2>
 
-      <p class="mt-2 text-sm text-neutral-600">Select the component you want to resolve first.</p>
+      <p class="mt-2 text-sm text-app-muted">Select the component you want to resolve first.</p>
     </div>
 
     <!-- Cards -->
@@ -70,22 +70,22 @@
         :class="[
           'cursor-pointer rounded-lg border p-5 transition',
           selectedId === sub.id
-            ? 'border-neutral-900 bg-neutral-50'
-            : 'border-neutral-200 hover:border-neutral-400'
+            ? 'border-app-border bg-app-hover'
+            : 'border-app-border hover:border-app-border'
         ]"
       >
         <div class="flex items-start justify-between">
           <div>
-            <div class="text-base font-semibold text-neutral-900">
+            <div class="text-base font-semibold text-app-text">
               {{ sub.title }}
             </div>
 
-            <div class="mt-2 text-sm text-neutral-600">
+            <div class="mt-2 text-sm text-app-muted">
               {{ sub.description }}
             </div>
           </div>
 
-          <div class="text-xs font-medium uppercase text-neutral-500">Impact: {{ sub.impact }}</div>
+          <div class="text-xs font-medium uppercase text-app-muted">Impact: {{ sub.impact }}</div>
         </div>
       </div>
     </div>
@@ -96,7 +96,7 @@
     </div>
 
     <!-- Loading -->
-    <div v-if="loading" class="mt-6 text-sm text-neutral-600">
+    <div v-if="loading" class="mt-6 text-sm text-app-muted">
       Generating measurable goal and conditions…
     </div>
 
@@ -105,7 +105,7 @@
       <button
         @click="handlePrevious"
         :disabled="loading"
-        class="rounded-md border border-neutral-300 px-6 py-2 text-sm font-medium text-neutral-700 transition disabled:cursor-not-allowed disabled:border-neutral-200 disabled:text-neutral-400"
+        class="rounded-md border border-app-border px-6 py-2 text-sm font-medium text-app-muted transition disabled:cursor-not-allowed disabled:border-app-border disabled:text-neutral-400"
       >
         ← Previous
       </button>
@@ -113,7 +113,7 @@
       <button
         @click="handleContinue"
         :disabled="!selectedId || loading"
-        class="rounded-md bg-neutral-900 px-6 py-2 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-500"
+        class="rounded-md bg-emerald-600 px-6 py-2 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-app-muted"
       >
         Continue →
       </button>

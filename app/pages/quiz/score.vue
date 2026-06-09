@@ -123,17 +123,17 @@
   <main class="px-6 py-12">
     <div class="mx-auto max-w-2xl">
       <div class="mb-5">
-        <h1 class="flex items-center gap-2 text-2xl font-semibold text-slate-900">
+        <h1 class="flex items-center gap-2 text-2xl font-semibold text-app-text">
           <span>Score</span>
           <Info
-            class="h-5 w-10 cursor-pointer text-gray-400 hover:text-gray-700"
+            class="h-5 w-10 cursor-pointer text-app-muted hover:text-app-muted"
             @click="showHelpDrawer = true"
           />
         </h1>
       </div>
 
       <!-- Loading -->
-      <p v-if="loading" class="text-base text-gray-600">Loading your results…</p>
+      <p v-if="loading" class="text-base text-app-muted">Loading your results…</p>
 
       <!-- Error -->
       <div v-else-if="error" class="text-base text-red-600">
@@ -145,7 +145,7 @@
         <!-- Idea heading -->
         <h2 class="mb-20 truncate text-xl font-semibold md:text-2xl">
           {{ quizMeta?.name || 'New idea' }}
-          <span v-if="Number(quizMeta?.revision_number ?? 0) > 0" class="text-base text-slate-500">
+          <span v-if="Number(quizMeta?.revision_number ?? 0) > 0" class="text-base text-app-muted">
             — Rev {{ quizMeta.revision_number }}
           </span>
         </h2>
@@ -170,7 +170,7 @@
           Decision: {{ result.decision.replaceAll('_', ' ') }}
         </h1>
 
-        <p class="mb-8 text-base text-gray-600">Based on your answers across all checkpoints.</p>
+        <p class="mb-8 text-base text-app-muted">Based on your answers across all checkpoints.</p>
 
         <!-- Market Breakdown -->
         <section class="mb-10">
@@ -183,7 +183,7 @@
               class="flex justify-between rounded border px-4 py-2"
             >
               <span> {{ checkpoint }}) {{ CHECKPOINT_NAMES[checkpoint] }} </span>
-              <span class="text-gray-600">{{ value }}</span>
+              <span class="text-app-muted">{{ value }}</span>
             </li>
           </ul>
         </section>
@@ -201,7 +201,7 @@
               <span class="capitalize">
                 {{ key.replaceAll('_', ' ') }}
               </span>
-              <span class="text-gray-600">{{ value }}</span>
+              <span class="text-app-muted">{{ value }}</span>
             </li>
           </ul>
         </section>
@@ -216,7 +216,7 @@
             class="mb-6 rounded border p-4"
           >
             <!-- Checkpoint -->
-            <p class="mb-1 text-xs text-gray-500">
+            <p class="mb-1 text-xs text-app-muted">
               Checkpoint {{ change.checkpoint }}) {{ CHECKPOINT_NAMES[change.checkpoint] }}
             </p>
 
@@ -227,16 +227,16 @@
 
             <!-- Main option -->
             <div v-if="change.main_option.previous !== change.main_option.current" class="mb-3">
-              <p class="mb-1 text-xs font-medium text-gray-600">Option</p>
+              <p class="mb-1 text-xs font-medium text-app-muted">Option</p>
 
               <div class="grid grid-cols-2 gap-6 text-base">
                 <!-- Previous -->
-                <div class="text-gray-400">
+                <div class="text-app-muted">
                   {{ change.main_option.previous ?? '—' }}
                 </div>
 
                 <!-- Current -->
-                <div class="font-medium text-gray-900">
+                <div class="font-medium text-app-text">
                   {{ change.main_option.current ?? '—' }}
                 </div>
               </div>
@@ -244,22 +244,22 @@
 
             <!-- ASQs -->
             <div v-if="change.asqs.previous.length || change.asqs.current.length" class="mb-4">
-              <p class="mb-1 text-xs font-medium text-gray-600">Follow-up answers</p>
+              <p class="mb-1 text-xs font-medium text-app-muted">Follow-up answers</p>
 
               <ul class="space-y-3">
                 <li v-for="(prev, i) in change.asqs.previous" :key="i">
-                  <p class="mb-1 text-xs text-gray-500">
+                  <p class="mb-1 text-xs text-app-muted">
                     {{ prev.text }}
                   </p>
 
                   <div class="grid grid-cols-2 gap-6 text-xs">
                     <!-- Previous -->
-                    <div class="text-gray-400">
+                    <div class="text-app-muted">
                       {{ prev.value ?? '—' }}
                     </div>
 
                     <!-- Current -->
-                    <div class="font-medium text-gray-900">
+                    <div class="font-medium text-app-text">
                       {{ change.asqs.current[i]?.value ?? '—' }}
                     </div>
                   </div>
@@ -270,13 +270,13 @@
                   v-for="(curr, i) in change.asqs.current.slice(change.asqs.previous.length)"
                   :key="'new-' + i"
                 >
-                  <p class="mb-1 text-xs text-gray-500">
+                  <p class="mb-1 text-xs text-app-muted">
                     {{ curr.text }}
                   </p>
 
                   <div class="grid grid-cols-2 gap-6 text-xs">
-                    <div class="text-gray-400">—</div>
-                    <div class="font-medium text-gray-900">
+                    <div class="text-app-muted">—</div>
+                    <div class="font-medium text-app-text">
                       {{ curr.value }}
                     </div>
                   </div>
@@ -292,16 +292,16 @@
               "
               class="mb-2"
             >
-              <p class="text-md mb-1 font-medium text-gray-600">Notes</p>
+              <p class="text-md mb-1 font-medium text-app-muted">Notes</p>
 
               <div class="text-md grid grid-cols-2 gap-6">
                 <!-- Previous -->
-                <div class="whitespace-pre-wrap text-gray-400">
+                <div class="whitespace-pre-wrap text-app-muted">
                   {{ change.notes?.previous?.join('; ') || '—' }}
                 </div>
 
                 <!-- Current -->
-                <div class="whitespace-pre-wrap font-medium text-gray-900">
+                <div class="whitespace-pre-wrap font-medium text-app-text">
                   {{ change.notes?.current?.join('; ') || '—' }}
                 </div>
               </div>
@@ -323,7 +323,7 @@
           class="mt-10 rounded-xl border p-6"
         >
           <h2 class="text-lg font-semibold">Insights are locked</h2>
-          <p class="mt-2 text-sm text-gray-600">
+          <p class="mt-2 text-sm text-app-muted">
             Create an account to unlock your full What’s working, What’s risky, and How to proceed
             insights.
           </p>
@@ -341,7 +341,7 @@
           </NuxtLink>
         </section>
 
-        <div v-if="loadingInsights" class="mt-6 text-base text-gray-500">Loading insights…</div>
+        <div v-if="loadingInsights" class="mt-6 text-base text-app-muted">Loading insights…</div>
 
         <div v-if="insightsError" class="mt-6 text-base text-red-600">
           {{ insightsError }}
@@ -350,7 +350,7 @@
         -->
 
         <!-- Footer -->
-        <p class="mb-8 text-xs text-gray-500">Results are locked to preserve objectivity.</p>
+        <p class="mb-8 text-xs text-app-muted">Results are locked to preserve objectivity.</p>
 
         <!-- Actions -->
         <div class="flex items-center gap-6">

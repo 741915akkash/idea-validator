@@ -5,7 +5,11 @@
 
   const headingRegex = /<h([2-4])([^>]*)>([\s\S]*?)<\/h\1>/gi
 
-  const stripTags = (value = '') => value.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
+  const stripTags = (value = '') =>
+    value
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
 
   const decodeEntities = (value = '') =>
     value
@@ -46,7 +50,7 @@
 <template>
   <section class="mx-auto max-w-3xl px-4">
     <div
-      class="max-w-none text-lg leading-8 text-slate-700 [&_a]:font-medium [&_a]:text-emerald-700 hover:[&_a]:text-emerald-800 [&_blockquote]:my-8 [&_blockquote]:border-l-4 [&_blockquote]:border-slate-200 [&_blockquote]:pl-4 [&_blockquote]:text-slate-600 [&_h2]:mt-12 [&_h2]:mb-4 [&_h2]:text-3xl [&_h2]:font-bold [&_h2]:leading-tight [&_h2]:text-slate-900 [&_h3]:mt-10 [&_h3]:mb-3 [&_h3]:text-2xl [&_h3]:font-semibold [&_h3]:leading-tight [&_h3]:text-slate-900 [&_h4]:mt-8 [&_h4]:mb-3 [&_h4]:text-xl [&_h4]:font-semibold [&_h4]:text-slate-900 [&_li]:mb-2 [&_ol]:my-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-6 [&_strong]:font-semibold [&_strong]:text-slate-900 [&_ul]:my-6 [&_ul]:list-disc [&_ul]:pl-6"
+      class="max-w-none text-lg leading-8 text-app-text [&_a]:font-medium [&_a]:text-emerald-500 hover:[&_a]:text-emerald-800 [&_blockquote]:my-8 [&_blockquote]:border-l-4 [&_blockquote]:border-app-border [&_blockquote]:pl-4 [&_blockquote]:text-app-muted [&_h2]:mb-4 [&_h2]:mt-12 [&_h2]:text-3xl [&_h2]:font-bold [&_h2]:leading-tight [&_h2]:text-app-text [&_h3]:mb-3 [&_h3]:mt-10 [&_h3]:text-2xl [&_h3]:font-semibold [&_h3]:leading-tight [&_h3]:text-app-text [&_h4]:mb-3 [&_h4]:mt-8 [&_h4]:text-xl [&_h4]:font-semibold [&_h4]:text-app-text [&_li]:mb-2 [&_ol]:my-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-6 [&_strong]:font-semibold [&_strong]:text-app-text [&_ul]:my-6 [&_ul]:list-disc [&_ul]:pl-6"
       v-html="processedContent"
     ></div>
   </section>

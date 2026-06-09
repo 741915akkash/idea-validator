@@ -132,15 +132,15 @@
   <div>
     <!-- Title -->
     <div>
-      <h2 class="text-xl font-semibold text-neutral-900">Resolution Complete</h2>
+      <h2 class="text-xl font-semibold text-app-text">Resolution Complete</h2>
 
       <div class="mt-5">
-        <div class="text-xs font-medium uppercase text-neutral-500">Respondent</div>
+        <div class="text-xs font-medium uppercase text-app-muted">Respondent</div>
 
         <textarea
           v-model="respondentName"
           rows="2"
-          class="mt-2 w-full resize-none rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          class="mt-2 w-full resize-none rounded-md border border-app-border px-3 py-2 text-sm"
         />
 
         <SavedStatus v-if="respondentSaved" class="mt-1" />
@@ -149,7 +149,7 @@
 
     <!-- Conditions Summary -->
     <div class="mt-10">
-      <div class="text-xl font-medium text-neutral-700">Condition Results</div>
+      <div class="text-xl font-medium text-app-muted">Condition Results</div>
 
       <div class="mt-4 space-y-3">
         <div
@@ -166,7 +166,7 @@
             {{ condition.status === 'met' ? '✓' : '✕' }}
           </div>
 
-          <div class="text-sm text-neutral-800">
+          <div class="text-sm text-app-text">
             {{ condition.description }}
           </div>
         </div>
@@ -178,7 +178,7 @@
       <button
         @click="goToPrevious"
         :disabled="loading"
-        class="rounded-md border border-neutral-300 px-6 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 disabled:border-neutral-200 disabled:text-neutral-400"
+        class="rounded-md border border-app-border px-6 py-2 text-sm font-medium text-app-muted hover:bg-app-hover disabled:border-app-border disabled:text-neutral-400"
       >
         ← Previous
       </button>
@@ -194,7 +194,7 @@
       <button
         @click="goToMasterDetail"
         :disabled="loading"
-        class="rounded-md border border-neutral-900 px-6 py-2 text-sm font-medium text-neutral-900"
+        class="rounded-md border border-app-border px-6 py-2 text-sm font-medium text-app-text"
       >
         Return to Structured Validation
       </button>

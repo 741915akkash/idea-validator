@@ -14,23 +14,23 @@
 </script>
 
 <template>
-  <header class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+  <header class="mb-6 rounded-lg border border-app-border px-6 py-5 text-app-text">
     <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <!-- LEFT -->
       <div class="flex items-start gap-4">
         <button
           @click="$emit('back')"
-          class="rounded-lg border border-slate-200 bg-white p-2.5 text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
+          class="rounded-lg border border-app-border p-2.5 text-app-muted text-app-text transition hover:bg-app-card hover:text-app-text"
         >
           <ArrowLeft class="h-5 w-5" />
         </button>
 
         <div>
-          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-app-text">
             <span>{{ isEdit ? 'Edit Sequence' : 'Create Sequence' }}</span>
 
             <Info
-              class="h-5 w-5 cursor-pointer text-gray-400 transition hover:text-gray-700"
+              class="h-5 w-5 cursor-pointer text-app-muted transition hover:text-app-muted"
               @click="showHelpDrawer = true"
             />
           </h1>

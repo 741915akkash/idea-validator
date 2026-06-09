@@ -80,12 +80,12 @@
   <div class="flex w-80 flex-shrink-0 flex-col">
     <!-- HEADER -->
     <div class="mb-3 flex items-center justify-between px-1">
-      <h3 class="text-xs font-bold uppercase text-gray-500">
+      <h3 class="text-xs font-bold uppercase text-app-muted">
         {{ stage.name }}
       </h3>
 
       <button @click="showEditModal = true">
-        <MoreHorizontal class="h-4 w-4 text-gray-400" />
+        <MoreHorizontal class="h-4 w-4 text-app-muted" />
       </button>
     </div>
 

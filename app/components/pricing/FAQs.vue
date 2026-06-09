@@ -42,7 +42,7 @@
 
 <template>
   <div class="mx-auto mt-20 max-w-3xl px-4 sm:mt-32 sm:px-0">
-    <h2 class="mb-8 text-center text-2xl font-extrabold text-slate-900 sm:mb-12 sm:text-3xl">
+    <h2 class="mb-8 text-center text-2xl font-extrabold text-app-text sm:mb-12 sm:text-3xl">
       Pricing FAQ
     </h2>
 
@@ -50,14 +50,14 @@
       <div
         v-for="(faq, i) in faqs"
         :key="i"
-        class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+        class="overflow-hidden rounded-2xl border border-app-border bg-app-panel text-app-text"
       >
         <button
           @click="toggleFaq(i)"
-          class="flex w-full items-start justify-between gap-3 p-4 text-left transition-colors hover:bg-slate-50 sm:items-center sm:p-6"
+          class="flex w-full items-start justify-between gap-3 p-1 text-left transition-colors hover:bg-app-hover sm:items-center sm:p-6"
         >
           <span
-            class="min-w-0 break-words font-sans text-base font-bold leading-6 text-slate-600 sm:text-lg sm:leading-7"
+            class="min-w-0 break-words font-sans text-md font-medium leading-6 text-app-text"
           >
             {{ faq.q }}
           </span>
@@ -66,14 +66,14 @@
             :is="openFaq === i ? ChevronUp : ChevronDown"
             :class="[
               'mt-0.5 h-5 w-5 flex-none transition-colors sm:mt-0',
-              openFaq === i ? 'text-slate-900' : 'text-slate-400'
+              openFaq === i ? 'text-app-text' : 'text-app-muted'
             ]"
           />
         </button>
 
         <div
           v-if="openFaq === i"
-          class="px-4 pb-4 text-sm leading-relaxed text-slate-700 sm:px-6 sm:pb-6"
+          class="border-t border-app-border px-4 py-4 text-sm leading-relaxed text-app-text sm:px-6"
         >
           {{ faq.a }}
         </div>

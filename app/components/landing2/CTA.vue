@@ -1,7 +1,7 @@
 <template>
-  <section id="cta-section" class="bg-white px-6 py-24 text-center">
+  <section id="cta-section" class="px-6 py-24 text-center text-app-text">
     <div class="mx-auto max-w-3xl">
-      <h2 class="mb-6 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
+      <h2 class="mb-6 text-4xl font-extrabold tracking-tight text-app-text sm:text-5xl">
         Validate without wasting time and money.
       </h2>
 
@@ -12,7 +12,7 @@
         Start Validating Free
       </button>
 
-      <p class="mt-8 text-sm font-medium text-slate-500">
+      <p class="mt-8 text-sm font-medium text-app-muted">
         No credit card required. Start building with confidence today.
       </p>
     </div>

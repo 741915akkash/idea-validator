@@ -170,14 +170,14 @@
 <template>
   <div>
     <div>
-      <h2 class="text-xl font-semibold text-neutral-900">Define the Uncertainty</h2>
-      <p class="mt-2 text-sm text-neutral-600">
+      <h2 class="text-xl font-semibold text-app-text">Define the Uncertainty</h2>
+      <p class="mt-2 text-sm text-app-muted">
         Edit uncertainty, generate sub-uncertainties any number of times, then continue.
       </p>
     </div>
 
     <div class="mt-8">
-      <label class="mb-2 block text-sm font-medium text-neutral-700">
+      <label class="mb-2 block text-sm font-medium text-app-muted">
         What is currently unknown?
       </label>
 
@@ -185,11 +185,11 @@
         v-model="text"
         :maxlength="maxChars"
         rows="5"
-        class="w-full resize-none rounded-md border border-neutral-300 px-4 py-3 text-sm focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900"
+        class="w-full resize-none rounded-md border border-app-border px-4 py-3 text-sm focus:border-app-border focus:outline-none focus:ring-2 focus:ring-neutral-900"
         placeholder="Example: Will founders pay $50/month for this product?"
       ></textarea>
 
-      <div class="mt-2 flex justify-between text-xs text-neutral-500">
+      <div class="mt-2 flex justify-between text-xs text-app-muted">
         <span>Be specific. Avoid vague wording.</span>
         <span>{{ charCount }} / {{ maxChars }}</span>
       </div>
@@ -199,24 +199,24 @@
       <button
         @click="generateSubUncertainties"
         :disabled="!isValid || generating || saving"
-        class="rounded-md bg-neutral-900 px-6 py-2 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-500"
+        class="rounded-md bg-emerald-600 px-6 py-2 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-app-muted"
       >
         {{ generating ? 'Generating…' : 'Generate sub-uncertainties' }}
       </button>
-      <div class="mt-2 text-xs text-neutral-500">
+      <div class="mt-2 text-xs text-app-muted">
         Costs {{ generateCost }} credits • {{ creditsHint }}
       </div>
     </div>
 
     <div v-if="hasSubUncertainties" class="mt-10">
       <div class="flex items-center justify-between">
-        <h3 class="text-base font-semibold text-neutral-900">Sub-uncertainties</h3>
-        <button @click="addSubUncertainty" class="text-sm text-neutral-900 underline">
+        <h3 class="text-base font-semibold text-app-text">Sub-uncertainties</h3>
+        <button @click="addSubUncertainty" class="text-sm text-app-text underline">
           + Add manually
         </button>
       </div>
 
-      <p class="mt-2 text-sm text-neutral-600">
+      <p class="mt-2 text-sm text-app-muted">
         Select one to continue with, and edit any text before saving.
       </p>
 
@@ -224,7 +224,7 @@
         <div
           v-for="sub in interview.subUncertainties"
           :key="sub.id"
-          class="rounded-md border border-neutral-200 p-3"
+          class="rounded-md border border-app-border p-3"
         >
           <div class="flex items-start gap-3">
             <input
@@ -238,7 +238,7 @@
               <input
                 v-model="sub.title"
                 type="text"
-                class="w-full rounded border border-neutral-300 px-3 py-2 text-sm"
+                class="w-full rounded border border-app-border px-3 py-2 text-sm"
                 placeholder="Enter sub-uncertainty"
               />
             </div>
@@ -262,11 +262,11 @@
       <button
         @click="handleContinue"
         :disabled="!isValid || !hasSubUncertainties || !hasSelected || saving || generating"
-        class="rounded-md bg-emerald-600 px-6 py-2 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-500"
+        class="rounded-md bg-emerald-600 px-6 py-2 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-app-muted"
       >
         {{ saving ? 'Saving…' : 'Continue →' }}
       </button>
-      <div class="mt-2 text-xs text-neutral-500">
+      <div class="mt-2 text-xs text-app-muted">
         Uses up to {{ continueMaxCost }} credits • {{ creditsHint }}
       </div>
     </div>

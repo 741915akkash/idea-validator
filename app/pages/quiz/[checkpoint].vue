@@ -171,32 +171,32 @@
     <!-- Header -->
     <header class="mb-6 flex items-center justify-between">
       <div>
-        <h1 class="text-xl font-semibold">Checkpoint {{ checkpoint }}</h1>
-        <p class="text-base text-gray-600">{{ unansweredCount }} unanswered</p>
+        <h1 class="text-xl font-semibold text-app-text">Checkpoint {{ checkpoint }}</h1>
+        <p class="text-base text-app-muted">{{ unansweredCount }} unanswered</p>
       </div>
 
       <button
         type="button"
         @click="navigateTo('/quiz/overview')"
-        class="inline-flex items-center justify-center rounded-lg bg-[#E5E4E2] px-4 py-2 text-sm font-medium text-black transition hover:bg-[#DAD8D4]"
+        class="inline-flex items-center justify-center rounded-lg border border-app-border bg-app-panel px-4 py-2 text-sm font-medium text-app-text transition hover:bg-app-card"
       >
         Back to Overview
       </button>
     </header>
 
     <!-- Loading -->
-    <p v-show="pending" class="text-base text-gray-500">Loading questions…</p>
+    <p v-show="pending" class="text-base text-app-muted">Loading questions…</p>
 
     <!-- Questions -->
     <section v-show="!pending" class="space-y-6">
       <div
         v-for="q in questions"
         :key="q.id"
-        class="relative w-full max-w-xl rounded border border-neutral-300 bg-white p-4"
+        class="relative w-full max-w-xl rounded border border-app-border bg-app-panel p-4"
       >
         <div>
           <div>
-            <p class="mb-3 break-words font-medium">
+            <p class="mb-3 break-words font-medium text-app-text">
               {{ q.question_text }}
             </p>
 
@@ -206,9 +206,9 @@
                 v-for="(opt, key) in q.option_map"
                 :key="key"
                 @click="saveAnswer(q.id, key)"
-                class="box-border block w-full rounded border px-4 py-2 text-left"
+                class="box-border block w-full rounded border border-app-border bg-app-card px-4 py-2 text-left text-app-text hover:bg-app-hover"
                 :class="{
-                  'border-emerald-600 bg-emerald-50': q.selected_option === key
+                  'bg-emerald-500/10/10 border-emerald-500': q.selected_option === key
                 }"
               >
                 {{ opt.label }}
@@ -216,7 +216,7 @@
             </div>
 
             <!-- Action buttons -->
-            <div class="mt-3 flex gap-4 text-base text-gray-500">
+            <div class="mt-3 flex gap-4 text-base text-app-muted hover:text-app-text">
               <button @click="toggleAsq(q.id)">ASQs</button>
               <button @click="toggleNotes(q.id)">Notes</button>
             </div>

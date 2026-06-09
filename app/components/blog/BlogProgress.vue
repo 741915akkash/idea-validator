@@ -21,7 +21,10 @@
 </script>
 
 <template>
-  <div class="fixed left-0 top-0 z-50 h-1.5 w-full bg-emerald-50">
-    <div class="h-1.5 bg-emerald-800 transition-all duration-150" :style="{ width: progress + '%' }"></div>
+  <div class="fixed left-0 top-0 z-50 h-1.5 w-full bg-emerald-500/10">
+    <div
+      class="h-1.5 bg-emerald-800 transition-all duration-150"
+      :style="{ width: progress + '%' }"
+    ></div>
   </div>
 </template>

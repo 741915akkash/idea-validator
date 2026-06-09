@@ -12,24 +12,24 @@
 </script>
 
 <template>
-  <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-    <h3 class="mb-6 text-sm font-bold uppercase tracking-widest text-slate-900">
+  <section class="rounded-2xl border border-app-border p-6 text-app-text shadow-sm">
+    <h3 class="mb-6 text-sm font-bold uppercase tracking-widest text-app-text">
       Technical Breakdown
     </h3>
     <div class="space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-50 py-2">
-        <span class="text-xs font-bold uppercase text-slate-400">Channel</span>
-        <span class="font-mono text-sm text-slate-900">{{ distribution.platform }} DM</span>
+      <div class="flex items-center justify-between border-b border-app-border py-2">
+        <span class="text-xs font-bold uppercase text-app-muted">Channel</span>
+        <span class="font-mono text-sm text-app-text">{{ distribution.platform }} DM</span>
       </div>
-      <div class="flex items-center justify-between border-b border-slate-50 py-2">
-        <span class="text-xs font-bold uppercase text-slate-400">Total Volume</span>
-        <span class="font-mono text-sm font-semibold text-slate-900"
+      <div class="flex items-center justify-between border-b border-app-border py-2">
+        <span class="text-xs font-bold uppercase text-app-muted">Total Volume</span>
+        <span class="font-mono text-sm font-semibold text-app-text"
           >{{ distribution.volume }} shots</span
         >
       </div>
-      <div class="flex items-center justify-between border-b border-slate-50 py-2">
-        <span class="text-xs font-bold uppercase text-slate-400">Rev per Lead</span>
-        <span class="font-mono text-sm font-bold text-green-600 text-slate-900"
+      <div class="flex items-center justify-between border-b border-app-border py-2">
+        <span class="text-xs font-bold uppercase text-app-muted">Rev per Lead</span>
+        <span class="font-mono text-sm font-bold text-app-text text-green-600"
           >${{ results.leads > 0 ? Math.round(results.revenue / results.leads) : 0 }}</span
         >
       </div>

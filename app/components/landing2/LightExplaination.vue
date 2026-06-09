@@ -40,22 +40,22 @@
 
 <template>
   <section id="light-explanation-section" class="mx-auto max-w-4xl px-6 py-20">
-    <h2 class="mb-10 text-center text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+    <h2 class="mb-10 text-center text-3xl font-extrabold tracking-tight text-app-text sm:text-4xl">
       How Validation Works
     </h2>
     <div
-      class="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-12"
+      class="relative overflow-hidden rounded-3xl border border-app-border p-6 text-app-text shadow-sm sm:p-12"
     >
       <!-- Header -->
       <div
-        class="mb-12 flex flex-col gap-2 border-b border-slate-100 pb-6 sm:grid sm:grid-cols-2 sm:gap-12"
+        class="mb-12 flex flex-col gap-2 border-b border-app-border pb-6 sm:grid sm:grid-cols-2 sm:gap-12"
       >
         <h3 class="text-center text-sm font-bold uppercase tracking-[0.3em] text-emerald-600">
           Process Step
         </h3>
 
         <h3
-          class="text-center text-sm font-bold uppercase tracking-[0.3em] text-slate-400 sm:pl-6 sm:text-left"
+          class="text-center text-sm font-bold uppercase tracking-[0.3em] text-app-muted sm:pl-6 sm:text-left"
         >
           Real Example
         </h3>
@@ -66,25 +66,25 @@
         <div v-for="(step, index) in loopSteps" :key="step.id" class="group/row flex flex-col">
           <!-- Step Row -->
           <div
-            class="-mx-4 grid grid-cols-1 items-stretch gap-1 rounded-xl px-4 transition-colors duration-300 hover:bg-slate-50/50 sm:grid-cols-2 sm:gap-12"
+            class="-mx-4 grid grid-cols-1 items-stretch gap-1 rounded-xl px-4 transition-colors duration-300 hover:bg-app-card sm:grid-cols-2 sm:gap-12"
           >
             <!-- Left -->
             <div class="relative flex items-center justify-center py-3 text-center sm:py-4">
-              <p class="text-lg font-semibold text-slate-900">
+              <p class="text-lg font-semibold text-app-text">
                 {{ step.name }}
               </p>
 
               <div
-                class="absolute -right-12 top-1/2 hidden w-12 -translate-y-1/2 border-t border-slate-200 sm:block"
+                class="absolute -right-12 top-1/2 hidden w-12 -translate-y-1/2 border-t border-app-border sm:block"
               />
             </div>
 
             <!-- Right -->
             <div
-              class="relative flex flex-col items-center justify-center border-l-0 border-slate-100 py-1.5 text-center text-sm font-medium leading-relaxed text-slate-700 sm:items-start sm:border-l sm:border-emerald-200 sm:py-3.5 sm:pl-6 sm:text-left sm:text-base"
+              class="relative flex flex-col items-center justify-center border-l-0 border-app-border py-1.5 text-center text-sm font-medium leading-relaxed text-app-text sm:items-start sm:border-l sm:border-emerald-200 sm:py-3.5 sm:pl-6 sm:text-left sm:text-base"
             >
               <div
-                class="absolute -left-[3px] top-1/2 hidden h-[6px] w-[6px] -translate-y-1/2 rounded-full bg-emerald-500 sm:block"
+                class="absolute -left-[3px] top-1/2 hidden h-[6px] w-[6px] -translate-y-1/2 rounded-full bg-emerald-500/10 sm:block"
               />
 
               {{ step.example }}
@@ -101,18 +101,18 @@
             </div>
 
             <div
-              class="hidden border-l border-slate-100 sm:ml-6 sm:block sm:border-emerald-100/50"
+              class="sm:border-emerald-500/20/50 hidden border-l border-app-border sm:ml-6 sm:block"
             />
           </div>
         </div>
 
         <!-- Final Decision -->
         <div
-          class="relative mt-8 grid grid-cols-1 items-stretch gap-4 border-t border-dashed border-slate-200 pt-8 sm:mt-12 sm:grid-cols-2 sm:gap-12 sm:pt-12"
+          class="relative mt-8 grid grid-cols-1 items-stretch gap-4 border-t border-dashed border-app-border pt-8 sm:mt-12 sm:grid-cols-2 sm:gap-12 sm:pt-12"
         >
           <div class="flex items-center justify-center text-emerald-600">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-emerald-50 p-2 text-emerald-600">
+              <div class="rounded-lg bg-emerald-500/10 p-2 text-emerald-600">
                 <RefreshCw class="h-4 w-4" />
               </div>
 
@@ -121,10 +121,10 @@
           </div>
 
           <div
-            class="flex items-center justify-center gap-3 rounded-xl border border-emerald-100/50 bg-emerald-50/50 p-4 text-sm font-semibold text-emerald-700"
+            class="border-emerald-500/20/50 bg-emerald-500/10/50 flex items-center justify-center gap-3 rounded-xl border p-4 text-sm font-semibold text-emerald-500"
           >
             <div
-              class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white shadow-sm"
+              class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-app-text shadow-sm"
             >
               <ArrowRight class="h-3 w-3 text-emerald-500" />
             </div>
@@ -136,7 +136,7 @@
     </div>
 
     <div class="mt-10 text-center">
-      <p class="text-base font-semibold text-slate-800 sm:text-lg">
+      <p class="text-base font-semibold text-app-text sm:text-lg">
         Want to see exactly how this works step-by-step?
       </p>
 

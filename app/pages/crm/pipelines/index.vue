@@ -235,16 +235,16 @@
     <!-- Header -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 class="text-2xl font-semibold text-slate-900">Pipeline Management</h2>
+        <h2 class="text-2xl font-semibold text-app-text">Pipeline Management</h2>
 
-        <p class="mt-1 text-sm text-slate-500">Manage pipelines and their stages.</p>
+        <p class="mt-1 text-sm text-app-muted">Manage pipelines and their stages.</p>
       </div>
 
-      <div v-if="showCreatePipeline" class="rounded-xl border border-slate-200 bg-white p-4">
+      <div v-if="showCreatePipeline" class="rounded-xl border border-app-border p-4 text-app-text">
         <input
           v-model="newPipelineName"
           placeholder="Pipeline name"
-          class="w-full rounded-lg border border-slate-300 px-3 py-2"
+          class="w-full rounded-lg border border-app-border px-3 py-2"
         />
 
         <div class="mt-3 flex gap-2">
@@ -264,14 +264,14 @@
       <div
         v-for="pipeline in pipelines"
         :key="pipeline.id"
-        class="rounded-xl border border-slate-200 bg-white shadow-sm"
+        class="rounded-xl border border-app-border text-app-text shadow-sm"
       >
         <div class="p-5">
-          <h3 class="text-lg font-semibold text-slate-900">
+          <h3 class="text-lg font-semibold text-app-text">
             {{ pipeline.name }}
           </h3>
 
-          <div class="mt-4 flex gap-4 text-sm text-slate-500">
+          <div class="mt-4 flex gap-4 text-sm text-app-muted">
             <span>{{ pipeline.stages.length }} Stages</span>
           </div>
 
@@ -281,14 +281,14 @@
               <div
                 v-for="stage in pipeline.stages"
                 :key="stage.id"
-                class="rounded-md bg-slate-50 px-3 py-2 text-sm text-slate-700"
+                class="rounded-md bg-app-card px-3 py-2 text-sm text-app-text"
               >
                 {{ stage.name }}
               </div>
             </div>
 
             <button
-              class="mt-5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+              class="mt-5 w-full rounded-lg border border-app-border px-3 py-2 text-sm font-medium text-app-text transition hover:bg-app-card"
               @click="togglePipeline(pipeline.id)"
             >
               Manage Pipeline
@@ -298,30 +298,30 @@
           <!-- EXPANDED VIEW -->
           <template v-else>
             <div class="mt-5">
-              <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+              <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-app-muted">
                 Pipeline Name
               </label>
 
               <input
                 v-model="pipeline.name"
                 type="text"
-                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+                class="w-full rounded-lg border border-app-border px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
               />
             </div>
 
             <div class="mt-5">
-              <h4 class="mb-3 text-sm font-semibold text-slate-900">Stages</h4>
+              <h4 class="mb-3 text-sm font-semibold text-app-text">Stages</h4>
 
               <div class="space-y-2">
                 <div
                   v-for="(stage, index) in pipeline.stages"
                   :key="stage.id"
-                  class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
+                  class="rounded-lg border border-app-border bg-app-card px-3 py-2"
                 >
                   <template v-if="pipeline.editingStageIndex === index">
                     <input
                       v-model="pipeline.editingStageValue"
-                      class="w-full rounded border border-slate-300 px-2 py-1 text-sm"
+                      class="w-full rounded border border-app-border px-2 py-1 text-sm"
                     />
 
                     <div class="mt-2 flex gap-2">
@@ -343,13 +343,11 @@
 
                   <template v-else>
                     <div class="flex items-center justify-between">
-                      <span class="text-sm text-slate-700">
-                        {{ index + 1 }}. {{ stage.name }}
-                      </span>
+                      <span class="text-sm text-app-text"> {{ index + 1 }}. {{ stage.name }} </span>
 
                       <div class="flex gap-3">
                         <button
-                          class="text-xs text-slate-500 hover:text-slate-900"
+                          class="text-xs text-app-muted hover:text-app-text"
                           @click="startRenameStage(pipeline.id, index)"
                         >
                           Edit
@@ -372,7 +370,7 @@
                   <input
                     v-model="pipeline.newStageName"
                     placeholder="Stage name"
-                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                    class="w-full rounded-lg border border-app-border px-3 py-2 text-sm"
                   />
 
                   <div class="mt-2 flex gap-2">
@@ -394,7 +392,7 @@
 
                 <button
                   v-else
-                  class="w-full rounded-lg border border-dashed border-slate-300 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
+                  class="w-full rounded-lg border border-dashed border-app-border px-3 py-2 text-sm text-app-muted hover:bg-app-card"
                   @click="startAddStage(pipeline.id)"
                 >
                   + Add Stage
@@ -411,7 +409,7 @@
               </button>
 
               <button
-                class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                class="rounded-lg border border-app-border px-3 py-2 text-sm font-medium text-app-text hover:bg-app-card"
                 @click="togglePipeline(pipeline.id)"
               >
                 Close

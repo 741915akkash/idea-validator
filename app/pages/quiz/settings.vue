@@ -340,6 +340,42 @@
   function contactSupport() {
     window.location.href = 'mailto:support@golaunchscall.com'
   }
+  const theme = ref('system')
+
+  const themeLabel = computed(() => {
+    switch (theme.value) {
+      case 'light':
+        return 'Light theme'
+      case 'dark':
+        return 'Dark theme'
+      default:
+        return 'Follow system preference'
+    }
+  })
+
+  onMounted(() => {
+    theme.value = localStorage.getItem('theme') || 'system'
+    applyTheme()
+  })
+
+  function applyTheme() {
+    localStorage.setItem('theme', theme.value)
+
+    if (theme.value === 'dark') {
+      document.documentElement.classList.add('dark')
+      return
+    }
+
+    if (theme.value === 'light') {
+      document.documentElement.classList.remove('dark')
+      return
+    }
+
+    // system
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+
+    document.documentElement.classList.toggle('dark', prefersDark)
+  }
 </script>
 
 <template>
@@ -352,15 +388,32 @@
   />
   <main class="px-6 py-6">
     <div class="mx-auto max-w-4xl">
-      <h1 class="mb-4 text-xl font-semibold text-slate-900">Settings</h1>
+      <div class="mb-6 rounded-lg border border-app-border bg-app-panel px-6 py-5">
+        <h1 class="text-2xl font-semibold tracking-tight text-app-text">Settings</h1>
+
+        <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
+      </div>
 
       <!-- ✅ Current Plan -->
       <SettingsBar title="Current plan" :subtitle="tierLabel">
-        <div class="text-xs text-slate-500">
+        <div class="text-xs text-app-muted">
           <span v-if="planStatusLabel">Status: {{ planStatusLabel }}</span>
           <span v-if="planStatusLabel && planExpiryLabel"> • </span>
           <span v-if="planExpiryLabel">Renews/Expires: {{ planExpiryLabel }}</span>
         </div>
+      </SettingsBar>
+
+      <!-- Theme -->
+      <SettingsBar title="Theme" :subtitle="themeLabel">
+        <select
+          v-model="theme"
+          class="rounded-lg border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text focus:outline-none"
+          @change="applyTheme"
+        >
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
       </SettingsBar>
 
       <!-- Pricing -->
@@ -404,30 +457,28 @@
 
       <!-- Support -->
       <SettingsBar title="Contact support" subtitle="support@golaunchscall.com">
-        <Button2 size="sm" variant="primary" @click="contactSupport">
-          Email us
-        </Button2>
+        <Button2 size="sm" variant="primary" @click="contactSupport"> Email us </Button2>
       </SettingsBar>
     </div>
 
     <!-- Modal unchanged -->
     <BaseModal v-model="showDeleteModal">
       <template #default="{ close }">
-        <h2 class="text-lg font-semibold text-rose-700">Delete this idea?</h2>
+        <h2 class="text-lg font-semibold text-rose-500">Delete this idea?</h2>
 
-        <p class="mt-2 text-sm text-slate-600">
+        <p class="mt-2 text-sm text-app-muted">
           This action cannot be undone. Type <strong>{{ currentIdeaName }}</strong> to confirm.
         </p>
 
         <div class="mt-4">
           <input
             v-model="deleteConfirmName"
-            class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            class="w-full rounded-md border border-app-border bg-app-card px-3 py-2 text-sm text-app-text placeholder:text-app-muted"
             placeholder="Type idea name"
           />
         </div>
 
-        <p v-if="deleteError" class="mt-2 text-sm text-rose-700">
+        <p v-if="deleteError" class="mt-2 text-sm text-rose-500">
           {{ deleteError }}
         </p>
 
@@ -447,36 +498,36 @@
 
     <BaseModal v-model="showProfileModal">
       <template #default="{ close }">
-        <h2 class="text-lg font-semibold text-slate-900">Update Profile</h2>
+        <h2 class="text-lg font-semibold text-app-text">Update Profile</h2>
 
-        <p class="mt-2 text-sm text-slate-600">Update your personal details.</p>
+        <p class="mt-2 text-sm text-app-muted">Update your personal details.</p>
 
         <!-- Name -->
         <div class="mt-4">
-          <label class="mb-2 block text-xs font-medium uppercase tracking-wide text-slate-500">
+          <label class="mb-2 block text-xs font-medium uppercase tracking-wide text-app-muted">
             Full Name
           </label>
           <input
             v-model="name"
-            class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            class="w-full rounded-md border border-app-border bg-app-card px-3 py-2 text-sm text-app-text placeholder:text-app-muted focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             placeholder="Your name"
           />
         </div>
 
         <!-- Email -->
         <div class="mt-3">
-          <label class="mb-2 block text-xs font-medium uppercase tracking-wide text-slate-500">
+          <label class="mb-2 block text-xs font-medium uppercase tracking-wide text-app-muted">
             Email
           </label>
           <input
             :value="currentUser?.email"
             disabled
-            class="w-full rounded-md border border-slate-200 bg-gray-50 px-3 py-2 text-sm text-gray-500"
+            class="w-full rounded-md border border-app-border bg-app-panel px-3 py-2 text-sm text-app-muted"
           />
         </div>
 
         <!-- Error -->
-        <p v-if="profileError" class="mt-2 text-sm text-rose-700">
+        <p v-if="profileError" class="mt-2 text-sm text-rose-500">
           {{ profileError }}
         </p>
 
@@ -493,20 +544,20 @@
 
     <BaseModal v-model="showSourcesModal">
       <template #default="{ close }">
-        <h2 class="text-lg font-semibold text-rose-700">Manage sources</h2>
+        <h2 class="text-lg font-semibold text-app-text">Manage sources</h2>
 
-        <p class="mt-2 text-sm text-slate-600">
+        <p class="mt-2 text-sm text-app-muted">
           Add or delete lead sources. Changes apply to your account only.
         </p>
 
         <div class="mt-4">
-          <label class="mb-2 block text-xs font-medium uppercase tracking-wide text-slate-500">
+          <label class="mb-2 block text-xs font-medium uppercase tracking-wide text-app-muted">
             Add new source
           </label>
           <div class="flex gap-2">
             <input
               v-model="newSourceName"
-              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              class="w-full rounded-md border border-app-border bg-app-card px-3 py-2 text-sm text-app-text placeholder:text-app-muted"
               placeholder="e.g. LinkedIn, Referral"
               @keyup.enter="addSource"
             />
@@ -524,9 +575,9 @@
           <div
             v-for="source in sourcesStore.sources"
             :key="source.id"
-            class="flex items-center justify-between rounded-md border border-slate-200 px-3 py-2"
+            class="flex items-center justify-between rounded-md border border-app-border bg-app-card px-3 py-2"
           >
-            <span class="text-sm text-slate-700">{{ source.name }}</span>
+            <span class="text-sm text-app-text">{{ source.name }}</span>
             <Button2
               size="sm"
               variant="danger"
@@ -536,12 +587,12 @@
               {{ deletingSourceId === source.id ? 'Deleting...' : 'Delete' }}
             </Button2>
           </div>
-          <p v-if="sourcesStore.sources.length === 0" class="text-sm text-slate-500">
+          <p v-if="sourcesStore.sources.length === 0" class="text-sm text-app-muted">
             No sources yet. Add your first source above.
           </p>
         </div>
 
-        <p v-if="sourcesError" class="mt-2 text-sm text-rose-700">
+        <p v-if="sourcesError" class="mt-2 text-sm text-rose-500">
           {{ sourcesError }}
         </p>
 
@@ -549,8 +600,10 @@
           <Button2
             class="rounded-md border px-4 py-2 text-sm"
             @click="
-              closeSourcesModal();
-              close()
+              () => {
+                closeSourcesModal()
+                close()
+              }
             "
           >
             Close

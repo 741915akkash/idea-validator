@@ -14,7 +14,7 @@
 <template>
   <div
     @click="handleClick"
-    class="flex h-full min-h-[1.75rem] w-full cursor-pointer items-center truncate rounded-md px-2 py-1 text-gray-800 hover:bg-gray-50"
+    class="flex h-full min-h-[1.75rem] w-full cursor-pointer items-center truncate rounded-md px-2 py-1 text-app-text hover:bg-app-panel"
   >
     {{ value || '—' }}
   </div>

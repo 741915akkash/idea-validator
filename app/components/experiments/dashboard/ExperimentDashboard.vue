@@ -31,17 +31,19 @@
 
 <template>
   <div class="mx-auto max-w-6xl space-y-10 pb-20">
-    <header class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+    <header
+  class="mb-6 rounded-lg border border-app-border bg-app-panel px-6 py-5 text-app-text"
+>
       <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <!-- LEFT -->
         <div>
-          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-app-text">
             <span>📊 Experiment Dashboard</span>
           </h1>
 
           <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
 
-          <p class="mt-3 text-sm text-slate-500">
+          <p class="mt-3 text-sm text-app-muted">
             Aggregated feedback from your outreach operations.
           </p>
         </div>

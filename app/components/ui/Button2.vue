@@ -33,8 +33,8 @@
 
   // variants
   const variants = {
-    primary: 'bg-gray-100 text-black hover:bg-gray-200',
-    secondary: 'border border-slate-300 text-slate-700 hover:bg-slate-50',
+    primary: 'bg-app-hover text-app-text hover:bg-app-card',
+    secondary: 'border border-app-border bg-app-panel text-app-text hover:bg-app-hover',
     success: 'bg-emerald-600 text-white hover:bg-emerald-700',
     danger: 'bg-rose-600 text-white hover:bg-rose-700'
   }

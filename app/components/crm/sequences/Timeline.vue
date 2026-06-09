@@ -1,43 +1,60 @@
 <script setup>
-import { Phone, Mail, MessageSquare } from 'lucide-vue-next';
+  import { Phone, Mail, MessageSquare } from 'lucide-vue-next'
 
-defineProps({
-  steps: Array,
-  cumulativeDays: Array
-});
+  defineProps({
+    steps: Array,
+    cumulativeDays: Array
+  })
 
-defineEmits(['scrollToStep']);
+  defineEmits(['scrollToStep'])
 </script>
 
 <template>
-  <div v-if="steps.length > 0" class="bg-white border border-gray-100 rounded-[32px] p-5 flex items-center justify-between shadow-sm transition-all">
-    <div class="flex items-center gap-5 overflow-x-auto no-scrollbar flex-1">
-      <div class="shrink-0 text-[9px] font-black text-gray-300 uppercase tracking-widest mr-2">Workflow<br/>Timeline</div>
+  <div
+    v-if="steps.length > 0"
+    class="flex items-center justify-between rounded-[32px] border border-app-border p-5 text-app-text shadow-sm transition-all"
+  >
+    <div class="no-scrollbar flex flex-1 items-center gap-5 overflow-x-auto">
+      <div class="mr-2 shrink-0 text-[9px] font-black uppercase tracking-widest text-gray-300">
+        Workflow<br />Timeline
+      </div>
 
       <div class="flex items-center">
-        <template v-for="(step, i) in steps" :key="'summary-'+i">
+        <template v-for="(step, i) in steps" :key="'summary-' + i">
           <button
             @click="$emit('scrollToStep', i)"
-            class="group relative flex items-center gap-2.5 px-4 py-3 bg-white hover:bg-gray-50 border border-gray-100 hover:border-emerald-200 rounded-[20px] transition-all shrink-0 shadow-sm"
-            :style="{ opacity: Math.max(0.6, 1 - (i * 0.08)) }"
+            class="group relative flex shrink-0 items-center gap-2.5 rounded-[20px] border border-app-border px-4 py-3 text-app-text shadow-sm transition-all hover:border-emerald-200 hover:bg-app-panel"
+            :style="{ opacity: Math.max(0.6, 1 - i * 0.08) }"
           >
-            <div :class="[
-              'p-1.5 rounded-lg transition-colors',
-              step.type === 'call' ? 'bg-blue-50 text-blue-500' :
-              step.type === 'email' ? 'bg-orange-50 text-orange-500' : 'bg-emerald-50 text-emerald-500'
-            ]">
+            <div
+              :class="[
+                'rounded-lg p-1.5 transition-colors',
+                step.type === 'call'
+                  ? 'bg-blue-50 text-blue-500'
+                  : step.type === 'email'
+                    ? 'bg-orange-50 text-orange-500'
+                    : 'bg-emerald-500/10 text-emerald-500'
+              ]"
+            >
               <component
                 :is="step.type === 'call' ? Phone : step.type === 'email' ? Mail : MessageSquare"
-                class="w-3.5 h-3.5"
+                class="h-3.5 w-3.5"
               />
             </div>
             <div class="flex flex-col items-start leading-tight">
-              <span class="text-xs font-black text-gray-900 whitespace-nowrap">{{ step.title || (step.type + ' ' + (i+1)) }}</span>
-              <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Day {{ cumulativeDays[i] }}</span>
+              <span class="whitespace-nowrap text-xs font-black text-app-text">{{
+                step.title || step.type + ' ' + (i + 1)
+              }}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600"
+                >Day {{ cumulativeDays[i] }}</span
+              >
             </div>
           </button>
 
-          <div v-if="i < steps.length - 1" class="w-8 h-0.5 bg-gray-100 shrink-0 mx-2 rounded-full"></div>
+          <div
+            v-if="i < steps.length - 1"
+            class="mx-2 h-0.5 w-8 shrink-0 rounded-full bg-gray-100"
+          ></div>
         </template>
       </div>
     </div>

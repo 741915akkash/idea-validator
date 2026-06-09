@@ -45,7 +45,9 @@
   const help = useHelpContent('interviews')
 
   async function loadInterviewTemplates() {
-    const templatesRes = await $fetch('/api/interview-template/list').catch(() => ({ templates: [] }))
+    const templatesRes = await $fetch('/api/interview-template/list').catch(() => ({
+      templates: []
+    }))
     const rows = Array.isArray(templatesRes?.templates)
       ? templatesRes.templates
       : Array.isArray(templatesRes)
@@ -452,11 +454,7 @@
 
   function quickRespondent(interview) {
     const structured = interview.latest_structured_responses || {}
-    return (
-      structured.name?.trim() ||
-      interview.respondent_info?.trim() ||
-      'Unknown respondent'
-    )
+    return structured.name?.trim() || interview.respondent_info?.trim() || 'Unknown respondent'
   }
 </script>
 
@@ -488,10 +486,13 @@
       v-if="showStartInterviewModal"
       class="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 p-4"
     >
-      <div class="w-full max-w-2xl rounded-xl border border-slate-200 bg-white p-5 shadow-xl">
+      <div class="w-full max-w-2xl bg-app-card rounded-xl border border-app-border p-5 text-app-text shadow-xl">
         <div class="mb-4 flex items-center justify-between">
-          <h3 class="text-lg font-semibold text-slate-900">Start Interview</h3>
-          <button class="text-sm font-medium text-slate-500 hover:text-slate-800" @click="closeStartInterviewModal">
+          <h3 class="text-lg font-semibold text-app-text">Start Interview</h3>
+          <button
+            class="text-sm font-medium text-app-muted hover:text-app-text"
+            @click="closeStartInterviewModal"
+          >
             Close
           </button>
         </div>
@@ -501,7 +502,7 @@
             v-model="templateSearchQuery"
             type="text"
             placeholder="Search interview templates..."
-            class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            class="w-full rounded-md bg-app-panel border border-app-border px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
 
@@ -512,17 +513,19 @@
             class="w-full rounded-lg border px-3 py-3 text-left transition"
             :class="
               selectedStartTemplateId === templateItem.id
-                ? 'border-emerald-500 bg-emerald-50'
-                : 'border-neutral-200 bg-white hover:border-neutral-300'
+                ? 'border-emerald-500 bg-emerald-500/10'
+                : 'border-app-border text-app-text hover:border-app-border'
             "
             @click="selectTemplateForStart(templateItem.id)"
           >
-            <div class="text-sm font-semibold text-slate-900">{{ templateItem.title }}</div>
-            <div class="mt-1 text-xs text-slate-600">{{ templateItem.description || 'No description' }}</div>
+            <div class="text-sm font-semibold text-app-text">{{ templateItem.title }}</div>
+            <div class="mt-1 text-xs text-app-muted">
+              {{ templateItem.description || 'No description' }}
+            </div>
           </button>
         </div>
 
-        <div v-if="modalFilteredTemplates.length === 0" class="mt-3 text-sm text-slate-500">
+        <div v-if="modalFilteredTemplates.length === 0" class="mt-3 text-sm text-app-muted">
           No templates found.
         </div>
         <div v-if="startModalError" class="mt-3 text-sm text-red-600">
@@ -531,7 +534,7 @@
 
         <div class="mt-5 flex justify-end gap-2">
           <button
-            class="rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100"
+            class="rounded-md border border-app-border px-4 py-2 text-sm font-medium text-app-muted text-app-text hover:bg-app-hover"
             @click="closeStartInterviewModal"
           >
             Cancel
@@ -550,16 +553,16 @@
     <div class="mx-auto max-w-2xl">
       <div class="mb-8 space-y-6">
         <!-- Page header -->
-        <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+        <div class="mb-6 rounded-lg border border-app-border px-6 py-5 text-app-text">
           <div class="flex items-start justify-between gap-4">
             <div>
               <h1
-                class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900"
+                class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-app-text"
               >
                 <span>Interviews</span>
 
                 <Info
-                  class="h-5 w-5 cursor-pointer text-gray-400 transition hover:text-gray-700"
+                  class="h-5 w-5 cursor-pointer text-app-muted transition hover:text-app-text"
                   @click="showHelpDrawer = true"
                 />
               </h1>
@@ -575,8 +578,8 @@
               class="rounded-md px-3 py-2 text-sm font-medium transition"
               :class="
                 selectedFilter === 'all'
-                  ? 'bg-neutral-900 text-white'
-                  : 'bg-white text-neutral-700 hover:bg-neutral-100'
+                  ? 'bg-emerald-600 text-white'
+                  : 'text-app-muted text-app-text hover:bg-app-hover'
               "
               @click="selectedFilter = 'all'"
             >
@@ -587,8 +590,8 @@
               class="rounded-md px-3 py-2 text-sm font-medium transition"
               :class="
                 selectedFilter === 'quick'
-                  ? 'bg-neutral-900 text-white'
-                  : 'bg-white text-neutral-700 hover:bg-neutral-100'
+                  ? 'bg-emerald-600 text-white'
+                  : 'text-app-muted text-app-text hover:bg-app-hover hover:text-app-text'
               "
               @click="selectedFilter = 'quick'"
             >
@@ -599,8 +602,8 @@
               class="rounded-md px-3 py-2 text-sm font-medium transition"
               :class="
                 selectedFilter === 'structured'
-                  ? 'bg-neutral-900 text-white'
-                  : 'bg-white text-neutral-700 hover:bg-neutral-100'
+                  ? 'bg-emerald-600 text-white'
+                  : 'text-app-muted text-app-text hover:bg-app-hover hover:text-app-text'
               "
               @click="selectedFilter = 'structured'"
             >
@@ -611,7 +614,7 @@
           <div class="flex w-full flex-wrap items-center gap-2 md:w-auto">
             <NuxtLink
               to="/quiz/overview"
-              class="inline-flex flex-1 items-center justify-center rounded-lg bg-[#E5E4E2] px-4 py-2 text-sm font-medium text-black transition hover:bg-[#DAD8D4] md:flex-none"
+              class="inline-flex flex-1 items-center justify-center rounded-lg border border-app-border bg-app-panel px-4 py-2 text-sm font-medium text-app-text transition hover:bg-app-hover md:flex-none"
             >
               Back to Overview
             </NuxtLink>
@@ -627,7 +630,7 @@
       </div>
 
       <!-- Loading -->
-      <div v-if="loading" class="text-base text-gray-600">Loading interviews...</div>
+      <div v-if="loading" class="text-base text-app-muted">Loading interviews...</div>
 
       <div v-else>
         <div v-if="actionError" class="mb-4 text-sm text-red-600">
@@ -636,227 +639,60 @@
 
         <!-- ALL TAB DASHBOARD -->
         <template v-if="selectedFilter === 'all'">
-            <section class="mb-8">
-              <div class="mb-4 flex items-center justify-between">
-                <h2 class="text-lg font-semibold text-gray-900">
-                  Templates ({{ interviewTemplates.length }})
-                </h2>
-                <NuxtLink
-                  to="/quiz/interview-templates"
-                  class="inline-flex items-center rounded-md border-2 border-emerald-600 bg-white px-3 py-2 text-sm font-medium text-neutral-800 transition hover:bg-neutral-100"
-                >
-                  Go to Templates
-                </NuxtLink>
-              </div>
-
-              <div v-if="interviewTemplates.length > 0" class="grid gap-3 sm:grid-cols-2">
-                <div
-                  v-for="templateItem in templatePreviewItems"
-                  :key="templateItem.id"
-                  class="rounded-lg border border-neutral-300 bg-white p-4 text-left transition hover:border-neutral-300 hover:bg-neutral-50"
-                >
-                  <div class="text-base font-semibold text-neutral-900">
-                    {{ templateItem.title }}
-                  </div>
-                  <div class="mt-2 text-sm text-neutral-600">
-                    {{ templateItem.description }}
-                  </div>
-                </div>
-              </div>
-
-              <div
-                v-else
-                class="rounded border border-gray-300 bg-gray-50 px-4 py-4 text-sm text-gray-700"
+          <section class="mb-8">
+            <div class="mb-4 flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-app-text">
+                Templates ({{ interviewTemplates.length }})
+              </h2>
+              <NuxtLink
+                to="/quiz/interview-templates"
+                class="inline-flex items-center rounded-md border-2 border-emerald-600 px-3 py-2 text-sm font-medium text-emerald-600 transition-all hover:bg-emerald-600 hover:text-white"
               >
-                No templates yet.
-              </div>
-            </section>
-
-            <section class="mb-8">
-              <div class="mb-4 flex items-center justify-between">
-                <h2 class="text-lg font-semibold text-gray-900">
-                  Quick Interviews ({{ quickInterviews.length }})
-                </h2>
-                <button
-                  class="text-sm font-medium text-emerald-700 hover:underline"
-                  @click="selectedFilter = 'quick'"
-                >
-                  View all →
-                </button>
-              </div>
-
-              <div v-if="quickInterviews.length > 0" class="grid gap-3 sm:grid-cols-2">
-                <div
-                  v-for="interview in quickPreviewInterviews"
-                  :key="interview.id"
-                  class="rounded-lg border border-neutral-300 bg-white p-4 text-left transition hover:border-neutral-300 hover:bg-neutral-50"
-                  role="button"
-                  tabindex="0"
-                  @click="openQuickInterview(interview)"
-                >
-                  <div class="mb-2 flex justify-end">
-                    <button
-                      class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
-                      aria-label="Delete quick interview"
-                      title="Delete"
-                      :disabled="deletingInterviewId === interview.id"
-                      @click.stop="deleteQuickInterview(interview.id)"
-                    >
-                      <Trash2 v-if="deletingInterviewId !== interview.id" class="h-4 w-4" />
-                      <span v-else class="text-[10px] font-medium">...</span>
-                    </button>
-                  </div>
-                  <div class="text-base font-semibold text-neutral-900">
-                    🧠 {{ quickTitle(interview) }}
-                  </div>
-                  <div class="mt-1 text-xs text-neutral-500">
-                    Respondent: {{ quickRespondent(interview) }}
-                  </div>
-                  <div class="mt-1 text-sm text-neutral-600">"{{ quickSnippet(interview) }}"</div>
-                </div>
-              </div>
-
-              <div
-                v-else
-                class="rounded border border-gray-300 bg-gray-50 px-4 py-4 text-sm text-gray-700"
-              >
-                No quick interviews yet.
-              </div>
-            </section>
-
-            <section>
-              <div class="mb-4 flex items-center justify-between gap-3">
-                <h2 class="text-lg font-semibold text-gray-900">
-                  Structured Interviews ({{ structuredInterviews.length }})
-                </h2>
-                <NuxtLink
-                  to="/quiz/master-detail"
-                  class="inline-flex items-center rounded-md border-2 border-emerald-600 bg-white px-3 py-2 text-sm font-medium text-neutral-800 transition hover:bg-neutral-100"
-                >
-                  Go to Structured Validation
-                </NuxtLink>
-              </div>
-              <div
-                v-if="groupedStructuredInterviews.length === 0"
-                class="rounded border border-gray-300 bg-gray-50 px-4 py-4 text-sm text-gray-700"
-              >
-                No structured interviews yet.
-              </div>
-              <template v-else>
-                <div
-                  v-for="group in groupedStructuredInterviews"
-                  :key="group.subUncertaintyId"
-                  class="mb-10"
-                >
-                  <div class="border-l-4 border-emerald-500 pl-4">
-                    <div class="space-y-3">
-                      <div>
-                        <h3 class="text-lg font-semibold text-gray-900">
-                          {{ group.subUncertainty }}
-                        </h3>
-                        <div class="text-xs text-gray-500">
-                          {{ group.interviews.length }} interviews
-                        </div>
-                      </div>
-
-                      <button
-                        class="inline-flex w-fit rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
-                        :disabled="!!cloningInterviewId"
-                        @click="interviewAgainFromCard(group.interviews[0].id)"
-                      >
-                        Interview Another Person
-                      </button>
-                    </div>
-                  </div>
-
-                  <div class="mt-4 border-t"></div>
-
-                  <div class="divide-y">
-                    <div
-                      v-for="interview in group.interviews"
-                      :key="interview.id"
-                      class="flex items-center justify-between py-4"
-                    >
-                      <div class="flex-1">
-                        <div class="group flex items-center gap-2">
-                          <template v-if="renamingId !== interview.id">
-                            <div class="font-medium text-gray-900">
-                              {{ interview.respondent_info || 'Interview' }}
-                            </div>
-
-                            <span
-                              class="cursor-pointer opacity-0 transition-opacity group-hover:opacity-100"
-                              title="Rename"
-                              @click="startRename(interview)"
-                            >
-                              ✏️
-                            </span>
-                          </template>
-
-                          <template v-else>
-                            <input
-                              v-model="nameDraft"
-                              class="rounded border border-gray-300 px-2 py-1 text-sm"
-                              placeholder="Respondent name, role, company..."
-                            />
-
-                            <button class="text-sm text-emerald-700" @click="saveRename(interview)">
-                              Save
-                            </button>
-
-                            <button class="text-sm text-gray-500" @click="renamingId = null">
-                              Cancel
-                            </button>
-                          </template>
-                        </div>
-
-                        <div class="mt-1 text-xs text-gray-500">
-                          Started {{ new Date(interview.started_at).toLocaleDateString() }}
-                        </div>
-
-                        <div class="mt-1 text-xs font-medium">
-                          <span v-if="interview.finished_at" class="text-emerald-700">
-                            Completed
-                          </span>
-                          <span v-else class="text-amber-600"> In Progress </span>
-                        </div>
-                      </div>
-
-                      <div class="flex items-center gap-4">
-                        <button
-                          class="text-sm font-medium text-emerald-700 hover:underline"
-                          @click="openInterview(interview.id)"
-                        >
-                          {{ interview.finished_at ? 'View' : 'Resume' }}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </template>
-            </section>
-          </template>
-
-          <!-- QUICK TAB -->
-          <section v-else-if="selectedFilter === 'quick'">
-            <h2 class="mb-4 text-lg font-semibold text-gray-900">
-              Quick Interviews ({{ filteredQuickInterviews.length }})
-            </h2>
-
-            <div class="mb-4">
-              <input
-                v-model="quickSearchQuery"
-                type="text"
-                placeholder="Search quick interviews by title, tags, or content"
-                class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
+                Go to Templates
+              </NuxtLink>
             </div>
 
-            <div v-if="filteredQuickInterviews.length > 0" class="grid gap-3 sm:grid-cols-2">
+            <div v-if="interviewTemplates.length > 0" class="grid gap-3 sm:grid-cols-2">
               <div
-                v-for="interview in filteredQuickInterviews"
+                v-for="templateItem in templatePreviewItems"
+                :key="templateItem.id"
+                class="rounded-lg border border-app-border p-4 text-left text-app-text transition hover:border-app-border hover:bg-app-hover"
+              >
+                <div class="text-base font-semibold text-app-text">
+                  {{ templateItem.title }}
+                </div>
+                <div class="mt-2 text-sm text-app-muted">
+                  {{ templateItem.description }}
+                </div>
+              </div>
+            </div>
+
+            <div
+              v-else
+              class="rounded border border-app-border bg-app-panel px-4 py-4 text-sm text-app-muted"
+            >
+              No templates yet.
+            </div>
+          </section>
+
+          <section class="mb-8">
+            <div class="mb-4 flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-app-text">
+                Quick Interviews ({{ quickInterviews.length }})
+              </h2>
+              <button
+                class="text-sm font-medium text-emerald-500 hover:underline"
+                @click="selectedFilter = 'quick'"
+              >
+                View all →
+              </button>
+            </div>
+
+            <div v-if="quickInterviews.length > 0" class="grid gap-3 sm:grid-cols-2">
+              <div
+                v-for="interview in quickPreviewInterviews"
                 :key="interview.id"
-                class="rounded-lg border border-neutral-300 bg-white p-4 text-left transition hover:border-neutral-300 hover:bg-neutral-50"
+                class="rounded-lg border border-app-border p-4 text-left text-app-text transition hover:border-app-border hover:bg-app-hover"
                 role="button"
                 tabindex="0"
                 @click="openQuickInterview(interview)"
@@ -873,70 +709,55 @@
                     <span v-else class="text-[10px] font-medium">...</span>
                   </button>
                 </div>
-                <div class="text-base font-semibold text-neutral-900">
+                <div class="text-base font-semibold text-app-text">
                   🧠 {{ quickTitle(interview) }}
                 </div>
-                <div class="mt-1 text-xs text-neutral-500">
+                <div class="mt-1 text-xs text-app-muted">
                   Respondent: {{ quickRespondent(interview) }}
                 </div>
-                <div class="mt-1 text-sm text-neutral-600">"{{ quickSnippet(interview) }}"</div>
+                <div class="mt-1 text-sm text-app-muted">"{{ quickSnippet(interview) }}"</div>
               </div>
             </div>
 
             <div
               v-else
-              class="rounded border border-gray-300 bg-gray-50 px-4 py-4 text-sm text-gray-700"
+              class="rounded border border-app-border bg-app-panel px-4 py-4 text-sm text-app-muted"
             >
               No quick interviews yet.
             </div>
           </section>
 
-          <!-- STRUCTURED TAB -->
-          <section v-else>
+          <section>
             <div class="mb-4 flex items-center justify-between gap-3">
-              <h2 class="text-lg font-semibold text-gray-900">
-                Structured Interviews ({{ structuredInterviewsForTab.length }})
+              <h2 class="text-lg font-semibold text-app-text">
+                Structured Interviews ({{ structuredInterviews.length }})
               </h2>
               <NuxtLink
                 to="/quiz/master-detail"
-                class="inline-flex items-center rounded-md border-2 border-emerald-600 bg-white px-3 py-2 text-sm font-medium text-neutral-800 transition hover:bg-neutral-100"
+                class="inline-flex items-center rounded-md border-2 border-emerald-600 px-3 py-2 text-sm font-medium text-emerald-600 transition hover:bg-emerald-600 hover:text-white"
               >
                 Go to Structured Validation
               </NuxtLink>
             </div>
-
-            <div class="my-5">
-              <select
-                v-model="structuredStatusFilter"
-                class="w-64 rounded border border-black px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              >
-                <option value="all">All</option>
-                <option value="completed">Completed</option>
-                <option value="in_progress">In Progress</option>
-              </select>
-            </div>
-
             <div
-              v-if="groupedStructuredInterviewsForTab.length === 0"
-              class="rounded border border-gray-300 bg-gray-50 px-4 py-4 text-sm text-gray-700"
+              v-if="groupedStructuredInterviews.length === 0"
+              class="rounded border border-app-border bg-app-panel px-4 py-4 text-sm text-app-muted"
             >
               No structured interviews yet.
             </div>
-
             <template v-else>
               <div
-                v-for="group in groupedStructuredInterviewsForTab"
+                v-for="group in groupedStructuredInterviews"
                 :key="group.subUncertaintyId"
                 class="mb-10"
               >
                 <div class="border-l-4 border-emerald-500 pl-4">
                   <div class="space-y-3">
                     <div>
-                      <h3 class="text-lg font-semibold text-gray-900">
+                      <h3 class="text-lg font-semibold text-app-text">
                         {{ group.subUncertainty }}
                       </h3>
-
-                      <div class="text-xs text-gray-500">
+                      <div class="text-xs text-app-muted">
                         {{ group.interviews.length }} interviews
                       </div>
                     </div>
@@ -962,7 +783,7 @@
                     <div class="flex-1">
                       <div class="group flex items-center gap-2">
                         <template v-if="renamingId !== interview.id">
-                          <div class="font-medium text-gray-900">
+                          <div class="font-medium text-app-text">
                             {{ interview.respondent_info || 'Interview' }}
                           </div>
 
@@ -978,26 +799,26 @@
                         <template v-else>
                           <input
                             v-model="nameDraft"
-                            class="rounded border border-gray-300 px-2 py-1 text-sm"
+                            class="rounded border border-app-border px-2 py-1 text-sm"
                             placeholder="Respondent name, role, company..."
                           />
 
-                          <button class="text-sm text-emerald-700" @click="saveRename(interview)">
+                          <button class="text-sm text-emerald-500" @click="saveRename(interview)">
                             Save
                           </button>
 
-                          <button class="text-sm text-gray-500" @click="renamingId = null">
+                          <button class="text-sm text-app-muted" @click="renamingId = null">
                             Cancel
                           </button>
                         </template>
                       </div>
 
-                      <div class="mt-1 text-xs text-gray-500">
-                        Started {{ formatLocalDateTime(interview.started_at) }}
+                      <div class="mt-1 text-xs text-app-muted">
+                        Started {{ new Date(interview.started_at).toLocaleDateString() }}
                       </div>
 
                       <div class="mt-1 text-xs font-medium">
-                        <span v-if="interview.finished_at" class="text-emerald-700">
+                        <span v-if="interview.finished_at" class="text-emerald-500">
                           Completed
                         </span>
                         <span v-else class="text-amber-600"> In Progress </span>
@@ -1006,7 +827,7 @@
 
                     <div class="flex items-center gap-4">
                       <button
-                        class="text-sm font-medium text-emerald-700 hover:underline"
+                        class="text-sm font-medium text-emerald-500 hover:underline"
                         @click="openInterview(interview.id)"
                       >
                         {{ interview.finished_at ? 'View' : 'Resume' }}
@@ -1017,6 +838,186 @@
               </div>
             </template>
           </section>
+        </template>
+
+        <!-- QUICK TAB -->
+        <section v-else-if="selectedFilter === 'quick'">
+          <h2 class="mb-4 text-lg font-semibold text-app-text">
+            Quick Interviews ({{ filteredQuickInterviews.length }})
+          </h2>
+
+          <div class="mb-4">
+            <input
+              v-model="quickSearchQuery"
+              type="text"
+              placeholder="Search quick interviews by title, tags, or content"
+              class="w-full rounded-md border border-app-border bg-app-panel px-3 py-2 text-app-text placeholder:text-app-muted focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+
+          <div v-if="filteredQuickInterviews.length > 0" class="grid gap-3 sm:grid-cols-2">
+            <div
+              v-for="interview in filteredQuickInterviews"
+              :key="interview.id"
+              class="rounded-lg border border-app-border p-4 text-left text-app-text transition hover:border-app-border hover:bg-app-hover"
+              role="button"
+              tabindex="0"
+              @click="openQuickInterview(interview)"
+            >
+              <div class="mb-2 flex justify-end">
+                <button
+                  class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  aria-label="Delete quick interview"
+                  title="Delete"
+                  :disabled="deletingInterviewId === interview.id"
+                  @click.stop="deleteQuickInterview(interview.id)"
+                >
+                  <Trash2 v-if="deletingInterviewId !== interview.id" class="h-4 w-4" />
+                  <span v-else class="text-[10px] font-medium">...</span>
+                </button>
+              </div>
+              <div class="text-base font-semibold text-app-text">
+                🧠 {{ quickTitle(interview) }}
+              </div>
+              <div class="mt-1 text-xs text-app-muted">
+                Respondent: {{ quickRespondent(interview) }}
+              </div>
+              <div class="mt-1 text-sm text-app-muted">"{{ quickSnippet(interview) }}"</div>
+            </div>
+          </div>
+
+          <div
+            v-else
+            class="rounded border border-app-border bg-app-panel px-4 py-4 text-sm text-app-muted"
+          >
+            No quick interviews yet.
+          </div>
+        </section>
+
+        <!-- STRUCTURED TAB -->
+        <section v-else>
+          <div class="mb-4 flex items-center justify-between gap-3">
+            <h2 class="text-lg font-semibold text-app-text">
+              Structured Interviews ({{ structuredInterviewsForTab.length }})
+            </h2>
+            <NuxtLink
+              to="/quiz/master-detail"
+              class="inline-flex items-center rounded-md border-2 border-emerald-600 px-3 py-2 text-sm font-medium text-emerald-600 transition hover:bg-emerald-600 hover:text-white"
+            >
+              Go to Structured Validation
+            </NuxtLink>
+          </div>
+
+          <div class="my-5">
+            <select
+              v-model="structuredStatusFilter"
+              class="w-64 rounded border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              <option value="all">All</option>
+              <option value="completed">Completed</option>
+              <option value="in_progress">In Progress</option>
+            </select>
+          </div>
+
+          <div
+            v-if="groupedStructuredInterviewsForTab.length === 0"
+            class="rounded border border-app-border bg-app-panel px-4 py-4 text-sm text-app-muted"
+          >
+            No structured interviews yet.
+          </div>
+
+          <template v-else>
+            <div
+              v-for="group in groupedStructuredInterviewsForTab"
+              :key="group.subUncertaintyId"
+              class="mb-10"
+            >
+              <div class="border-l-4 border-emerald-500 pl-4">
+                <div class="space-y-3">
+                  <div>
+                    <h3 class="text-lg font-semibold text-app-text">
+                      {{ group.subUncertainty }}
+                    </h3>
+
+                    <div class="text-xs text-app-muted">
+                      {{ group.interviews.length }} interviews
+                    </div>
+                  </div>
+
+                  <button
+                    class="inline-flex w-fit rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+                    :disabled="!!cloningInterviewId"
+                    @click="interviewAgainFromCard(group.interviews[0].id)"
+                  >
+                    Interview Another Person
+                  </button>
+                </div>
+              </div>
+
+              <div class="mt-4 border-t border-app-border"></div>
+
+              <div class="divide-y divide-app-border">
+                <div
+                  v-for="interview in group.interviews"
+                  :key="interview.id"
+                  class="flex items-center justify-between py-4"
+                >
+                  <div class="flex-1">
+                    <div class="group flex items-center gap-2">
+                      <template v-if="renamingId !== interview.id">
+                        <div class="font-medium text-app-text">
+                          {{ interview.respondent_info || 'Interview' }}
+                        </div>
+
+                        <span
+                          class="cursor-pointer opacity-0 transition-opacity group-hover:opacity-100"
+                          title="Rename"
+                          @click="startRename(interview)"
+                        >
+                          ✏️
+                        </span>
+                      </template>
+
+                      <template v-else>
+                        <input
+                          v-model="nameDraft"
+                          class="rounded border border-app-border px-2 py-1 text-sm"
+                          placeholder="Respondent name, role, company..."
+                        />
+
+                        <button class="text-sm text-emerald-500" @click="saveRename(interview)">
+                          Save
+                        </button>
+
+                        <button class="text-sm text-app-muted" @click="renamingId = null">
+                          Cancel
+                        </button>
+                      </template>
+                    </div>
+
+                    <div class="mt-1 text-xs text-app-muted">
+                      Started {{ formatLocalDateTime(interview.started_at) }}
+                    </div>
+
+                    <div class="mt-1 text-xs font-medium">
+                      <span v-if="interview.finished_at" class="text-emerald-500"> Completed </span>
+                      <span v-else class="text-amber-600"> In Progress </span>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-4">
+                    <button
+                      class="text-sm font-medium text-emerald-500 hover:underline"
+                      @click="openInterview(interview.id)"
+                    >
+                      {{ interview.finished_at ? 'View' : 'Resume' }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </section>
       </div>
     </div>
     <HelpDrawer :open="showHelpDrawer" :content="help" @close="showHelpDrawer = false" />

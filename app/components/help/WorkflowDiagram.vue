@@ -10,7 +10,7 @@
             <template v-for="(node, index) in row" :key="node.id">
               <!-- NODE -->
               <div
-                class="relative z-10 flex w-full max-w-[320px] shrink-0 items-center gap-3 rounded-2xl border border-emerald-100 bg-white px-5 py-4 shadow-sm lg:w-52"
+                class="relative z-10 flex w-full max-w-[320px] shrink-0 items-center gap-3 rounded-2xl border border-emerald-500/20 px-5 py-4 text-app-text shadow-sm lg:w-52"
               >
                 <!-- NUMBER -->
                 <div
@@ -20,7 +20,7 @@
                 </div>
 
                 <!-- LABEL -->
-                <div class="text-left text-sm font-semibold leading-6 text-gray-900">
+                <div class="text-left text-sm font-semibold leading-6 text-app-text">
                   {{ node.label }}
                 </div>
               </div>
@@ -67,7 +67,9 @@
             <div class="absolute -top-4 right-[8rem] h-4 w-[2px] bg-emerald-500" />
 
             <!-- horizontal -->
-            <div class="absolute left-[8rem] top-0 h-[2px] w-[calc(100%-16rem)] bg-emerald-500" />
+            <div
+              class="absolute left-[8rem] top-0 h-[2px] w-[calc(100%-16rem)] bg-emerald-500"
+            />
 
             <!-- vertical into next row -->
             <div class="absolute left-[8rem] top-0 h-11 w-[2px] bg-emerald-500" />

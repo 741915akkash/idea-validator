@@ -109,7 +109,7 @@
     <button
       ref="triggerRef"
       @click.stop="toggleDropdown"
-      class="group relative flex h-6 w-full items-center rounded-full border border-gray-200 bg-gray-50 pl-3 pr-5 text-[10px] font-medium text-gray-700 transition-all hover:shadow-sm"
+      class="group relative flex h-6 w-full items-center rounded-full border border-app-border bg-app-panel pl-3 pr-5 text-[10px] font-medium text-app-muted transition-all hover:shadow-sm"
     >
       <span class="truncate">
         {{ currentSource?.name || '—' }}
@@ -132,14 +132,14 @@
       <div
         v-if="open"
         :style="dropdownStyle"
-        class="fixed z-[9999] rounded-md border border-gray-200 bg-white shadow-lg"
+        class="fixed z-[9999] rounded-md border border-app-border text-app-text shadow-lg"
       >
         <div class="max-h-60 overflow-auto py-1">
           <div
             v-for="source in sourcesStore.sources"
             :key="source.id"
             @click="updateSource(source.id)"
-            class="flex cursor-pointer items-center px-3 py-1.5 text-[11px] font-medium text-gray-700 hover:bg-gray-100"
+            class="flex cursor-pointer items-center px-3 py-1.5 text-[11px] font-medium text-app-muted hover:bg-gray-100"
             :class="source.id === lead.source_id ? 'bg-gray-100 font-semibold' : ''"
           >
             <span class="truncate">{{ source.name }}</span>

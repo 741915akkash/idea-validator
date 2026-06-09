@@ -1,69 +1,68 @@
 <template>
-  <div class="min-h-screen bg-white p-6">
+  <div class="min-h-screen p-6 text-app-text">
     <div class="mx-auto max-w-6xl">
       <!-- Header -->
-      <div class="mb-6 rounded-2xl border border-slate-200 bg-white px-6 py-5 shadow-sm">
+      <div class="mb-6 rounded-2xl border border-app-border bg-app-panel px-6 py-5 text-app-text">
         <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div>
-            <h1 class="text-3xl font-semibold tracking-tight text-slate-900">Template Versions</h1>
+            <h1 class="text-3xl font-semibold tracking-tight text-app-text">Template Versions</h1>
 
-            <p class="mt-2 text-sm text-slate-500">Live version history for this template.</p>
+            <p class="mt-2 text-sm text-app-muted">Live version history for this template.</p>
           </div>
         </div>
       </div>
 
       <!-- Table -->
-      <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div class="border-b border-slate-200 px-6 py-4">
-          <h2 class="text-lg font-semibold text-slate-900">Versions</h2>
+      <div class="overflow-hidden rounded-2xl border border-app-border bg-app-panel text-app-text">
+        <div class="border-b border-app-border px-6 py-4">
+          <h2 class="text-lg font-semibold text-app-text">Versions</h2>
         </div>
 
-        <div v-if="loading" class="px-6 py-8 text-sm text-slate-500">Loading versions...</div>
+        <div v-if="loading" class="px-6 py-8 text-sm text-app-muted">Loading versions...</div>
 
-        <div v-else-if="error" class="px-6 py-8 text-sm text-red-700">
+        <div v-else-if="error" class="px-6 py-8 text-sm text-rose-500">
           {{ error }}
         </div>
 
         <div v-else class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-slate-200">
-            <thead class="bg-slate-50">
+          <table class="min-w-full divide-y divide-app-border">
+            <thead class="bg-app-hover">
               <tr>
                 <th
-                  class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                  class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-app-muted"
                 >
                   Version
                 </th>
 
                 <th
-                  class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                  class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-app-muted"
                 >
                   Analytics
                 </th>
 
                 <th
-                  class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                  class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-app-muted"
                 >
                   Updated
                 </th>
-
               </tr>
             </thead>
 
-            <tbody class="divide-y divide-slate-100 bg-white">
+            <tbody class="divide-y divide-app-border text-app-text">
               <tr v-for="version in versions" :key="version.version">
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-2">
-                    <div class="font-medium text-slate-900">Version {{ version.version }}</div>
+                    <div class="font-medium text-app-text">Version {{ version.version }}</div>
 
                     <span
                       v-if="version.is_current"
-                      class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-700"
+                      class="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-500"
                     >
                       Current
                     </span>
                   </div>
 
-                  <div class="mt-1 text-sm text-slate-500">
+                  <div class="mt-1 text-sm text-app-muted">
                     {{ version.note }}
                   </div>
                 </td>
@@ -71,7 +70,7 @@
                 <!-- Analytics -->
                 <td class="px-6 py-4">
                   <button
-                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition hover:bg-slate-50"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-app-border bg-app-panel text-app-muted transition hover:bg-app-hover"
                     title="View Analytics"
                     @click="openAnalytics(version.version)"
                   >
@@ -79,7 +78,7 @@
                   </button>
                 </td>
 
-                <td class="px-6 py-4 text-sm text-slate-600">
+                <td class="px-6 py-4 text-sm text-app-muted">
                   {{ version.updated }}
                 </td>
               </tr>

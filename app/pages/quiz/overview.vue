@@ -321,16 +321,14 @@
       @close="showRevisionLimitAlert = false"
     />
     <div class="mx-auto max-w-2xl">
-      <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+      <div class="mb-6 rounded-lg border border-app-border bg-app-panel px-6 py-5">
         <div class="flex items-start justify-between gap-4">
           <div>
-            <h1
-              class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900"
-            >
+            <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-app-text">
               <span>Overview - Refine your idea</span>
 
               <Info
-                class="h-5 w-5 cursor-pointer text-gray-400 transition hover:text-gray-700"
+                class="h-5 w-5 cursor-pointer text-app-muted transition hover:text-app-text"
                 @click="showHelpDrawer = true"
               />
             </h1>
@@ -353,7 +351,7 @@
           >
             <h2 class="truncate text-xl font-semibold md:text-2xl">
               {{ currentQuiz.name || 'New idea' }}
-              <span v-if="currentQuiz.revision_number > 0" class="text-base text-slate-500">
+              <span v-if="currentQuiz.revision_number > 0" class="text-base text-app-muted">
                 — Rev {{ currentQuiz.revision_number }}
               </span>
             </h2>
@@ -362,7 +360,7 @@
           <div class="mt-1 flex flex-wrap items-center gap-2" v-else>
             <input
               v-model="nameDraft"
-              class="w-full rounded border px-2 py-2 text-sm md:w-auto"
+              class="w-full rounded border border-app-border bg-app-card px-2 py-2 text-sm text-app-text placeholder:text-app-muted md:w-auto"
               placeholder="Quiz name"
             />
             <button
@@ -371,7 +369,7 @@
             >
               Save
             </button>
-            <button @click="renaming = false" class="text-sm text-gray-500">Cancel</button>
+            <button @click="renaming = false" class="text-sm text-app-muted">Cancel</button>
           </div>
         </div>
       </div>
@@ -381,10 +379,10 @@
         <div
           v-for="cp in quizStore.checkpoints"
           :key="cp.checkpoint"
-          class="flex items-center justify-between rounded border border-neutral-300 bg-white px-4 py-3"
+          class="flex items-center justify-between rounded-lg border border-app-border bg-app-panel px-4 py-3"
         >
           <div>
-            <div class="flex items-center gap-2 text-base font-medium">
+            <div class="flex items-center gap-2 text-base font-medium text-app-text">
               <span> {{ cp.checkpoint }}) {{ CHECKPOINT_NAMES[cp.checkpoint] }} </span>
 
               <!-- 📝 Notes indicator -->
@@ -397,14 +395,14 @@
               </span>
             </div>
 
-            <div class="text-xs text-gray-600">
+            <div class="text-xs text-app-muted">
               <span v-if="cp.unanswered > 0"> {{ cp.unanswered }} unanswered </span>
               <span v-else> All questions answered </span>
             </div>
           </div>
 
           <button
-            class="text-base text-emerald-700 hover:underline"
+            class="text-base text-app-link hover:underline"
             @click="goToCheckpoint(cp.checkpoint)"
           >
             Review
@@ -435,7 +433,7 @@
           <!-- Score button (before completion) -->
           <Button
             v-if="quizStore.checkpoints.length && !quizStore.isCompleted"
-            class="rounded border border-emerald-600 bg-white px-6 py-3 !text-black hover:bg-white hover:!text-black"
+            class="rounded border-2 border-emerald-600 bg-transparent px-5 py-2 font-medium !text-emerald-600 hover:bg-emerald-600 hover:!text-white"
             @click="handleScoreClick()"
           >
             Score My Idea
@@ -445,7 +443,7 @@
           <NuxtLink
             v-else-if="quizStore.isCompleted"
             :to="`/quiz/score?quiz_id=${quizStore.quizId}`"
-            class="rounded border border-emerald-600 bg-white px-6 py-3 text-black hover:bg-white hover:text-black"
+            class="rounded border-2 border-emerald-600 bg-transparent px-6 py-3 font-medium text-emerald-600 transition hover:bg-emerald-600 hover:text-white"
           >
             View Score
           </NuxtLink>

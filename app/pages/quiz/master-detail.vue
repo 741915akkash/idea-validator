@@ -266,14 +266,14 @@
 <template>
   <div class="mx-auto min-h-screen max-w-7xl px-6 py-6">
     <!-- PAGE HEADER -->
-    <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+    <div class="mb-6 rounded-lg border border-app-border bg-app-panel px-6 py-5 text-app-text">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-app-text">
             <span>Resolve Doubts</span>
 
             <Info
-              class="h-5 w-5 cursor-pointer text-gray-400 transition hover:text-gray-700"
+              class="h-5 w-5 cursor-pointer text-app-muted transition hover:text-app-text"
               @click="showHelpDrawer = true"
             />
           </h1>
@@ -286,14 +286,14 @@
     <!-- PAGE CONTENT -->
     <div class="flex h-[calc(100vh-97px)] justify-center">
       <div
-        class="flex h-full w-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white"
+        class="flex h-full w-full flex-col overflow-hidden rounded-lg border border-app-border bg-app-panel text-app-text"
       >
         <div class="flex min-h-0 flex-1">
           <!-- ================= DESKTOP LAYOUT ================= -->
 
           <!-- UNCERTAINTIES -->
-          <div class="hidden w-80 flex-col border-r md:flex">
-            <div class="flex min-h-[104px] flex-col border-b px-4 py-3">
+          <div class="hidden w-80 flex-col border-r border-app-border md:flex">
+            <div class="flex min-h-[104px] flex-col border-b border-app-border px-4 py-3 hover:bg-app-hover">
               <span class="font-semibold">Uncertainties</span>
               <div class="mt-3 min-h-[30px]">
                 <button
@@ -310,11 +310,14 @@
                 v-for="u in uncertainties"
                 :key="u.id"
                 @click="selectUncertainty(u)"
-                class="cursor-pointer border-b px-4 py-3 hover:bg-gray-50"
-                :class="{ 'bg-emerald-50': selectedUncertainty?.id === u.id }"
+                class="cursor-pointer border-b border-app-border px-4 py-3 hover:bg-app-hover hover:bg-app-panel"
+                :class="{
+                  'border-l-2 border-l-emerald-500 bg-emerald-500/10':
+                    selectedUncertainty?.id === u.id
+                }"
               >
                 <div class="font-medium">{{ u.text }}</div>
-                <div class="mt-1 text-xs text-gray-500">
+                <div class="mt-1 text-xs text-app-muted">
                   {{ u.created_at ? new Date(u.created_at).toLocaleDateString() : '' }}
                 </div>
               </div>
@@ -322,18 +325,18 @@
           </div>
 
           <!-- SUB UNCERTAINTIES -->
-          <div class="hidden w-96 flex-col border-r md:flex">
-            <div class="flex min-h-[104px] flex-col border-b px-4 py-3">
+          <div class="hidden w-96 flex-col border-r border-app-border md:flex">
+            <div class="flex min-h-[104px] flex-col border-b border-app-border px-4 py-3 hover:bg-app-hover">
               <div class="font-semibold">Sub-uncertainties</div>
               <div class="mt-3 min-h-[30px]"></div>
             </div>
 
             <div class="flex-1 overflow-y-auto">
-              <div v-if="!selectedUncertainty" class="p-4 text-sm text-gray-500">
+              <div v-if="!selectedUncertainty" class="p-4 text-sm text-app-muted">
                 Select an uncertainty
               </div>
 
-              <div v-else-if="loadingSubs" class="p-4 text-sm text-gray-500">
+              <div v-else-if="loadingSubs" class="p-4 text-sm text-app-muted">
                 Loading sub-uncertainties...
               </div>
 
@@ -341,11 +344,11 @@
                 v-for="sub in subUncertainties"
                 :key="sub.id"
                 @click="selectSub(sub)"
-                class="cursor-pointer border-b px-4 py-3 hover:bg-gray-50"
-                :class="{ 'bg-emerald-50': selectedSub?.id === sub.id }"
+                class="cursor-pointer border-b border-app-border px-4 py-3 hover:bg-app-hover hover:bg-app-panel"
+                :class="{ 'bg-emerald-500/10': selectedSub?.id === sub.id }"
               >
                 <div class="font-medium">{{ sub.title }}</div>
-                <div class="mt-1 text-xs text-gray-500">
+                <div class="mt-1 text-xs text-app-muted">
                   {{ sub.interview_count || 0 }} interviews
                 </div>
               </div>
@@ -354,21 +357,21 @@
 
           <!-- INTERVIEWS -->
           <div class="hidden flex-1 flex-col md:flex">
-            <div class="flex min-h-[104px] flex-col border-b px-4 py-3">
+            <div class="flex min-h-[104px] flex-col border-b border-app-border px-4 py-3 hover:bg-app-hover">
               <span class="font-semibold">Interviews</span>
               <div class="mt-3 min-h-[30px]">
                 <div v-if="selectedSub" class="flex items-center gap-2">
                   <button
                     @click="interviewAnotherPerson"
                     :disabled="startingAnother"
-                    class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:bg-neutral-300"
+                    class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:bg-app-border"
                   >
                     {{ startingAnother ? 'Starting...' : 'Interview Another Person' }}
                   </button>
 
                   <button
                     @click="openAnalytics"
-                    class="rounded-md border border-emerald-300 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
+                    class="rounded-md border border-emerald-500/30 px-3 py-1.5 text-xs font-medium text-emerald-500 hover:bg-emerald-500/10"
                   >
                     Analytics
                   </button>
@@ -380,22 +383,22 @@
               <div
                 v-for="interview in interviews"
                 :key="interview.id"
-                class="flex items-center justify-between border-b px-4 py-3"
+                class="flex items-center justify-between border-b border-app-border px-4 py-3 hover:bg-app-hover"
               >
                 <div>
-                  <div class="font-medium text-gray-900">
+                  <div class="font-medium text-app-text">
                     {{ interview.respondent_info || 'Interview' }}
                   </div>
 
-                  <div class="mt-1 text-xs text-gray-500">
+                  <div class="mt-1 text-xs text-app-muted">
                     {{ new Date(interview.started_at).toLocaleDateString() }}
                   </div>
 
                   <div class="mt-1 text-xs">
-                    <span v-if="interview.finished_at" class="font-medium text-emerald-700">
+                    <span v-if="interview.finished_at" class="font-medium text-emerald-500">
                       Completed
                     </span>
-                    <span v-else class="font-medium text-amber-600"> In Progress </span>
+                    <span v-else class="font-medium text-amber-500"> In Progress </span>
                   </div>
                 </div>
 
@@ -414,7 +417,7 @@
           <div class="flex w-full flex-col md:hidden">
             <!-- UNCERTAINTIES -->
             <div v-if="mobileView === 'uncertainties'">
-              <div class="border-b px-4 py-3">
+              <div class="border-b border-app-border bg-app-panel px-4 py-3">
                 <span class="font-semibold">Uncertainties</span>
                 <button
                   @click="startNewInterview"
@@ -428,13 +431,13 @@
                 v-for="u in uncertainties"
                 :key="u.id"
                 @click="selectUncertainty(u)"
-                class="border-b px-4 py-3"
+                class="border-b border-app-border bg-app-panel px-4 py-3"
               >
                 <div class="font-medium">
                   {{ u.text }}
                 </div>
 
-                <div class="mt-1 text-xs text-gray-500">
+                <div class="mt-1 text-xs text-app-muted">
                   {{ u.created_at ? new Date(u.created_at).toLocaleDateString() : '' }}
                 </div>
               </div>
@@ -442,7 +445,7 @@
 
             <!-- SUB UNCERTAINTIES -->
             <div v-if="mobileView === 'subs'">
-              <div class="flex items-center border-b px-4 py-3">
+              <div class="flex items-center border-b border-app-border px-4 py-3 hover:bg-app-hover">
                 <button class="mr-3 text-sm text-emerald-600" @click="mobileView = 'uncertainties'">
                   ← Back
                 </button>
@@ -454,13 +457,13 @@
                 v-for="sub in subUncertainties"
                 :key="sub.id"
                 @click="selectSub(sub)"
-                class="border-b px-4 py-3"
+                class="border-b border-app-border bg-app-panel px-4 py-3"
               >
                 <div class="font-medium">
                   {{ sub.title }}
                 </div>
 
-                <div class="mt-1 text-xs text-gray-500">
+                <div class="mt-1 text-xs text-app-muted">
                   {{ sub.interview_count || 0 }} interviews
                 </div>
               </div>
@@ -468,7 +471,7 @@
 
             <!-- INTERVIEWS -->
             <div v-if="mobileView === 'interviews'">
-              <div class="border-b px-4 py-3">
+              <div class="border-b border-app-border bg-app-panel px-4 py-3">
                 <div class="flex items-center">
                   <button class="mr-3 text-sm text-emerald-600" @click="mobileView = 'subs'">
                     ← Back
@@ -480,7 +483,7 @@
                 <div v-if="selectedSub" class="mt-3 flex items-center gap-2">
                   <button
                     @click="openAnalytics"
-                    class="rounded-md border border-emerald-300 px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
+                    class="rounded-md border border-emerald-500/30 px-3 py-1.5 text-xs font-medium text-emerald-500 hover:bg-emerald-500/10"
                   >
                     Analytics
                   </button>
@@ -488,28 +491,32 @@
                   <button
                     @click="interviewAnotherPerson"
                     :disabled="startingAnother"
-                    class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:bg-neutral-300"
+                    class="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:bg-app-border"
                   >
                     {{ startingAnother ? 'Starting...' : 'Interview Another Person' }}
                   </button>
                 </div>
               </div>
 
-              <div v-for="interview in interviews" :key="interview.id" class="border-b px-4 py-3">
-                <div class="font-medium text-gray-900">
+              <div
+                v-for="interview in interviews"
+                :key="interview.id"
+                class="border-b border-app-border bg-app-panel px-4 py-3"
+              >
+                <div class="font-medium text-app-text">
                   {{ interview.respondent_info || 'Interview' }}
                 </div>
 
-                <div class="mt-1 text-xs text-gray-500">
+                <div class="mt-1 text-xs text-app-muted">
                   {{ new Date(interview.started_at).toLocaleDateString() }}
                 </div>
 
                 <div class="mt-1 text-xs">
-                  <span v-if="interview.finished_at" class="font-medium text-emerald-700">
+                  <span v-if="interview.finished_at" class="font-medium text-emerald-500">
                     Completed
                   </span>
 
-                  <span v-else class="font-medium text-amber-600"> In Progress </span>
+                  <span v-else class="font-medium text-amber-500"> In Progress </span>
                 </div>
 
                 <button
@@ -525,19 +532,19 @@
       </div>
 
       <div v-if="showUpgradeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-slate-900/50" @click="closeUpgradeModal" />
+        <div class="absolute inset-0 bg-black/50" @click="closeUpgradeModal" />
 
         <div
-          class="relative z-10 w-full max-w-md rounded-lg border border-slate-200 bg-white p-5 shadow-xl"
+          class="relative z-10 w-full bg-app-panel max-w-md rounded-lg border border-app-border p-5 text-app-text shadow-xl"
         >
-          <h2 class="text-lg font-semibold text-slate-900">Upgrade required</h2>
-          <p class="mt-2 text-sm text-slate-600">
+          <h2 class="text-lg font-semibold text-app-text">Upgrade required</h2>
+          <p class="mt-2 text-sm text-app-muted">
             Move to a paid tier to access Resolve New Uncertainties.
           </p>
 
           <div class="mt-5 flex items-center justify-end gap-2">
             <button
-              class="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              class="rounded-md border border-app-border px-4 py-2 text-sm font-medium text-app-text hover:bg-app-card"
               @click="closeUpgradeModal"
             >
               Not now

@@ -37,12 +37,12 @@
 </style>
 
 <template>
-  <div class="flex min-h-screen flex-col bg-slate-50 font-sans text-gray-900 antialiased">
+  <div class="flex min-h-screen flex-col bg-app-card font-sans text-app-text antialiased">
     <!-- Sticky header -->
     <header
       :class="[
-        'sticky top-0 z-50 border-b bg-white/95 backdrop-blur-sm transition-shadow duration-200',
-        scrolled ? 'border-gray-100 shadow-sm' : 'border-transparent'
+        'text-app-text/95 sticky top-0 z-50 border-b backdrop-blur-sm transition-shadow duration-200',
+        scrolled ? 'border-app-border shadow-sm' : 'border-transparent'
       ]"
     >
       <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
@@ -68,7 +68,7 @@
         <!-- Mobile menu button -->
         <button
           @click="isMenuOpen = !isMenuOpen"
-          class="p-2 text-gray-600 transition-colors hover:text-black md:hidden"
+          class="p-2 text-app-muted transition-colors hover:text-black md:hidden"
           aria-label="Toggle menu"
         >
           <span v-if="!isMenuOpen" class="text-2xl">☰</span>
@@ -77,7 +77,7 @@
       </div>
 
       <!-- Mobile menu -->
-      <div v-if="isMenuOpen" class="border-t border-gray-100 bg-white px-4 pb-6 md:hidden">
+      <div v-if="isMenuOpen" class="border-t border-app-border px-4 pb-6 text-app-text md:hidden">
         <div class="flex flex-col gap-4 pt-4 text-sm font-medium">
           <NuxtLink
             to="/"
@@ -102,9 +102,9 @@
       <slot />
     </main>
 
-    <footer class="mt-20 border-t border-gray-100 py-12 text-center text-sm text-gray-400">
+    <footer class="mt-20 border-t border-app-border py-12 text-center text-sm text-app-muted">
       <div class="mx-auto max-w-5xl px-4">
-        <p class="mb-2 font-semibold text-gray-900">GO Launch Scall</p>
+        <p class="mb-2 font-semibold text-app-text">GO Launch Scall</p>
         <p>&copy; 2026 GO Launch Scall. All rights reserved.</p>
       </div>
     </footer>

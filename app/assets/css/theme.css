@@ -1,0 +1,70 @@
+:root {
+  /* Page */
+  --bg: #f8faf9;
+
+  /* Surfaces */
+  --panel: #ffffff;
+  --card: #ffffff;
+
+  /* Typography */
+  --text: #111827;
+  --muted: #6b7280;
+
+  /* Borders */
+  --border: #e5e7eb;
+
+  /* Brand */
+  --primary: #10b981;
+
+  /* Hover */
+  --hover: #f3f4f6;
+
+  /* Sidebar */
+  --sidebar: #fafafa;
+
+  /* Active nav */
+  --nav-active-bg: #dcfce7;
+  --nav-active-text: #047857;
+
+  /* Links */
+  --link: #059669;
+
+  /* Selection */
+  --selected-bg: #ecfdf5;
+
+  --pill-active-bg: #111827;
+  --pill-active-text: #ffffff;
+}
+
+.dark {
+  /* Background hierarchy */
+  --bg: #0f0f10;
+  --panel: #141414;
+  --card: #18181b;
+
+  /* Typography */
+  --text: #fafafa;
+  --muted: #a1a1aa;
+
+  /* Borders */
+  --border: #27272a;
+
+  /* Brand */
+  --primary: #10b981;
+
+  /* Hover */
+  --hover: #202024;
+
+  /* Navigation */
+  --nav-active-bg: rgba(16, 185, 129, 0.12);
+  --nav-active-text: #34d399;
+
+  /* Links */
+  --link: #34d399;
+
+  /* Selected states */
+  --selected-bg: rgba(16, 185, 129, 0.10);
+
+  --pill-active-bg: #10b981;
+  --pill-active-text: #ffffff;
+}

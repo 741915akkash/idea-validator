@@ -19,7 +19,7 @@ export const columns = [
       label: 'Name'
     },
     header: () =>
-      h('span', { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' }, 'Name'),
+      h('span', { class: 'text-xs font-semibold text-app-muted uppercase tracking-wider' }, 'Name'),
     enableHiding: false,
     enableSorting: true,
     size: 220,
@@ -40,7 +40,7 @@ export const columns = [
     header: () =>
       h(
         'span',
-        { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' },
+        { class: 'text-xs font-semibold text-app-muted uppercase tracking-wider' },
         'Company'
       ),
     enableSorting: true,
@@ -60,7 +60,11 @@ export const columns = [
       label: 'Email'
     },
     header: () =>
-      h('span', { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' }, 'Email'),
+      h(
+        'span',
+        { class: 'text-xs font-semibold text-app-muted uppercase tracking-wider' },
+        'Email'
+      ),
     enableSorting: true,
     size: 280,
     minSize: 200,
@@ -80,7 +84,7 @@ export const columns = [
     header: () =>
       h(
         'span',
-        { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' },
+        { class: 'text-xs font-semibold text-app-muted uppercase tracking-wider' },
         'Pipeline'
       ),
     enableSorting: true,
@@ -100,7 +104,11 @@ export const columns = [
       label: 'Stage'
     },
     header: () =>
-      h('span', { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' }, 'Stage'),
+      h(
+        'span',
+        { class: 'text-xs font-semibold text-app-muted uppercase tracking-wider' },
+        'Stage'
+      ),
     enableSorting: true,
     filterFn: (row, _columnId, selected) => {
       if (!Array.isArray(selected) || selected.length === 0) return true
@@ -121,7 +129,11 @@ export const columns = [
       label: 'Owner'
     },
     header: () =>
-      h('span', { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' }, 'Owner'),
+      h(
+        'span',
+        { class: 'text-xs font-semibold text-app-muted uppercase tracking-wider' },
+        'Owner'
+      ),
     enableSorting: true,
     filterFn: (row, _columnId, selected) => {
       if (!Array.isArray(selected) || selected.length === 0) return true
@@ -141,7 +153,7 @@ export const columns = [
     header: () =>
       h(
         'span',
-        { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' },
+        { class: 'text-xs font-semibold text-app-muted uppercase tracking-wider' },
         'Source'
       ),
     enableSorting: true,
@@ -163,7 +175,7 @@ export const columns = [
     header: () =>
       h(
         'span',
-        { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' },
+        { class: 'text-xs font-semibold text-app-muted uppercase tracking-wider' },
         'Sequence'
       ),
     enableSorting: true,
@@ -185,7 +197,7 @@ export const columns = [
     header: () =>
       h(
         'span',
-        { class: 'text-xs font-semibold text-gray-500 uppercase tracking-wider' },
+        { class: 'text-xs font-semibold text-app-muted uppercase tracking-wider' },
         'Created'
       ),
     enableSorting: true,

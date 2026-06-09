@@ -9,7 +9,7 @@
         <div
           v-for="(item, i) in costs"
           :key="i"
-          class="flex items-center gap-3 rounded-2xl border border-rose-100/40 bg-white p-4 shadow-sm sm:p-5"
+          class="flex items-center gap-3 rounded-2xl border border-rose-100/40 p-4 text-app-text shadow-sm sm:p-5"
         >
           <XCircle class="h-5 w-5 shrink-0 text-rose-500" />
 

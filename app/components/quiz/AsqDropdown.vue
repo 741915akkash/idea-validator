@@ -41,15 +41,15 @@
 
 <template>
   <div class="mt-2">
-    <button class="text-base text-emerald-700 hover:underline" @click="toggle">
+    <button class="text-app-link text-base hover:underline" @click="toggle">
       {{ open ? 'Hide breakdown' : 'Break this down' }}
     </button>
 
-    <div v-if="open" class="mt-3 space-y-4 border-l pl-4">
-      <p v-if="loading" class="text-base text-gray-500">Loading…</p>
+    <div v-if="open" class="border-app-border mt-3 space-y-4 border-l pl-4">
+      <p v-if="loading" class="text-app-muted text-base">Loading…</p>
 
       <div v-for="asq in asqs" :key="asq.id" class="text-base">
-        <p class="mb-1 font-medium">
+        <p class="text-app-text mb-1 font-medium">
           {{ asq.question_text }}
         </p>
 
@@ -57,7 +57,7 @@
         <input
           v-if="asq.input_type === 'number'"
           type="number"
-          class="w-32 rounded border px-2 py-1"
+          class="border-app-border bg-app-card text-app-text w-32 rounded border px-2 py-1"
           :value="asq.answer_value ?? ''"
           @input="saveAsqAnswer(asq, Number($event.target.value))"
         />
@@ -65,7 +65,7 @@
         <!-- boolean -->
         <select
           v-else-if="asq.input_type === 'boolean'"
-          class="rounded border px-2 py-1"
+          class="border-app-border bg-app-card text-app-text rounded border px-2 py-1"
           :value="asq.answer_value ?? ''"
           @change="saveAsqAnswer(asq, $event.target.value === 'true')"
         >
@@ -78,7 +78,7 @@
         <input
           v-else
           type="text"
-          class="w-full rounded border px-2 py-1"
+          class="border-app-border bg-app-card text-app-text placeholder:text-app-muted w-full rounded border px-2 py-1"
           :value="asq.answer_value ?? ''"
           @blur="saveAsqAnswer(asq, $event.target.value)"
         />

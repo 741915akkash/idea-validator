@@ -304,7 +304,7 @@
 
 <template>
   <div
-    class="min-h-screen bg-white font-sans text-slate-900 selection:bg-emerald-100 selection:text-emerald-900"
+    class="min-h-screen font-sans text-app-text selection:bg-emerald-500/20 selection:text-emerald-500"
   >
     <main class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:flex lg:gap-x-12">
       <!-- LEFT SIDEBAR: PERSUASION NAV -->
@@ -318,11 +318,11 @@
               <li v-for="step in stepsNav" :key="step.anchor">
                 <a
                   :href="`#${step.anchor}`"
-                  class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-600 transition-all duration-200 hover:bg-slate-50 hover:text-slate-900"
+                  class="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-app-muted transition-all duration-200 hover:bg-app-hover hover:text-app-text"
                 >
                   <component
                     :is="step.icon"
-                    class="h-4 w-4 text-slate-400 transition-colors group-hover:text-emerald-500"
+                    class="h-4 w-4 text-app-muted transition-colors group-hover:text-emerald-500"
                   />
                   {{ step.title }}
                 </a>
@@ -332,19 +332,19 @@
 
           <div
             v-if="!isLoggedIn"
-            class="rounded-xl bg-slate-900 p-4 text-white shadow-xl shadow-slate-200"
+            class="rounded-xl bg-app-panel p-4 text-app-text shadow-xl border border-app-border"
           >
-            <p class="mb-3 text-base font-black leading-tight text-white">
+            <p class="mb-3 text-base font-black leading-tight text-app-text">
               Start validating your idea
             </p>
-            <ul class="mb-4 space-y-1.5 text-xs text-slate-200">
+            <ul class="mb-4 space-y-1.5 text-xs text-app-muted">
               <li>→ Turn assumptions into testable questions</li>
               <li>→ Interview target customers</li>
               <li>→ Get clear decisions</li>
             </ul>
             <NuxtLink
               to="signup-login"
-              class="group flex w-full items-center justify-center gap-2 rounded-lg border-4 border-white bg-emerald-600 py-2.5 text-[11px] font-black uppercase tracking-wide text-white transition-colors hover:bg-emerald-500 active:scale-95"
+              class="group flex w-full items-center justify-center gap-2 rounded-lg border-4 border-white bg-emerald-600 py-2.5 text-[11px] font-black uppercase tracking-wide text-app-text transition-colors hover:bg-emerald-500/10 active:scale-95"
             >
               Start Validating Free
               <ArrowRight class="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
@@ -358,11 +358,11 @@
         <!-- 1. HERO: EDITORIAL STYLE -->
         <section id="introduction" class="mb-16 sm:mb-24 lg:mb-32">
           <h1
-            class="mb-6 text-3xl font-black leading-[0.95] tracking-tighter text-slate-900 sm:mb-8 sm:text-5xl lg:text-7xl"
+            class="mb-6 text-3xl font-black leading-[0.95] tracking-tighter text-app-text sm:mb-8 sm:text-5xl lg:text-7xl"
           >
-            Stop building ideas that <span class="text-slate-300">don’t work.</span>
+            Stop building ideas that <span class="text-app-muted">don’t work.</span>
           </h1>
-          <p class="max-w-2xl text-base leading-relaxed text-slate-700 sm:text-lg">
+          <p class="max-w-2xl text-base leading-relaxed text-app-text sm:text-lg">
             Validate your idea with real user signals before you waste months building the wrong
             thing.
           </p>
@@ -371,17 +371,17 @@
         <!-- 2. URGENCY BLOCK -->
         <section
           id="reality-check"
-          class="mb-16 scroll-mt-24 rounded-3xl border border-amber-100 bg-amber-50 p-6 sm:mb-24 sm:p-8 lg:mb-32 lg:p-10"
+          class="mb-16 scroll-mt-24 rounded-3xl border border-amber-500/5 bg-amber-500/5 p-6 sm:mb-24 sm:p-8 lg:mb-32 lg:p-10"
         >
           <div class="flex gap-4 sm:gap-6">
             <div
-              class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-100"
+              class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-500/10"
             >
               <AlertCircle class="h-6 w-6 text-amber-600" />
             </div>
             <div>
-              <h3 class="mb-2 text-base font-black text-slate-900 sm:text-lg">The Reality Check</h3>
-              <p class="text-sm leading-relaxed text-slate-700 sm:text-base">
+              <h3 class="mb-2 text-base font-black text-app-text sm:text-lg">The Reality Check</h3>
+              <p class="text-sm leading-relaxed text-app-text sm:text-base">
                 Most founders waste 3–6 months building something nobody wants. Not because they
                 lack skill — but because they validate the wrong things. This system prevents that
                 by forcing you to face the data early.
@@ -394,39 +394,39 @@
         <section id="overview" class="mb-16 scroll-mt-24 sm:mb-24 lg:mb-32">
           <div class="mb-8 flex items-end justify-between sm:mb-10">
             <div>
-              <h2 class="text-2xl font-black tracking-tight text-slate-900 sm:text-4xl">
+              <text-app-muted class="text-2xl font-black tracking-tight text-app-text sm:text-4xl">
                 System Overview
-              </h2>
-              <p class="mt-1 text-sm text-slate-600 sm:text-base">
+              </text-app-muted>
+              <p class="mt-1 text-sm text-app-muted sm:text-base">
                 The 6-step process from idea → evidence → decision.
               </p>
             </div>
-            <div class="mx-8 mb-3 hidden h-px flex-1 bg-slate-100 sm:block"></div>
+            <div class="mx-8 mb-3 hidden h-px flex-1 bg-app-border sm:block"></div>
           </div>
 
-          <div class="rounded-3xl border border-slate-100 shadow-sm">
+          <div class="rounded-3xl border border-app-border ">
             <div class="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
               <table class="w-full min-w-[640px] border-collapse text-left">
                 <thead>
-                  <tr class="border-b border-slate-100 bg-slate-50">
+                  <tr class="border-b border-app-border bg-app-card">
                     <th
-                      class="px-4 py-4 text-xs font-black uppercase tracking-widest text-slate-500 md:px-8 md:py-5"
+                      class="px-4 py-4 text-xs font-black uppercase tracking-widest text-app-muted md:px-8 md:py-5"
                     >
                       Step
                     </th>
                     <th
-                      class="px-4 py-4 text-xs font-black uppercase tracking-widest text-slate-500 md:px-8 md:py-5"
+                      class="px-4 py-4 text-xs font-black uppercase tracking-widest text-app-muted md:px-8 md:py-5"
                     >
                       Process
                     </th>
                     <th
-                      class="px-4 py-4 text-xs font-black uppercase tracking-widest text-slate-500 md:px-8 md:py-5"
+                      class="px-4 py-4 text-xs font-black uppercase tracking-widest text-app-muted md:px-8 md:py-5"
                     >
                       Outcome
                     </th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="divide-y divide-app-border">
                   <tr
                     v-for="(step, idx) in [
                       'Problem',
@@ -437,19 +437,19 @@
                       'Reality'
                     ]"
                     :key="step"
-                    class="group transition-colors hover:bg-slate-50/50"
+                    class="group transition-colors hover:bg-app-hover"
                   >
                     <td
-                      class="px-4 py-4 font-mono text-sm text-slate-400 transition-colors group-hover:text-slate-900 md:px-8 md:py-5"
+                      class="px-4 py-4 font-mono text-sm text-app-muted transition-colors group-hover:text-app-text md:px-8 md:py-5"
                     >
                       0{{ idx + 1 }}
                     </td>
-                    <td class="px-4 py-4 text-sm font-black text-slate-900 md:px-8 md:py-5">
+                    <td class="px-4 py-4 text-sm font-black text-app-text md:px-8 md:py-5">
                       {{ step }}
                     </td>
                     <td class="px-4 py-4 md:px-8 md:py-5">
                       <span
-                        class="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-700"
+                        class="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-500"
                       >
                         <CheckCircle2 class="h-3 w-3" />
                         {{
@@ -474,10 +474,10 @@
         <!-- 6. HYPER-DETAILED EXAMPLES: EDITORIAL STACK -->
         <section id="example" class="mb-16 scroll-mt-24 sm:mb-24 lg:mb-32">
           <div class="mb-10 sm:mb-16">
-            <h2 class="mb-4 text-2xl font-black tracking-tighter text-slate-900 sm:text-4xl">
+            <text-app-muted class="mb-4 text-2xl font-black tracking-tighter text-app-text sm:text-4xl">
               Industry Scenarios
-            </h2>
-            <p class="max-w-xl text-base text-slate-700 sm:text-lg">
+            </text-app-muted>
+            <p class="max-w-xl text-base text-app-text sm:text-lg">
               Real-world examples of the system in action. From B2B SaaS to Local Services.
             </p>
           </div>
@@ -491,56 +491,56 @@
             >
               <div class="mb-8 flex items-center gap-4 sm:mb-10 sm:gap-5">
                 <div
-                  class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-xl shadow-slate-200 transition-transform duration-500 group-hover:scale-110"
+                  class="flex h-14 w-14 items-center justify-center rounded-2xl bg-app-panel text-app-text shadow-xl border border-app-border transition-transform duration-500 group-hover:scale-110"
                 >
                   <component :is="study.icon" class="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 class="text-xl font-black tracking-tight text-slate-900 sm:text-2xl">
+                  <h3 class="text-xl font-black tracking-tight text-app-text sm:text-2xl">
                     {{ study.name }}
                   </h3>
-                  <p class="text-sm text-slate-600 sm:text-base">{{ study.description }}</p>
+                  <p class="text-sm text-app-muted sm:text-base">{{ study.description }}</p>
                 </div>
               </div>
 
               <div
-                class="overflow-hidden rounded-[2.5rem] border border-slate-100 bg-white shadow-2xl shadow-slate-100"
+                class="overflow-hidden rounded-[2.5rem] border border-app-border text-app-text"
               >
                 <div class="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
                   <table class="w-full min-w-[700px] border-collapse text-left">
                     <thead>
-                      <tr class="border-b border-slate-100 bg-slate-50">
+                      <tr class="border-b border-app-border bg-app-card">
                         <th
-                          class="w-24 px-8 py-6 text-xs font-black uppercase tracking-widest text-slate-500"
+                          class="w-24 px-8 py-6 text-xs font-black uppercase tracking-widest text-app-muted"
                         >
                           Step
                         </th>
                         <th
-                          class="w-44 px-8 py-6 text-xs font-black uppercase tracking-widest text-slate-500"
+                          class="w-44 px-8 py-6 text-xs font-black uppercase tracking-widest text-app-muted"
                         >
                           Process
                         </th>
                         <th
-                          class="px-8 py-6 text-xs font-black uppercase tracking-widest text-slate-500"
+                          class="px-8 py-6 text-xs font-black uppercase tracking-widest text-app-muted"
                         >
                           Scenario Detail
                         </th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-50">
+                    <tbody class="divide-y divide-app-border">
                       <tr
                         v-for="item in study.steps"
                         :key="item.step"
-                        class="align-top transition-colors hover:bg-slate-50/30"
+                        class="hover:bg-app-hover/30 align-top transition-colors"
                       >
-                        <td class="px-8 py-8 font-mono text-sm text-slate-400">{{ item.step }}</td>
+                        <td class="px-8 py-8 font-mono text-sm text-app-muted">{{ item.step }}</td>
                         <td class="px-8 py-8">
-                          <p class="text-base font-bold leading-relaxed text-slate-900">
+                          <p class="text-base font-bold leading-relaxed text-app-text">
                             {{ item.process }}
                           </p>
                         </td>
                         <td class="px-8 py-8">
-                          <p class="text-base leading-relaxed text-slate-700">{{ item.detail }}</p>
+                          <p class="text-base leading-relaxed text-app-text">{{ item.detail }}</p>
                         </td>
                       </tr>
                     </tbody>
@@ -554,8 +554,8 @@
         <!-- 5. HOW IT WORKS: FINAL PRODUCT-LAYERED STEPS -->
         <section class="mb-16 sm:mb-24 lg:mb-32">
           <div class="mb-10 sm:mb-14">
-            <h2 class="text-2xl font-black tracking-tighter text-slate-900 sm:text-4xl">Steps</h2>
-            <p class="mt-3 max-w-2xl text-base text-slate-700 sm:text-lg">
+            <text-app-muted class="text-2xl font-black tracking-tighter text-app-text sm:text-4xl">Steps</text-app-muted>
+            <p class="mt-3 max-w-2xl text-base text-app-text sm:text-lg">
               A structured system to evaluate your idea before you build.
             </p>
           </div>
@@ -565,28 +565,28 @@
               v-for="step in finalSteps"
               :id="step.anchor"
               :key="step.anchor"
-              class="scroll-mt-24 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm sm:rounded-3xl sm:p-8"
+              class="scroll-mt-24 rounded-2xl border border-app-border p-5 text-app-text  sm:rounded-3xl sm:p-8"
             >
               <div class="mb-4">
-                <p class="text-2xl font-black tracking-tight text-slate-900">
+                <p class="text-2xl font-black tracking-tight text-app-text">
                   {{ step.number }} - {{ step.title }}
                 </p>
                 <p
-                  class="mt-3 inline-flex rounded bg-slate-500 px-2 py-0.5 text-sm font-semibold text-white"
+                  class="bg-app-card mt-3 inline-flex rounded px-2 py-0.5 text-sm font-semibold text-app-text"
                 >
                   {{ step.label }}
                 </p>
               </div>
 
-              <ul class="space-y-2 text-base leading-relaxed text-slate-700">
+              <ul class="space-y-2 text-base leading-relaxed text-app-text">
                 <li v-for="item in step.bullets" :key="item">- {{ item }}</li>
               </ul>
 
               <p class="mt-5 text-sm font-bold text-emerald-600">{{ step.insight }}</p>
-              <p v-if="step.subnote" class="mt-2 text-sm font-medium text-slate-500">
+              <p v-if="step.subnote" class="mt-2 text-sm font-medium text-app-muted">
                 {{ step.subnote }}
               </p>
-              <p v-if="step.micro" class="mt-2 text-xs font-semibold tracking-wide text-slate-400">
+              <p v-if="step.micro" class="mt-2 text-xs font-semibold tracking-wide text-app-muted">
                 {{ step.micro }}
               </p>
             </section>
@@ -595,16 +595,16 @@
 
         <!-- 7. FAILURE ANALYSIS -->
         <section id="failure" class="mb-16 scroll-mt-24 sm:mb-24 lg:mb-32">
-          <h2 class="mb-8 text-2xl font-black tracking-tight text-slate-900 sm:mb-10 sm:text-4xl">
+          <text-app-muted class="mb-8 text-2xl font-black tracking-tight text-app-text sm:mb-10 sm:text-4xl">
             Why Most Ideas Fail
-          </h2>
+          </text-app-muted>
           <ul class="space-y-6">
             <li v-for="reason in failureReasons" :key="reason.t">
               <div class="flex items-start gap-3">
                 <XCircle class="mt-0.5 h-5 w-5 shrink-0 text-rose-500" />
                 <div>
-                  <h4 class="text-lg font-black text-slate-900">{{ reason.t }}</h4>
-                  <p class="mt-1 text-base leading-relaxed text-slate-700">{{ reason.d }}</p>
+                  <h4 class="text-lg font-black text-app-text">{{ reason.t }}</h4>
+                  <p class="mt-1 text-base leading-relaxed text-app-text">{{ reason.d }}</p>
                 </div>
               </div>
             </li>
@@ -614,26 +614,26 @@
         <!-- 8. FINAL CTA -->
         <section
           v-if="!isLoggedIn"
-          class="relative overflow-hidden rounded-xl bg-slate-900 p-6 text-center text-white sm:p-12 lg:p-16"
+          class="relative overflow-hidden rounded-xl bg-app-panel p-6 text-center text-app-text sm:p-12 lg:p-16"
         >
           <div
             class="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent"
           ></div>
           <div class="relative z-10">
-            <h2 class="mb-6 text-2xl font-black tracking-tighter sm:text-4xl lg:text-5xl">
+            <text-app-muted class="mb-6 text-2xl font-black tracking-tighter sm:text-4xl lg:text-5xl">
               Stop guessing. <br class="sm:hidden" />Start validating.
-            </h2>
-            <p class="mx-auto mb-8 max-w-md text-base text-slate-300 sm:mb-10 sm:text-lg">
+            </text-app-muted>
+            <p class="mx-auto mb-8 max-w-md text-base text-app-muted sm:mb-10 sm:text-lg">
               Join 1,000+ founders who use this system to build evidence-backed startups.
             </p>
             <NuxtLink
               to="signup-login"
-              class="group inline-flex items-center gap-3 rounded-2xl border-4 border-white bg-emerald-600 px-6 py-3 text-base font-black text-white transition-colors hover:bg-emerald-500 active:scale-95 sm:px-10 sm:py-5 sm:text-lg"
+              class="group inline-flex items-center gap-3 rounded-2xl border-4 border-white bg-emerald-600 px-6 py-3 text-base font-black text-app-text transition-colors hover:bg-emerald-500/10 active:scale-95 sm:px-10 sm:py-5 sm:text-lg"
             >
               Validate Your Idea Now
               <ArrowRight class="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </NuxtLink>
-            <p class="mt-6 text-xs font-black uppercase tracking-widest text-white/40">
+            <p class="mt-6 text-xs font-black uppercase tracking-widest text-app-text/40">
               No credit card required • Instant access
             </p>
           </div>

@@ -54,12 +54,12 @@
 
 <template>
   <div class="space-y-1">
-    <label class="text-xs text-gray-500">Notes</label>
+    <label class="text-app-muted text-xs">Notes</label>
 
     <textarea
       v-model="noteText"
       :readonly="readOnly"
-      class="box-border min-h-[270px] w-full resize-y rounded border border-2 border-gray-500 p-3 text-base focus:border-emerald-500 focus:outline-none focus:ring-0"
+      class="border-app-border bg-app-panel text-app-text placeholder:text-app-muted box-border min-h-[270px] w-full resize-y rounded-lg border p-3 text-base focus:border-emerald-500 focus:outline-none focus:ring-0"
     />
 
     <SavedStatus v-if="saved" />

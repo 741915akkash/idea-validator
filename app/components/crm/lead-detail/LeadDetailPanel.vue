@@ -101,7 +101,7 @@
     <div
       v-if="lead"
       @click.stop
-      class="animate-in slide-in-from-right fixed inset-y-0 right-0 z-[150] flex w-full max-w-[460px] flex-col overflow-hidden border-l border-gray-200 bg-white shadow-2xl duration-300"
+      class="animate-in slide-in-from-right fixed inset-y-0 right-0 z-[150] flex w-full max-w-[460px] flex-col overflow-hidden border-l border-app-border text-app-text shadow-2xl duration-300"
     >
       <LeadDetailHeader
         :lead="lead"

@@ -1,8 +1,8 @@
 <template>
-  <section id="features-section" class="bg-white px-6 py-20">
+  <section id="features-section" class="px-6 py-20 text-app-text">
     <div class="mx-auto max-w-5xl">
       <h2
-        class="mb-10 text-center text-3xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-4xl"
+        class="mb-10 text-center text-3xl font-extrabold leading-tight tracking-tight text-app-text sm:text-4xl"
       >
         Everything You Need To Learn Faster
       </h2>
@@ -11,15 +11,15 @@
         <div
           v-for="(item, i) in features"
           :key="i"
-          class="group flex flex-col rounded-2xl border border-slate-100 bg-slate-50/50 p-6 transition-all duration-300 hover:border-emerald-200 hover:bg-white hover:shadow-md"
+          class="group flex flex-col rounded-2xl border border-app-border bg-app-card p-6 transition-all duration-300 hover:border-emerald-200 hover:text-app-text hover:shadow-md"
         >
           <div
-            class="mb-5 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 transition-colors group-hover:bg-emerald-100"
+            class="mb-5 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 transition-colors group-hover:bg-emerald-100"
           >
             <component :is="item.icon" class="h-6 w-6 text-emerald-600" />
           </div>
-          <h3 class="mb-2.5 text-xl font-extrabold text-slate-900">{{ item.title }}</h3>
-          <p class="text-base font-medium leading-relaxed text-slate-600">
+          <h3 class="mb-2.5 text-xl font-extrabold text-app-text">{{ item.title }}</h3>
+          <p class="text-base font-medium leading-relaxed text-app-muted">
             {{ item.description }}
           </p>
         </div>

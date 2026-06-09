@@ -53,15 +53,15 @@
 
 <template>
   <div class="mx-auto max-w-3xl px-6 py-12">
-    <header class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+    <header class="mb-6 rounded-lg border border-app-border px-6 py-5 text-app-text">
       <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <!-- LEFT -->
         <div>
-          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 class="flex items-center gap-2 text-2xl font-semibold tracking-tight text-app-text">
             <span>Sequences</span>
 
             <Info
-              class="h-5 w-5 cursor-pointer text-gray-400 transition hover:text-gray-700"
+              class="h-5 w-5 cursor-pointer text-app-muted transition hover:text-app-muted"
               @click="showHelpDrawer = true"
             />
           </h1>
@@ -74,7 +74,7 @@
           <!-- Back -->
           <button
             @click="$router.push('/crm/leads')"
-            class="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+            class="inline-flex items-center justify-center rounded-lg border border-app-border px-4 py-2 text-sm font-medium text-app-text transition hover:bg-app-card"
           >
             Back To Leads
           </button>
@@ -96,22 +96,22 @@
         v-for="seq in sequencesStore.sequences"
         :key="seq.id"
         @click="$emit('edit', seq)"
-        class="group relative cursor-pointer rounded-3xl border border-gray-300 bg-white p-6 transition-all hover:border-emerald-200 hover:shadow-2xl hover:shadow-emerald-500/5"
+        class="group relative cursor-pointer rounded-3xl border border-app-border p-6 text-app-text transition-all hover:border-emerald-200 hover:shadow-2xl hover:shadow-emerald-500/5"
       >
         <div class="flex flex-col gap-6">
           <div class="flex items-start justify-between">
             <div class="flex items-center gap-4">
               <div
-                class="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-300 bg-white text-gray-400 transition-colors group-hover:bg-emerald-50 group-hover:text-emerald-500"
+                class="flex h-10 w-10 items-center justify-center rounded-xl border border-app-border text-app-muted text-app-text transition-colors group-hover:bg-emerald-500/10 group-hover:text-emerald-500"
               >
                 <Layers class="h-5 w-5" />
               </div>
               <div>
-                <h3 class="font-black text-gray-900 transition-colors group-hover:text-emerald-600">
+                <h3 class="font-black text-app-text transition-colors group-hover:text-emerald-600">
                   {{ seq.title }}
                 </h3>
                 <div
-                  class="mt-1 flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-gray-400"
+                  class="mt-1 flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-app-muted"
                 >
                   <span>{{ seq.steps.length }} steps</span>
                   <span class="bg-gray h-1 w-1 rounded-full"></span>
@@ -125,14 +125,14 @@
             >
               <button
                 @click.stop="$emit('edit', seq)"
-                class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-900"
+                class="rounded-lg p-2 text-app-muted transition-colors hover:bg-app-panel hover:text-app-text"
                 title="Edit"
               >
                 <Edit2 class="h-4 w-4" />
               </button>
               <button
                 @click.stop="removeSequence(seq.id)"
-                class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                class="rounded-lg p-2 text-app-muted transition-colors hover:bg-red-50 hover:text-red-600"
                 title="Delete"
               >
                 <Trash2 class="h-4 w-4" />
@@ -144,7 +144,7 @@
           <div class="no-scrollbar flex items-center gap-1 overflow-x-auto py-2">
             <template v-for="(step, i) in seq.steps" :key="i">
               <div
-                class="flex shrink-0 items-center gap-2 rounded-xl border border-gray-100 bg-gray-50 px-3 py-1.5 transition-colors group-hover:border-emerald-100 group-hover:bg-white"
+                class="flex shrink-0 items-center gap-2 rounded-xl border border-app-border bg-app-panel px-3 py-1.5 transition-colors group-hover:border-emerald-500/20 group-hover:text-app-text"
               >
                 <component
                   :is="step.type === 'call' ? Phone : step.type === 'email' ? Mail : MessageSquare"
@@ -157,7 +157,7 @@
                         : 'text-emerald-500'
                   ]"
                 />
-                <span class="text-[9px] font-bold text-gray-500"
+                <span class="text-[9px] font-bold text-app-muted"
                   >Day {{ getCumulativeDay(seq.steps, i) }}</span
                 >
               </div>
@@ -165,9 +165,9 @@
             </template>
           </div>
 
-          <div class="flex items-center justify-between border-t border-gray-50 pt-4">
-            <!-- <div class="text-[9px] font-bold uppercase tracking-widest text-gray-400">
-              Used in <span class="text-gray-900">{{ getLeadUsageCount(seq) }} leads</span>
+          <div class="flex items-center justify-between border-t border-app-border pt-4">
+            <!-- <div class="text-[9px] font-bold uppercase tracking-widest text-app-muted">
+              Used in <span class="text-app-text">{{ getLeadUsageCount(seq) }} leads</span>
             </div> -->
             <div
               class="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-emerald-600 opacity-0 transition-opacity group-hover:opacity-100"
@@ -181,15 +181,15 @@
 
     <div
       v-else
-      class="rounded-[40px] border-2 border-dashed border-gray-100 bg-gray-50/50 py-24 text-center"
+      class="bg-app-panel/50 rounded-[40px] border-2 border-dashed border-app-border py-24 text-center"
     >
       <div
-        class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-gray-200 shadow-sm"
+        class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl text-app-text text-gray-200 shadow-sm"
       >
         <Layers class="h-8 w-8" />
       </div>
-      <h3 class="text-sm font-black uppercase tracking-widest text-gray-900">No sequences yet</h3>
-      <p class="mx-auto mt-2 max-w-xs text-xs text-gray-400">
+      <h3 class="text-sm font-black uppercase tracking-widest text-app-text">No sequences yet</h3>
+      <p class="mx-auto mt-2 max-w-xs text-xs text-app-muted">
         Create your first outreach workflow to automate your sales process
       </p>
       <button

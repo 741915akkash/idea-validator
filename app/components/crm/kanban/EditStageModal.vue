@@ -79,28 +79,28 @@
     class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm"
     @click="$emit('close')"
   >
-    <div class="w-96 rounded-xl border border-gray-200 bg-white p-6 shadow-2xl" @click.stop>
-      <h2 class="mb-6 text-xl font-bold text-gray-900">Edit Stage</h2>
+    <div class="w-96 rounded-xl border border-app-border p-6 text-app-text shadow-2xl" @click.stop>
+      <h2 class="mb-6 text-xl font-bold text-app-text">Edit Stage</h2>
 
       <div class="space-y-4">
         <div>
-          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
             Name
           </label>
           <input
             v-model="name"
             placeholder="Qualified"
-            class="w-full rounded-lg border border-gray-300 p-2.5 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+            class="w-full rounded-lg border border-app-border p-2.5 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
           />
         </div>
 
         <div>
-          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
             Color
           </label>
           <select
             v-model="color"
-            class="w-full rounded-lg border border-gray-300 p-2.5 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+            class="w-full rounded-lg border border-app-border p-2.5 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
           >
             <option v-for="option in COLOR_OPTIONS" :key="option.value" :value="option.value">
               {{ option.swatch }} {{ option.label }}
@@ -113,7 +113,7 @@
 
       <div class="mt-8 flex justify-end gap-3">
         <button
-          class="rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          class="rounded-lg border border-app-border px-4 py-2 font-medium text-app-muted transition-colors hover:bg-app-panel"
           @click="$emit('close')"
         >
           Cancel

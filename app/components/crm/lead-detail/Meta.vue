@@ -137,23 +137,23 @@
 </script>
 
 <template>
-  <div class="border-t border-gray-100 bg-gray-50/50 p-6">
+  <div class="bg-app-panel/50 border-t border-app-border p-6">
     <!-- HEADER -->
     <button @click="$emit('toggle-meta')" class="group flex w-full items-center justify-between">
       <h3
-        class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400"
+        class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-app-muted"
       >
         <Tag class="h-3 w-3" /> Meta Information
       </h3>
       <ChevronRight
-        :class="['h-4 w-4 text-gray-400 transition-transform', showMeta ? 'rotate-90' : '']"
+        :class="['h-4 w-4 text-app-muted transition-transform', showMeta ? 'rotate-90' : '']"
       />
     </button>
 
     <div v-show="showMeta" class="mt-4 space-y-4">
       <!-- VALUE -->
       <div class="flex items-center">
-        <span class="w-24 text-[11px] text-gray-400">Value</span>
+        <span class="w-24 text-[11px] text-app-muted">Value</span>
 
         <div class="flex-1">
           <input
@@ -170,7 +170,7 @@
           <span
             v-else
             @click="$emit('start-edit', 'value', lead.value)"
-            class="cursor-pointer rounded px-1 text-sm font-bold hover:bg-gray-50"
+            class="cursor-pointer rounded px-1 text-sm font-bold hover:bg-app-panel"
           >
             ${{ lead.value?.toLocaleString() || '0' }}
           </span>
@@ -179,7 +179,7 @@
 
       <!-- SOURCE -->
       <div ref="sourceDropdownRef" class="relative flex items-center">
-        <span class="w-24 text-[11px] text-gray-400">Source</span>
+        <span class="w-24 text-[11px] text-app-muted">Source</span>
 
         <div class="flex-1">
           <div
@@ -187,21 +187,21 @@
             class="cursor-pointer rounded px-1 py-1 text-sm hover:bg-gray-100"
           >
             {{
-              sourcesStore.sources.find((source) => source.id === lead.source_id)?.name
-                || lead.source_name
-                || 'Select Source'
+              sourcesStore.sources.find((source) => source.id === lead.source_id)?.name ||
+              lead.source_name ||
+              'Select Source'
             }}
           </div>
 
           <div
             v-if="showSourceDropdown"
-            class="absolute z-50 mt-1 w-56 rounded border bg-white shadow"
+            class="absolute z-50 mt-1 w-56 rounded border text-app-text shadow"
           >
             <button
               v-for="source in sourcesStore.sources"
               :key="source.id"
               @click="updateSource(source.id)"
-              class="block w-full px-3 py-2 text-left text-sm hover:bg-gray-50"
+              class="block w-full px-3 py-2 text-left text-sm hover:bg-app-panel"
             >
               {{ source.name }}
             </button>
@@ -228,7 +228,7 @@
 
       <!-- 🔥 OWNER (UPDATED) -->
       <div ref="ownerDropdownRef" class="relative flex items-center">
-        <span class="w-24 text-[11px] text-gray-400">Owner</span>
+        <span class="w-24 text-[11px] text-app-muted">Owner</span>
 
         <div class="flex-1">
           <!-- current owner -->
@@ -237,7 +237,7 @@
             class="flex cursor-pointer items-center gap-2 rounded px-1 py-1 hover:bg-gray-100"
           >
             <div
-              class="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700"
+              class="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-500"
             >
               {{ usersStore.users.find((u) => u.id === lead.user_id)?.name?.[0] || '?' }}
             </div>
@@ -250,13 +250,13 @@
           <!-- dropdown -->
           <div
             v-if="showOwnerDropdown"
-            class="absolute z-50 mt-1 w-40 rounded border bg-white shadow"
+            class="absolute z-50 mt-1 w-40 rounded border text-app-text shadow"
           >
             <button
               v-for="user in usersStore.users"
               :key="user.id"
               @click="updateOwner(user.id)"
-              class="block w-full px-3 py-2 text-left text-sm hover:bg-gray-50"
+              class="block w-full px-3 py-2 text-left text-sm hover:bg-app-panel"
             >
               {{ user.name || user.email }}
             </button>

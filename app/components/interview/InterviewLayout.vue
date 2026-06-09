@@ -9,7 +9,7 @@
 </script>
 
 <template>
-  <div class="min-h-screen bg-neutral-50">
+  <div class="min-h-screen bg-app-hover">
     <!-- Centered Container -->
     <div class="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
       <!-- Header -->
@@ -22,7 +22,7 @@
 
       <!-- Main Phase Container -->
       <div class="mt-6 sm:mt-10">
-        <div class="rounded-lg border border-neutral-200 bg-white p-5 shadow-sm sm:p-8">
+        <div class="rounded-lg border border-app-border p-5 text-app-text shadow-sm sm:p-8">
           <slot />
         </div>
       </div>

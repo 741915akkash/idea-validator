@@ -46,7 +46,7 @@
           {{ post.title.rendered }}
         </NuxtLink>
 
-        <p class="mt-2 text-gray-600">
+        <p class="text-app-muted mt-2">
           {{ cleanExcerpt(post.excerpt.rendered) }}
         </p>
       </div>

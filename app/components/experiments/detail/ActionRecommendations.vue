@@ -20,14 +20,14 @@
 
 <template>
   <section class="rounded-2xl bg-slate-900 p-6 text-white shadow-xl shadow-slate-900/10">
-    <h3 class="mb-6 text-sm font-bold uppercase tracking-widest text-slate-400">
+    <h3 class="mb-6 text-sm font-bold uppercase tracking-widest text-app-muted">
       Action Recommendations
     </h3>
     <div class="space-y-3">
       <div
         v-for="rec in recommendations"
         :key="rec.title"
-        class="group cursor-pointer rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:bg-white/10"
+        class="text-app-text/5 hover:text-app-text/10 group cursor-pointer rounded-xl border border-white/10 p-3 transition-colors"
       >
         <p
           class="mb-1 text-xs font-semibold"
@@ -35,7 +35,7 @@
         >
           {{ rec.title }}
         </p>
-        <p class="mb-3 text-[10px] text-slate-400">{{ rec.description }}</p>
+        <p class="mb-3 text-[10px] text-app-muted">{{ rec.description }}</p>
         <div class="flex justify-end">
           <button class="text-nuxt-green text-[10px] font-bold uppercase group-hover:underline">
             Scale Up

@@ -8,7 +8,7 @@
 </script>
 
 <template>
-  <main class="h-full overflow-hidden">
+  <main class="h-full overflow-hidden bg-app-bg text-app-text">
     <div class="flex h-full flex-col overflow-hidden">
       <AllNotes />
     </div>

@@ -90,9 +90,9 @@
 
   /* colors */
   const colorMap = {
-    1: 'bg-slate-100 text-slate-700 border-slate-200/60',
+    1: 'bg-slate-100 text-app-text border-app-border/60',
     2: 'bg-amber-50 text-amber-800 border-amber-200/50',
-    3: 'bg-emerald-50 text-emerald-800 border-emerald-200/50',
+    3: 'bg-emerald-500/10 text-emerald-800 border-emerald-200/50',
     4: 'bg-indigo-50 text-indigo-800 border-indigo-200/50',
     5: 'bg-red-50 text-red-800 border-red-200/50'
   }
@@ -100,7 +100,7 @@
   const dotColorMap = {
     1: 'bg-slate-400',
     2: 'bg-amber-500',
-    3: 'bg-emerald-500',
+    3: 'bg-emerald-500/10',
     4: 'bg-indigo-500',
     5: 'bg-red-500'
   }
@@ -113,7 +113,7 @@
       ref="triggerRef"
       @click.stop="toggleDropdown"
       class="group relative flex h-6 w-full items-center rounded-full border pl-6 pr-5 text-[10px] font-bold uppercase tracking-wider transition-all hover:shadow-sm"
-      :class="colorMap[lead.stage_id] || 'border-gray-200 bg-gray-50 text-gray-700'"
+      :class="colorMap[lead.stage_id] || 'border-app-border bg-app-panel text-app-muted'"
     >
       <!-- dot -->
       <span
@@ -142,14 +142,14 @@
       <div
         v-if="open"
         :style="dropdownStyle"
-        class="fixed z-[9999] rounded-md border border-gray-200 bg-white shadow-lg"
+        class="fixed z-[9999] rounded-md border border-app-border text-app-text shadow-lg"
       >
         <div class="max-h-60 overflow-auto py-1">
           <div
             v-for="stage in stagesStore.stages"
             :key="stage.id"
             @click="updateStage(stage.id)"
-            class="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-[11px] font-medium text-gray-700 hover:bg-gray-100"
+            class="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-[11px] font-medium text-app-muted hover:bg-gray-100"
             :class="stage.id === lead.stage_id ? 'bg-gray-100 font-semibold' : ''"
           >
             <span class="h-1.5 w-1.5 rounded-full" :class="dotColorMap[stage.id]" />

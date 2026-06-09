@@ -207,10 +207,10 @@
         <!-- NORMAL BROWSE MODE -->
         <template v-if="!isSearchActive">
           <!-- HEADER CARD -->
-          <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+          <div class="mb-6 rounded-lg border border-app-border px-6 py-5 text-app-text">
             <div class="flex items-start justify-between gap-4">
               <div>
-                <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Knowledge Base</h1>
+                <h1 class="text-2xl font-semibold tracking-tight text-app-text">Knowledge Base</h1>
 
                 <div class="mt-2 h-1 w-16 bg-emerald-500"></div>
               </div>
@@ -235,7 +235,7 @@
             "
           >
             <div
-              class="rounded-2xl border border-slate-200 bg-slate-50/90 px-3 py-2 shadow-sm backdrop-blur-md"
+              class="bg-app-card/90 rounded-2xl border border-app-border px-3 py-2 shadow-sm backdrop-blur-md"
             >
               <SearchBar
                 ref="headerRef"
@@ -274,13 +274,13 @@
             class="fixed left-[max(17rem,calc(50%-28rem))] right-6 top-4 z-30 max-w-6xl transition-all duration-200 max-md:left-4 max-md:right-4"
           >
             <div
-              class="rounded-3xl border border-slate-200 bg-slate-50/90 px-3 py-2 shadow-sm backdrop-blur-md"
+              class="bg-app-card/90 rounded-3xl border border-app-border px-3 py-2 shadow-sm backdrop-blur-md"
             >
               <div class="flex items-center gap-3">
                 <!-- FILTER -->
                 <button
                   @click="isSidebarOpen = !isSidebarOpen"
-                  class="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm transition-all hover:border-emerald-200 hover:text-emerald-700"
+                  class="inline-flex shrink-0 items-center gap-2 rounded-full border border-app-border px-4 py-3 text-sm font-medium text-app-muted text-app-text shadow-sm transition-all hover:border-emerald-200 hover:text-emerald-500"
                 >
                   <Filter class="h-4 w-4" />
                   <span class="hidden md:inline"> Filters </span>

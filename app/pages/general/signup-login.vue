@@ -108,12 +108,12 @@
       :message="rateLimitMessage"
       @close="showRateLimitAlert = false"
     />
-    <h1 class="text-2xl font-semibold text-slate-900">Continue to GO Launch Scall</h1>
-    <p class="mt-2 text-sm text-slate-600">Enter your email to get a one-time code.</p>
+    <h1 class="text-2xl font-semibold text-app-text">Continue to GO Launch Scall</h1>
+    <p class="mt-2 text-sm text-app-muted">Enter your email to get a one-time code.</p>
 
     <form class="mt-6 space-y-4" @submit.prevent="verifyOtp">
       <div>
-        <label for="email" class="mb-1 block text-sm font-medium text-slate-700">Email</label>
+        <label for="email" class="mb-1 block text-sm font-medium text-app-text">Email</label>
         <input
           id="email"
           v-model="email"
@@ -121,12 +121,14 @@
           required
           autocomplete="email"
           placeholder="you@example.com"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 outline-none ring-emerald-500 focus:ring-2"
+          class="w-full rounded-md border border-app-border px-3 py-2 outline-none ring-emerald-500 focus:ring-2"
         />
       </div>
 
       <div>
-        <label for="code" class="mb-1 block text-sm font-medium text-slate-700">Verification code</label>
+        <label for="code" class="mb-1 block text-sm font-medium text-app-text"
+          >Verification code</label
+        >
         <input
           id="code"
           v-model="code"
@@ -140,20 +142,22 @@
           :disabled="!codeSent"
           :class="
             codeSent
-              ? 'w-full rounded-md border border-slate-300 px-3 py-2 outline-none ring-emerald-500 focus:ring-2'
-              : 'w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-slate-500'
+              ? 'w-full rounded-md border border-app-border px-3 py-2 outline-none ring-emerald-500 focus:ring-2'
+              : 'w-full rounded-md border border-app-border bg-app-card px-3 py-2 text-app-muted'
           "
         />
-        <p v-if="!codeSent" class="mt-1 text-xs text-slate-500">Send a code first to enable verification.</p>
+        <p v-if="!codeSent" class="mt-1 text-xs text-app-muted">
+          Send a code first to enable verification.
+        </p>
       </div>
 
       <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
-      <p v-if="info" class="text-sm text-slate-600">{{ info }}</p>
+      <p v-if="info" class="text-sm text-app-muted">{{ info }}</p>
 
       <div class="flex items-center justify-between gap-3">
         <button
           type="button"
-          class="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 disabled:opacity-60"
+          class="rounded-md border border-app-border px-3 py-2 text-sm font-medium text-app-text disabled:opacity-60"
           :disabled="loadingAction !== ''"
           @click="requestOtp"
         >

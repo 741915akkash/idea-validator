@@ -148,70 +148,70 @@
     @close="showContactsLimitAlert = false"
   />
   <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-    <div class="w-96 rounded-xl border border-gray-200 bg-white p-6 shadow-2xl">
-      <h2 class="mb-6 text-xl font-bold text-gray-900">Add Lead</h2>
+    <div class="w-96 rounded-xl border border-app-border bg-app-panel p-6 text-app-text shadow-2xl">
+      <h2 class="mb-6 text-xl font-bold text-app-text">Add Lead</h2>
 
       <div class="space-y-4">
         <!-- Name -->
         <div>
-          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
             Full Name
           </label>
           <input
             v-model="name"
             placeholder="John Doe"
-            class="w-full rounded-lg border border-gray-300 p-2.5 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+            class="w-full rounded-lg border border-app-border bg-app-card p-2.5 text-app-text outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>
 
         <!-- Company -->
         <div>
-          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
             Company
           </label>
           <input
             v-model="company"
             placeholder="Acme Inc."
-            class="w-full rounded-lg border border-gray-300 p-2.5 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+            class="w-full rounded-lg border border-app-border bg-app-card p-2.5 text-app-text outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>
 
         <!-- Email -->
         <div>
-          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
             Email Address
           </label>
           <input
             v-model="email"
             placeholder="john@example.com"
-            class="w-full rounded-lg border p-2.5 outline-none transition-all focus:ring-2"
+            class="w-full rounded-lg border bg-app-card p-2.5 text-app-text outline-none transition-all placeholder:text-app-muted focus:ring-2"
             :class="
               emailError
-                ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500'
-                : 'border-gray-300 focus:border-emerald-500 focus:ring-emerald-500'
+                ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                : 'border-app-border focus:border-emerald-500 focus:ring-emerald-500/20'
             "
           />
-          <p v-if="emailError" class="mt-1 text-xs font-medium text-rose-600">
+          <p v-if="emailError" class="mt-1 text-xs font-medium text-red-600">
             {{ emailError }}
           </p>
         </div>
 
         <!-- Phone -->
         <div>
-          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
             Phone Number
           </label>
           <input
             v-model="phone"
             placeholder="+14155552671"
-            class="w-full rounded-lg border p-2.5 outline-none transition-all focus:ring-2"
+            class="w-full rounded-lg border bg-app-card p-2.5 text-app-text outline-none transition-all placeholder:text-app-muted focus:ring-2"
             :class="
               phoneError
-                ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-500'
-                : 'border-gray-300 focus:border-emerald-500 focus:ring-emerald-500'
+                ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                : 'border-app-border focus:border-emerald-500 focus:ring-emerald-500/20'
             "
           />
-          <p v-if="phoneError" class="mt-1 text-xs font-medium text-rose-600">
+          <p v-if="phoneError" class="mt-1 text-xs font-medium text-red-500">
             {{ phoneError }}
           </p>
         </div>
@@ -219,12 +219,12 @@
         <!-- Stage + Owner -->
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
               Stage
             </label>
             <select
               v-model="stageId"
-              class="w-full rounded-lg border border-gray-300 p-2.5 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+              class="w-full rounded-lg border border-app-border bg-app-card p-2.5 text-app-text outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
             >
               <option v-for="stage in stagesStore.stages" :key="stage.id" :value="stage.id">
                 {{ stage.name }}
@@ -233,12 +233,12 @@
           </div>
 
           <div>
-            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
               Owner
             </label>
             <select
               v-model="userId"
-              class="w-full rounded-lg border border-gray-300 p-2.5 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+              class="w-full rounded-lg border border-app-border bg-app-card p-2.5 text-app-text outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
             >
               <option v-for="user in usersStore.users" :key="user.id" :value="user.id">
                 {{ user.name || user.email }}
@@ -249,12 +249,12 @@
 
         <!-- Sequence -->
         <div>
-          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
             Sequence
           </label>
           <select
             v-model="sequenceId"
-            class="w-full rounded-lg border border-gray-300 p-2.5 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500"
+            class="w-full rounded-lg border border-app-border bg-app-card p-2.5 text-app-text outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
           >
             <option value="">None</option>
             <option v-for="sequence in sequences" :key="sequence.id" :value="sequence.id">
@@ -267,14 +267,14 @@
       <!-- Actions -->
       <div class="mt-8 flex justify-end gap-3">
         <button
-          class="rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          class="rounded-lg border border-app-border px-4 py-2 font-medium text-app-muted transition-colors hover:bg-app-hover hover:text-app-text"
           @click="$emit('close')"
         >
           Cancel
         </button>
 
         <button
-          class="rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white shadow-lg shadow-emerald-600/20 transition-all hover:bg-emerald-700"
+          class="rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white transition-all hover:bg-emerald-700"
           @click="createLead"
         >
           Create Lead

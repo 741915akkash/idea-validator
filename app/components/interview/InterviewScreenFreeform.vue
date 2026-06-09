@@ -203,7 +203,9 @@
   }
 
   async function flushPendingAnswerSaves() {
-    await Promise.all([...pendingAnswerSaves.keys()].map((questionId) => flushQueuedAnswerSave(questionId)))
+    await Promise.all(
+      [...pendingAnswerSaves.keys()].map((questionId) => flushQueuedAnswerSave(questionId))
+    )
   }
 
   function toggleMulti(question, option) {
@@ -356,13 +358,13 @@
 </script>
 
 <template>
-  <div class="fixed inset-0 z-50 overflow-y-auto bg-slate-50 p-4 md:p-6">
+  <div class="fixed inset-0 z-50 overflow-y-auto bg-app-bg p-4 md:p-6">
     <div
-      class="mx-auto flex min-h-full w-full max-w-7xl flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:p-6"
+      class="mx-auto flex min-h-full w-full max-w-7xl flex-col gap-4 rounded-xl border border-app-border p-4 text-app-text shadow-sm md:p-6"
     >
       <button
         @click="showRespondent = !showRespondent"
-        class="rounded-md bg-neutral-100 px-3 py-2 text-xs font-medium uppercase text-neutral-700"
+        class="rounded-md bg-app-panel px-3 py-2 text-xs font-medium uppercase text-app-muted"
       >
         {{ showRespondent ? 'Hide respondent' : 'Show respondent' }}
       </button>
@@ -370,42 +372,42 @@
       <!-- RESPONDENT -->
       <div v-if="showRespondent" class="grid grid-cols-1 gap-3 md:grid-cols-2">
         <div>
-          <div class="text-xs font-medium uppercase text-black">Respondent Name</div>
+          <div class="text-xs font-medium uppercase text-app-text">Respondent Name</div>
           <input
             v-model="name"
             type="text"
             placeholder="John Doe"
-            class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            class="mt-1 w-full rounded-md border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text placeholder:text-app-muted focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>
 
         <div>
-          <div class="text-xs font-medium uppercase text-black">Email</div>
+          <div class="text-xs font-medium uppercase text-app-text">Email</div>
           <input
             v-model="email"
             type="text"
             placeholder="john@example.com"
-            class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            class="mt-1 w-full rounded-md border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text placeholder:text-app-muted focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>
 
         <div>
-          <div class="text-xs font-medium uppercase text-black">Phone</div>
+          <div class="text-xs font-medium uppercase text-app-text">Phone</div>
           <input
             v-model="phone"
             type="text"
             placeholder="+123456789"
-            class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            class="mt-1 w-full rounded-md border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text placeholder:text-app-muted focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>
 
         <div>
-          <div class="text-xs font-medium uppercase text-black">Company</div>
+          <div class="text-xs font-medium uppercase text-app-text">Company</div>
           <input
             v-model="company"
             type="text"
             placeholder="Acme Inc"
-            class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            class="mt-1 w-full rounded-md border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text placeholder:text-app-muted focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>
       </div>
@@ -413,22 +415,22 @@
       <!-- TITLE + TAGS -->
       <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
         <div>
-          <div class="text-xs font-medium uppercase text-black">Title</div>
+          <div class="text-xs font-medium uppercase text-app-text">Title</div>
           <input
             v-model="title"
             type="text"
             placeholder="Add interview title"
-            class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            class="mt-1 w-full rounded-md border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text placeholder:text-app-muted focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>
 
         <div>
-          <div class="text-xs font-medium uppercase text-black">Tags</div>
+          <div class="text-xs font-medium uppercase text-app-text">Tags</div>
           <input
             v-model="tags"
             type="text"
             placeholder="Add tags (comma-separated)"
-            class="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            class="mt-1 w-full rounded-md border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text placeholder:text-app-muted focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>
       </div>
@@ -436,9 +438,9 @@
       <!-- MAIN 2 COLUMN LAYOUT -->
       <div class="grid flex-1 grid-cols-2 gap-4">
         <!-- QUESTIONS -->
-        <div class="flex min-h-[600px] flex-col rounded-lg border border-neutral-200 bg-neutral-50">
+        <div class="flex min-h-[600px] flex-col rounded-lg border border-app-border bg-app-panel">
           <div
-            class="border-b border-neutral-200 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-700"
+            class="border-b border-app-border px-4 py-3 text-xs font-semibold uppercase tracking-wide text-app-muted"
           >
             Questions
           </div>
@@ -447,21 +449,21 @@
             <div
               v-for="(question, index) in questions"
               :key="question.id"
-              class="w-full rounded-lg border border-neutral-200 bg-white p-3 text-left transition hover:border-emerald-300 hover:bg-emerald-50"
+              class="w-full rounded-lg border border-app-border p-3 text-left text-app-text transition hover:border-emerald-300 hover:bg-emerald-500/10"
             >
               <div class="flex items-start gap-2">
                 <div
-                  class="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border border-neutral-300 text-[10px] font-semibold text-neutral-600"
+                  class="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border border-app-border text-[10px] font-semibold text-app-muted"
                 >
                   {{ index + 1 }}
                 </div>
 
                 <div class="min-w-0 flex-1">
-                  <div class="text-sm font-medium text-neutral-900">
+                  <div class="text-sm font-medium text-app-text">
                     {{ question.text }}
                   </div>
 
-                  <div class="mt-1 text-xs text-neutral-500">
+                  <div class="mt-1 text-xs text-app-muted">
                     {{ question.question_type }}
                   </div>
 
@@ -471,20 +473,22 @@
                     v-model="answers[question.id]"
                     @input="queueAnswerSave(question, answers[question.id])"
                     placeholder="Type answer..."
-                    class="mt-3 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+                    class="mt-3 w-full rounded-md border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text placeholder:text-app-muted focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                   />
 
                   <!-- YES / NO -->
                   <div v-else-if="question.question_type === 'yes_no'" class="mt-3 flex gap-2">
-                      <button
+                    <button
                       @click="
-                        answers[question.id] = 'yes';
-                        queueAnswerSave(question, 'yes')
+                        () => {
+                          answers[question.id] = 'yes'
+                          queueAnswerSave(question, 'yes')
+                        }
                       "
                       :class="
                         answers[question.id] === 'yes'
-                          ? 'border-emerald-500 bg-emerald-100'
-                          : 'border-neutral-300 bg-white'
+                          ? 'border-emerald-500 border-emerald-500 bg-emerald-500/10 text-emerald-500'
+                          : 'border-app-border bg-app-panel text-app-text hover:border-emerald-500/30 hover:bg-emerald-500/5'
                       "
                       class="rounded-full border px-4 py-2 text-xs font-medium"
                     >
@@ -493,13 +497,15 @@
 
                     <button
                       @click="
-                        answers[question.id] = 'no';
-                        queueAnswerSave(question, 'no')
+                        () => {
+                          answers[question.id] = 'no'
+                          queueAnswerSave(question, 'no')
+                        }
                       "
                       :class="
                         answers[question.id] === 'no'
-                          ? 'border-red-500 bg-red-100'
-                          : 'border-neutral-300 bg-white'
+                          ? 'border-red-500 bg-red-500/10 text-red-500'
+                          : 'border-app-border bg-app-panel text-app-text hover:border-emerald-500/30 hover:bg-emerald-500/5'
                       "
                       class="rounded-full border px-4 py-2 text-xs font-medium"
                     >
@@ -516,13 +522,15 @@
                       v-for="option in question.options_json?.options || []"
                       :key="option"
                       @click="
-                        answers[question.id] = option;
-                        queueAnswerSave(question, option)
+                        () => {
+                          answers[question.id] = option
+                          queueAnswerSave(question, option)
+                        }
                       "
                       :class="
                         answers[question.id] === option
-                          ? 'border-emerald-500 bg-emerald-100'
-                          : 'border-neutral-300 bg-white'
+                          ? 'border-emerald-500 border-emerald-500 bg-emerald-500/10 text-emerald-500'
+                          : 'border-app-border bg-app-panel text-app-text hover:border-emerald-500/30 hover:bg-emerald-500/5'
                       "
                       class="rounded-full border px-4 py-2 text-xs font-medium"
                     >
@@ -541,8 +549,8 @@
                       @click="toggleMulti(question, option)"
                       :class="
                         (answers[question.id] || []).includes(option)
-                          ? 'border-emerald-500 bg-emerald-100'
-                          : 'border-neutral-300 bg-white'
+                          ? 'border-emerald-500 border-emerald-500 bg-emerald-500/10 text-emerald-500'
+                          : 'border-app-border bg-app-panel text-app-text hover:border-emerald-500/30 hover:bg-emerald-500/5'
                       "
                       class="rounded-full border px-4 py-2 text-xs font-medium"
                     >
@@ -551,10 +559,7 @@
                   </div>
 
                   <!-- RATING -->
-                  <div
-                    v-else-if="question.question_type === 'rating'"
-                    class="mt-3 space-y-3"
-                  >
+                  <div v-else-if="question.question_type === 'rating'" class="mt-3 space-y-3">
                     <div class="flex flex-wrap gap-2">
                       <button
                         v-for="value in getRatingValues(question)"
@@ -562,8 +567,8 @@
                         @click="selectRating(question, value)"
                         :class="
                           answers[question.id] === value
-                            ? 'border-emerald-500 bg-emerald-100 text-emerald-900'
-                            : 'border-neutral-300 bg-white text-neutral-700'
+                            ? 'border-emerald-500 border-emerald-500 bg-emerald-500/10 text-emerald-500 text-emerald-900'
+                            : 'border-app-border bg-app-panel text-app-text hover:border-emerald-500/30 hover:bg-emerald-500/5'
                         "
                         class="min-w-[2.5rem] rounded-full border px-4 py-2 text-xs font-medium transition"
                       >
@@ -571,7 +576,7 @@
                       </button>
                     </div>
 
-                    <div class="text-xs text-neutral-500">
+                    <div class="text-xs text-app-muted">
                       Choose a rating from {{ getRatingValues(question)[0] }} to
                       {{ getRatingValues(question)[getRatingValues(question).length - 1] }}
                     </div>
@@ -584,11 +589,11 @@
 
         <!-- NOTES -->
         <div class="flex min-h-[600px] flex-col gap-2">
-          <div class="text-xs font-medium uppercase text-black">Interview Notes</div>
+          <div class="text-xs font-medium uppercase text-app-text">Interview Notes</div>
 
           <textarea
             v-model="notes"
-            class="min-h-0 flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            class="min-h-0 flex-1 rounded-md border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text placeholder:text-app-muted focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
 
           <SavedStatus v-if="savedDraft" />

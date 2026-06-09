@@ -145,25 +145,27 @@
 
 <template>
   <div class="mt-20 sm:mt-32">
-    <h2 class="mb-8 text-center text-2xl font-extrabold text-slate-900 sm:mb-12 sm:text-3xl">
+    <h2 class="mb-8 text-center text-2xl font-extrabold text-app-text sm:mb-12 sm:text-3xl">
       Compare features
     </h2>
 
     <!-- SCROLL CONTAINER -->
-    <div class="overflow-x-auto rounded-3xl border border-slate-200 bg-white">
-      <table class="w-full min-w-[720px] table-fixed border-collapse bg-white text-left">
+    <div
+  class="overflow-x-auto rounded-3xl border border-app-border bg-app-panel text-app-text"
+>
+      <table class="w-full min-w-[720px] table-fixed border-collapse text-left text-app-text">
         <!-- HEADER -->
         <thead>
-          <tr class="bg-slate-100">
-            <th class="min-w-[220px] px-6 py-4 text-sm font-semibold text-slate-700">
+          <tr class="bg-app-hover">
+            <th class="min-w-[220px] px-6 py-4 text-sm font-semibold text-app-text">
               <div class="max-w-[220px]">Feature</div>
             </th>
 
-            <th class="min-w-[150px] px-6 py-4 text-center text-sm font-semibold text-slate-700">
+            <th class="min-w-[150px] px-6 py-4 text-center text-sm font-semibold text-app-text">
               Free
             </th>
 
-            <th class="min-w-[150px] px-6 py-4 text-center text-sm font-semibold text-slate-700">
+            <th class="min-w-[150px] px-6 py-4 text-center text-sm font-semibold text-app-text">
               Growth
             </th>
           </tr>
@@ -172,8 +174,8 @@
         <!-- BODY -->
         <tbody>
           <template v-for="cat in categories" :key="cat.name">
-            <tr class="border-t border-slate-200 bg-slate-100">
-              <td colspan="3" class="px-6 py-3 text-sm font-semibold text-slate-900">
+            <tr class="border-t border-app-border bg-app-hover">
+              <td colspan="3" class="px-6 py-3 text-sm font-semibold text-app-text">
                 <div class="flex items-center gap-2">
                   <component :is="cat.icon" class="h-5 w-5 text-emerald-500" />
                   {{ cat.name }}
@@ -184,9 +186,9 @@
             <tr
               v-for="f in cat.features"
               :key="f.name"
-              class="border-b border-slate-100 bg-white transition hover:bg-slate-50"
+              class="border-b border-app-border text-app-text transition hover:bg-app-hover"
             >
-              <td class="px-6 py-4 align-top text-sm text-slate-700">
+              <td class="px-6 py-4 align-top text-sm text-app-text">
                 <div class="flex flex-col items-start gap-1">
                   <span class="max-w-[220px] whitespace-normal break-words">
                     {{ f.name }}
@@ -194,7 +196,7 @@
 
                   <span
                     v-if="f.badge"
-                    class="inline-flex items-center rounded bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700 ring-1 ring-emerald-600/20"
+                    class="inline-flex items-center rounded bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold text-emerald-500 border border-emerald-500/20"
                   >
                     {{ f.badge }}
                   </span>
@@ -202,21 +204,21 @@
               </td>
 
               <td class="px-6 py-4 text-center align-middle">
-                <Check v-if="isCheck(f.free)" class="mx-auto block h-5 w-5 text-emerald-600" />
+                <Check v-if="isCheck(f.free)" class="mx-auto block h-5 w-5 text-emerald-500" />
 
                 <X v-else-if="isCross(f.free)" class="mx-auto block h-5 w-5 text-rose-500" />
 
-                <span v-else class="text-sm font-medium text-slate-800">
+                <span v-else class="text-sm font-medium text-app-text">
                   {{ f.free }}
                 </span>
               </td>
 
               <td class="px-6 py-4 text-center align-middle">
-                <Check v-if="isCheck(f.growth)" class="mx-auto block h-5 w-5 text-emerald-600" />
+                <Check v-if="isCheck(f.growth)" class="mx-auto block h-5 w-5 text-emerald-500" />
 
                 <X v-else-if="isCross(f.growth)" class="mx-auto block h-5 w-5 text-rose-500" />
 
-                <span v-else class="text-sm font-medium text-slate-800">
+                <span v-else class="text-sm font-medium text-app-text">
                   {{ f.growth }}
                 </span>
               </td>

@@ -1,13 +1,18 @@
 import { normalizePlanTier } from '../../utils/track-usage.js'
 
-export async function getPlanLimitsRows({ pool, tier }) {
+export async function getPlanLimitsRows({ client, tier }) {
   const normalizedTier = normalizePlanTier(tier)
 
-  const { rows } = await pool.query(
+  const { rows } = await client.query(
     `
-    SELECT plan_tier, feature, enabled, limit_value, period
-    FROM plan_limits
-    WHERE plan_tier = $1
+      SELECT
+        plan_tier,
+        feature,
+        enabled,
+        limit_value,
+        period
+      FROM plan_limits
+      WHERE plan_tier = $1
     `,
     [normalizedTier]
   )
@@ -15,8 +20,8 @@ export async function getPlanLimitsRows({ pool, tier }) {
   return rows
 }
 
-export async function getPlanLimitsMap({ pool, tier }) {
-  const rows = await getPlanLimitsRows({ pool, tier })
+export async function getPlanLimitsMap({ client, tier }) {
+  const rows = await getPlanLimitsRows({ client, tier })
 
   const limits = {}
   for (const row of rows) {

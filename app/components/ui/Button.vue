@@ -14,7 +14,7 @@
 
   const styles = {
     primary: 'bg-emerald-600 text-white hover:bg-emerald-700',
-    secondary: 'border border-emerald-600 text-emerald-700 hover:bg-emerald-50'
+    secondary: 'border border-emerald-600 text-emerald-500 hover:bg-emerald-500/10'
   }
 
   const classes = `${base} ${styles[props.variant]}`

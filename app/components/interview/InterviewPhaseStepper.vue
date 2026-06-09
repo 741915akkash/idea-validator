@@ -31,7 +31,7 @@
             'flex h-7 w-7 items-center justify-center rounded-full border text-xs font-semibold',
             index <= currentIndex
               ? 'border-emerald-600 bg-emerald-600 text-white'
-              : 'border-neutral-300 text-neutral-400'
+              : 'border-app-border text-neutral-400'
           ]"
         >
           {{ index + 1 }}
@@ -57,7 +57,7 @@
                 ? 'border-emerald-600 bg-emerald-600 text-white'
                 : index === currentIndex
                   ? 'border-emerald-600 text-emerald-600'
-                  : 'border-neutral-300 text-neutral-400'
+                  : 'border-app-border text-neutral-400'
             ]"
           >
             {{ index + 1 }}
@@ -66,7 +66,7 @@
           <div
             :class="[
               'ml-3 text-sm font-medium',
-              index <= currentIndex ? 'text-neutral-900' : 'text-neutral-400'
+              index <= currentIndex ? 'text-app-text' : 'text-neutral-400'
             ]"
           >
             {{ phase.label }}
@@ -76,7 +76,7 @@
         <!-- Connector -->
         <div
           v-if="index !== phases.length - 1"
-          :class="['mx-4 h-px flex-1', index < currentIndex ? 'bg-neutral-900' : 'bg-neutral-200']"
+          :class="['mx-4 h-px flex-1', index < currentIndex ? 'bg-emerald-600' : 'bg-neutral-200']"
         ></div>
       </div>
     </div>

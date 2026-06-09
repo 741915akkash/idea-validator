@@ -44,6 +44,6 @@
     </svg>
 
     <div class="text-xl font-medium">{{ value }}</div>
-    <div class="text-base text-gray-500">{{ label }}</div>
+    <div class="text-app-muted text-base">{{ label }}</div>
   </div>
 </template>

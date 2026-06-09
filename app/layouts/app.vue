@@ -51,7 +51,7 @@
 
 <template>
   <!-- ✅ Allow horizontal overflow globally -->
-  <div class="flex min-h-screen overflow-x-visible bg-white font-sans">
+  <div class="bg-app-bg text-app-text flex min-h-screen overflow-x-visible font-sans">
     <!-- Desktop Sidebar -->
     <Sidebar class="fixed left-0 top-0 z-40 hidden h-screen w-64 md:flex md:pt-10" />
 
@@ -65,20 +65,22 @@
 
     <!-- Main Content Area -->
     <div
-      class="flex flex-1 flex-col overflow-hidden"
+      class="bg-app-bg flex flex-1 flex-col overflow-hidden"
       :class="{
         'md:ml-64': !$route.meta.fullWidth
       }"
     >
       <!-- Mobile Top Bar -->
-      <div class="flex items-center gap-3 border-b px-4 py-2 md:hidden">
+      <div
+        class="border-app-border bg-app-panel flex items-center gap-3 border-b px-4 py-2 md:hidden"
+      >
         <button @click="sidebarOpen = true">
           <Menu class="h-6 w-6" />
         </button>
 
         <NuxtLink to="/" class="flex items-center gap-2">
           <Orbit class="h-6 w-6 text-emerald-600" />
-          <span class="text-lg font-semibold text-slate-900">GO Launch Scall</span>
+          <span class="text-app-text text-lg font-semibold">GO Launch Scall</span>
         </NuxtLink>
       </div>
 

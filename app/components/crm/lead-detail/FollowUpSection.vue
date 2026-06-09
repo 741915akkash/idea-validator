@@ -258,28 +258,28 @@
 </script>
 
 <template>
-  <div class="bg-white p-6">
+  <div class="p-6 text-app-text">
     <!-- HEADER -->
     <h3
-      class="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400"
+      class="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-app-muted"
     >
       🔥 FOLLOW-UP
     </h3>
 
     <!-- CARD -->
-    <div class="relative rounded-xl border border-gray-200 bg-gray-50/30 p-5">
+    <div class="bg-app-panel/30 relative rounded-xl border border-app-border p-5">
       <!-- HEADER ROW -->
       <div class="flex items-start justify-between gap-4">
         <!-- LEFT -->
         <div class="flex flex-col gap-1">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-app-muted">
             Next Action
           </span>
 
           <!-- TYPE + STATUS -->
           <div class="mt-1 flex items-center gap-2">
             <!-- TYPE -->
-            <span v-if="stepType" class="text-sm font-semibold text-gray-900">
+            <span v-if="stepType" class="text-sm font-semibold text-app-text">
               {{ stepType }}
             </span>
 
@@ -304,7 +304,7 @@
           <button
             @click="toggle"
             :disabled="isSaving"
-            class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-[10px] font-bold uppercase text-gray-600 shadow-sm transition hover:border-emerald-500 hover:text-emerald-600 disabled:opacity-60"
+            class="rounded-lg border border-app-border px-3 py-1.5 text-[10px] font-bold uppercase text-app-muted text-app-text shadow-sm transition hover:border-emerald-500 hover:text-emerald-600 disabled:opacity-60"
           >
             Reschedule ▾
           </button>
@@ -323,58 +323,58 @@
       <!-- STEP CARD -->
       <div
         v-if="stepTitle || stepText"
-        class="mt-5 w-full rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+        class="mt-5 w-full rounded-xl border border-app-border p-5 text-app-text shadow-sm"
       >
         <!-- TITLE -->
         <div
           v-if="stepTitle"
-          class="mb-3 text-[11px] font-bold uppercase tracking-wide text-gray-500"
+          class="mb-3 text-[11px] font-bold uppercase tracking-wide text-app-muted"
         >
           {{ stepTitle }}
         </div>
 
         <!-- BODY -->
-        <p v-if="stepText" class="whitespace-pre-wrap break-words text-sm leading-7 text-gray-700">
+        <p v-if="stepText" class="whitespace-pre-wrap break-words text-sm leading-7 text-app-muted">
           {{ stepText }}
         </p>
       </div>
 
       <!-- DATE -->
-      <span class="mt-5 block text-xs text-gray-500">
+      <span class="mt-5 block text-xs text-app-muted">
         {{ formatDate(followUp) }}
       </span>
 
       <!-- DROPDOWN -->
       <div
         v-if="open"
-        class="absolute right-5 top-14 z-10 w-44 rounded-lg border border-gray-200 bg-white shadow-lg"
+        class="absolute right-5 top-14 z-10 w-44 rounded-lg border border-app-border text-app-text shadow-lg"
       >
         <button
           @click="setFollowUp('today')"
-          class="w-full px-3 py-2 text-left text-xs text-gray-600 hover:bg-gray-100"
+          class="w-full px-3 py-2 text-left text-xs text-app-muted hover:bg-gray-100"
         >
           Today
         </button>
 
         <button
           @click="setFollowUp('tomorrow')"
-          class="w-full px-3 py-2 text-left text-xs text-gray-600 hover:bg-gray-100"
+          class="w-full px-3 py-2 text-left text-xs text-app-muted hover:bg-gray-100"
         >
           Tomorrow
         </button>
 
         <button
           @click="setFollowUp('plus3d')"
-          class="w-full px-3 py-2 text-left text-xs text-gray-600 hover:bg-gray-100"
+          class="w-full px-3 py-2 text-left text-xs text-app-muted hover:bg-gray-100"
         >
           +3 days
         </button>
 
-        <div class="border-t border-gray-100 p-2">
+        <div class="border-t border-app-border p-2">
           <input
             v-model="customDate"
             type="date"
-            class="mb-2 w-full rounded border border-gray-200 px-2 py-1 text-xs text-gray-700"
+            class="mb-2 w-full rounded border border-app-border px-2 py-1 text-xs text-app-muted"
           />
 
           <button
@@ -387,7 +387,7 @@
 
         <button
           @click="close"
-          class="w-full border-t border-gray-100 px-3 py-2 text-left text-xs text-gray-600 hover:bg-gray-100"
+          class="w-full border-t border-app-border px-3 py-2 text-left text-xs text-app-muted hover:bg-gray-100"
         >
           Close
         </button>

@@ -103,13 +103,13 @@
 
     <div class="space-y-6 pb-40">
       <!-- 1. Title Input (Top Priority) -->
-      <div class="rounded-[32px] border border-gray-100 bg-white p-8 shadow-sm">
-        <label class="mb-3 block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400"
+      <div class="rounded-[32px] border border-app-border p-8 text-app-text shadow-sm">
+        <label class="mb-3 block text-[10px] font-black uppercase tracking-[0.2em] text-app-muted"
           >Sequence Title</label
         >
         <input
           v-model="form.title"
-          class="w-full border-none p-0 text-3xl font-black tracking-tight text-gray-900 placeholder-gray-200 outline-none focus:ring-0"
+          class="w-full border-none p-0 text-3xl font-black tracking-tight text-app-text placeholder-gray-200 outline-none focus:ring-0"
           placeholder="e.g. Cold Lead Outreach"
         />
       </div>
@@ -124,11 +124,11 @@
       <!-- 3. Steps List -->
       <div class="space-y-6 pt-12">
         <div class="flex items-center justify-between px-2 pt-4">
-          <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
+          <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-app-muted">
             Step Configuration
           </h2>
           <div
-            class="flex items-center gap-4 text-[10px] font-bold uppercase tracking-wider text-gray-400"
+            class="flex items-center gap-4 text-[10px] font-bold uppercase tracking-wider text-app-muted"
           >
             <span class="flex items-center gap-1.5"
               ><Circle class="h-2.5 w-2.5 fill-current text-blue-500" /> Call</span
@@ -155,10 +155,10 @@
 
         <button
           @click="addStep"
-          class="group mt-4 flex w-full flex-col items-center gap-3 rounded-[28px] border-2 border-dashed border-gray-100 py-6 text-gray-400 transition-all hover:border-emerald-200 hover:bg-emerald-50/30 hover:text-emerald-600"
+          class="hover:bg-emerald-500/10/30 group mt-4 flex w-full flex-col items-center gap-3 rounded-[28px] border-2 border-dashed border-app-border py-6 text-app-muted transition-all hover:border-emerald-200 hover:text-emerald-600"
         >
           <div
-            class="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm transition-transform group-hover:scale-110"
+            class="rounded-2xl border border-app-border p-3 text-app-text shadow-sm transition-transform group-hover:scale-110"
           >
             <Plus class="h-6 w-6" />
           </div>

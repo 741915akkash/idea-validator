@@ -1,8 +1,8 @@
 <template>
   <div class="mx-auto max-w-4xl px-6 py-16">
-    <h1 class="mb-4 text-5xl font-bold text-slate-900">Terms of Service</h1>
+    <h1 class="text-app-text mb-4 text-5xl font-bold">Terms of Service</h1>
 
-    <p class="mb-12 text-slate-500">Last updated: June 1, 2026</p>
+    <p class="text-app-muted mb-12">Last updated: June 1, 2026</p>
 
     <div class="prose prose-slate max-w-none">
       <h2>1. Description of Service</h2>

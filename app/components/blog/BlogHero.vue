@@ -70,12 +70,12 @@
   <section class="mx-auto max-w-3xl px-4 py-12 text-center">
     <!-- Heading -->
     <h1
-      class="mb-6 text-4xl font-bold leading-tight text-gray-900 md:text-5xl"
+      class="mb-6 text-4xl font-bold leading-tight text-app-text md:text-5xl"
       v-html="post.title.rendered"
     />
 
     <!-- Author + Date -->
-    <div class="mb-6 flex items-center justify-center gap-2 text-sm font-medium text-gray-500">
+    <div class="mb-6 flex items-center justify-center gap-2 text-sm font-medium text-app-muted">
       <span>{{ authorName }}</span>
       <span class="text-gray-300">•</span>
       <span>{{ postDate }}</span>
@@ -89,7 +89,7 @@
         :href="`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`"
         target="_blank"
         rel="noopener noreferrer"
-        class="p-2 text-gray-400 transition-colors hover:text-black"
+        class="p-2 text-app-muted transition-colors hover:text-black"
         title="Share on Twitter"
       >
         <Twitter :size="20" />
@@ -98,7 +98,7 @@
         :href="`https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`"
         target="_blank"
         rel="noopener noreferrer"
-        class="p-2 text-gray-400 transition-colors hover:text-black"
+        class="p-2 text-app-muted transition-colors hover:text-black"
         title="Share on LinkedIn"
       >
         <Linkedin :size="20" />
@@ -107,14 +107,14 @@
         :href="`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`"
         target="_blank"
         rel="noopener noreferrer"
-        class="p-2 text-gray-400 transition-colors hover:text-black"
+        class="p-2 text-app-muted transition-colors hover:text-black"
         title="Share on Facebook"
       >
         <Facebook :size="20" />
       </a>
       <button
         @click="copyLink"
-        class="relative p-2 text-gray-400 transition-colors hover:text-black"
+        class="relative p-2 text-app-muted transition-colors hover:text-black"
         title="Copy link"
       >
         <Check v-if="copied" :size="20" class="text-green-500" />
@@ -129,7 +129,7 @@
     </div>
 
     <!-- Excerpt -->
-    <p class="mx-auto mb-10 max-w-2xl text-xl leading-relaxed text-gray-600">
+    <p class="mx-auto mb-10 max-w-2xl text-xl leading-relaxed text-app-muted">
       {{ cleanExcerpt(post.excerpt.rendered) }}
     </p>
 

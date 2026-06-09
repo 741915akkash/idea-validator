@@ -114,10 +114,8 @@
     <!-- PRICING HEADER -->
     <div class="mx-auto max-w-3xl text-center">
       <h1 class="text-base font-semibold leading-7 text-emerald-600">Pricing</h1>
-      <h1 class="mt-2 text-4xl font-bold text-slate-900 sm:text-5xl">
-        Simple, transparent pricing
-      </h1>
-      <p class="mt-6 text-lg leading-8 text-slate-700">
+      <h1 class="mt-2 text-4xl font-bold text-app-text sm:text-5xl">Simple, transparent pricing</h1>
+      <p class="mt-6 text-lg leading-8 text-app-text">
         Choose the plan that's right for your stage. Whether you're just starting or scaling
         multiple ideas, we've got you covered.
       </p>
@@ -127,20 +125,20 @@
     <div class="mx-auto mt-16 grid max-w-md gap-8 lg:max-w-6xl lg:grid-cols-3">
       <!-- 1. FREE PLAN -->
       <div
-        class="flex flex-col justify-between rounded-3xl bg-white p-8 ring-1 ring-slate-200 transition-shadow duration-300 hover:shadow-lg xl:p-10"
+        class="flex flex-col justify-between rounded-3xl p-8 text-app-text ring-1 ring-slate-200 transition-shadow duration-300 hover:shadow-lg xl:p-10"
       >
         <div>
           <div class="flex items-center justify-between gap-x-4">
-            <h2 class="text-lg font-semibold leading-8 text-slate-900">Free</h2>
+            <h2 class="text-lg font-semibold leading-8 text-app-text">Free</h2>
           </div>
-          <p class="mt-4 text-sm leading-6 text-slate-600">
+          <p class="mt-4 text-sm leading-6 text-app-muted">
             Perfect for testing the waters and learning the framework.
           </p>
           <p class="mt-6 flex items-baseline gap-x-1">
-            <span class="text-4xl font-bold tracking-tight text-slate-900">$0</span>
-            <span class="text-sm font-semibold leading-6 text-slate-400">/forever</span>
+            <span class="text-4xl font-bold tracking-tight text-app-text">$0</span>
+            <span class="text-sm font-semibold leading-6 text-app-muted">/forever</span>
           </p>
-          <ul role="list" class="mt-8 space-y-3 text-sm leading-6 text-slate-600">
+          <ul role="list" class="mt-8 space-y-3 text-sm leading-6 text-app-muted">
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-600" aria-hidden="true" />
               2 active ideas + 3 archived ideas
@@ -165,7 +163,7 @@
         </div>
         <a
           href="#"
-          class="mt-8 block rounded-xl px-4 py-3 text-center text-base font-bold leading-6 text-slate-900 ring-2 ring-inset ring-slate-300 transition-all hover:bg-slate-50 hover:ring-slate-400"
+          class="mt-8 block rounded-xl px-4 py-3 text-center text-base font-bold leading-6 text-app-text ring-2 ring-inset ring-slate-300 transition-all hover:bg-app-card hover:ring-slate-400"
         >
           Get started for free
         </a>
@@ -173,13 +171,13 @@
 
       <!-- 2. GROWTH PLAN (With Internal Toggle) -->
       <div
-        class="relative flex flex-col justify-between rounded-3xl bg-white p-8 shadow-xl ring-1 ring-slate-200 transition-all duration-300 xl:p-10"
+        class="relative flex flex-col justify-between rounded-3xl p-8 text-app-text shadow-xl ring-1 ring-slate-200 transition-all duration-300 xl:p-10"
       >
         <div>
           <div class="flex items-center justify-between gap-x-4">
-            <h2 class="text-lg font-semibold leading-8 text-slate-900">Growth</h2>
+            <h2 class="text-lg font-semibold leading-8 text-app-text">Growth</h2>
           </div>
-          <p class="mt-2 text-sm leading-6 text-slate-600">
+          <p class="mt-2 text-sm leading-6 text-app-muted">
             Validate ideas faster with serious tools — not guesswork.
           </p>
 
@@ -193,7 +191,7 @@
                   :class="
                     billing === 'monthly'
                       ? 'bg-emerald-600 text-white shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
+                      : 'text-app-muted hover:text-app-text'
                   "
                 >
                   Monthly
@@ -204,7 +202,7 @@
                   :class="
                     billing === 'yearly'
                       ? 'bg-emerald-600 text-white shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
+                      : 'text-app-muted hover:text-app-text'
                   "
                 >
                   Yearly
@@ -222,21 +220,21 @@
           <div class="mt-6 h-20">
             <div v-if="billing === 'monthly'">
               <p class="flex items-baseline gap-x-1">
-                <span class="text-4xl font-bold tracking-tight text-slate-900">$9</span>
-                <span class="text-sm font-semibold leading-6 text-slate-400">/mo</span>
+                <span class="text-4xl font-bold tracking-tight text-app-text">$9</span>
+                <span class="text-sm font-semibold leading-6 text-app-muted">/mo</span>
               </p>
-              <p class="mt-1 text-xs text-slate-400">Billed monthly</p>
+              <p class="mt-1 text-xs text-app-muted">Billed monthly</p>
             </div>
             <div v-else>
               <p class="flex items-baseline gap-x-1">
-                <span class="text-4xl font-bold tracking-tight text-slate-900">$72</span>
-                <span class="text-sm font-semibold leading-6 text-slate-400">/year</span>
+                <span class="text-4xl font-bold tracking-tight text-app-text">$72</span>
+                <span class="text-sm font-semibold leading-6 text-app-muted">/year</span>
               </p>
               <p class="mt-1 text-sm font-bold text-emerald-600">$6/month billed yearly</p>
             </div>
           </div>
 
-          <ul role="list" class="mt-8 space-y-3 text-sm leading-6 text-slate-600">
+          <ul role="list" class="mt-8 space-y-3 text-sm leading-6 text-app-muted">
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-600" aria-hidden="true" />
               5 active ideas + 50 archived ideas
@@ -258,7 +256,7 @@
               CRM, Social lead finder, Market research agent included (when released)
             </li>
           </ul>
-          <p class="mt-5 text-sm font-medium text-slate-700">
+          <p class="mt-5 text-sm font-medium text-app-text">
             Everything you need to validate and move forward
           </p>
         </div>
@@ -275,7 +273,7 @@
         class="relative z-10 flex flex-col justify-between rounded-3xl bg-slate-900 p-8 shadow-2xl ring-4 ring-emerald-500 lg:scale-105 xl:p-10"
       >
         <div
-          class="absolute -top-4 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-emerald-500 px-4 py-1 text-xs font-bold uppercase tracking-wider text-white"
+          class="absolute -top-4 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-emerald-500/10 px-4 py-1 text-xs font-bold uppercase tracking-wider text-white"
         >
           🔥 Founder Pass
         </div>
@@ -290,20 +288,22 @@
               Limited Time Offer
             </span>
           </div>
-          <p class="mt-4 text-sm leading-6 text-slate-300">
+          <p class="mt-4 text-sm leading-6 text-app-muted">
             Lock in early access before plans evolve.
           </p>
           <div class="mt-6">
             <p class="flex items-baseline gap-x-1">
               <span class="text-5xl font-bold tracking-tight text-white">$99</span>
-              <span class="text-sm font-semibold leading-6 text-slate-400">/2 years</span>
+              <span class="text-sm font-semibold leading-6 text-app-muted">/2 years</span>
             </p>
             <p class="mt-2 text-lg font-bold text-emerald-400">$4.1/month billed once</p>
             <p class="mt-4 text-xl font-extrabold text-white">Better limits. Better access.</p>
-            <p class="mt-1 text-sm font-medium text-emerald-200">Generous limits on new features.</p>
+            <p class="mt-1 text-sm font-medium text-emerald-200">
+              Generous limits on new features.
+            </p>
           </div>
 
-          <ul role="list" class="mt-8 space-y-3 text-sm leading-6 text-slate-300">
+          <ul role="list" class="mt-8 space-y-3 text-sm leading-6 text-app-muted">
             <li class="flex gap-x-3">
               <Check class="h-6 w-5 flex-none text-emerald-400" aria-hidden="true" />
               5 active ideas + 100 archived ideas
@@ -341,7 +341,7 @@
         </div>
         <a
           href="#"
-          class="mt-8 block rounded-xl bg-emerald-500 px-4 py-3 text-center text-base font-extrabold leading-6 text-white shadow-sm transition-all hover:bg-emerald-400"
+          class="mt-8 block rounded-xl bg-emerald-500/10 px-4 py-3 text-center text-base font-extrabold leading-6 text-white shadow-sm transition-all hover:bg-emerald-400"
         >
           Lock Founder Pricing
         </a>
@@ -351,15 +351,15 @@
     <!-- COMPARISON TABLE -->
     <div class="mt-32">
       <div class="mb-12 text-center">
-        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+        <h2 class="text-3xl font-extrabold tracking-tight text-app-text sm:text-4xl">
           Compare features
         </h2>
-        <p class="mt-4 text-lg text-slate-700">
+        <p class="mt-4 text-lg text-app-text">
           A detailed breakdown of everything included in each plan.
         </p>
       </div>
 
-      <div class="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
+      <div class="overflow-x-auto rounded-3xl border border-app-border text-app-text shadow-sm">
         <table class="w-full min-w-[600px] table-fixed border-collapse text-left">
           <colgroup>
             <col class="w-2/5" />
@@ -368,28 +368,28 @@
             <col class="w-1/5" />
           </colgroup>
           <thead>
-            <tr class="bg-slate-50">
-              <th class="px-8 py-4 text-base font-bold tracking-tight text-slate-900 sm:px-16">
+            <tr class="bg-app-card">
+              <th class="px-8 py-4 text-base font-bold tracking-tight text-app-text sm:px-16">
                 Feature
               </th>
-              <th class="px-6 py-4 text-center text-base font-bold tracking-tight text-slate-900">
+              <th class="px-6 py-4 text-center text-base font-bold tracking-tight text-app-text">
                 Free
               </th>
-              <th class="px-6 py-4 text-center text-base font-bold tracking-tight text-slate-900">
+              <th class="px-6 py-4 text-center text-base font-bold tracking-tight text-app-text">
                 Growth
               </th>
-              <th class="px-6 py-4 text-center text-base font-bold tracking-tight text-slate-900">
+              <th class="px-6 py-4 text-center text-base font-bold tracking-tight text-app-text">
                 Founder
               </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
             <tr v-for="f in features" :key="f.name">
-              <td class="px-8 py-4 text-sm text-slate-700 sm:px-16">
+              <td class="px-8 py-4 text-sm text-app-text sm:px-16">
                 {{ f.name }}
                 <span
                   v-if="f.badge"
-                  class="ml-2 inline-flex items-center whitespace-nowrap rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold uppercase text-emerald-700 ring-1 ring-inset ring-emerald-600/20"
+                  class="ml-2 inline-flex items-center whitespace-nowrap rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold uppercase text-emerald-500 ring-1 ring-inset ring-emerald-600/20"
                 >
                   {{ f.badge }}
                 </span>
@@ -401,7 +401,11 @@
                 <template v-else-if="f.free === '❌'">
                   <X class="mx-auto h-5 w-5 text-rose-500" />
                 </template>
-                <span v-else class="text-sm font-medium leading-6 text-slate-800" :class="{ 'font-bold': f.isBold }">
+                <span
+                  v-else
+                  class="text-sm font-medium leading-6 text-app-text"
+                  :class="{ 'font-bold': f.isBold }"
+                >
                   {{ f.free }}
                 </span>
               </td>
@@ -412,7 +416,11 @@
                 <template v-else-if="f.growth === '❌'">
                   <X class="mx-auto h-5 w-5 text-rose-500" />
                 </template>
-                <span v-else class="text-sm font-medium leading-6 text-slate-900" :class="{ 'font-bold': f.isBold }">
+                <span
+                  v-else
+                  class="text-sm font-medium leading-6 text-app-text"
+                  :class="{ 'font-bold': f.isBold }"
+                >
                   {{ f.growth }}
                 </span>
               </td>
@@ -423,7 +431,11 @@
                 <template v-else-if="f.founder === '❌'">
                   <X class="mx-auto h-5 w-5 text-rose-500" />
                 </template>
-                <span v-else class="text-sm font-medium leading-6 text-slate-900" :class="{ 'font-bold': f.isBold }">
+                <span
+                  v-else
+                  class="text-sm font-medium leading-6 text-app-text"
+                  :class="{ 'font-bold': f.isBold }"
+                >
                   {{ f.founder }}
                 </span>
               </td>
@@ -435,24 +447,24 @@
 
     <!-- FAQ -->
     <div class="mx-auto mt-32 max-w-3xl">
-      <h2 class="mb-12 text-center text-3xl font-extrabold tracking-tight text-slate-900">
+      <h2 class="mb-12 text-center text-3xl font-extrabold tracking-tight text-app-text">
         Pricing FAQ
       </h2>
       <div class="space-y-4">
         <div
           v-for="(faq, index) in faqs"
           :key="index"
-          class="overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-200"
+          class="overflow-hidden rounded-2xl border border-app-border text-app-text transition-all duration-200"
         >
           <button
             @click="toggleFaq(index)"
             class="flex w-full items-center justify-between p-6 text-left"
           >
-            <span class="text-lg font-bold leading-7 text-slate-600">{{ faq.question }}</span>
-            <ChevronDown v-if="openFaq !== index" class="h-5 w-5 text-slate-400" />
-            <ChevronUp v-else class="h-5 w-5 text-slate-900" />
+            <span class="text-lg font-bold leading-7 text-app-muted">{{ faq.question }}</span>
+            <ChevronDown v-if="openFaq !== index" class="h-5 w-5 text-app-muted" />
+            <ChevronUp v-else class="h-5 w-5 text-app-text" />
           </button>
-          <div v-if="openFaq === index" class="px-6 pb-6 text-sm leading-relaxed text-slate-700">
+          <div v-if="openFaq === index" class="px-6 pb-6 text-sm leading-relaxed text-app-text">
             {{ faq.answer }}
           </div>
         </div>

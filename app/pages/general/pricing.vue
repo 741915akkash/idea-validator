@@ -19,16 +19,16 @@
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50/50 text-slate-900">
+  <div class="min-h-screen bg-app-bg text-app-text">
     <main class="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16 lg:py-24">
       <div class="mx-auto max-w-2xl text-center sm:max-w-3xl">
-        <h1 class="text-sm font-semibold text-emerald-600">Pricing</h1>
+        <h1 class="text-sm font-semibold text-emerald-500">Pricing</h1>
 
-        <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl">
+        <h2 class="mt-2 text-3xl font-bold text-app-text sm:text-4xl lg:text-5xl">
           Simple, transparent pricing
         </h2>
 
-        <p class="mt-4 text-base leading-relaxed text-slate-700 sm:mt-6 sm:text-lg">
+        <p class="mt-4 text-base leading-relaxed text-app-muted sm:mt-6 sm:text-lg">
           Choose the plan that's right for your stage. Whether you're just starting or scaling
           multiple ideas, we've got you covered.
         </p>
@@ -37,7 +37,7 @@
       <PricingCards v-model:billing="billing" />
 
       <!-- Mobile scroll hint -->
-      <p class="mb-4 mt-12 text-center text-sm text-slate-500 sm:hidden">
+      <p class="mb-4 mt-12 text-center text-sm text-app-muted sm:hidden">
         Swipe horizontally to compare →
       </p>
 

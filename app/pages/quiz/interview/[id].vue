@@ -63,7 +63,7 @@
 <template>
   <main>
     <!-- Loading State -->
-    <div v-if="loading" class="mx-auto max-w-4xl px-6 py-12 text-sm text-neutral-600">
+    <div v-if="loading" class="mx-auto max-w-4xl px-6 py-12 text-sm text-app-muted">
       Loading interview…
     </div>
 

@@ -14,31 +14,31 @@
       v-if="open"
       @touchstart="handleTouchStart"
       @touchend="handleTouchEnd"
-      class="fixed inset-0 z-50 flex h-[100dvh] w-full flex-col bg-white sm:left-auto sm:right-0 sm:w-full sm:max-w-md sm:border-l sm:border-gray-200 sm:shadow-2xl"
+      class="fixed inset-0 z-50 flex h-[100dvh] w-full flex-col bg-app-bg text-app-text sm:left-auto sm:right-0 sm:w-full sm:max-w-md sm:border-l sm:border-app-border sm:shadow-2xl"
     >
       <!-- MOBILE HANDLE -->
       <div class="mt-5 flex justify-center sm:hidden">
-        <div class="h-1.5 w-12 rounded-full bg-gray-300" />
+        <div class="h-1.5 w-12 rounded-full bg-app-border" />
       </div>
 
       <!-- HEADER -->
-      <div class="sticky top-0 z-10 border-b border-gray-100 bg-white px-5 py-4 sm:px-6">
+      <div class="sticky top-0 z-10 bg-app-card border-b border-app-border px-5 py-4 text-app-text sm:px-6">
         <div class="flex items-start justify-between gap-4">
           <div class="min-w-0">
             <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-600">Help</p>
 
-            <h2 class="mt-1 text-2xl font-bold text-gray-900">
+            <h2 class="mt-1 text-2xl font-bold text-app-text">
               {{ content.title }}
             </h2>
 
-            <p v-if="content.subtitle" class="mt-2 text-sm leading-relaxed text-gray-500">
+            <p v-if="content.subtitle" class="mt-2 text-sm leading-relaxed text-app-muted">
               {{ content.subtitle }}
             </p>
           </div>
 
           <!-- CLOSE -->
           <button
-            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-app-muted transition hover:bg-app-hover hover:text-app-text"
             @click="$emit('close')"
           >
             <X class="h-5 w-5" />
@@ -47,21 +47,21 @@
       </div>
 
       <!-- CONTENT -->
-      <div class="flex-1 overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
+      <div class="flex-1 overflow-y-auto bg-app-card px-5 py-5 sm:px-6 sm:py-6">
         <!-- PURPOSE -->
         <details
           v-if="content.purpose"
           open
-          class="group mb-4 overflow-hidden rounded-2xl border border-gray-200 bg-white"
+          class="group mb-4 overflow-hidden rounded-2xl border border-app-border text-app-text"
         >
           <summary class="flex cursor-pointer list-none items-center justify-between px-5 py-4">
-            <span class="text-sm font-bold uppercase tracking-wide text-gray-500"> Purpose </span>
+            <span class="text-sm font-bold uppercase tracking-wide text-app-muted"> Purpose </span>
 
-            <ChevronDown class="h-4 w-4 text-gray-400 transition group-open:rotate-180" />
+            <ChevronDown class="h-4 w-4 text-app-muted transition group-open:rotate-180" />
           </summary>
 
-          <div class="border-t border-gray-100 px-5 py-4">
-            <p class="whitespace-pre-line text-sm leading-6 text-slate-700">
+          <div class="border-t border-app-border px-5 py-4">
+            <p class="whitespace-pre-line text-sm leading-6 text-app-text">
               {{ content.purpose }}
             </p>
           </div>
@@ -72,35 +72,35 @@
         <button
           v-if="content.workflow"
           type="button"
-          class="mb-4 flex w-full items-center justify-between rounded-2xl border border-gray-200 bg-white px-5 py-4 text-left transition hover:border-emerald-200 hover:bg-emerald-50"
+          class="mb-4 flex w-full items-center justify-between rounded-2xl border border-app-border px-5 py-4 text-left text-app-text transition hover:border-emerald-500/30 hover:bg-emerald-500/10"
           @click="showWorkflowModal = true"
         >
           <div>
-            <div class="text-sm font-bold uppercase tracking-wide text-gray-500">Workflow</div>
+            <div class="text-sm font-bold uppercase tracking-wide text-app-muted">Workflow</div>
 
-            <div class="mt-1 text-sm text-gray-600">View validation flow diagram</div>
+            <div class="mt-1 text-sm text-app-muted">View validation flow diagram</div>
           </div>
 
-          <ChevronRight class="h-5 w-5 text-gray-400" />
+          <ChevronRight class="h-5 w-5 text-app-muted" />
         </button>
 
         <!-- STEPS -->
         <details
           v-if="content.steps?.length"
           open
-          class="group mb-4 overflow-hidden rounded-2xl border border-gray-200 bg-white"
+          class="group mb-4 overflow-hidden rounded-2xl border border-app-border text-app-text"
         >
           <summary class="flex cursor-pointer list-none items-center justify-between px-5 py-4">
-            <span class="text-sm font-bold uppercase tracking-wide text-gray-500"> Steps </span>
+            <span class="text-sm font-bold uppercase tracking-wide text-app-muted"> Steps </span>
 
-            <ChevronDown class="h-4 w-4 text-gray-400 transition group-open:rotate-180" />
+            <ChevronDown class="h-4 w-4 text-app-muted transition group-open:rotate-180" />
           </summary>
 
-          <div class="space-y-3 border-t border-gray-100 px-5 py-4">
+          <div class="space-y-3 border-t border-app-border px-5 py-4">
             <div
               v-for="(step, index) in content.steps"
               :key="index"
-              class="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4"
+              class="flex items-start gap-3 rounded-2xl border border-app-border bg-app-card p-4"
             >
               <div
                 class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-[10px] font-semibold text-white"
@@ -108,7 +108,7 @@
                 {{ index + 1 }}
               </div>
 
-              <p class="text-sm leading-6 text-slate-700">
+              <p class="text-sm leading-6 text-app-text">
                 {{ step }}
               </p>
             </div>
@@ -119,23 +119,23 @@
         <details
           v-if="content.bestPractices?.length"
           open
-          class="group mb-4 overflow-hidden rounded-2xl border border-gray-200 bg-white"
+          class="group mb-4 overflow-hidden rounded-2xl border border-app-border text-app-text"
         >
           <summary class="flex cursor-pointer list-none items-center justify-between px-5 py-4">
-            <span class="text-sm font-bold uppercase tracking-wide text-gray-500">
+            <span class="text-sm font-bold uppercase tracking-wide text-app-muted">
               Best Practices
             </span>
 
-            <ChevronDown class="h-4 w-4 text-gray-400 transition group-open:rotate-180" />
+            <ChevronDown class="h-4 w-4 text-app-muted transition group-open:rotate-180" />
           </summary>
 
-          <div class="space-y-3 border-t border-gray-100 px-5 py-4">
+          <div class="space-y-3 border-t border-app-border px-5 py-4">
             <div
               v-for="(tip, index) in content.bestPractices"
               :key="index"
-              class="rounded-2xl border border-gray-100 bg-gray-50 p-4"
+              class="rounded-2xl border border-app-border bg-app-panel p-4"
             >
-              <p class="whitespace-pre-line text-sm leading-6 text-slate-700">
+              <p class="whitespace-pre-line text-sm leading-6 text-app-text">
                 {{ tip }}
               </p>
             </div>
@@ -146,22 +146,22 @@
         <details
           v-if="relatedItems.length"
           open
-          class="group overflow-hidden rounded-2xl border border-gray-200 bg-white"
+          class="group overflow-hidden rounded-2xl border border-app-border text-app-text"
         >
           <summary class="flex cursor-pointer list-none items-center justify-between px-5 py-4">
-            <span class="text-sm font-bold uppercase tracking-wide text-gray-500">
+            <span class="text-sm font-bold uppercase tracking-wide text-app-muted">
               Related Features
             </span>
 
-            <ChevronDown class="h-4 w-4 text-gray-400 transition group-open:rotate-180" />
+            <ChevronDown class="h-4 w-4 text-app-muted transition group-open:rotate-180" />
           </summary>
 
-          <div class="flex flex-wrap gap-2 border-t border-gray-100 px-5 py-4">
+          <div class="flex flex-wrap gap-2 border-t border-app-border px-5 py-4">
             <template v-for="item in relatedItems" :key="`${item.label}-${item.to || 'static'}`">
               <NuxtLink
                 v-if="item.to"
                 :to="item.to"
-                class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
+                class="rounded-xl border border-app-border px-3 py-2 text-sm font-medium text-app-text transition hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-500"
                 @click="emit('close')"
               >
                 {{ item.label }}
@@ -170,7 +170,7 @@
               <button
                 v-else
                 type="button"
-                class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
+                class="rounded-xl border border-app-border px-3 py-2 text-sm font-medium text-app-text transition hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-500"
               >
                 {{ item.label }}
               </button>
@@ -187,20 +187,20 @@
           @click.self="showWorkflowModal = false"
         >
           <div
-            class="relative flex w-fit max-w-[95vw] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl"
+            class="relative flex w-fit max-w-[95vw] flex-col overflow-hidden rounded-3xl border border-app-border bg-app-panel text-app-text shadow-2xl"
           >
             <!-- HEADER -->
-            <div class="flex items-center justify-between border-b border-gray-100 px-6 py-5">
+            <div class="flex items-center justify-between border-b border-app-border px-6 py-5">
               <div>
                 <div class="text-xs font-bold uppercase tracking-[0.2em] text-emerald-600">
                   Workflow
                 </div>
 
-                <h3 class="mt-1 text-2xl font-bold text-gray-900">{{ content.title }} Flow</h3>
+                <h3 class="mt-1 text-2xl font-bold text-app-text">{{ content.title }} Flow</h3>
               </div>
 
               <button
-                class="flex h-11 w-11 items-center justify-center rounded-xl text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                class="flex h-11 w-11 items-center justify-center rounded-xl text-app-muted transition hover:bg-app-hover hover:text-app-muted"
                 @click="showWorkflowModal = false"
               >
                 <X class="h-5 w-5" />
@@ -208,7 +208,7 @@
             </div>
 
             <!-- CONTENT -->
-            <div class="max-h-[85vh] overflow-y-auto overflow-x-hidden bg-slate-50 px-10 py-12">
+            <div class="max-h-[85vh] overflow-y-auto overflow-x-hidden bg-app-card px-10 py-12">
               <WorkflowDiagram :workflow="content.workflow" />
             </div>
           </div>

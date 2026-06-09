@@ -2,7 +2,7 @@
   <section id="stages-section" class="relative overflow-hidden bg-slate-900 px-6 py-20 text-white">
     <!-- Background glow -->
     <div
-      class="pointer-events-none absolute left-1/4 top-0 h-[500px] w-[500px] rounded-full bg-emerald-500/10 blur-[120px]"
+      class="bg-emerald-500/10/10 pointer-events-none absolute left-1/4 top-0 h-[500px] w-[500px] rounded-full blur-[120px]"
     />
 
     <div class="relative mx-auto max-w-4xl">
@@ -16,7 +16,7 @@
         <div
           v-for="(item, i) in stages"
           :key="i"
-          class="rounded-2xl border border-slate-800 bg-slate-800/40 p-5 backdrop-blur-sm transition-colors hover:border-slate-700"
+          class="rounded-2xl border border-app-border bg-slate-800/40 p-5 backdrop-blur-sm transition-colors hover:border-app-border"
         >
           <div class="mb-2 text-sm font-semibold uppercase tracking-wide text-emerald-400">
             {{ item.stage }}
@@ -26,7 +26,7 @@
             {{ item.title }}
           </h3>
 
-          <p class="text-sm leading-relaxed text-slate-400">
+          <p class="text-sm leading-relaxed text-app-muted">
             {{ item.desc }}
           </p>
         </div>

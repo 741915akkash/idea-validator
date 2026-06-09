@@ -74,14 +74,14 @@
     const status = getResponse(interviewId, conditionId)?.status
     if (status === 'met') return { label: 'Met', className: 'bg-emerald-100 text-emerald-800' }
     if (status === 'failed') return { label: 'Not Met', className: 'bg-red-100 text-red-800' }
-    return { label: 'Pending', className: 'bg-neutral-100 text-neutral-700' }
+    return { label: 'Pending', className: 'bg-app-hover text-app-muted' }
   }
 
   function matrixCell(interviewId, conditionId) {
     const status = getResponse(interviewId, conditionId)?.status
 
     if (status === 'met') {
-      return { hasStatus: true, dotClass: 'bg-emerald-500' }
+      return { hasStatus: true, dotClass: 'bg-emerald-500/10' }
     }
 
     if (status === 'failed') {
@@ -130,7 +130,7 @@
 
       if (total >= 6) {
         confidenceLabel = 'High'
-        confidenceTone = 'text-emerald-700'
+        confidenceTone = 'text-emerald-500'
       } else if (total >= 3) {
         confidenceLabel = 'Medium'
         confidenceTone = 'text-amber-700'
@@ -170,7 +170,7 @@
       return {
         icon: '✔',
         title: 'VALIDATED',
-        className: 'border-emerald-200 bg-emerald-50 text-emerald-900'
+        className: 'border-emerald-200 bg-emerald-500/10 text-emerald-900'
       }
     }
 
@@ -205,7 +205,7 @@
     <!-- LOADING -->
     <div
       v-if="loading"
-      class="rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-sm text-neutral-600"
+      class="rounded-lg border border-app-border bg-app-hover p-4 text-sm text-app-muted"
     >
       Loading analytics...
     </div>
@@ -219,10 +219,11 @@
     </div>
 
     <!-- SELECTED SUB UNCERTAINTY -->
-    <div v-else-if="subUncertainty" class="rounded-lg border border-emerald-100 bg-emerald-50 p-5">
-      <div class="text-xs font-medium uppercase text-emerald-700">
-        Selected Sub-uncertainty
-      </div>
+    <div
+      v-else-if="subUncertainty"
+      class="rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-5"
+    >
+      <div class="text-xs font-medium uppercase text-emerald-500">Selected Sub-uncertainty</div>
 
       <div class="mt-1 text-lg font-semibold text-emerald-900">
         {{ subUncertainty.title }}
@@ -233,11 +234,7 @@
       </div>
     </div>
 
-    <div
-      v-if="!loading && !loadError"
-      class="rounded-lg border p-5"
-      :class="verdict.className"
-    >
+    <div v-if="!loading && !loadError" class="rounded-lg border p-5" :class="verdict.className">
       <div class="text-xs font-medium uppercase">Hypothesis Verdict</div>
       <div class="mt-2 text-2xl font-semibold">{{ verdict.icon }} {{ verdict.title }}</div>
       <div class="mt-2 text-sm">
@@ -248,32 +245,32 @@
     </div>
 
     <!-- CONDITION STRENGTH -->
-    <div v-if="!loading && !loadError" class="rounded-lg border bg-white p-6 shadow-sm">
+    <div v-if="!loading && !loadError" class="rounded-lg border p-6 text-app-text shadow-sm">
       <h2 class="mb-5 text-lg font-semibold">Condition Strength</h2>
 
       <div class="space-y-4">
         <div v-for="c in conditionStats" :key="c.id">
           <div class="mb-1 flex justify-between text-sm font-medium">
             <span>{{ c.description }}</span>
-            <span class="text-emerald-700">{{ c.percent }}%</span>
+            <span class="text-emerald-500">{{ c.percent }}%</span>
           </div>
 
           <div class="h-2 w-full rounded-full bg-neutral-200">
             <div
-              class="h-2 rounded-full bg-emerald-500 transition-all"
+              class="h-2 rounded-full bg-emerald-500/10 transition-all"
               :style="{ width: c.percent + '%' }"
             />
           </div>
 
-          <div class="mt-1 text-xs text-neutral-500">
+          <div class="mt-1 text-xs text-app-muted">
             {{ c.met }}/{{ totalInterviews }} interviews
           </div>
 
           <div class="mt-1 text-xs">
-            <span class="text-neutral-500">Confidence:</span>
+            <span class="text-app-muted">Confidence:</span>
             <span class="ml-1 font-medium" :class="c.confidenceTone">
               {{ c.confidenceLabel }}
-              <span v-if="c.confidenceLabel !== 'High'" class="font-normal text-neutral-500">
+              <span v-if="c.confidenceLabel !== 'High'" class="font-normal text-app-muted">
                 ({{ c.total }} interview{{ c.total === 1 ? '' : 's' }})
               </span>
             </span>
@@ -283,21 +280,21 @@
     </div>
 
     <!-- MATRIX -->
-    <div v-if="!loading && !loadError" class="rounded-lg border bg-white shadow-sm">
+    <div v-if="!loading && !loadError" class="rounded-lg border text-app-text shadow-sm">
       <div class="border-b px-6 py-4">
         <h2 class="text-lg font-semibold">Interview Matrix</h2>
       </div>
 
       <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
-          <thead class="bg-neutral-50">
+          <thead class="bg-app-hover">
             <tr>
-              <th class="px-6 py-3 text-left font-medium text-neutral-600">Interview</th>
+              <th class="px-6 py-3 text-left font-medium text-app-muted">Interview</th>
 
               <th
                 v-for="condition in conditions"
                 :key="condition.id"
-                class="px-6 py-3 text-left font-medium text-neutral-600"
+                class="px-6 py-3 text-left font-medium text-app-muted"
               >
                 {{ condition.description }}
               </th>
@@ -309,12 +306,14 @@
               v-for="interview in interviews"
               :key="interview.id"
               @click="selectInterview(interview)"
-              class="cursor-pointer hover:bg-neutral-50"
+              class="cursor-pointer hover:bg-app-hover"
             >
-              <td class="px-6 py-3 font-medium text-neutral-900">
+              <td class="px-6 py-3 font-medium text-app-text">
                 <div>{{ interview.respondent_info || 'Interview' }}</div>
-                <div class="mt-0.5 text-xs font-normal text-neutral-500">
-                  {{ interview.started_at ? new Date(interview.started_at).toLocaleDateString() : '' }}
+                <div class="mt-0.5 text-xs font-normal text-app-muted">
+                  {{
+                    interview.started_at ? new Date(interview.started_at).toLocaleDateString() : ''
+                  }}
                 </div>
               </td>
 
@@ -340,14 +339,14 @@
                 </div>
 
                 <div
-                  class="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden w-64 -translate-x-1/2 rounded-md border border-neutral-200 bg-white p-3 text-left text-xs text-neutral-700 shadow-lg group-hover:block"
+                  class="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden w-64 -translate-x-1/2 rounded-md border border-app-border p-3 text-left text-xs text-app-muted text-app-text shadow-lg group-hover:block"
                 >
-                  <div class="font-semibold text-neutral-900">Notes:</div>
+                  <div class="font-semibold text-app-text">Notes:</div>
                   <div class="mb-2 mt-0.5 whitespace-pre-wrap break-words">
                     {{ matrixPreview(interview.id, condition.id).notes }}
                   </div>
 
-                  <div class="font-semibold text-neutral-900">Evidence:</div>
+                  <div class="font-semibold text-app-text">Evidence:</div>
                   <div class="mt-0.5 whitespace-pre-wrap break-words">
                     {{ matrixPreview(interview.id, condition.id).evidence }}
                   </div>
@@ -358,19 +357,19 @@
         </table>
       </div>
 
-      <div class="border-t px-6 py-3 text-xs text-neutral-600">
+      <div class="border-t px-6 py-3 text-xs text-app-muted">
         <span class="mr-4 inline-flex items-center gap-1">
-          <span class="inline-block h-3 w-3 rounded-full bg-emerald-500" /> met
+          <span class="inline-block h-3 w-3 rounded-full bg-emerald-500/10" /> met
         </span>
         <span class="mr-4 inline-flex items-center gap-1">
           <span class="inline-block h-3 w-3 rounded-full bg-red-500" /> failed
         </span>
-        <span class="font-mono text-neutral-500">- = missing</span>
+        <span class="font-mono text-app-muted">- = missing</span>
       </div>
     </div>
 
     <!-- INTERVIEW DETAIL -->
-    <div v-if="selectedInterview" class="rounded-lg border bg-white p-6 shadow-sm">
+    <div v-if="selectedInterview" class="rounded-lg border p-6 text-app-text shadow-sm">
       <h2 class="mb-4 text-lg font-semibold">Interview Detail</h2>
 
       <div class="space-y-5">
@@ -392,12 +391,12 @@
             </span>
           </div>
 
-          <div class="mt-2 text-sm text-neutral-600">
+          <div class="mt-2 text-sm text-app-muted">
             {{ getResponse(selectedInterview.id, condition.id)?.notes || 'No notes' }}
           </div>
 
-          <div class="mt-1 text-sm text-neutral-600">
-            <span class="font-medium text-neutral-700">Evidence:</span>
+          <div class="mt-1 text-sm text-app-muted">
+            <span class="font-medium text-app-muted">Evidence:</span>
             {{ getResponse(selectedInterview.id, condition.id)?.evidence_log || 'No evidence' }}
           </div>
         </div>

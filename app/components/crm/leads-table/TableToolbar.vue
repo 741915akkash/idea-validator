@@ -335,12 +335,12 @@
     <div class="flex w-full items-center gap-2">
       <!-- LEFT CONTROLS -->
       <div
-        class="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white p-1 shadow-sm"
+        class="flex items-center gap-1.5 rounded-lg border border-app-border bg-app-panel p-1 text-app-text"
       >
         <input
           type="text"
           placeholder="Search name, email, company, phone, activities..."
-          class="w-72 rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 placeholder:text-gray-400 focus:border-emerald-500 focus:outline-none"
+          class="w-72 rounded-md border border-app-border bg-app-card px-3 py-1.5 text-sm text-app-text placeholder:text-app-muted focus:border-emerald-500 focus:outline-none"
           :value="props.table.getState().globalFilter ?? ''"
           @input="props.table.setGlobalFilter($event.target.value)"
         />
@@ -349,7 +349,7 @@
         <div ref="filterMenuRef" class="relative" @click.stop>
           <button
             ref="filterButtonRef"
-            class="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+            class="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-app-muted transition-colors hover:bg-app-hover hover:text-app-text"
             @click="openFilterMenu"
           >
             <Filter class="h-4 w-4" />
@@ -361,7 +361,7 @@
         <div ref="viewMenuRef" class="relative" @click.stop>
           <button
             ref="viewButtonRef"
-            class="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+            class="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-app-muted transition-colors hover:bg-app-hover hover:text-app-text"
             @click="
               () => {
                 showColumns = !showColumns
@@ -382,7 +382,7 @@
         <button
           @click="props.table.resetSorting()"
           title="Reset Sorting"
-          class="rounded-md p-1.5 text-gray-400 transition-all hover:bg-gray-50 hover:text-emerald-600"
+          class="rounded-md p-1.5 text-app-muted transition-all hover:bg-app-hover hover:text-app-text hover:text-emerald-600"
         >
           <RotateCcw class="h-4 w-4" />
         </button>
@@ -390,7 +390,7 @@
 
       <!-- ADD BUTTON -->
       <button
-        class="ml-auto flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-1.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition-all hover:bg-emerald-700"
+        class="ml-auto flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-1.5 text-sm font-bold text-white transition-all hover:bg-emerald-700"
         @click="openModal"
       >
         <Plus class="h-4 w-4" />
@@ -402,21 +402,21 @@
       <span
         v-for="pill in selectedFilterPills"
         :key="`${pill.id}-${pill.value}`"
-        class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700"
+        class="inline-flex items-center gap-1.5 rounded-full border border-app-border bg-app-card px-2.5 py-1 text-xs font-medium text-app-text"
       >
         <span
           >{{ pill.label }}:
           {{ pill.id === 'created_at' ? formatFilterOption(pill.value) : pill.value }}</span
         >
         <button
-          class="text-gray-400 transition-colors hover:text-gray-700"
+          class="text-app-muted transition-colors hover:text-app-text"
           @click="removeFilterPill(pill)"
         >
           ×
         </button>
       </span>
       <button
-        class="inline-flex items-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+        class="inline-flex items-center rounded-full border border-app-border px-3 py-1 text-xs font-semibold text-app-text transition-colors hover:bg-app-hover hover:text-app-text"
         @click="clearAllFilters"
       >
         Clear all
@@ -438,31 +438,31 @@
           v-if="showFilters"
           ref="filterPanelRef"
           :style="filterDropdownStyle"
-          class="w-64 rounded-xl border border-gray-200 bg-white p-2 shadow-xl ring-1 ring-black ring-opacity-5"
+          class="w-64 rounded-xl border border-app-border bg-app-panel p-2 text-app-text shadow-xl ring-1 ring-black ring-opacity-5"
           @click.stop
         >
           <template v-if="!activeFilterType">
-            <div class="mb-2 rounded-lg px-3 py-2 text-sm font-semibold text-gray-700">
+            <div class="mb-2 rounded-lg px-3 py-2 text-sm font-semibold text-app-muted">
               Add Filter
             </div>
 
             <button
               v-for="item in filterTypes"
               :key="item.id"
-              class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+              class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-app-muted transition-colors hover:bg-app-hover hover:text-app-text"
               @click="openFilterType(item.id)"
             >
               <span>{{ item.label }}</span>
-              <ChevronRight class="h-4 w-4 text-gray-400" />
+              <ChevronRight class="h-4 w-4 text-app-muted" />
             </button>
           </template>
 
           <template v-else>
             <button
-              class="mb-2 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+              class="mb-2 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm font-semibold text-app-muted hover:bg-app-hover hover:text-app-text"
               @click="backToFilterList"
             >
-              <ChevronLeft class="h-4 w-4 text-gray-500" />
+              <ChevronLeft class="h-4 w-4 text-app-muted" />
               <span>{{ activeFilterLabel }}</span>
             </button>
 
@@ -470,11 +470,11 @@
               <label
                 v-for="option in activeFilterOptions"
                 :key="option"
-                class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+                class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm text-app-muted hover:bg-app-hover hover:text-app-text"
               >
                 <input
                   type="checkbox"
-                  class="h-4 w-4 rounded border-gray-300 text-emerald-600"
+                  class="h-4 w-4 rounded border-app-border text-emerald-600"
                   :checked="isOptionSelected(option)"
                   @change="toggleOption(option, $event.target.checked)"
                 />
@@ -499,10 +499,10 @@
           v-if="showColumns"
           ref="viewPanelRef"
           :style="viewDropdownStyle"
-          class="w-56 rounded-xl border border-gray-200 bg-white p-3 shadow-xl ring-1 ring-black ring-opacity-5"
+          class="w-56 rounded-xl bg-app-panel border border-app-border p-3 text-app-text shadow-xl ring-1 ring-black ring-opacity-5"
           @click.stop
         >
-          <h3 class="mb-3 px-1 text-xs font-bold uppercase tracking-widest text-gray-400">
+          <h3 class="mb-3 px-1 text-xs font-bold uppercase tracking-widest text-app-muted">
             Display Columns
           </h3>
 
@@ -510,18 +510,18 @@
             <label
               v-for="column in props.table.getAllLeafColumns()"
               :key="column.id"
-              class="group flex cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5 transition-colors hover:bg-gray-50"
+              class="group flex cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5 transition-colors hover:bg-app-hover hover:text-app-text"
             >
               <input
                 type="checkbox"
                 :checked="column.getIsVisible()"
                 :disabled="!column.getCanHide()"
                 @change="column.toggleVisibility($event.target.checked)"
-                class="h-4 w-4 cursor-pointer rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                class="h-4 w-4 cursor-pointer rounded border-app-border text-emerald-600 focus:ring-emerald-500"
               />
 
               <span
-                class="text-sm font-medium text-gray-700 transition-colors group-hover:text-emerald-600"
+                class="text-sm font-medium text-app-muted transition-colors group-hover:text-emerald-500"
               >
                 {{ labelFor(column) }}
               </span>
@@ -529,7 +529,7 @@
           </div>
 
           <div
-            class="mt-3 border-t border-gray-100 pt-3 text-center text-[10px] italic text-gray-400"
+            class="mt-3 border-t border-app-border pt-3 text-center text-[10px] italic text-app-muted"
           >
             Changes auto-save to browser
           </div>

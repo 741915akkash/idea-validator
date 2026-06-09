@@ -249,7 +249,10 @@
   const filteredNotes = computed(() => {
     const useServerSearch = !!searchQuery.value?.trim()
     let result = [...(useServerSearch ? searchResults.value : notes.value)]
-    const normalize = (value) => String(value || '').trim().toLowerCase()
+    const normalize = (value) =>
+      String(value || '')
+        .trim()
+        .toLowerCase()
 
     // SEARCH (fallback local filtering when server search not active)
     if (!useServerSearch && searchQuery.value?.trim()) {
@@ -392,7 +395,6 @@
   const handleQuickCaptureShortcut = () => {
     showQuickCapture.value = true
   }
-
 </script>
 
 <template>
@@ -416,7 +418,9 @@
       <!-- LEFT MAIN AREA -->
       <div class="min-w-0 overflow-hidden">
         <!-- CENTERED CONTENT -->
-        <div class="ml-auto mr-4 flex h-full w-full max-w-4xl flex-col overflow-hidden max-xl:max-w-none">
+        <div
+          class="ml-auto mr-4 flex h-full w-full max-w-3xl flex-col overflow-hidden max-xl:max-w-none"
+        >
           <!-- NORMAL BROWSE MODE -->
           <div
             v-if="!isSearchActive"
@@ -425,10 +429,10 @@
             @scroll="handleFeedScroll"
           >
             <!-- HEADER CARD -->
-            <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+            <div class="mb-6 rounded-lg border border-app-border bg-app-panel px-6 py-5">
               <div class="flex items-start justify-between gap-4">
                 <div>
-                  <h1 class="text-2xl font-semibold tracking-tight text-slate-900">
+                  <h1 class="text-2xl font-semibold tracking-tight text-app-text">
                     Knowledge Base
                   </h1>
 
@@ -455,7 +459,7 @@
               "
             >
               <div
-                class="rounded-2xl border border-slate-200 bg-gray-100 px-3 py-2 shadow-sm backdrop-blur-md"
+                class="rounded-2xl border border-app-border border-app-panel px-3 py-2 shadow-sm backdrop-blur-md"
               >
                 <SearchBar
                   ref="headerRef"
@@ -484,13 +488,13 @@
               class="fixed left-[max(17rem,calc(50%-28rem))] right-[404px] top-4 z-30 max-w-5xl transition-all duration-200 max-md:left-4 max-md:right-4"
             >
               <div
-                class="rounded-3xl border border-slate-200 bg-gray-100 px-3 py-2 shadow-sm backdrop-blur-md"
+                class="rounded-3xl border border-app-border border-app-panel px-3 py-2 shadow-sm backdrop-blur-md"
               >
                 <div class="flex items-center gap-3">
                   <!-- FILTER -->
                   <button
                     @click="isSidebarOpen = !isSidebarOpen"
-                    class="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm transition-all hover:border-emerald-200 hover:text-emerald-700"
+                    class="inline-flex shrink-0 items-center gap-2 rounded-full border border-app-border bg-app-panel px-4 py-3 text-sm font-medium text-app-muted shadow-sm transition-all hover:border-emerald-200 hover:text-emerald-500"
                   >
                     <Filter class="h-4 w-4" />
                     <span class="hidden md:inline"> Filters </span>
@@ -504,11 +508,15 @@
                       v-model:activeScope="activeScope"
                       :scopes="scopes"
                     />
-                    <p class="mt-2 hidden text-xs text-slate-500 md:block">
-                      Hint: Press <kbd class="rounded border border-slate-300 bg-white px-1.5 py-0.5 text-[11px]">Esc</kbd>
+                    <p class="mt-2 hidden text-xs text-app-muted md:block">
+                      Hint: Press
+                      <kbd
+                        class="rounded border border-app-border bg-app-panel px-1.5 py-0.5 text-[11px]"
+                        >Esc</kbd
+                      >
                       to return to normal mode.
                     </p>
-                    <p class="mt-2 text-xs text-slate-500 md:hidden">
+                    <p class="mt-2 text-xs text-app-muted md:hidden">
                       Hint: Use your phone back button to clear search and return to normal mode.
                     </p>
                   </div>
@@ -532,7 +540,7 @@
       </div>
 
       <!-- RIGHT DRAWER AREA -->
-      <div class="relative hidden h-full bg-white md:block">
+      <div class="relative hidden h-full bg-app-bg md:block">
         <div class="fixed right-0 top-0 flex h-screen w-[clamp(280px,28vw,380px)] items-center p-6">
           <NoteDetailsDrawer
             :note="selectedNote"
@@ -560,7 +568,7 @@
         @click.self="selectedNote = null"
       >
         <div
-          class="max-h-[92vh] w-full overflow-hidden overscroll-contain rounded-t-[28px] bg-white"
+          class="max-h-[92vh] w-full overflow-hidden overscroll-contain rounded-t-[28px] bg-app-panel"
           @touchstart="handleTouchStart"
           @touchmove="handleTouchMove"
           @touchend="handleDrawerClose"
@@ -596,7 +604,7 @@
         @click.self="isSidebarOpen = false"
       >
         <div
-          class="max-h-[88vh] w-full overflow-hidden overscroll-contain rounded-t-[28px] bg-white"
+          class="max-h-[88vh] w-full overflow-hidden overscroll-contain rounded-t-[28px] bg-app-panel"
           @touchstart="handleTouchStart"
           @touchmove="handleTouchMove"
           @touchend="handleFilterClose"
@@ -607,13 +615,13 @@
           </div>
 
           <!-- HEADER -->
-          <div class="border-b border-slate-100 px-5 pb-4">
+          <div class="border-b border-app-border px-5 pb-4">
             <div class="flex items-center justify-between">
-              <h2 class="text-lg font-semibold text-slate-900">Filters</h2>
+              <h2 class="text-lg font-semibold text-app-text">Filters</h2>
 
               <button
                 @click="isSidebarOpen = false"
-                class="rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                class="hover: rounded-xl p-2 text-app-muted text-app-text transition hover:bg-app-hover"
               >
                 <X class="h-5 w-5" />
               </button>

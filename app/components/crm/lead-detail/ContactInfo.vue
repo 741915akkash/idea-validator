@@ -11,16 +11,16 @@
 </script>
 
 <template>
-  <div class="border-t border-gray-50 bg-white p-6">
+  <div class="border-t border-app-border p-6 text-app-text">
     <h3
-      class="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400"
+      class="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-app-muted"
     >
       <Building2 class="h-3 w-3" /> Contact Info
     </h3>
     <div class="space-y-4">
       <!-- Email -->
       <div class="group flex items-center">
-        <span class="w-24 shrink-0 text-[11px] font-bold uppercase tracking-wider text-gray-400"
+        <span class="w-24 shrink-0 text-[11px] font-bold uppercase tracking-wider text-app-muted"
           >Email</span
         >
         <div class="min-w-0 flex-1">
@@ -31,12 +31,12 @@
             @input="$emit('update-value', $event.target.value)"
             @blur="$emit('save-edit')"
             @keyup.enter="$emit('save-edit')"
-            class="w-full border-b border-emerald-500 text-sm font-medium text-gray-900 outline-none"
+            class="w-full border-b border-emerald-500 text-sm font-medium text-app-text outline-none"
           />
           <span
             v-else
             @click="$emit('start-edit', 'email', lead.email)"
-            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-gray-900 hover:bg-gray-50"
+            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-app-text hover:bg-app-panel"
           >
             {{ lead.email }}
             <Mail
@@ -48,7 +48,7 @@
 
       <!-- Phone -->
       <div class="group flex items-center">
-        <span class="w-24 shrink-0 text-[11px] font-bold uppercase tracking-wider text-gray-400"
+        <span class="w-24 shrink-0 text-[11px] font-bold uppercase tracking-wider text-app-muted"
           >Phone</span
         >
         <div class="min-w-0 flex-1">
@@ -59,12 +59,12 @@
             @input="$emit('update-value', $event.target.value)"
             @blur="$emit('save-edit')"
             @keyup.enter="$emit('save-edit')"
-            class="w-full border-b border-emerald-500 text-sm font-medium text-gray-900 outline-none"
+            class="w-full border-b border-emerald-500 text-sm font-medium text-app-text outline-none"
           />
           <span
             v-else
             @click="$emit('start-edit', 'phone', lead.phone || '')"
-            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-50 group-hover:text-emerald-600"
+            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-app-text transition-colors hover:bg-app-panel group-hover:text-emerald-600"
             :class="!lead.phone ? 'italic text-gray-300' : ''"
           >
             {{ lead.phone || 'Not provided' }}
@@ -77,7 +77,7 @@
 
       <!-- Company -->
       <div class="group flex items-center">
-        <span class="w-24 shrink-0 text-[11px] font-bold uppercase tracking-wider text-gray-400"
+        <span class="w-24 shrink-0 text-[11px] font-bold uppercase tracking-wider text-app-muted"
           >Company</span
         >
         <div class="min-w-0 flex-1">
@@ -88,12 +88,12 @@
             @input="$emit('update-value', $event.target.value)"
             @blur="$emit('save-edit')"
             @keyup.enter="$emit('save-edit')"
-            class="w-full border-b border-emerald-500 text-sm font-medium text-gray-900 outline-none"
+            class="w-full border-b border-emerald-500 text-sm font-medium text-app-text outline-none"
           />
           <span
             v-else
             @click="$emit('start-edit', 'company', lead.company)"
-            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-gray-900 hover:bg-gray-50"
+            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-app-text hover:bg-app-panel"
           >
             {{ lead.company }}
             <Building2
@@ -105,7 +105,7 @@
 
       <!-- Website -->
       <div class="group flex items-center">
-        <span class="w-24 shrink-0 text-[11px] font-bold uppercase tracking-wider text-gray-400"
+        <span class="w-24 shrink-0 text-[11px] font-bold uppercase tracking-wider text-app-muted"
           >Website</span
         >
         <div class="min-w-0 flex-1">
@@ -116,12 +116,12 @@
             @input="$emit('update-value', $event.target.value)"
             @blur="$emit('save-edit')"
             @keyup.enter="$emit('save-edit')"
-            class="w-full border-b border-emerald-500 text-sm font-medium text-gray-900 outline-none"
+            class="w-full border-b border-emerald-500 text-sm font-medium text-app-text outline-none"
           />
           <span
             v-else
             @click="$emit('start-edit', 'website', lead.website || '')"
-            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-gray-900 underline decoration-gray-100 underline-offset-4 transition-colors hover:bg-gray-50 group-hover:text-emerald-600"
+            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-app-text underline decoration-gray-100 underline-offset-4 transition-colors hover:bg-app-panel group-hover:text-emerald-600"
             :class="!lead.website ? 'italic text-gray-300' : ''"
           >
             {{ lead.website || '—' }}

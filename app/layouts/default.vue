@@ -1,5 +1,5 @@
 <template>
-  <main class="min-h-screen bg-white font-sans">
+  <main class="min-h-screen font-sans text-app-text">
     <slot />
   </main>
 </template>

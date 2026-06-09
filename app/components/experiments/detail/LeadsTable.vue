@@ -12,10 +12,10 @@
 </script>
 
 <template>
-  <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-    <div class="flex items-center justify-between border-b border-slate-100 p-6">
-      <div class="flex items-center gap-2 font-semibold text-slate-900">
-        <Users class="h-4 w-4 text-slate-400" />
+  <section class="overflow-hidden rounded-2xl border border-app-border text-app-text shadow-sm">
+    <div class="flex items-center justify-between border-b border-app-border p-6">
+      <div class="flex items-center gap-2 font-semibold text-app-text">
+        <Users class="h-4 w-4 text-app-muted" />
         Leads generated from this experiment
       </div>
       <button
@@ -28,7 +28,7 @@
     <div class="overflow-x-auto">
       <table class="w-full text-left">
         <thead>
-          <tr class="bg-slate-50 text-[10px] font-bold uppercase text-slate-400">
+          <tr class="bg-app-card text-[10px] font-bold uppercase text-app-muted">
             <th class="px-6 py-4">Name</th>
             <th class="px-6 py-4">Stage</th>
             <th class="px-6 py-4 text-right">Value</th>
@@ -36,8 +36,8 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100 font-mono text-sm italic">
-          <tr v-for="lead in leads" :key="lead.id" class="transition-colors hover:bg-slate-50/50">
-            <td class="px-6 py-4 font-semibold not-italic text-slate-900">{{ lead.name }}</td>
+          <tr v-for="lead in leads" :key="lead.id" class="transition-colors hover:bg-app-card">
+            <td class="px-6 py-4 font-semibold not-italic text-app-text">{{ lead.name }}</td>
             <td class="px-6 py-4">
               <span
                 :class="
@@ -50,8 +50,8 @@
                 {{ lead.stage }}
               </span>
             </td>
-            <td class="px-6 py-4 text-right text-slate-600">${{ lead.value || '-' }}</td>
-            <td class="px-6 py-4 text-slate-400">{{ lead.source }}</td>
+            <td class="px-6 py-4 text-right text-app-muted">${{ lead.value || '-' }}</td>
+            <td class="px-6 py-4 text-app-muted">{{ lead.source }}</td>
           </tr>
         </tbody>
       </table>

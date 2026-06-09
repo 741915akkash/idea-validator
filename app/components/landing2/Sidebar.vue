@@ -320,7 +320,7 @@
 
 <template>
   <nav
-    class="flex h-screen w-64 flex-col overflow-y-auto overscroll-contain border-r border-slate-200 bg-white px-6 pb-6 pt-10"
+    class="bg-app-sidebar flex h-screen w-64 flex-col overflow-y-auto overscroll-contain border-r border-app-border px-6 pb-6 pt-10"
   >
     <TopAlert
       :open="showPlanLimitAlert"
@@ -333,7 +333,7 @@
     <!-- Logo -->
     <NuxtLink v-if="props.showBrand" to="/" class="flex items-center gap-2">
       <Orbit class="h-6 w-6 text-emerald-600 md:h-8 md:w-8" />
-      <span class="text-lg font-semibold text-slate-900 md:text-xl"> GO Launch Scall </span>
+      <span class="text-lg font-semibold text-app-text md:text-xl"> GO Launch Scall </span>
     </NuxtLink>
 
     <IdeaSelector
@@ -356,7 +356,7 @@
 
     <!-- MAIN SECTION -->
     <div class="mt-8">
-      <div class="mb-2 text-xs uppercase text-neutral-500">Main</div>
+      <div class="mb-2 text-xs uppercase text-app-muted">Main</div>
 
       <div class="flex flex-col gap-1 text-sm">
         <!-- Overview -->
@@ -365,8 +365,8 @@
           class="flex items-center gap-2 rounded-lg px-3 py-2 transition"
           :class="
             isOverview
-              ? 'bg-emerald-50 font-medium text-emerald-700'
-              : 'text-slate-700 hover:bg-slate-100'
+              ? 'bg-app-navActiveBg font-medium text-app-navActiveText'
+              : 'text-app-muted hover:bg-app-card hover:text-app-text'
           "
         >
           <LayoutDashboard class="h-4 w-4" />
@@ -379,8 +379,8 @@
           class="flex items-center gap-2 rounded-lg px-3 py-2 transition"
           :class="
             isKnowledgeBase
-              ? 'bg-emerald-50 font-medium text-emerald-700'
-              : 'text-slate-700 hover:bg-slate-100'
+              ? 'bg-app-navActiveBg font-medium text-app-navActiveText'
+              : 'text-app-muted hover:bg-app-card hover:text-app-text'
           "
         >
           <BookOpen class="h-4 w-4" />
@@ -392,8 +392,8 @@
           class="flex items-center gap-2 rounded-lg px-3 py-2 transition"
           :class="
             isInterviews
-              ? 'bg-emerald-50 font-medium text-emerald-700'
-              : 'text-slate-700 hover:bg-slate-100'
+              ? 'bg-app-navActiveBg font-medium text-app-navActiveText'
+              : 'text-app-muted hover:bg-app-card hover:text-app-text'
           "
         >
           <MessagesSquare class="h-4 w-4" />
@@ -406,8 +406,8 @@
           class="flex items-center gap-2 rounded-lg px-3 py-2 transition"
           :class="
             route.path.startsWith('/quiz/master-detail')
-              ? 'bg-emerald-50 font-medium text-emerald-700'
-              : 'text-slate-700 hover:bg-slate-100'
+              ? 'bg-app-navActiveBg font-medium text-app-navActiveText'
+              : 'text-app-muted hover:bg-app-card hover:text-app-text'
           "
         >
           <Columns3 class="h-4 w-4" />
@@ -420,8 +420,8 @@
           class="flex items-center gap-2 rounded-lg px-3 py-2 transition"
           :class="
             isCrm
-              ? 'bg-emerald-50 font-medium text-emerald-700'
-              : 'text-slate-700 hover:bg-slate-100'
+              ? 'bg-app-navActiveBg font-medium text-app-navActiveText'
+              : 'text-app-muted hover:bg-app-card hover:text-app-text'
           "
         >
           <Briefcase class="h-4 w-4" />
@@ -434,8 +434,8 @@
           class="flex items-center gap-2 rounded-lg px-3 py-2 transition"
           :class="
             isExperiments
-              ? 'bg-emerald-50 font-medium text-emerald-700'
-              : 'text-slate-700 hover:bg-slate-100'
+              ? 'bg-app-navActiveBg font-medium text-app-navActiveText'
+              : 'text-app-muted hover:bg-app-card hover:text-app-text'
           "
         >
           <FlaskConical class="h-4 w-4" />
@@ -444,23 +444,12 @@
       </div>
     </div>
 
-    <!-- PRIMARY CTA -->
     <div class="mt-6">
-      <NuxtLink
-        v-if="!isClientReady || !quizStore.hasQuiz"
-        to="/general/signup-login"
-        class="block w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-center font-medium text-white transition hover:bg-emerald-700"
-      >
-        Start Validating
-      </NuxtLink>
-    </div>
-
-    <div class="mt-6">
-      <div class="mb-2 text-xs uppercase text-neutral-500">Action</div>
+      <div class="mb-2 text-xs uppercase text-app-muted">Action</div>
 
       <button
         @click="startNewQuiz"
-        class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-100"
+        class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-app-muted transition hover:bg-app-card hover:text-app-text"
       >
         <Rocket class="h-4 w-4" />
         + New Idea
@@ -469,15 +458,15 @@
 
     <!-- LEARN SECTION -->
     <div class="mt-6">
-      <div class="mb-2 text-xs uppercase text-neutral-500">Learn</div>
+      <div class="mb-2 text-xs uppercase text-app-muted">Learn</div>
 
       <NuxtLink
         to="/general/how-it-works"
         class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
         :class="
           isHowItWorks
-            ? 'bg-emerald-50 font-medium text-emerald-700'
-            : 'text-slate-700 hover:bg-slate-100'
+            ? 'bg-app-navActiveBg font-medium text-app-navActiveText'
+            : 'text-app-muted hover:bg-app-card hover:text-app-text'
         "
       >
         <BookOpen class="h-4 w-4" />
@@ -490,8 +479,8 @@
         class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
         :class="
           isDocs
-            ? 'bg-emerald-50 font-medium text-emerald-700'
-            : 'text-slate-700 hover:bg-slate-100'
+            ? 'bg-app-navActiveBg font-medium text-app-navActiveText'
+            : 'text-app-muted hover:bg-app-card hover:text-app-text'
         "
       >
         <BookOpen class="h-4 w-4" />
@@ -500,14 +489,14 @@
     </div>
 
     <div class="mt-auto pt-6">
-      <div class="mb-2 text-xs uppercase text-neutral-500">System</div>
+      <div class="mb-2 text-xs uppercase text-app-muted">System</div>
       <NuxtLink
         to="/quiz/settings"
         class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
         :class="
           isSettings
-            ? 'bg-emerald-50 font-medium text-emerald-700'
-            : 'text-slate-700 hover:bg-slate-100'
+            ? 'bg-app-navActiveBg font-medium text-app-navActiveText'
+            : 'text-app-muted hover:bg-app-card hover:text-app-text'
         "
       >
         <Settings class="h-4 w-4" />

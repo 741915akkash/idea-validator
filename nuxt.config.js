@@ -4,6 +4,8 @@ export default defineNuxtConfig({
   // ✅ fix nitro warning
   compatibilityDate: '2026-04-25',
 
+  css: ['~/assets/css/theme.css'],
+
   srcDir: 'app',
 
   app: {

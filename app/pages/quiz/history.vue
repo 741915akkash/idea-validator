@@ -219,20 +219,20 @@
 </script>
 
 <template>
-  <main class="min-h-screen bg-white px-4 py-5 md:px-6 md:py-6">
+  <main class="min-h-screen px-4 py-5 text-app-text md:px-6 md:py-6">
     <!-- HEADER -->
     <div class="mx-auto max-w-2xl">
       <div class="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div class="min-w-0">
-          <h1 class="flex items-center gap-2 text-2xl font-semibold text-slate-900 sm:text-3xl">
+          <h1 class="flex items-center gap-2 text-2xl font-semibold text-app-text sm:text-3xl">
             <span>History</span>
             <Info
-              class="h-5 w-10 cursor-pointer text-gray-400 hover:text-gray-700"
+              class="h-5 w-10 cursor-pointer text-app-muted hover:text-app-muted"
               @click="showHelpDrawer = true"
             />
           </h1>
 
-          <p class="mt-1 truncate text-sm text-slate-600">
+          <p class="mt-1 truncate text-sm text-app-muted">
             {{ ideaName }}
           </p>
         </div>
@@ -251,15 +251,15 @@
 
     <!-- LOADING -->
     <div v-if="loading" class="mx-auto max-w-2xl">
-      <div class="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-500">
+      <div class="rounded-lg border border-app-border p-4 text-sm text-app-muted text-app-text">
         Loading history...
       </div>
     </div>
 
     <!-- EMPTY STATE -->
     <div v-else-if="!historyEntries.length" class="mx-auto max-w-2xl">
-      <div class="rounded-lg border border-slate-200 bg-white p-6 text-center">
-        <p class="text-sm text-slate-600">No completed score pages yet.</p>
+      <div class="rounded-lg border border-app-border p-6 text-center text-app-text">
+        <p class="text-sm text-app-muted">No completed score pages yet.</p>
       </div>
     </div>
 
@@ -267,7 +267,7 @@
     <div v-else class="space-y-6">
       <!-- SCORE COMPARISON -->
       <div class="mx-auto max-w-2xl">
-        <h2 class="mb-3 text-2xl font-semibold text-slate-900">Score comparison</h2>
+        <h2 class="mb-3 text-2xl font-semibold text-app-text">Score comparison</h2>
         <ScoreComparison
           :latestThreeEntries="latestThreeEntries"
           :marketBreakdownKeys="marketBreakdownKeys"
@@ -287,30 +287,30 @@
         v-if="latestThreeEntries.length"
         class="mx-auto mt-10 max-w-2xl border-t pt-6 sm:mt-12 sm:pt-8"
       >
-        <h2 class="mb-4 text-2xl font-semibold text-slate-900">What changed</h2>
+        <h2 class="mb-4 text-2xl font-semibold text-app-text">What changed</h2>
 
         <div class="space-y-4">
           <div
             v-for="(entry, entryIndex) in latestThreeEntries"
             :key="`change-entry-${entry.id}`"
-            class="rounded-md border border-slate-200 bg-white p-3 sm:p-4"
+            class="rounded-md border border-app-border p-3 text-app-text sm:p-4"
           >
-            <div class="mb-3 text-base font-semibold text-slate-900">
+            <div class="mb-3 text-base font-semibold text-app-text">
               {{ versionLabel(entry, entryIndex) }}
             </div>
 
-            <p v-if="Number(entry.revision_number ?? 0) === 0" class="text-sm text-slate-500">
+            <p v-if="Number(entry.revision_number ?? 0) === 0" class="text-sm text-app-muted">
               Original version. No previous revision to compare.
             </p>
 
-            <p v-else-if="!changesForEntry(entry).length" class="text-sm text-slate-500">
+            <p v-else-if="!changesForEntry(entry).length" class="text-sm text-app-muted">
               No answer/note changes detected versus previous revision.
             </p>
 
             <div
               v-for="change in changesForEntry(entry)"
               :key="`${entry.id}-${change.question_id}`"
-              class="mb-4 rounded-md border border-slate-200 bg-white p-3"
+              class="mb-4 rounded-md border border-app-border p-3 text-app-text"
             >
               <!-- Checkpoint -->
               <p class="mb-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-600">
@@ -318,22 +318,22 @@
               </p>
 
               <!-- Question -->
-              <p class="mb-3 text-sm font-medium text-slate-900 sm:text-base">
+              <p class="mb-3 text-sm font-medium text-app-text sm:text-base">
                 {{ change.question_text }}
               </p>
 
               <!-- OPTION -->
               <div v-if="change.main_option.previous !== change.main_option.current" class="mb-3">
-                <p class="mb-1 text-[11px] font-medium uppercase text-slate-500">Option</p>
+                <p class="mb-1 text-[11px] font-medium uppercase text-app-muted">Option</p>
 
                 <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 text-sm">
-                  <span class="truncate text-left text-slate-400 line-through">
+                  <span class="truncate text-left text-app-muted line-through">
                     {{ change.main_option.previous ?? '—' }}
                   </span>
 
                   <span class="text-2xl font-bold leading-none text-black">→</span>
 
-                  <span class="truncate text-right font-semibold text-slate-900">
+                  <span class="truncate text-right font-semibold text-app-text">
                     {{ change.main_option.current ?? '—' }}
                   </span>
                 </div>
@@ -341,22 +341,22 @@
 
               <!-- ASQs -->
               <div v-if="change.asqs.previous.length || change.asqs.current.length" class="mb-4">
-                <p class="mb-1 text-[11px] font-medium uppercase text-slate-500">
+                <p class="mb-1 text-[11px] font-medium uppercase text-app-muted">
                   Follow-up answers
                 </p>
 
                 <ul class="space-y-3">
                   <li v-for="(prev, i) in change.asqs.previous" :key="i">
-                    <p class="mb-1 text-[11px] text-slate-400">
+                    <p class="mb-1 text-[11px] text-app-muted">
                       {{ prev.text }}
                     </p>
 
                     <div class="grid grid-cols-1 gap-1 text-xs sm:grid-cols-2 sm:gap-6">
-                      <div class="text-slate-400">
+                      <div class="text-app-muted">
                         {{ prev.value ?? '—' }}
                       </div>
 
-                      <div class="font-medium text-slate-900">
+                      <div class="font-medium text-app-text">
                         {{ change.asqs.current[i]?.value ?? '—' }}
                       </div>
                     </div>
@@ -367,13 +367,13 @@
                     v-for="(curr, i) in change.asqs.current.slice(change.asqs.previous.length)"
                     :key="'new-' + i"
                   >
-                    <p class="mb-1 text-[11px] text-slate-400">
+                    <p class="mb-1 text-[11px] text-app-muted">
                       {{ curr.text }}
                     </p>
 
                     <div class="grid grid-cols-1 gap-1 text-xs sm:grid-cols-2 sm:gap-6">
-                      <div class="text-slate-400">—</div>
-                      <div class="font-medium text-slate-900">
+                      <div class="text-app-muted">—</div>
+                      <div class="font-medium text-app-text">
                         {{ curr.value }}
                       </div>
                     </div>
@@ -384,10 +384,10 @@
               <!-- NOTES -->
               <div v-if="change.notes.previous.length || change.notes.current.length">
                 <div
-                  class="mt-2 rounded-md border border-l-4 border-emerald-200 border-l-emerald-500 bg-emerald-50 px-3 py-2.5"
+                  class="mt-2 rounded-md border border-l-4 border-emerald-200 border-l-emerald-500 bg-emerald-500/10 px-3 py-2.5"
                 >
                   <div
-                    class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-700"
+                    class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-500"
                   >
                     Note
                   </div>
@@ -403,23 +403,23 @@
 
       <!-- HISTORY LIST -->
       <div class="mx-auto max-w-2xl">
-        <h2 class="mb-3 text-2xl font-semibold text-slate-900">All Revisions</h2>
+        <h2 class="mb-3 text-2xl font-semibold text-app-text">All Revisions</h2>
         <div class="space-y-2">
           <button
             v-for="entry in displayedHistoryEntries"
             :key="entry.id"
-            class="group w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-left shadow-sm transition hover:border-indigo-300 active:scale-[0.98]"
+            class="group w-full rounded-lg border border-app-border px-3 py-3 text-left text-app-text shadow-sm transition hover:border-indigo-300 active:scale-[0.98]"
             @click="goToScore(entry)"
           >
             <div class="flex items-center justify-between">
-              <div class="text-base font-medium text-slate-900">
+              <div class="text-base font-medium text-app-text">
                 {{ entryLabel(entry) }}
               </div>
 
-              <div class="text-xs text-slate-400 group-hover:text-indigo-500">→</div>
+              <div class="text-xs text-app-muted group-hover:text-indigo-500">→</div>
             </div>
 
-            <div class="mt-1 text-xs text-slate-500">Open score page</div>
+            <div class="mt-1 text-xs text-app-muted">Open score page</div>
           </button>
         </div>
       </div>

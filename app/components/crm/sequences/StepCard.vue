@@ -29,7 +29,7 @@
 
     <!-- Step Indicator Dot -->
     <div
-      class="absolute left-0 top-5 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-xs font-black text-gray-400 shadow-sm transition-all group-hover/step:border-emerald-500 group-hover/step:text-emerald-500"
+      class="absolute left-0 top-5 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-app-border text-xs font-black text-app-muted text-app-text shadow-sm transition-all group-hover/step:border-emerald-500 group-hover/step:text-emerald-500"
     >
       {{ index + 1 }}
     </div>
@@ -39,10 +39,10 @@
       :class="[
         'group/card relative overflow-visible rounded-[32px] border-l-[3px] p-6 shadow-sm transition-all hover:shadow-md',
         step.type === 'call'
-          ? 'border-blue-200 border-l-blue-500 bg-white'
+          ? 'border-blue-200 border-l-blue-500 text-app-text'
           : step.type === 'email'
-            ? 'border-orange-200 border-l-orange-500 bg-white'
-            : 'border-emerald-200 border-l-emerald-500 bg-white'
+            ? 'border-orange-200 border-l-orange-500 text-app-text'
+            : 'border-emerald-200 border-l-emerald-500 text-app-text'
       ]"
     >
       <div class="flex flex-col gap-6">
@@ -59,13 +59,13 @@
 
             <!-- CONTROL GROUP -->
             <div
-              class="flex items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-sm"
+              class="flex items-center gap-2 rounded-2xl border border-app-border p-1.5 text-app-text shadow-sm"
             >
               <!-- TYPE -->
               <div class="relative">
                 <select
                   v-model="step.type"
-                  class="cursor-pointer appearance-none rounded-xl border border-transparent bg-gray-50 px-4 py-2.5 pr-10 text-sm font-semibold text-gray-700 transition-all hover:border-gray-200 hover:bg-white focus:border-emerald-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/10"
+                  class="cursor-pointer appearance-none rounded-xl border border-transparent bg-app-panel px-4 py-2.5 pr-10 text-sm font-semibold text-app-muted transition-all hover:border-app-border hover:text-app-text focus:border-emerald-300 focus:text-app-text focus:outline-none focus:ring-4 focus:ring-emerald-500/10"
                 >
                   <option value="call">📞 Call</option>
                   <option value="email">📧 Email</option>
@@ -73,7 +73,7 @@
                 </select>
 
                 <ChevronDown
-                  class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+                  class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-app-muted"
                 />
               </div>
 
@@ -83,7 +83,7 @@
                   <select
                     :value="step.offset"
                     @change="(e) => setOffset(e.target.value)"
-                    class="cursor-pointer appearance-none rounded-xl border border-transparent bg-gray-50 px-4 py-2.5 pr-10 text-sm font-semibold text-gray-700 transition-all hover:border-gray-200 hover:bg-white focus:border-emerald-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/10"
+                    class="cursor-pointer appearance-none rounded-xl border border-transparent bg-app-panel px-4 py-2.5 pr-10 text-sm font-semibold text-app-muted transition-all hover:border-app-border hover:text-app-text focus:border-emerald-300 focus:text-app-text focus:outline-none focus:ring-4 focus:ring-emerald-500/10"
                   >
                     <option :value="0">Immediately</option>
                     <option :value="1">After 1 Day</option>
@@ -93,7 +93,7 @@
                   </select>
 
                   <ChevronDown
-                    class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+                    class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-app-muted"
                   />
                 </div>
               </template>
@@ -101,23 +101,23 @@
               <!-- CUSTOM DELAY -->
               <template v-else>
                 <div
-                  class="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2"
+                  class="flex items-center gap-2 rounded-xl border border-app-border bg-app-panel px-3 py-2"
                 >
-                  <span class="text-sm font-semibold text-gray-700"> After </span>
+                  <span class="text-sm font-semibold text-app-muted"> After </span>
 
                   <input
                     v-model.number="step.offset"
                     type="number"
                     min="0"
-                    class="w-16 rounded-lg border border-gray-200 bg-white px-2 py-1 text-center text-sm font-bold text-emerald-700 outline-none focus:border-emerald-300"
+                    class="w-16 rounded-lg border border-app-border px-2 py-1 text-center text-sm font-bold text-app-text text-emerald-500 outline-none focus:border-emerald-300"
                   />
 
-                  <span class="text-sm font-semibold text-gray-700"> Days </span>
+                  <span class="text-sm font-semibold text-app-muted"> Days </span>
 
                   <!-- BACK TO PRESETS -->
                   <button
                     @click="step.offset = 1"
-                    class="ml-2 rounded-lg border border-gray-200 bg-white px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-gray-500 transition hover:bg-gray-100 hover:text-gray-700"
+                    class="ml-2 rounded-lg border border-app-border px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-app-muted text-app-text transition hover:bg-gray-100 hover:text-app-muted"
                   >
                     Presets
                   </button>
@@ -133,7 +133,7 @@
             <button
               @click="$emit('move', index, -1)"
               :disabled="index === 0"
-              class="rounded-xl p-2 text-gray-300 transition-colors hover:bg-white hover:text-gray-900 disabled:opacity-10"
+              class="rounded-xl p-2 text-gray-300 transition-colors hover:text-app-text disabled:opacity-10"
             >
               <ChevronUp class="h-5 w-5" />
             </button>
@@ -141,7 +141,7 @@
             <button
               @click="$emit('move', index, 1)"
               :disabled="index === totalSteps - 1"
-              class="rounded-xl p-2 text-gray-300 transition-colors hover:bg-white hover:text-gray-900 disabled:opacity-10"
+              class="rounded-xl p-2 text-gray-300 transition-colors hover:text-app-text disabled:opacity-10"
             >
               <ChevronDown class="h-5 w-5" />
             </button>
@@ -160,14 +160,14 @@
           <!-- TITLE -->
           <input
             v-model="step.title"
-            class="w-full border-none bg-transparent p-0 text-xl font-black tracking-tight text-gray-900 placeholder-gray-300 outline-none focus:ring-0"
+            class="w-full border-none bg-transparent p-0 text-xl font-black tracking-tight text-app-text placeholder-gray-300 outline-none focus:ring-0"
             placeholder="Step Title (e.g. Discovery Call)"
           />
 
           <!-- DESCRIPTION -->
           <textarea
             v-model="step.description"
-            class="min-h-[140px] w-full resize-none rounded-3xl border border-white/60 bg-gray-100/70 p-5 text-sm leading-relaxed text-gray-700 placeholder-gray-400 outline-none transition-all focus:border-emerald-200 focus:bg-white focus:ring-0"
+            class="min-h-[140px] w-full resize-none rounded-3xl border border-white/60 bg-gray-100/70 p-5 text-sm leading-relaxed text-app-muted placeholder-gray-400 outline-none transition-all focus:border-emerald-200 focus:text-app-text focus:ring-0"
             placeholder="Add detailed instructions, talking points, email copy, follow-up notes, or workflow guidance..."
           ></textarea>
         </div>

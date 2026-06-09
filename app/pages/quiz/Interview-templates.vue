@@ -1,13 +1,13 @@
 <template>
   <div class="min-h-screen p-6">
     <!-- Header -->
-    <div class="mb-6 rounded-lg border border-slate-200 bg-white px-6 py-5">
+    <div class="mb-6 rounded-lg border border-app-border px-6 py-5 text-app-text">
       <div>
-        <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Templates</h1>
+        <h1 class="text-2xl font-semibold tracking-tight text-app-text">Templates</h1>
 
         <div class="mt-3 h-1 w-16 bg-emerald-500"></div>
 
-        <p class="mt-2 text-sm text-slate-500">Reusable interview question sets</p>
+        <p class="mt-2 text-sm text-app-muted">Reusable interview question sets</p>
       </div>
     </div>
 
@@ -18,13 +18,13 @@
         <button class="rounded-full bg-black px-4 py-2 text-sm font-medium text-white">All</button>
 
         <button
-          class="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+          class="rounded-full border border-app-border px-4 py-2 text-sm text-app-text hover:bg-app-hover"
         >
           Recently Used
         </button>
 
         <button
-          class="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+          class="rounded-full border border-app-border px-4 py-2 text-sm text-app-text hover:bg-app-hover"
         >
           Most Interviews
         </button>
@@ -34,7 +34,7 @@
       <div class="flex flex-wrap items-center justify-end gap-2">
         <NuxtLink
           to="/quiz/interviews"
-          class="inline-flex items-center justify-center rounded-lg bg-[#E5E4E2] px-4 py-2 text-sm font-medium text-black transition hover:bg-[#DAD8D4]"
+          class="inline-flex items-center justify-center rounded-lg border border-app-border bg-app-panel px-4 py-2 text-sm font-medium text-app-text transition hover:bg-app-hover"
         >
           Back to Interviews
         </NuxtLink>
@@ -54,14 +54,14 @@
         v-model="searchQuery"
         type="text"
         placeholder="Search templates..."
-        class="w-full rounded-xl border border-gray-500 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-500"
+        class="w-full rounded-xl border border-app-border bg-app-panel px-4 py-3 text-sm text-app-text outline-none transition focus:border-emerald-500"
       />
     </div>
 
     <!-- Template Grid -->
     <div
       v-if="loading"
-      class="rounded border border-gray-200 bg-gray-50 px-4 py-4 text-sm text-gray-600"
+      class="rounded border border-app-border bg-app-panel px-4 py-4 text-sm text-app-muted"
     >
       Loading templates...
     </div>
@@ -75,7 +75,7 @@
 
     <div
       v-else-if="filteredTemplates.length === 0"
-      class="rounded border border-gray-200 bg-gray-50 px-4 py-4 text-sm text-gray-600"
+      class="rounded border border-app-border bg-app-panel px-4 py-4 text-sm text-app-muted"
     >
       No templates found.
     </div>
@@ -85,41 +85,41 @@
       <div
         v-for="template in filteredTemplates"
         :key="template.id"
-        class="rounded-2xl border border-gray-300 bg-white p-5 shadow-sm transition hover:shadow-md"
+        class="rounded-2xl border border-app-border bg-app-panel p-5 text-app-text transition hover:border-emerald-500/30"
         role="button"
         tabindex="0"
         @click="openTemplate(template.id)"
       >
         <!-- Title -->
         <div class="mb-4">
-          <h2 class="text-lg font-semibold text-gray-900">
+          <h2 class="text-lg font-semibold text-app-text">
             {{ template.title }}
           </h2>
 
-          <p class="mt-1 text-sm text-gray-500">
+          <p class="mt-1 text-sm text-app-muted">
             {{ template.description }}
           </p>
         </div>
 
         <!-- Stats -->
-        <div class="mb-5 space-y-2 text-sm text-gray-600">
+        <div class="mb-5 space-y-2 text-sm text-app-muted">
           <div class="flex items-center justify-between">
             <span>Questions</span>
-            <span class="font-medium text-gray-900">
+            <span class="font-medium text-app-text">
               {{ template.questions }}
             </span>
           </div>
 
           <div class="flex items-center justify-between">
             <span>Interviews</span>
-            <span class="font-medium text-gray-900">
+            <span class="font-medium text-app-text">
               {{ template.interviews }}
             </span>
           </div>
 
           <div class="flex items-center justify-between">
             <span>Updated</span>
-            <span class="font-medium text-gray-900">
+            <span class="font-medium text-app-text">
               {{ template.updated }}
             </span>
           </div>
@@ -130,17 +130,17 @@
           <span
             v-for="tag in template.tags"
             :key="tag"
-            class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700"
+            class="rounded-full bg-app-hover px-3 py-1 text-xs font-medium text-app-muted"
           >
             {{ tag }}
           </span>
         </div>
 
         <!-- Actions -->
-        <div class="mt-4 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4">
+        <div class="mt-4 flex flex-wrap items-center gap-2 border-t border-app-border pt-4">
           <button
             @click.stop="openTemplate(template.id, 'edit')"
-            class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#E5E4E2] text-black transition hover:bg-[#DAD8D4]"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-app-border bg-app-panel text-app-text transition hover:bg-app-hover"
             aria-label="Edit template"
             title="Edit"
           >
@@ -149,7 +149,7 @@
 
           <button
             @click.stop="openVersions(template.id)"
-            class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#E5E4E2] text-black transition hover:bg-[#DAD8D4]"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-app-border bg-app-panel text-app-text transition hover:bg-app-hover"
             aria-label="View versions"
             title="Versions"
           >
@@ -158,7 +158,7 @@
 
           <button
             @click.stop="openAnalytics(template.id)"
-            class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#E5E4E2] text-black transition hover:bg-[#DAD8D4]"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-app-border bg-app-panel text-app-text transition hover:bg-app-hover"
             aria-label="View analytics"
             title="Analytics"
           >
@@ -245,7 +245,9 @@
     if (!id) return
     const template = templates.value.find((item) => item.id === id)
     const version = template?.version ? `&version=${encodeURIComponent(template.version)}` : ''
-    navigateTo(`/quiz/interview-templates/analytics?template_id=${encodeURIComponent(id)}${version}`)
+    navigateTo(
+      `/quiz/interview-templates/analytics?template_id=${encodeURIComponent(id)}${version}`
+    )
   }
 
   function openVersions(id) {

@@ -26,7 +26,7 @@
       <!-- SEARCH ROW -->
       <div class="relative w-full">
         <Search
-          class="absolute left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-300 transition-colors"
+          class="absolute left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-app-muted transition-colors"
         />
 
         <input
@@ -35,14 +35,14 @@
           :value="searchQuery"
           @input="emit('update:searchQuery', $event.target.value)"
           placeholder="Search everything..."
-          class="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-14 pr-6 text-base text-slate-900 shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/5"
+          class="w-full rounded-2xl border border-app-border bg-app-card py-3 pl-14 pr-6 text-base text-app-text shadow-sm transition-all placeholder:text-app-muted focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/5"
         />
 
         <!-- RIGHT ACTION -->
         <div class="absolute right-6 top-1/2 flex -translate-y-1/2 items-center gap-2">
           <div
             v-if="!searchQuery"
-            class="rounded-lg border border-slate-400 bg-white px-2 py-1 text-[9px] font-bold uppercase tracking-widest text-black/90"
+            class="rounded-lg border border-app-border bg-app-card px-2 py-1 text-[9px] font-bold uppercase tracking-widest text-app-muted"
           >
             Ctrl + K
           </div>
@@ -54,7 +54,7 @@
                 emit('update:searchQuery', '')
               }
             "
-            class="rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            class="rounded-lg p-1 text-app-muted transition hover:bg-app-hover hover:text-app-text"
           >
             <ArrowRight class="h-4 w-4 rotate-180" />
           </button>
@@ -79,8 +79,8 @@
               class="shrink-0 rounded-xl px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all"
               :class="
                 activeScope === scope
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'bg-transparent text-slate-400 hover:bg-white hover:text-slate-900'
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'bg-transparent text-app-muted hover:text-app-text'
               "
             >
               {{ scope }}

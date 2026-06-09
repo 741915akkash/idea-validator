@@ -140,27 +140,27 @@
   <div class="max-w-3xl">
     <!-- Title -->
     <div>
-      <h2 class="text-xl font-semibold text-neutral-900">Review Goal Structure</h2>
+      <h2 class="text-xl font-semibold text-app-text">Review Goal Structure</h2>
 
-      <p class="mt-2 text-sm text-neutral-600">
+      <p class="mt-2 text-sm text-app-muted">
         Edit goal and required conditions before starting deterministic evaluation.
       </p>
     </div>
 
     <!-- Goal -->
     <div class="mt-8">
-      <div class="mb-2 text-sm font-medium text-neutral-700">Goal</div>
+      <div class="mb-2 text-sm font-medium text-app-muted">Goal</div>
 
       <textarea
         v-model="editableGoal"
         rows="3"
-        class="w-full rounded-md border border-neutral-300 px-4 py-3 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+        class="w-full rounded-md border border-app-border px-4 py-3 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
       ></textarea>
     </div>
 
     <!-- Conditions Header -->
     <div class="mt-10 flex items-center justify-between">
-      <div class="text-sm font-medium text-neutral-700">Conditions (Binary & Observable)</div>
+      <div class="text-sm font-medium text-app-muted">Conditions (Binary & Observable)</div>
 
       <div class="flex items-center gap-3">
         <!-- Generate -->
@@ -171,12 +171,14 @@
         >
           {{ generating ? 'Generating…' : 'Generate Conditions + Questions' }}
         </button>
-        <span class="text-xs text-neutral-500">Costs {{ generateCost }} credits • {{ creditsHint }}</span>
+        <span class="text-xs text-app-muted"
+          >Costs {{ generateCost }} credits • {{ creditsHint }}</span
+        >
 
         <!-- Add -->
         <button
           @click="addCondition"
-          class="rounded-md border border-emerald-300 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50"
+          class="rounded-md border border-emerald-300 px-4 py-2 text-sm font-medium text-emerald-500 hover:bg-emerald-500/10"
         >
           + Add Condition
         </button>
@@ -188,7 +190,7 @@
       <div
         v-for="(condition, i) in editableConditions"
         :key="condition.id"
-        class="rounded-lg border border-emerald-100  p-6"
+        class="rounded-lg border border-emerald-500/20 p-6"
       >
         <div class="space-y-4">
           <!-- Condition Row -->
@@ -198,7 +200,7 @@
             <textarea
               v-model="condition.description"
               rows="2"
-              class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              class="w-full rounded-md border border-app-border px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               placeholder="Condition description"
             ></textarea>
 
@@ -220,7 +222,7 @@
 
             <input
               v-model="condition.questions[index]"
-              class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              class="w-full rounded-md border border-app-border px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               placeholder="Question"
             />
 
@@ -238,7 +240,7 @@
 
             <button
               @click="addQuestion(condition)"
-              class="text-left text-xs font-medium text-emerald-700 hover:underline"
+              class="text-left text-xs font-medium text-emerald-500 hover:underline"
             >
               + Add Question
             </button>
@@ -251,7 +253,7 @@
 
     <!-- Notice -->
     <div
-      class="mt-8 rounded-md border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-900"
+      class="mt-8 rounded-md border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-900"
     >
       All conditions must be resolved individually. The goal is met only if required conditions are
       satisfied.
@@ -267,7 +269,7 @@
       <button
         @click="handlePrevious"
         :disabled="isPreviousDisabled"
-        class="rounded-md border border-neutral-300 px-6 py-2 text-sm font-medium text-neutral-700 transition disabled:cursor-not-allowed disabled:border-neutral-200 disabled:text-neutral-400"
+        class="rounded-md border border-app-border px-6 py-2 text-sm font-medium text-app-muted transition disabled:cursor-not-allowed disabled:border-app-border disabled:text-neutral-400"
       >
         ← Previous
       </button>
