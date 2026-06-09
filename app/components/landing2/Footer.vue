@@ -1,5 +1,5 @@
 <template>
-  <footer id="main-footer" class="border-t border-app-border bg-app-card px-6 py-16">
+  <footer id="main-footer" class="border-t border-slate-200 bg-white px-6 py-16">
     <div
       class="mx-auto flex max-w-5xl flex-col items-start justify-between gap-10 md:flex-row md:items-center"
     >
@@ -7,19 +7,19 @@
       <div class="flex flex-col gap-3">
         <div class="flex items-center gap-2">
           <Orbit class="h-5 w-5 text-emerald-600" />
-          <span class="text-xl font-bold tracking-tight text-app-text"> GO Launch Scall </span>
+          <span class="text-xl font-bold tracking-tight text-slate-900"> GO Launch Scall </span>
         </div>
 
-        <p class="max-w-sm text-sm font-medium leading-relaxed text-app-muted">
+        <p class="max-w-sm text-sm font-medium leading-relaxed text-slate-600">
           AI-powered idea validation system for founders. Validate before you build.
         </p>
       </div>
 
       <!-- Right -->
-      <div class="flex flex-wrap gap-8 text-sm text-app-muted">
+      <div class="flex flex-wrap gap-8 text-sm text-slate-600">
         <!-- Product -->
         <div class="flex flex-col gap-2.5">
-          <span class="font-semibold text-app-text">Product</span>
+          <span class="font-semibold text-slate-900">Product</span>
 
           <NuxtLink
             to="general/pricing"
@@ -38,7 +38,7 @@
 
         <!-- Company -->
         <div class="flex flex-col gap-2.5">
-          <span class="font-semibold text-app-text">Company</span>
+          <span class="font-semibold text-slate-900">Company</span>
 
           <NuxtLink
             to="general/contact"
@@ -57,7 +57,7 @@
 
         <!-- Legal -->
         <div class="flex flex-col gap-2.5">
-          <span class="font-semibold text-app-text">Legal</span>
+          <span class="font-semibold text-slate-900">Legal</span>
 
           <NuxtLink
             to="general/terms-of-service"
@@ -84,7 +84,7 @@
     </div>
 
     <div
-      class="mx-auto mt-12 max-w-5xl border-t border-app-border pt-6 text-center text-sm font-medium text-app-muted"
+      class="mx-auto mt-12 max-w-5xl border-t border-slate-200 pt-6 text-center text-sm font-medium text-slate-500"
     >
       © 2026 GO Launch Scall. All rights reserved.
     </div>

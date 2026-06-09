@@ -5,7 +5,7 @@
     <div class="relative mx-auto max-w-4xl text-center">
       <!-- H1 -->
       <h1
-        class="mb-6 text-4xl font-extrabold leading-tight tracking-tight text-app-text sm:text-5xl md:text-6xl lg:text-7xl"
+        class="mb-6 text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl md:text-6xl lg:text-7xl"
       >
         Validate Your Idea
         <span class="relative mt-2 inline-block text-emerald-600">
@@ -16,7 +16,7 @@
 
       <!-- Subheadline -->
       <p
-        class="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-app-text sm:text-xl md:text-2xl"
+        class="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-slate-600 sm:text-xl md:text-2xl"
       >
         Break your idea into clear assumptions and validate them through real customer
         conversations—so you know exactly what to build next.
@@ -34,7 +34,7 @@
         </button>
       </div>
 
-      <p class="mt-5 text-sm font-medium text-app-muted sm:text-base">
+      <p class="mt-5 text-sm font-medium text-slate-500 sm:text-base">
         No guesswork. Just structured validation.
       </p>
     </div>
@@ -43,6 +43,7 @@
 
 <script setup>
   import { ArrowRight } from 'lucide-vue-next'
+
   const { $posthog } = useNuxtApp()
 
   function startValidation() {

@@ -11,7 +11,7 @@ import Footer from '~/components/landing2/Footer.vue'
 import LightExplaination from '../components/landing2/LightExplaination.vue'
 
 definePageMeta({
-  layout: 'marketing'
+  layout: 'light-marketing'
 })
 
 const { $posthog } = useNuxtApp()

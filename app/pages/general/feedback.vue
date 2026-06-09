@@ -3,7 +3,7 @@
   import { ref } from 'vue'
 
   definePageMeta({
-    layout: 'marketing'
+    layout: 'general'
   })
 
   const stage = ref('idea')

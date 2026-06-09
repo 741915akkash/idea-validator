@@ -1,3 +1,12 @@
+<script setup>
+
+definePageMeta({
+  layout:'general'
+})
+
+</script>
+
+
 <template>
   <div class="mx-auto max-w-4xl px-6 py-16">
     <h1 class="text-app-text mb-4 text-5xl font-bold">Privacy Policy</h1>

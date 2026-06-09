@@ -1,5 +1,5 @@
 <template>
-  <section id="cost-section" class="border-y border-rose-100 bg-rose-50/70 px-6 py-20">
+  <section id="cost-section" class="border-y border-rose-200 bg-rose-50 px-6 py-20">
     <div class="mx-auto max-w-3xl">
       <h2 class="mb-8 text-center text-3xl font-extrabold tracking-tight text-rose-950 sm:text-4xl">
         The Cost of Guessing Is Measured in Months — and Money.
@@ -9,7 +9,7 @@
         <div
           v-for="(item, i) in costs"
           :key="i"
-          class="flex items-center gap-3 rounded-2xl border border-rose-100/40 p-4 text-app-text shadow-sm sm:p-5"
+          class="flex items-center gap-3 rounded-2xl border border-rose-200 bg-white p-4 shadow-sm sm:p-5"
         >
           <XCircle class="h-5 w-5 shrink-0 text-rose-500" />
 
