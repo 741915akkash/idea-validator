@@ -142,7 +142,7 @@
           :disabled="!codeSent"
           :class="
             codeSent
-              ? 'w-full rounded-md border border-app-border px-3 py-2 outline-none ring-emerald-500 focus:ring-2'
+              ? 'w-full rounded-md border border-app-border bg-app-panel px-3 py-2 text-app-text outline-none ring-emerald-500 placeholder:text-app-muted focus:ring-2'
               : 'w-full rounded-md border border-app-border bg-app-hover px-3 py-2 text-app-muted'
           "
         />
