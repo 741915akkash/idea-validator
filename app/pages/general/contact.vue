@@ -18,11 +18,6 @@
       <p class="text-sm text-app-muted">We typically respond within 24–48 hours.</p>
     </div>
 
-    <div class="mb-10">
-      <h2 class="text-lg font-semibold text-app-text">Location</h2>
-      <p class="text-app-text">Austin, Texas, United States</p>
-    </div>
-
     <h2 class="mb-4 text-lg font-semibold">Send a Message</h2>
 
     <form class="space-y-4">
