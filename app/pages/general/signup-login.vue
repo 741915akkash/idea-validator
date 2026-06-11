@@ -121,7 +121,7 @@
           required
           autocomplete="email"
           placeholder="you@example.com"
-          class="w-full rounded-md border border-app-border px-3 py-2 outline-none ring-emerald-500 focus:ring-2"
+          class="w-full rounded-md border border-app-border bg-app-panel px-3 py-2 text-app-text outline-none ring-emerald-500 placeholder:text-app-muted focus:ring-2"
         />
       </div>
 
@@ -143,7 +143,7 @@
           :class="
             codeSent
               ? 'w-full rounded-md border border-app-border px-3 py-2 outline-none ring-emerald-500 focus:ring-2'
-              : 'w-full rounded-md border border-app-border bg-app-card px-3 py-2 text-app-muted'
+              : 'w-full rounded-md border border-app-border bg-app-hover px-3 py-2 text-app-muted'
           "
         />
         <p v-if="!codeSent" class="mt-1 text-xs text-app-muted">
@@ -151,13 +151,13 @@
         </p>
       </div>
 
-      <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+      <p v-if="error" class="text-sm text-red-500">{{ error }}</p>
       <p v-if="info" class="text-sm text-app-muted">{{ info }}</p>
 
       <div class="flex items-center justify-between gap-3">
         <button
           type="button"
-          class="rounded-md border border-app-border px-3 py-2 text-sm font-medium text-app-text disabled:opacity-60"
+          class="rounded-md border border-app-border bg-app-panel px-3 py-2 text-sm font-medium text-app-text transition hover:bg-app-hover disabled:opacity-60"
           :disabled="loadingAction !== ''"
           @click="requestOtp"
         >
