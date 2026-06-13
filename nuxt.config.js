@@ -104,6 +104,8 @@ export default defineNuxtConfig({
   sitemap: {
     siteUrl: 'https://golaunchscall.com',
 
+    exclude: ['/quiz/**', '/crm/**', '/experiments/**', '/knowledge-base/**'],
+
     urls: async () => {
       const fetchJsonArray = async (url) => {
         try {
