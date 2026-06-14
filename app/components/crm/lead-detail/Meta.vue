@@ -164,13 +164,13 @@
             @input="$emit('update-value', Number($event.target.value))"
             @blur="$emit('save-edit')"
             @keyup.enter="$emit('save-edit')"
-            class="w-full border-b border-emerald-500 text-sm font-bold outline-none"
+            class="w-full border-b border-emerald-500 bg-transparent text-sm font-bold text-app-text outline-none"
           />
 
           <span
             v-else
             @click="$emit('start-edit', 'value', lead.value)"
-            class="cursor-pointer rounded px-1 text-sm font-bold hover:bg-app-panel"
+            class="cursor-pointer rounded px-1 text-sm font-bold hover:bg-app-hover"
           >
             ${{ lead.value?.toLocaleString() || '0' }}
           </span>
@@ -184,7 +184,7 @@
         <div class="flex-1">
           <div
             @click="showSourceDropdown = !showSourceDropdown"
-            class="cursor-pointer rounded px-1 py-1 text-sm hover:bg-gray-100"
+            class="cursor-pointer rounded px-1 py-1 text-sm hover:bg-app-hover"
           >
             {{
               sourcesStore.sources.find((source) => source.id === lead.source_id)?.name ||
@@ -195,24 +195,24 @@
 
           <div
             v-if="showSourceDropdown"
-            class="absolute z-50 mt-1 w-56 rounded border text-app-text shadow"
+            class="absolute z-50 mt-1 w-56 rounded border border-app-border bg-app-panel text-app-text shadow-lg"
           >
             <button
               v-for="source in sourcesStore.sources"
               :key="source.id"
               @click="updateSource(source.id)"
-              class="block w-full px-3 py-2 text-left text-sm hover:bg-app-panel"
+              class="block w-full px-3 py-2 text-left text-sm hover:bg-app-hover"
             >
               {{ source.name }}
             </button>
 
-            <div class="my-1 border-t"></div>
+            <div class="my-1 border-t border-app-border"></div>
 
             <div class="p-2">
               <input
                 v-model="newSource"
                 placeholder="Add new source"
-                class="w-full rounded border px-2 py-1 text-sm outline-none"
+                class="w-full rounded border border-app-border bg-app-panel px-2 py-1 text-sm text-app-text outline-none focus:border-emerald-500"
                 @keyup.enter="addNewSource"
               />
               <button
@@ -234,10 +234,10 @@
           <!-- current owner -->
           <div
             @click="showOwnerDropdown = !showOwnerDropdown"
-            class="flex cursor-pointer items-center gap-2 rounded px-1 py-1 hover:bg-gray-100"
+            class="flex cursor-pointer items-center gap-2 rounded px-1 py-1 hover:bg-app-hover"
           >
             <div
-              class="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-500"
+              class="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/10 text-xs font-bold text-emerald-500"
             >
               {{ usersStore.users.find((u) => u.id === lead.user_id)?.name?.[0] || '?' }}
             </div>
@@ -250,13 +250,13 @@
           <!-- dropdown -->
           <div
             v-if="showOwnerDropdown"
-            class="absolute z-50 mt-1 w-40 rounded border text-app-text shadow"
+            class="absolute z-50 mt-1 w-40 rounded border border-app-border bg-app-panel text-app-text shadow-lg"
           >
             <button
               v-for="user in usersStore.users"
               :key="user.id"
               @click="updateOwner(user.id)"
-              class="block w-full px-3 py-2 text-left text-sm hover:bg-app-panel"
+              class="block w-full px-3 py-2 text-left text-sm hover:bg-app-hover"
             >
               {{ user.name || user.email }}
             </button>
@@ -268,7 +268,7 @@
       <div class="flex justify-end border-t pt-2">
         <button
           @click="deleteLead"
-          class="flex items-center gap-2 text-[10px] text-red-500 hover:text-red-600"
+          class="flex items-center gap-2 text-[10px] text-red-500 transition hover:text-red-400"
         >
           <Trash2 class="h-3 w-3" /> Delete Lead
         </button>

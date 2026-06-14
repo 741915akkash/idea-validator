@@ -95,7 +95,7 @@
       :group="{ name: 'leads', pull: true, put: true }"
       :move="onMove"
       item-key="id"
-      class="min-h-[200px] flex-1 space-y-3 overflow-y-auto rounded-xl bg-gray-100/50 p-2"
+      class="bg-app-panel/50 min-h-[200px] flex-1 space-y-3 overflow-y-auto rounded-xl p-2"
       ghost-class="opacity-50"
       :animation="200"
       @change="onDragChange"

@@ -206,7 +206,7 @@
 
             <button
               @click="removeCondition(condition.id)"
-              class="pt-2 text-xs text-red-600 hover:underline"
+              class="pt-2 text-xs text-red-500 hover:underline"
             >
               Remove
             </button>
@@ -228,7 +228,7 @@
 
             <button
               @click="removeQuestion(condition, index)"
-              class="text-xs text-red-600 hover:underline"
+              class="text-xs text-red-500 hover:underline"
             >
               Remove
             </button>
@@ -253,14 +253,14 @@
 
     <!-- Notice -->
     <div
-      class="mt-8 rounded-md border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-900"
+      class="mt-8 rounded-md border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-500"
     >
       All conditions must be resolved individually. The goal is met only if required conditions are
       satisfied.
     </div>
 
     <!-- Error -->
-    <div v-if="error" class="mt-6 text-sm text-red-600">
+    <div v-if="error" class="mt-6 text-sm text-red-500">
       {{ error }}
     </div>
 

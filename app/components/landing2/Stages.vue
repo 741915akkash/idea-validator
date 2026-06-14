@@ -5,7 +5,7 @@
   >
     <!-- Background glow -->
     <div
-      class="pointer-events-none absolute left-1/4 top-0 h-[500px] w-[500px] rounded-full bg-emerald-100 blur-[120px]"
+      class="pointer-events-none absolute left-1/4 top-0 h-[500px] w-[500px] rounded-full bg-emerald-500/10 blur-[120px]"
     />
 
     <div class="relative mx-auto max-w-4xl">

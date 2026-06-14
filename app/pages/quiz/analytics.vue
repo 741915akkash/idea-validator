@@ -72,8 +72,8 @@
 
   function conditionStatus(interviewId, conditionId) {
     const status = getResponse(interviewId, conditionId)?.status
-    if (status === 'met') return { label: 'Met', className: 'bg-emerald-100 text-emerald-800' }
-    if (status === 'failed') return { label: 'Not Met', className: 'bg-red-100 text-red-800' }
+    if (status === 'met') return { label: 'Met', className: 'bg-emerald-500/10 text-emerald-800' }
+    if (status === 'failed') return { label: 'Not Met', className: 'bg-red-500/100/5 text-red-500' }
     return { label: 'Pending', className: 'bg-app-hover text-app-muted' }
   }
 
@@ -85,7 +85,7 @@
     }
 
     if (status === 'failed') {
-      return { hasStatus: true, dotClass: 'bg-red-500' }
+      return { hasStatus: true, dotClass: 'bg-red-500/100/5' }
     }
 
     return { hasStatus: false, dotClass: '' }
@@ -126,7 +126,7 @@
 
       const total = met + failed
       let confidenceLabel = 'Low'
-      let confidenceTone = 'text-red-700'
+      let confidenceTone = 'text-red-500'
 
       if (total >= 6) {
         confidenceLabel = 'High'
@@ -170,7 +170,7 @@
       return {
         icon: '✔',
         title: 'VALIDATED',
-        className: 'border-emerald-200 bg-emerald-500/10 text-emerald-900'
+        className: 'border-emerald-200 bg-emerald-500/10 text-emerald-500'
       }
     }
 
@@ -185,7 +185,7 @@
     return {
       icon: '✖',
       title: 'INVALIDATED',
-      className: 'border-red-200 bg-red-50 text-red-900'
+      className: 'border-red-500/20 bg-red-500/100/5 text-red-500'
     }
   })
 </script>
@@ -213,7 +213,7 @@
     <!-- ERROR -->
     <div
       v-else-if="loadError"
-      class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+      class="bg-red-500/100/5 rounded-lg border border-red-500/20 p-4 text-sm text-red-500"
     >
       {{ loadError }}
     </div>
@@ -225,7 +225,7 @@
     >
       <div class="text-xs font-medium uppercase text-emerald-500">Selected Sub-uncertainty</div>
 
-      <div class="mt-1 text-lg font-semibold text-emerald-900">
+      <div class="mt-1 text-lg font-semibold text-emerald-500">
         {{ subUncertainty.title }}
       </div>
 
@@ -362,7 +362,7 @@
           <span class="inline-block h-3 w-3 rounded-full bg-emerald-500/10" /> met
         </span>
         <span class="mr-4 inline-flex items-center gap-1">
-          <span class="inline-block h-3 w-3 rounded-full bg-red-500" /> failed
+          <span class="bg-red-500/100/5 inline-block h-3 w-3 rounded-full" /> failed
         </span>
         <span class="font-mono text-app-muted">- = missing</span>
       </div>

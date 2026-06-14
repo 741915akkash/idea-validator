@@ -15,7 +15,7 @@
     class="flex items-center justify-between rounded-[32px] border border-app-border p-5 text-app-text shadow-sm transition-all"
   >
     <div class="no-scrollbar flex flex-1 items-center gap-5 overflow-x-auto">
-      <div class="mr-2 shrink-0 text-[9px] font-black uppercase tracking-widest text-gray-300">
+      <div class="mr-2 shrink-0 text-[9px] font-black uppercase tracking-widest text-app-muted">
         Workflow<br />Timeline
       </div>
 
@@ -30,9 +30,9 @@
               :class="[
                 'rounded-lg p-1.5 transition-colors',
                 step.type === 'call'
-                  ? 'bg-blue-50 text-blue-500'
+                  ? 'bg-blue-500/10 text-blue-500'
                   : step.type === 'email'
-                    ? 'bg-orange-50 text-orange-500'
+                    ? 'bg-orange-500/10 text-orange-500'
                     : 'bg-emerald-500/10 text-emerald-500'
               ]"
             >
@@ -53,7 +53,7 @@
 
           <div
             v-if="i < steps.length - 1"
-            class="mx-2 h-0.5 w-8 shrink-0 rounded-full bg-gray-100"
+            class="mx-2 h-0.5 w-8 shrink-0 rounded-full bg-app-panel"
           ></div>
         </template>
       </div>

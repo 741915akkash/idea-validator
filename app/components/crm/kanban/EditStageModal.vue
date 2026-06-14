@@ -1,7 +1,6 @@
 <script setup>
   import { ref } from 'vue'
   import { useLeadsStore } from '~/stores/leads'
-  import { useStagesStore } from '~/stores/stages'
   import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
 
   const props = defineProps({
@@ -13,7 +12,6 @@
 
   const emit = defineEmits(['close'])
 
-  const stagesStore = useStagesStore()
   const leadsStore = useLeadsStore()
 
   const COLOR_OPTIONS = [
@@ -46,7 +44,7 @@
     saveError.value = ''
 
     try {
-      const updated = await crmGlobalFetch('/api/crm/pipeline/stages/update', {
+      const updated = await crmGlobalFetch('/api/crm/pipelines/stages/update', {
         method: 'PATCH',
         body: {
           id: props.stage.id,
@@ -55,7 +53,6 @@
         }
       })
 
-      stagesStore.updateStage(updated)
       leadsStore.setLeads(
         leadsStore.leads.map((lead) =>
           lead.stage_id === updated.id ? { ...lead, stage: updated.name } : lead
@@ -109,7 +106,7 @@
         </div>
       </div>
 
-      <p v-if="saveError" class="mt-3 text-xs text-red-600">{{ saveError }}</p>
+      <p v-if="saveError" class="mt-3 text-xs text-red-500">{{ saveError }}</p>
 
       <div class="mt-8 flex justify-end gap-3">
         <button

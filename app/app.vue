@@ -1,5 +1,6 @@
 <script setup>
   import { useQuizSessionStore } from '~/stores/quizSession'
+  import { bootstrapTheme } from '~/composables/useTheme'
 
   const quizStore = useQuizSessionStore()
   if (import.meta.client) {
@@ -7,7 +8,7 @@
   }
 
   onMounted(() => {
-    document.documentElement.classList.add('dark')
+    bootstrapTheme()
   })
 
   useHead({

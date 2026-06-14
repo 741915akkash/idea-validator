@@ -15,7 +15,7 @@
     <NuxtLink to="/blog" class="transition-colors hover:text-black">Blog</NuxtLink>
 
     <template v-for="(seg, i) in segments" :key="i">
-      <span class="text-gray-300">/</span>
+      <span class="text-app-muted">/</span>
 
       <NuxtLink
         :to="'/' + segments.slice(0, i + 1).join('/')"

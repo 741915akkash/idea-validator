@@ -139,8 +139,8 @@
             v-for="source in sourcesStore.sources"
             :key="source.id"
             @click="updateSource(source.id)"
-            class="flex cursor-pointer items-center px-3 py-1.5 text-[11px] font-medium text-app-muted hover:bg-gray-100"
-            :class="source.id === lead.source_id ? 'bg-gray-100 font-semibold' : ''"
+            class="flex cursor-pointer items-center px-3 py-1.5 text-[11px] font-medium text-app-muted hover:bg-app-panel"
+            :class="source.id === lead.source_id ? 'bg-app-panel font-semibold' : ''"
           >
             <span class="truncate">{{ source.name }}</span>
           </div>

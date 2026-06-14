@@ -10,7 +10,9 @@
         Validate Your Idea
         <span class="relative mt-2 inline-block text-emerald-600">
           Before You Build
-          <span class="absolute bottom-1 left-0 -z-10 h-[6px] w-full rounded-full bg-emerald-100" />
+          <span
+            class="absolute bottom-1 left-0 -z-10 h-[6px] w-full rounded-full bg-emerald-500/10"
+          />
         </span>
       </h1>
 

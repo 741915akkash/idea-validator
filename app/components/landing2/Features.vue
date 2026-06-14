@@ -14,7 +14,7 @@
           class="group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-lg"
         >
           <div
-            class="mb-5 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 transition-colors group-hover:bg-emerald-100"
+            class="mb-5 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 transition-colors group-hover:bg-emerald-500/10"
           >
             <component :is="item.icon" class="h-6 w-6 text-emerald-600" />
           </div>

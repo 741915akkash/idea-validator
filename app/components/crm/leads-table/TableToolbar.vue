@@ -3,7 +3,6 @@
   import { useUser } from '~/composables/useUser'
   import { useSequencesStore } from '~/stores/sequences'
   import { useSourcesStore } from '~/stores/sources'
-  import { useStagesStore } from '~/stores/stages'
   import { useUsersStore } from '~/stores/users'
   import { usePipelinesStore } from '~/stores/pipelines'
   import AddLeadModal from './AddLeadModal.vue'
@@ -26,7 +25,6 @@
   const filterDropdownStyle = ref({})
   const viewDropdownStyle = ref({})
   const pipelinesStore = usePipelinesStore()
-  const stagesStore = useStagesStore()
   const usersStore = useUsersStore()
   const sourcesStore = useSourcesStore()
   const sequencesStore = useSequencesStore()
@@ -138,7 +136,7 @@
     }
 
     if (typeId === 'stage_id') {
-      activeFilterOptions.value = stagesStore.stages
+      activeFilterOptions.value = pipelinesStore.stages
         .map((stage) => stage?.name)
         .filter((value) => value !== null && value !== undefined && String(value).trim() !== '')
         .map((value) => String(value))
@@ -499,7 +497,7 @@
           v-if="showColumns"
           ref="viewPanelRef"
           :style="viewDropdownStyle"
-          class="w-56 rounded-xl bg-app-panel border border-app-border p-3 text-app-text shadow-xl ring-1 ring-black ring-opacity-5"
+          class="w-56 rounded-xl border border-app-border bg-app-panel p-3 text-app-text shadow-xl ring-1 ring-black ring-opacity-5"
           @click.stop
         >
           <h3 class="mb-3 px-1 text-xs font-bold uppercase tracking-widest text-app-muted">

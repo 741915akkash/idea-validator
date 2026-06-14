@@ -192,7 +192,7 @@
                       class="text-[8px] text-emerald-600"
                       >▼</span
                     >
-                    <span v-else class="text-[8px] text-gray-300">▲</span>
+                    <span v-else class="text-[8px] text-app-muted">▲</span>
                   </div>
                 </div>
 
@@ -204,7 +204,7 @@
                   @touchstart.stop="header.getResizeHandler()($event)"
                 >
                   <div
-                    class="absolute right-0 top-0 h-full w-[1px] bg-gray-200 transition-colors"
+                    class="absolute right-0 top-0 h-full w-[1px] bg-app-panel transition-colors"
                     :class="header.column.getIsResizing() ? 'w-[2px] bg-emerald-500/10' : ''"
                   />
                 </div>
@@ -218,7 +218,7 @@
               v-for="row in table.getRowModel().rows"
               :key="row.id"
               @click="openLead(row.original)"
-              class="group h-[44px] cursor-pointer transition-all duration-200 hover:bg-gray-100/80 hover:shadow-[0_4px_12px_-4px_rgba(0,0,0,0.1)]"
+              class="hover:bg-app-panel/80 group h-[44px] cursor-pointer transition-all duration-200 hover:shadow-[0_4px_12px_-4px_rgba(0,0,0,0.1)]"
             >
               <td
                 v-for="(cell, index) in row.getVisibleCells()"

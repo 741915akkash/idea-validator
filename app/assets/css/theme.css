@@ -1,4 +1,6 @@
-:root {
+html {
+  color-scheme: light;
+
   /* Page */
   --bg: #f8faf9;
 
@@ -36,7 +38,9 @@
   --pill-active-text: #ffffff;
 }
 
-.dark {
+html.dark {
+  color-scheme: dark;
+
   /* Background hierarchy */
   --bg: #0f0f10;
   --panel: #141414;

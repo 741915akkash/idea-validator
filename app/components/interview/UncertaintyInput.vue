@@ -244,7 +244,7 @@
             </div>
             <button
               @click="removeSubUncertainty(sub.id)"
-              class="text-sm text-red-600"
+              class="text-sm text-red-500"
               type="button"
             >
               Remove
@@ -254,7 +254,7 @@
       </div>
     </div>
 
-    <div v-if="error" class="mt-4 text-sm text-red-600">
+    <div v-if="error" class="mt-4 text-sm text-red-500">
       {{ error }}
     </div>
 

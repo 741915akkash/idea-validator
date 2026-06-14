@@ -2,14 +2,15 @@
   import { computed, ref } from 'vue'
   import draggable from 'vuedraggable'
   import { useLeadsStore } from '~/stores/leads'
-  import { useStagesStore } from '~/stores/stages'
+  import { usePipelinesStore } from '~/stores/pipelines'
   import KanbanColumn from './KanbanColumn.vue'
   import LeadDetailPanel from '../lead-detail/LeadDetailPanel.vue'
 
   const leadsStore = useLeadsStore()
-  const stagesStore = useStagesStore()
+  const pipelinesStore = usePipelinesStore()
 
-  const stages = computed(() => stagesStore.stages)
+  const stages = computed(() => pipelinesStore.activePipeline?.stages || [])
+
   const selectedLeadId = ref(null)
   const showDetail = ref(false)
 
@@ -30,7 +31,12 @@
     <!-- Scroll area -->
     <div class="custom-scrollbar flex flex-1 overflow-x-auto pb-4">
       <div class="flex min-w-max items-start gap-6">
-        <KanbanColumn v-for="stage in stages" :key="stage.id" :stage="stage" @open-lead="openLead" />
+        <KanbanColumn
+          v-for="stage in stages"
+          :key="stage.id"
+          :stage="stage"
+          @open-lead="openLead"
+        />
       </div>
     </div>
 

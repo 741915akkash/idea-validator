@@ -11,7 +11,7 @@
         <p class="mb-6 text-xl font-semibold leading-relaxed text-slate-900 sm:text-2xl">
           Founders Don't Fail From Lack of Effort.
           <br />
-          <span class="text-red-600 underline decoration-red-200 underline-offset-4">
+          <span class="text-red-500 underline decoration-red-200 underline-offset-4">
             They fail because they validate the wrong things.
           </span>
         </p>

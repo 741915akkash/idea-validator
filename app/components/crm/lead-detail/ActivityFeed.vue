@@ -80,17 +80,17 @@
 
     <!-- Top 3 Feed -->
     <div
-      class="relative space-y-8 before:absolute before:bottom-0 before:left-2 before:top-2 before:w-px before:bg-gray-100"
+      class="relative space-y-8 before:absolute before:bottom-0 before:left-2 before:top-2 before:w-px before:bg-app-border"
     >
       <div v-for="act in recentActivities" :key="act.id" class="relative pl-8">
         <div
           :class="[
-            'absolute left-0 top-0.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white ring-4 ring-white',
+            'absolute left-0 top-0.5 z-10 flex h-4 w-4 items-center justify-center rounded-full',
             act.type === 'note'
               ? 'bg-emerald-500/10'
               : act.type === 'email'
-                ? 'bg-blue-500'
-                : 'bg-gray-300'
+                ? 'bg-blue-500/100'
+                : 'bg-app-panel'
           ]"
         >
           <div class="h-1.5 w-1.5 rounded-full text-app-text"></div>
@@ -104,7 +104,7 @@
           <button
             v-if="act.type === 'interview' && act.interview_id"
             @click="openInterviewFromActivity(act.interview_id)"
-            class="w-fit text-[11px] font-medium text-violet-700 hover:underline"
+            class="w-fit text-[11px] font-medium text-violet-500 hover:underline"
           >
             Open Interview
           </button>
@@ -114,7 +114,7 @@
               {{ formatExactDate(act.created_at) }}
             </span>
 
-            <span class="h-0.5 w-0.5 rounded-full bg-gray-300"></span>
+            <span class="h-0.5 w-0.5 rounded-full bg-app-panel"></span>
 
             <span class="text-app-muted">
               {{ formatRelativeDate(act.created_at) }}
@@ -148,7 +148,7 @@
       <!-- Panel -->
       <div
         v-if="showPanel"
-        class="fixed inset-y-0 right-0 z-[201] flex w-full max-w-[480px] flex-col border-l border-app-border text-app-text shadow-2xl"
+        class="fixed inset-y-0 right-0 z-[201] flex w-full max-w-[480px] flex-col border-l border-app-border bg-app-panel text-app-text shadow-2xl"
       >
         <!-- Header -->
         <header class="flex h-[72px] items-center justify-between border-b border-app-border px-6">
@@ -161,7 +161,7 @@
 
           <button
             @click="showPanel = false"
-            class="rounded-full p-2 text-app-muted hover:bg-gray-100 hover:text-app-muted"
+            class="rounded-full p-2 text-app-muted hover:bg-app-hover hover:text-app-text"
           >
             <X class="h-5 w-5" />
           </button>
@@ -170,21 +170,21 @@
         <!-- Content -->
         <main class="bg-app-panel/40 flex-1 overflow-y-auto p-6">
           <div
-            class="relative space-y-10 before:absolute before:bottom-0 before:left-[11px] before:top-2 before:w-px before:bg-gray-200"
+            class="relative space-y-10 before:absolute before:bottom-0 before:left-[11px] before:top-2 before:w-px before:bg-app-border"
           >
             <div v-for="act in activities" :key="'panel-' + act.id" class="relative pl-10">
               <div
                 :class="[
-                  'absolute left-0 top-1 h-5 w-5 rounded-full border-4 border-white ring-4 ring-white',
+                  'absolute left-0 top-1 h-5 w-5 rounded-full',
                   act.type === 'note'
                     ? 'bg-emerald-500/10'
                     : act.type === 'email'
-                      ? 'bg-blue-500'
-                      : 'bg-gray-400'
+                      ? 'bg-blue-500/100'
+                      : 'bg-app-panel'
                 ]"
               ></div>
 
-              <div class="rounded-xl border border-app-border p-4 text-app-text">
+              <div class="rounded-xl border border-app-border bg-app-card p-4 text-app-text">
                 <div class="mb-2 flex justify-between text-xs text-app-muted">
                   <span class="font-medium uppercase">{{ act.type }}</span>
                   <div class="flex items-center gap-2">
@@ -192,7 +192,7 @@
                       {{ formatExactDate(act.created_at) }}
                     </span>
 
-                    <span class="h-0.5 w-0.5 rounded-full bg-gray-300"></span>
+                    <span class="h-0.5 w-0.5 rounded-full bg-app-panel"></span>
 
                     <span class="text-app-muted">
                       {{ formatRelativeDate(act.created_at) }}
@@ -207,7 +207,7 @@
                 <button
                   v-if="act.type === 'interview' && act.interview_id"
                   @click="openInterviewFromActivity(act.interview_id)"
-                  class="mt-3 w-fit text-xs font-medium text-violet-700 hover:underline"
+                  class="mt-3 w-fit text-xs font-medium text-violet-500 hover:underline"
                 >
                   Open Interview
                 </button>

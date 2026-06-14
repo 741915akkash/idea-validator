@@ -391,7 +391,7 @@
                   >
                     Note
                   </div>
-                  <div class="whitespace-pre-wrap text-sm italic text-emerald-900">
+                  <div class="whitespace-pre-wrap text-sm italic text-emerald-500">
                     {{ change.notes.current.join('; ') || '—' }}
                   </div>
                 </div>

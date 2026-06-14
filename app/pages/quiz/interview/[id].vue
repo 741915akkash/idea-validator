@@ -68,7 +68,7 @@
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="mx-auto max-w-4xl px-6 py-12 text-sm text-red-600">
+    <div v-else-if="error" class="mx-auto max-w-4xl px-6 py-12 text-sm text-red-500">
       {{ error }}
     </div>
 

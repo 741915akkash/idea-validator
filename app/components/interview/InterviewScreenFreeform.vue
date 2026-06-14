@@ -487,7 +487,7 @@
                       "
                       :class="
                         answers[question.id] === 'yes'
-                          ? 'border-emerald-500 border-emerald-500 bg-emerald-500/10 text-emerald-500'
+                          ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500'
                           : 'border-app-border bg-app-panel text-app-text hover:border-emerald-500/30 hover:bg-emerald-500/5'
                       "
                       class="rounded-full border px-4 py-2 text-xs font-medium"
@@ -504,7 +504,7 @@
                       "
                       :class="
                         answers[question.id] === 'no'
-                          ? 'border-red-500 bg-red-500/10 text-red-500'
+                          ? 'bg-red-500/100/5/10 border-red-500/20 text-red-500'
                           : 'border-app-border bg-app-panel text-app-text hover:border-emerald-500/30 hover:bg-emerald-500/5'
                       "
                       class="rounded-full border px-4 py-2 text-xs font-medium"
@@ -529,7 +529,7 @@
                       "
                       :class="
                         answers[question.id] === option
-                          ? 'border-emerald-500 border-emerald-500 bg-emerald-500/10 text-emerald-500'
+                          ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500'
                           : 'border-app-border bg-app-panel text-app-text hover:border-emerald-500/30 hover:bg-emerald-500/5'
                       "
                       class="rounded-full border px-4 py-2 text-xs font-medium"
@@ -549,7 +549,7 @@
                       @click="toggleMulti(question, option)"
                       :class="
                         (answers[question.id] || []).includes(option)
-                          ? 'border-emerald-500 border-emerald-500 bg-emerald-500/10 text-emerald-500'
+                          ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500'
                           : 'border-app-border bg-app-panel text-app-text hover:border-emerald-500/30 hover:bg-emerald-500/5'
                       "
                       class="rounded-full border px-4 py-2 text-xs font-medium"
@@ -567,7 +567,7 @@
                         @click="selectRating(question, value)"
                         :class="
                           answers[question.id] === value
-                            ? 'border-emerald-500 border-emerald-500 bg-emerald-500/10 text-emerald-500 text-emerald-900'
+                            ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500'
                             : 'border-app-border bg-app-panel text-app-text hover:border-emerald-500/30 hover:bg-emerald-500/5'
                         "
                         class="min-w-[2.5rem] rounded-full border px-4 py-2 text-xs font-medium transition"

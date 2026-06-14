@@ -91,7 +91,7 @@
     </div>
 
     <!-- Error -->
-    <div v-if="error" class="mt-4 text-sm text-red-600">
+    <div v-if="error" class="mt-4 text-sm text-red-500">
       {{ error }}
     </div>
 

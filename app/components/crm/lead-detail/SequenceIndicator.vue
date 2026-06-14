@@ -137,7 +137,7 @@
     <div
       v-if="sequence"
       @click="openSequence"
-      class="bg-app-panel/30 group cursor-pointer rounded-xl border border-app-border p-4 transition-all hover:bg-gray-100"
+      class="bg-app-panel/30 group cursor-pointer rounded-xl border border-app-border p-4 transition-all hover:bg-app-hover"
     >
       <div class="flex items-start justify-between">
         <div class="flex flex-col gap-1">
@@ -156,7 +156,7 @@
         </div>
 
         <div
-          class="mt-1 text-xs text-app-muted transition group-hover:translate-x-0.5 group-hover:text-app-muted"
+          class="mt-1 text-xs text-app-muted transition group-hover:translate-x-0.5 group-hover:text-app-text"
         >
           →
         </div>
@@ -171,21 +171,24 @@
     </div>
 
     <!-- DROPDOWN -->
-    <div v-if="open" class="mt-4 overflow-hidden rounded-xl border border-app-border text-app-text">
+    <div
+      v-if="open"
+      class="mt-4 overflow-hidden rounded-xl border border-app-border bg-app-panel text-app-text"
+    >
       <!-- REMOVE SEQUENCE -->
       <button
         v-if="sequence"
         :disabled="loading"
         @click="assignSequence(null)"
-        class="flex w-full items-center justify-between border-b border-red-100 bg-red-50/40 px-4 py-3 text-left transition-all hover:bg-red-50"
+        class="bg-red-500/100/5/5 hover:bg-red-500/100/5/10 border-red-500/20/20 flex w-full items-center justify-between border-b px-4 py-3 text-left transition-all"
       >
         <div class="flex flex-col">
-          <span class="text-sm font-medium text-red-700"> Remove Sequence </span>
+          <span class="text-sm font-medium text-red-500"> Remove Sequence </span>
 
-          <span class="text-xs text-red-400"> Clear active automation </span>
+          <span class="text-xs text-red-500"> Clear active automation </span>
         </div>
 
-        <span class="text-xs text-red-300"> × </span>
+        <span class="text-xs text-red-500"> × </span>
       </button>
 
       <!-- SEQUENCES -->
@@ -207,12 +210,12 @@
         <div class="flex items-center gap-2">
           <span
             v-if="String(sequence?.id) === String(item.id)"
-            class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase text-emerald-500"
+            class="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold uppercase text-emerald-500"
           >
             Active
           </span>
 
-          <span class="text-xs text-gray-300"> → </span>
+          <span class="text-xs text-app-muted"> → </span>
         </div>
       </button>
 

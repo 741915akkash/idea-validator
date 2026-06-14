@@ -21,7 +21,7 @@
     if (priority >= 79) {
       return {
         label: 'High',
-        classes: 'bg-red-100 text-red-700 border-red-200'
+        classes: 'bg-red-500/100/5 text-red-500 border-red-500/20'
       }
     }
     if (priority >= 65) {
@@ -43,7 +43,7 @@
   const toneClasses = {
     positive: {
       title: 'text-emerald-500',
-      bullet: 'text-emerald-900',
+      bullet: 'text-emerald-500',
       dot: 'bg-emerald-500/10'
     },
     negative: {

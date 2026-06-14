@@ -96,12 +96,12 @@
 
 <template>
   <!-- overlay -->
-  <div class="fixed inset-0 z-[140] bg-black/20" @click="handleOutsideClick">
+  <div class="fixed inset-0 z-[140] bg-black/20 dark:bg-black/60" @click="handleOutsideClick">
     <!-- modal -->
     <div
       v-if="lead"
       @click.stop
-      class="animate-in slide-in-from-right fixed inset-y-0 right-0 z-[150] flex w-full max-w-[460px] flex-col overflow-hidden border-l border-app-border text-app-text shadow-2xl duration-300"
+      class="animate-in slide-in-from-right fixed inset-y-0 right-0 z-[150] flex w-full max-w-[460px] flex-col overflow-hidden border-l border-app-border bg-app-panel text-app-text shadow-2xl duration-300"
     >
       <LeadDetailHeader
         :lead="lead"

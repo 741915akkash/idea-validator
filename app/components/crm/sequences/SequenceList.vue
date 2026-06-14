@@ -132,7 +132,7 @@
               </button>
               <button
                 @click.stop="removeSequence(seq.id)"
-                class="rounded-lg p-2 text-app-muted transition-colors hover:bg-red-50 hover:text-red-600"
+                class="hover:bg-red-500/100/5 rounded-lg p-2 text-app-muted transition-colors hover:text-red-500"
                 title="Delete"
               >
                 <Trash2 class="h-4 w-4" />
@@ -184,7 +184,7 @@
       class="bg-app-panel/50 rounded-[40px] border-2 border-dashed border-app-border py-24 text-center"
     >
       <div
-        class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl text-app-text text-gray-200 shadow-sm"
+        class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl text-app-muted text-app-text shadow-sm"
       >
         <Layers class="h-8 w-8" />
       </div>

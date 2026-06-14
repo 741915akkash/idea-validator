@@ -68,7 +68,7 @@
 
     <div
       v-else-if="error"
-      class="rounded border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-700"
+      class="bg-red-500/100/5 rounded border border-red-500/20 px-4 py-4 text-sm text-red-500"
     >
       {{ error }}
     </div>

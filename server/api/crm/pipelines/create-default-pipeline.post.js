@@ -1,19 +1,29 @@
 import { pool } from '../../../db/index.js'
 import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js'
 
+const DEFAULT_PIPELINE_NAME = 'Sales Pipeline'
+
 const DEFAULT_STAGES = ['New Lead', 'Qualified', 'Proposal Sent', 'Negotiation', 'Closed Won']
 
 export default defineEventHandler(async (event) => {
   const { userId } = await requireCrmEnabled(event)
-  const body = await readBody(event)
 
-  const name = String(body?.name || '').trim()
+  const existingPipeline = await pool.query(
+    `
+    SELECT id
+    FROM pipelines
+    WHERE user_id = $1
+    LIMIT 1
+    `,
+    [userId]
+  )
 
-  if (!name) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Pipeline name is required'
-    })
+  if (existingPipeline.rows.length) {
+    return {
+      success: true,
+      skipped: true,
+      message: 'User already has pipelines'
+    }
   }
 
   const client = await pool.connect()
@@ -30,7 +40,7 @@ export default defineEventHandler(async (event) => {
       VALUES ($1, $2)
       RETURNING *
       `,
-      [userId, name]
+      [userId, DEFAULT_PIPELINE_NAME]
     )
 
     const pipeline = pipelineResult.rows[0]
@@ -40,19 +50,22 @@ export default defineEventHandler(async (event) => {
         `
         INSERT INTO pipeline_stages (
           pipeline_id,
+          user_id,
           name,
-          position,
-          user_id
+          position
         )
         VALUES ($1, $2, $3, $4)
         `,
-        [pipeline.id, DEFAULT_STAGES[i], i + 1, userId]
+        [pipeline.id, userId, DEFAULT_STAGES[i], i + 1]
       )
     }
 
     await client.query('COMMIT')
 
-    return pipeline
+    return {
+      success: true,
+      pipeline
+    }
   } catch (error) {
     await client.query('ROLLBACK')
     throw error

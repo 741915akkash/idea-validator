@@ -160,7 +160,7 @@
           <div
             class="mt-0.5 flex h-5 w-5 items-center justify-center rounded-sm text-xs font-semibold"
             :class="
-              condition.status === 'met' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+              condition.status === 'met' ? 'bg-green-600 text-white' : 'bg-red-500/100/5 text-white'
             "
           >
             {{ condition.status === 'met' ? '✓' : '✕' }}
@@ -200,7 +200,7 @@
       </button>
     </div>
 
-    <div v-if="error" class="mt-4 text-sm text-red-600">
+    <div v-if="error" class="mt-4 text-sm text-red-500">
       {{ error }}
     </div>
   </div>

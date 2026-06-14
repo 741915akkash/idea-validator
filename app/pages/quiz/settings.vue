@@ -1,6 +1,7 @@
 <script setup>
   import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { applyThemeMode, getStoredTheme } from '~/composables/useTheme'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import { useSourcesStore } from '~/stores/sources'
   import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
@@ -354,27 +355,16 @@
   })
 
   onMounted(() => {
-    theme.value = localStorage.getItem('theme') || 'system'
+    theme.value = getStoredTheme()
     applyTheme()
   })
 
   function applyTheme() {
-    localStorage.setItem('theme', theme.value)
-
-    if (theme.value === 'dark') {
-      document.documentElement.classList.add('dark')
-      return
+    if (import.meta.client) {
+      localStorage.setItem('theme', theme.value)
     }
 
-    if (theme.value === 'light') {
-      document.documentElement.classList.remove('dark')
-      return
-    }
-
-    // system
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-
-    document.documentElement.classList.toggle('dark', prefersDark)
+    applyThemeMode(theme.value)
   }
 </script>
 

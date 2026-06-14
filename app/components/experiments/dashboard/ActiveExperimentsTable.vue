@@ -55,7 +55,7 @@
                 :class="{
                   'text-nuxt-green': exp.status === 'winning',
                   'text-app-muted': exp.status === 'neutral',
-                  'text-red-400': exp.status === 'failing'
+                  'text-red-500': exp.status === 'failing'
                 }"
                 class="font-bold"
                 >#{{ exp.id }}</span

@@ -1,6 +1,6 @@
 <script setup>
   import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-  import { useStagesStore } from '~/stores/stages'
+  import { usePipelinesStore } from '../../../stores/pipelines'
   import { useLeadsStore } from '~/stores/leads'
   import { crmQuizFetch } from '~/composables/useCrmRequest'
 
@@ -8,7 +8,7 @@
     lead: Object
   })
 
-  const stagesStore = useStagesStore()
+  const pipelineStore = usePipelinesStore()
   const leadsStore = useLeadsStore()
 
   const open = ref(false)
@@ -20,7 +20,9 @@
     width: '120px'
   })
 
-  const currentStage = computed(() => stagesStore.stages.find((s) => s.id === props.lead.stage_id))
+  const currentStage = computed(() =>
+    pipelineStore.activeStages.find((s) => s.id === props.lead.stage_id)
+  )
 
   function updatePosition() {
     if (!triggerRef.value) return
@@ -51,6 +53,7 @@
   onMounted(() => {
     document.addEventListener('click', handleClickOutside)
     window.addEventListener('scroll', updatePosition, true)
+    console.log(`Active Stages: ${JSON.stringify(pipelineStore.activeStages)}`)
   })
 
   onBeforeUnmount(() => {
@@ -63,7 +66,7 @@
 
     const nextStageId = Number(stage_id)
     const previousLead = { ...props.lead }
-    const nextStage = stagesStore.stages.find((s) => s.id === nextStageId)
+    const nextStage = pipelineStore.activeStages.find((s) => s.id === nextStageId)
 
     // optimistic update
     leadsStore.updateLead({
@@ -94,7 +97,7 @@
     2: 'bg-amber-50 text-amber-800 border-amber-200/50',
     3: 'bg-emerald-500/10 text-emerald-800 border-emerald-200/50',
     4: 'bg-indigo-50 text-indigo-800 border-indigo-200/50',
-    5: 'bg-red-50 text-red-800 border-red-200/50'
+    5: 'bg-red-500/100/5 text-red-500 border-red-500/20/50'
   }
 
   const dotColorMap = {
@@ -102,7 +105,7 @@
     2: 'bg-amber-500',
     3: 'bg-emerald-500/10',
     4: 'bg-indigo-500',
-    5: 'bg-red-500'
+    5: 'bg-red-500/100/5'
   }
 </script>
 
@@ -146,11 +149,11 @@
       >
         <div class="max-h-60 overflow-auto py-1">
           <div
-            v-for="stage in stagesStore.stages"
+            v-for="stage in pipelineStore.activeStages"
             :key="stage.id"
             @click="updateStage(stage.id)"
-            class="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-[11px] font-medium text-app-muted hover:bg-gray-100"
-            :class="stage.id === lead.stage_id ? 'bg-gray-100 font-semibold' : ''"
+            class="flex cursor-pointer items-center gap-2 px-3 py-1.5 text-[11px] font-medium text-app-muted hover:bg-app-panel"
+            :class="stage.id === lead.stage_id ? 'bg-app-panel font-semibold' : ''"
           >
             <span class="h-1.5 w-1.5 rounded-full" :class="dotColorMap[stage.id]" />
             <span class="truncate">{{ stage.name }}</span>

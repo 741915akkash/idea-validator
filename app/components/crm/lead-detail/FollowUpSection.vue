@@ -286,11 +286,11 @@
             <!-- STATUS -->
             <span
               v-if="status"
-              class="rounded-md px-2 py-0.5 text-[10px] font-bold uppercase text-white"
+              class="rounded-md px-2 py-0.5 text-[10px] font-bold uppercase"
               :class="{
-                'bg-emerald-600': status === 'today',
-                'bg-gray-600': status === 'tomorrow',
-                'bg-red-600': status === 'overdue'
+                'bg-emerald-600 text-white': status === 'today',
+                'border border-app-border bg-app-card text-app-text': status === 'tomorrow',
+                'bg-red-500/100/10 text-red-500': status === 'overdue'
               }"
             >
               {{ statusLabel() }}
@@ -304,7 +304,7 @@
           <button
             @click="toggle"
             :disabled="isSaving"
-            class="rounded-lg border border-app-border px-3 py-1.5 text-[10px] font-bold uppercase text-app-muted text-app-text shadow-sm transition hover:border-emerald-500 hover:text-emerald-600 disabled:opacity-60"
+            class="rounded-lg border border-app-border px-3 py-1.5 text-[10px] font-bold uppercase text-app-text shadow-sm transition hover:border-emerald-500 hover:text-emerald-600 disabled:opacity-60"
           >
             Reschedule ▾
           </button>
@@ -347,25 +347,25 @@
       <!-- DROPDOWN -->
       <div
         v-if="open"
-        class="absolute right-5 top-14 z-10 w-44 rounded-lg border border-app-border text-app-text shadow-lg"
+        class="absolute right-5 top-14 z-10 w-44 rounded-lg border border-app-border bg-app-panel text-app-text shadow-lg"
       >
         <button
           @click="setFollowUp('today')"
-          class="w-full px-3 py-2 text-left text-xs text-app-muted hover:bg-gray-100"
+          class="w-full px-3 py-2 text-left text-xs text-app-muted hover:bg-app-panel"
         >
           Today
         </button>
 
         <button
           @click="setFollowUp('tomorrow')"
-          class="w-full px-3 py-2 text-left text-xs text-app-muted hover:bg-gray-100"
+          class="w-full px-3 py-2 text-left text-xs text-app-muted hover:bg-app-panel"
         >
           Tomorrow
         </button>
 
         <button
           @click="setFollowUp('plus3d')"
-          class="w-full px-3 py-2 text-left text-xs text-app-muted hover:bg-gray-100"
+          class="w-full px-3 py-2 text-left text-xs text-app-muted hover:bg-app-panel"
         >
           +3 days
         </button>
@@ -374,12 +374,12 @@
           <input
             v-model="customDate"
             type="date"
-            class="mb-2 w-full rounded border border-app-border px-2 py-1 text-xs text-app-muted"
+            class="mb-2 w-full rounded border border-app-border bg-app-card px-2 py-1 text-xs text-app-text outline-none focus:border-emerald-500"
           />
 
           <button
             @click="applyCustomDate"
-            class="w-full rounded bg-gray-900 px-2 py-1.5 text-xs font-semibold text-white hover:bg-gray-800"
+            class="w-full rounded bg-emerald-600 px-2 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700"
           >
             Apply Date
           </button>
@@ -387,7 +387,7 @@
 
         <button
           @click="close"
-          class="w-full border-t border-app-border px-3 py-2 text-left text-xs text-app-muted hover:bg-gray-100"
+          class="w-full border-t border-app-border px-3 py-2 text-left text-xs text-app-muted hover:bg-app-panel"
         >
           Close
         </button>

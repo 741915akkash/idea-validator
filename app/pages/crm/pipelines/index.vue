@@ -1,6 +1,7 @@
 <script setup>
   import { ref, onMounted } from 'vue'
   import { crmGlobalFetch } from '~/composables/useCrmRequest'
+  import TopAlert from '~/components/ui/TopAlert.vue'
 
   definePageMeta({
     layout: 'app',
@@ -8,36 +9,53 @@
   })
 
   const pipelines = ref([])
-  const showCreatePipeline = ref(false)
-  const newPipelineName = ref('')
+  const showPipelinesLimitAlert = ref(false)
 
   onMounted(async () => {
     await loadPipelines()
   })
 
-  // function createPipeline(id, name, leads, stages) {
-  //   return {
-  //     id,
-  //     name,
-  //     leads,
-  //     stages,
+  function createEmptyPipeline() {
+    if (pipelines.value.some((p) => p.isNew)) {
+      return
+    }
 
-  //     open: false,
+    pipelines.value.forEach((p) => {
+      p.open = false
+    })
 
-  //     isAddingStage: false,
-  //     newStageName: '',
+    pipelines.value.unshift({
+      id: 'new',
 
-  //     editingStageIndex: null,
-  //     editingStageValue: '',
+      name: '',
+      stages: [],
 
-  //     deletingStageIndex: null,
+      open: true,
+      isNew: true,
 
-  //     confirmingDeletePipeline: false
-  //   }
-  // }
+      isAddingStage: false,
+      newStageName: '',
+
+      editingStageIndex: null,
+      editingStageValue: '',
+
+      deletingStageIndex: null,
+
+      confirmingDeletePipeline: false
+    })
+  }
+
+  function startAddStage(pipelineId) {
+    const pipeline = pipelines.value.find((p) => p.id === pipelineId)
+
+    if (!pipeline) return
+
+    pipeline.isAddingStage = true
+  }
 
   async function loadPipelines() {
-    const pipelineRows = await crmGlobalFetch('/api/crm/pipelines')
+    const pipelineRows = await crmGlobalFetch('/api/crm/pipelines/list')
+    console.log('Fetched pipelines:', pipelineRows)
 
     const pipelinesWithStages = await Promise.all(
       pipelineRows.map(async (pipeline) => {
@@ -53,6 +71,8 @@
 
           open: false,
 
+          isNew: false,
+
           isAddingStage: false,
           newStageName: '',
 
@@ -67,29 +87,58 @@
     )
 
     pipelines.value = pipelinesWithStages
+    console.log('Loaded pipelines:', pipelines.value)
   }
 
-  async function createPipeline() {
-    const name = newPipelineName.value.trim()
+  async function createPipeline(pipeline) {
+    const name = pipeline.name.trim()
 
     if (!name) return
 
-    await crmGlobalFetch('/api/crm/pipelines/create', {
-      method: 'POST',
-      body: {
-        name
+    try {
+      const createdPipeline = await crmGlobalFetch('/api/crm/pipelines/create', {
+        method: 'POST',
+        body: {
+          name
+        }
+      })
+
+      for (const [index, stage] of pipeline.stages.entries()) {
+        await crmGlobalFetch('/api/crm/pipelines/stages/create', {
+          method: 'POST',
+          body: {
+            pipeline_id: createdPipeline.id,
+            name: stage.name,
+            position: index + 1
+          }
+        })
       }
-    })
 
-    showCreatePipeline.value = false
-    newPipelineName.value = ''
+      await loadPipelines()
+    } catch (error) {
+      if (error?.response?.status === 403) {
+        showPipelinesLimitAlert.value = true
+        cancelNewPipeline()
+        return
+      }
 
-    await loadPipelines()
+      throw error
+    }
+  }
+
+  function cancelNewPipeline() {
+    pipelines.value = pipelines.value.filter((p) => p.id !== 'new')
   }
 
   function togglePipeline(id) {
     pipelines.value.forEach((pipeline) => {
-      pipeline.open = pipeline.id === id ? !pipeline.open : false
+      if (pipeline.id === id) {
+        if (!pipeline.isNew) {
+          pipeline.open = !pipeline.open
+        }
+      } else {
+        pipeline.open = false
+      }
     })
   }
 
@@ -101,6 +150,19 @@
     const name = pipeline.newStageName.trim()
 
     if (!name) return
+
+    // NEW PIPELINE = LOCAL ONLY
+    if (pipeline.isNew) {
+      pipeline.stages.push({
+        id: `temp-${Date.now()}`,
+        name
+      })
+
+      pipeline.newStageName = ''
+      pipeline.isAddingStage = false
+
+      return
+    }
 
     await crmGlobalFetch('/api/crm/pipelines/stages/create', {
       method: 'POST',
@@ -127,6 +189,12 @@
     const pipeline = pipelines.value.find((p) => p.id === pipelineId)
 
     if (!pipeline) return
+
+    // NEW PIPELINE = LOCAL ONLY
+    if (pipeline.isNew) {
+      pipeline.stages.splice(stageIndex, 1)
+      return
+    }
 
     const stage = pipeline.stages[stageIndex]
 
@@ -179,6 +247,16 @@
 
     if (!name) return
 
+    // NEW PIPELINE = LOCAL ONLY
+    if (pipeline.isNew) {
+      pipeline.stages[index].name = name
+
+      pipeline.editingStageIndex = null
+      pipeline.editingStageValue = ''
+
+      return
+    }
+
     await crmGlobalFetch('/api/crm/pipelines/stages/update', {
       method: 'PATCH',
       body: {
@@ -191,6 +269,10 @@
   }
 
   async function savePipeline(pipeline) {
+    if (pipeline.isNew) {
+      return createPipeline(pipeline)
+    }
+
     await crmGlobalFetch('/api/crm/pipelines/update', {
       method: 'PATCH',
       body: {
@@ -232,6 +314,13 @@
 
 <template>
   <div class="mx-auto w-full max-w-4xl space-y-6 px-6 py-6">
+    <TopAlert
+      :open="showPipelinesLimitAlert"
+      title="Pipelines limit reached"
+      variant="warning"
+      message="Upgrade your plan to create more pipelines."
+      @close="showPipelinesLimitAlert = false"
+    />
     <!-- Header -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
@@ -239,32 +328,32 @@
 
         <p class="mt-1 text-sm text-app-muted">Manage pipelines and their stages.</p>
       </div>
-
-      <div v-if="showCreatePipeline" class="rounded-xl border border-app-border p-4 text-app-text">
-        <input
-          v-model="newPipelineName"
-          placeholder="Pipeline name"
-          class="w-full rounded-lg border border-app-border px-3 py-2"
-        />
-
-        <div class="mt-3 flex gap-2">
-          <button class="rounded-lg bg-emerald-600 px-4 py-2 text-white" @click="createPipeline">
-            Create Pipeline
-          </button>
-
-          <button class="rounded-lg border px-4 py-2" @click="showCreatePipeline = false">
-            Cancel
-          </button>
-        </div>
-      </div>
     </div>
 
     <!-- Cards -->
     <div class="grid gap-6" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr))">
       <div
+        v-if="!pipelines.some((p) => p.isNew)"
+        class="rounded-xl border border-app-border bg-app-panel text-app-text shadow-sm"
+      >
+        <button
+          class="flex min-h-[260px] w-full flex-col items-center justify-center gap-3 p-5 transition hover:bg-app-card"
+          @click="createEmptyPipeline"
+        >
+          <div
+            class="flex h-12 w-12 items-center justify-center rounded-xl border border-app-border bg-app-card text-app-text"
+          >
+            +
+          </div>
+
+          <span class="font-medium text-app-muted"> New Pipeline </span>
+        </button>
+      </div>
+
+      <div
         v-for="pipeline in pipelines"
         :key="pipeline.id"
-        class="rounded-xl border border-app-border text-app-text shadow-sm"
+        class="rounded-xl border border-app-border bg-app-panel text-app-text shadow-sm"
       >
         <div class="p-5">
           <h3 class="text-lg font-semibold text-app-text">
@@ -281,7 +370,7 @@
               <div
                 v-for="stage in pipeline.stages"
                 :key="stage.id"
-                class="rounded-md bg-app-card px-3 py-2 text-sm text-app-text"
+                class="rounded-md border border-app-border bg-app-card px-3 py-2 text-sm text-app-text"
               >
                 {{ stage.name }}
               </div>
@@ -289,7 +378,7 @@
 
             <button
               class="mt-5 w-full rounded-lg border border-app-border px-3 py-2 text-sm font-medium text-app-text transition hover:bg-app-card"
-              @click="togglePipeline(pipeline.id)"
+              @click="pipeline.isNew ? cancelNewPipeline() : togglePipeline(pipeline.id)"
             >
               Manage Pipeline
             </button>
@@ -305,7 +394,7 @@
               <input
                 v-model="pipeline.name"
                 type="text"
-                class="w-full rounded-lg border border-app-border px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+                class="w-full rounded-lg border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               />
             </div>
 
@@ -316,12 +405,12 @@
                 <div
                   v-for="(stage, index) in pipeline.stages"
                   :key="stage.id"
-                  class="rounded-lg border border-app-border bg-app-card px-3 py-2"
+                  class="rounded-lg border border-app-border bg-app-card px-3 py-2 text-app-text"
                 >
                   <template v-if="pipeline.editingStageIndex === index">
                     <input
                       v-model="pipeline.editingStageValue"
-                      class="w-full rounded border border-app-border px-2 py-1 text-sm"
+                      class="w-full rounded border border-app-border bg-app-panel px-2 py-1 text-sm text-app-text outline-none focus:border-emerald-500"
                     />
 
                     <div class="mt-2 flex gap-2">
@@ -333,7 +422,7 @@
                       </button>
 
                       <button
-                        class="rounded border px-2 py-1 text-xs"
+                        class="rounded border border-app-border bg-app-panel px-2 py-1 text-xs text-app-text hover:bg-app-card"
                         @click="cancelRenameStage(pipeline.id)"
                       >
                         Cancel
@@ -354,7 +443,8 @@
                         </button>
 
                         <button
-                          class="text-xs text-red-500 hover:text-red-700"
+                          v-if="!pipeline.isNew"
+                          class="text-xs text-red-500 hover:text-red-500"
                           @click="deleteStage(pipeline.id, index)"
                         >
                           Delete
@@ -370,7 +460,7 @@
                   <input
                     v-model="pipeline.newStageName"
                     placeholder="Stage name"
-                    class="w-full rounded-lg border border-app-border px-3 py-2 text-sm"
+                    class="w-full rounded-lg border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text outline-none focus:border-emerald-500"
                   />
 
                   <div class="mt-2 flex gap-2">
@@ -382,7 +472,7 @@
                     </button>
 
                     <button
-                      class="rounded-lg border px-3 py-2 text-sm"
+                      class="rounded-lg border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text hover:bg-app-card"
                       @click="cancelAddStage(pipeline.id)"
                     >
                       Cancel
@@ -392,7 +482,7 @@
 
                 <button
                   v-else
-                  class="w-full rounded-lg border border-dashed border-app-border px-3 py-2 text-sm text-app-muted hover:bg-app-card"
+                  class="w-full rounded-lg border border-dashed border-app-border bg-app-panel px-3 py-2 text-sm text-app-muted transition hover:bg-app-card"
                   @click="startAddStage(pipeline.id)"
                 >
                   + Add Stage
@@ -409,14 +499,14 @@
               </button>
 
               <button
-                class="rounded-lg border border-app-border px-3 py-2 text-sm font-medium text-app-text hover:bg-app-card"
-                @click="togglePipeline(pipeline.id)"
+                class="rounded-lg border border-app-border bg-app-panel px-3 py-2 text-sm font-medium text-app-text transition hover:bg-app-card"
+                @click="pipeline.isNew ? cancelNewPipeline() : togglePipeline(pipeline.id)"
               >
                 Close
               </button>
 
               <button
-                class="rounded-lg border border-red-300 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                class="hover:bg-red-500/100/5/10 rounded-lg border border-red-500/20 px-3 py-2 text-sm font-medium text-red-500 transition"
                 @click="deletePipeline(pipeline.id)"
               >
                 Delete

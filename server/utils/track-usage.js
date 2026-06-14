@@ -236,7 +236,7 @@ async function countPipelines(client, userId) {
   const { rows } = await client.query(
     `
     SELECT COUNT(*)::int AS count
-    FROM pipeline_stages
+    FROM pipelines
     WHERE user_id = $1
     `,
     [userId]

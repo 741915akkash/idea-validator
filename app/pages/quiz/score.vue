@@ -136,7 +136,7 @@
       <p v-if="loading" class="text-base text-app-muted">Loading your results…</p>
 
       <!-- Error -->
-      <div v-else-if="error" class="text-base text-red-600">
+      <div v-else-if="error" class="text-base text-red-500">
         Something went wrong while loading the score.
       </div>
 
@@ -343,7 +343,7 @@
 
         <div v-if="loadingInsights" class="mt-6 text-base text-app-muted">Loading insights…</div>
 
-        <div v-if="insightsError" class="mt-6 text-base text-red-600">
+        <div v-if="insightsError" class="mt-6 text-base text-red-500">
           {{ insightsError }}
         </div>
         </template>

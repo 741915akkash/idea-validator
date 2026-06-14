@@ -42,8 +42,8 @@
               <span
                 :class="
                   lead.stage === 'Closed'
-                    ? 'bg-green-50 text-green-700'
-                    : 'bg-blue-50 text-blue-700'
+                    ? 'bg-green-500/10 text-green-700'
+                    : 'bg-blue-500/10 text-blue-700'
                 "
                 class="rounded-full px-2 py-0.5 text-[10px] font-bold"
               >

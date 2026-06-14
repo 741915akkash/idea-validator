@@ -31,16 +31,16 @@
             @input="$emit('update-value', $event.target.value)"
             @blur="$emit('save-edit')"
             @keyup.enter="$emit('save-edit')"
-            class="w-full border-b border-emerald-500 text-sm font-medium text-app-text outline-none"
+            class="w-full border-b border-emerald-500 bg-transparent text-sm font-medium text-app-text outline-none"
           />
           <span
             v-else
             @click="$emit('start-edit', 'email', lead.email)"
-            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-app-text hover:bg-app-panel"
+            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-app-text hover:bg-app-hover"
           >
             {{ lead.email }}
             <Mail
-              class="h-3 w-3 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
+              class="h-3 w-3 text-app-muted opacity-0 transition-all group-hover:opacity-100 group-hover:text-emerald-500"
             />
           </span>
         </div>
@@ -64,12 +64,12 @@
           <span
             v-else
             @click="$emit('start-edit', 'phone', lead.phone || '')"
-            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-app-text transition-colors hover:bg-app-panel group-hover:text-emerald-600"
-            :class="!lead.phone ? 'italic text-gray-300' : ''"
+            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-app-text transition-colors hover:bg-app-hover group-hover:text-emerald-600"
+            :class="!lead.phone ? 'italic text-app-muted' : ''"
           >
             {{ lead.phone || 'Not provided' }}
             <Phone
-              class="h-3 w-3 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
+              class="h-3 w-3 text-app-muted opacity-0 transition-all group-hover:opacity-100 group-hover:text-emerald-500"
             />
           </span>
         </div>
@@ -93,11 +93,11 @@
           <span
             v-else
             @click="$emit('start-edit', 'company', lead.company)"
-            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-app-text hover:bg-app-panel"
+            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-app-text hover:bg-app-hover"
           >
             {{ lead.company }}
             <Building2
-              class="h-3 w-3 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
+              class="h-3 w-3 text-app-muted opacity-0 transition-all group-hover:opacity-100 group-hover:text-emerald-500"
             />
           </span>
         </div>
@@ -121,12 +121,12 @@
           <span
             v-else
             @click="$emit('start-edit', 'website', lead.website || '')"
-            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-app-text underline decoration-gray-100 underline-offset-4 transition-colors hover:bg-app-panel group-hover:text-emerald-600"
-            :class="!lead.website ? 'italic text-gray-300' : ''"
+            class="-ml-1 flex cursor-pointer items-center gap-2 rounded px-1 text-sm font-medium text-app-text underline decoration-app-border underline-offset-4 transition-colors hover:bg-app-hover group-hover:text-emerald-600"
+            :class="!lead.website ? 'italic text-app-muted' : ''"
           >
             {{ lead.website || '—' }}
             <Globe
-              class="h-3 w-3 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
+              class="h-3 w-3 text-app-muted opacity-0 transition-all group-hover:opacity-100 group-hover:text-emerald-500"
             />
           </span>
         </div>

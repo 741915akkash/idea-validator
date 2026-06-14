@@ -77,9 +77,9 @@
     <!-- Author + Date -->
     <div class="mb-6 flex items-center justify-center gap-2 text-sm font-medium text-app-muted">
       <span>{{ authorName }}</span>
-      <span class="text-gray-300">•</span>
+      <span class="text-app-muted">•</span>
       <span>{{ postDate }}</span>
-      <span class="text-gray-300">•</span>
+      <span class="text-app-muted">•</span>
       <span>{{ readingTime }}</span>
     </div>
 

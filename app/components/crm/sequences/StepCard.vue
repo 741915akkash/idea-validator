@@ -24,7 +24,7 @@
     <!-- Timeline Vertical Line -->
     <div
       v-if="index < totalSteps - 1"
-      class="absolute bottom-0 left-[22px] top-14 w-px bg-gray-200"
+      class="absolute bottom-0 left-[22px] top-14 w-px bg-app-panel"
     ></div>
 
     <!-- Step Indicator Dot -->
@@ -39,9 +39,9 @@
       :class="[
         'group/card relative overflow-visible rounded-[32px] border-l-[3px] p-6 shadow-sm transition-all hover:shadow-md',
         step.type === 'call'
-          ? 'border-blue-200 border-l-blue-500 text-app-text'
+          ? 'border-blue-500/30 border-l-blue-500 text-app-text'
           : step.type === 'email'
-            ? 'border-orange-200 border-l-orange-500 text-app-text'
+            ? 'border-orange-500/30 border-l-orange-500 text-app-text'
             : 'border-emerald-200 border-l-emerald-500 text-app-text'
       ]"
     >
@@ -51,7 +51,7 @@
           <!-- LEFT CONTROLS -->
           <div class="flex flex-wrap items-center gap-3">
             <!-- DAY -->
-            <div class="flex shrink-0 items-center rounded-xl bg-gray-900 px-4 py-2 shadow-sm">
+            <div class="flex shrink-0 items-center rounded-xl bg-app-panel px-4 py-2 shadow-sm">
               <span class="text-[11px] font-black uppercase tracking-widest text-white">
                 Day {{ cumulativeDay }}
               </span>
@@ -117,7 +117,7 @@
                   <!-- BACK TO PRESETS -->
                   <button
                     @click="step.offset = 1"
-                    class="ml-2 rounded-lg border border-app-border px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-app-muted text-app-text transition hover:bg-gray-100 hover:text-app-muted"
+                    class="ml-2 rounded-lg border border-app-border px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-app-muted text-app-text transition hover:bg-app-panel hover:text-app-muted"
                   >
                     Presets
                   </button>
@@ -133,7 +133,7 @@
             <button
               @click="$emit('move', index, -1)"
               :disabled="index === 0"
-              class="rounded-xl p-2 text-gray-300 transition-colors hover:text-app-text disabled:opacity-10"
+              class="rounded-xl p-2 text-app-muted transition-colors hover:text-app-text disabled:opacity-10"
             >
               <ChevronUp class="h-5 w-5" />
             </button>
@@ -141,14 +141,14 @@
             <button
               @click="$emit('move', index, 1)"
               :disabled="index === totalSteps - 1"
-              class="rounded-xl p-2 text-gray-300 transition-colors hover:text-app-text disabled:opacity-10"
+              class="rounded-xl p-2 text-app-muted transition-colors hover:text-app-text disabled:opacity-10"
             >
               <ChevronDown class="h-5 w-5" />
             </button>
 
             <button
               @click="$emit('remove', index)"
-              class="rounded-xl p-2 text-gray-300 transition-colors hover:bg-red-50 hover:text-red-500"
+              class="hover:bg-red-500/100/5 rounded-xl p-2 text-app-muted transition-colors hover:text-red-500"
             >
               <Trash2 class="h-5 w-5" />
             </button>
@@ -167,7 +167,7 @@
           <!-- DESCRIPTION -->
           <textarea
             v-model="step.description"
-            class="min-h-[140px] w-full resize-none rounded-3xl border border-white/60 bg-gray-100/70 p-5 text-sm leading-relaxed text-app-muted placeholder-gray-400 outline-none transition-all focus:border-emerald-200 focus:text-app-text focus:ring-0"
+            class="bg-app-panel/70 min-h-[140px] w-full resize-none rounded-3xl border border-white/60 p-5 text-sm leading-relaxed text-app-muted placeholder-gray-400 outline-none transition-all focus:border-emerald-200 focus:text-app-text focus:ring-0"
             placeholder="Add detailed instructions, talking points, email copy, follow-up notes, or workflow guidance..."
           ></textarea>
         </div>

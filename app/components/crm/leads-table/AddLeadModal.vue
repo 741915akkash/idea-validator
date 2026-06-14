@@ -1,14 +1,13 @@
 <script setup>
   import { onMounted, ref, watch } from 'vue'
   import { useLeadsStore } from '~/stores/leads'
-  import { useStagesStore } from '~/stores/stages'
+  import { usePipelinesStore } from '~/stores/pipelines'
   import { useUsersStore } from '~/stores/users'
   import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
   import TopAlert from '~/components/ui/TopAlert.vue'
 
   const emit = defineEmits(['close'])
-
-  const stagesStore = useStagesStore()
+  const pipelinesStore = usePipelinesStore()
   const usersStore = useUsersStore()
   const leadsStore = useLeadsStore()
 
@@ -61,7 +60,7 @@
   })
 
   watch(
-    () => stagesStore.stages,
+    () => pipelinesStore.stages,
     (stages) => {
       if (!stageId.value && stages.length > 0) {
         stageId.value = stages[0].id
@@ -187,11 +186,11 @@
             class="w-full rounded-lg border bg-app-card p-2.5 text-app-text outline-none transition-all placeholder:text-app-muted focus:ring-2"
             :class="
               emailError
-                ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                ? 'border-red-500/20 focus:border-red-500/20 focus:ring-red-500/20'
                 : 'border-app-border focus:border-emerald-500 focus:ring-emerald-500/20'
             "
           />
-          <p v-if="emailError" class="mt-1 text-xs font-medium text-red-600">
+          <p v-if="emailError" class="mt-1 text-xs font-medium text-red-500">
             {{ emailError }}
           </p>
         </div>
@@ -207,7 +206,7 @@
             class="w-full rounded-lg border bg-app-card p-2.5 text-app-text outline-none transition-all placeholder:text-app-muted focus:ring-2"
             :class="
               phoneError
-                ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                ? 'border-red-500/20 focus:border-red-500/20 focus:ring-red-500/20'
                 : 'border-app-border focus:border-emerald-500 focus:ring-emerald-500/20'
             "
           />
@@ -226,7 +225,7 @@
               v-model="stageId"
               class="w-full rounded-lg border border-app-border bg-app-card p-2.5 text-app-text outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
             >
-              <option v-for="stage in stagesStore.stages" :key="stage.id" :value="stage.id">
+              <option v-for="stage in pipelinesStore.stages" :key="stage.id" :value="stage.id">
                 {{ stage.name }}
               </option>
             </select>

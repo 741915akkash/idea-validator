@@ -93,7 +93,7 @@
         class="rounded-3xl p-8 text-center text-app-text shadow-xl ring-1 ring-slate-200 sm:p-16"
       >
         <div
-          class="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100"
+          class="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10"
         >
           <Check class="h-8 w-8 text-emerald-600" />
         </div>

@@ -5,7 +5,6 @@
   import LeadsTable from '~/components/crm/leads-table/LeadsTable.vue'
   import KanbanBoard from '~/components/crm/kanban/KanbanBoard.vue'
   import { useLeadsStore } from '~/stores/leads'
-  import { useStagesStore } from '~/stores/stages'
   import { useSourcesStore } from '~/stores/sources'
   import { usePipelinesStore } from '~/stores/pipelines'
   import { useUsersStore } from '~/stores/users'
@@ -15,7 +14,6 @@
   import { onMounted, ref, watch } from 'vue'
 
   const leadsStore = useLeadsStore()
-  const stagesStore = useStagesStore()
   const sourcesStore = useSourcesStore()
   const usersStore = useUsersStore()
   const pipelinesStore = usePipelinesStore()
@@ -25,18 +23,6 @@
   const showHelpDrawer = ref(false)
 
   const help = useHelpContent('leads-page-content')
-
-  async function loadStages() {
-    if (!pipelinesStore.activePipelineId) return
-
-    const stages = await crmGlobalFetch('/api/crm/pipelines/stages/list', {
-      query: {
-        pipelineId: pipelinesStore.activePipelineId
-      }
-    })
-
-    stagesStore.setStages(stages)
-  }
 
   try {
     quizStore.hydrate()
@@ -53,20 +39,21 @@
     }
 
     const [pipelines, sources, users] = await Promise.all([
-      crmGlobalFetch('/api/crm/pipelines'),
+      crmGlobalFetch('/api/crm/pipelines/list'),
       crmGlobalFetch('/api/crm/sources'),
       crmGlobalFetch('/api/crm/users')
     ])
 
     pipelinesStore.setPipelines(pipelines)
 
-    await loadStages()
-
     sourcesStore.setSources(sources)
     usersStore.setUsers(users)
 
     if (quizId) {
-      const leads = await crmQuizFetch('/api/crm/leads', { quizId })
+      const leads = await crmQuizFetch('/api/crm/leads', {
+        quizId
+      })
+
       leadsStore.setLeads(leads)
     } else {
       leadsStore.setLeads([])
@@ -91,13 +78,6 @@
     localStorage.setItem('crm-view-mode', value)
   })
 
-  watch(
-    () => pipelinesStore.activePipelineId,
-    async () => {
-      await loadStages()
-    }
-  )
-
   function openHelpDrawer() {
     showHelpDrawer.value = true
   }
@@ -108,14 +88,6 @@
     class="flex min-h-[calc(100vh-7rem)] w-full min-w-0 flex-col gap-4 overflow-hidden px-6 py-6"
     :class="viewMode === 'table' ? 'mx-auto max-w-7xl' : 'max-w-none'"
   >
-    <TopAlert
-      :open="showPipelinesLimitAlert"
-      title="Pipelines limit reached"
-      variant="warning"
-      message="Upgrade your plan to create more pipelines."
-      @close="showPipelinesLimitAlert = false"
-    />
-
     <div class="mb-6 rounded-lg border border-app-border px-6 py-5 text-app-text">
       <div class="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:items-center">
         <!-- LEFT -->
@@ -148,7 +120,7 @@
             class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
             :class="
               viewMode === 'table'
-                ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/30'
+                ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-500'
                 : 'text-app-muted hover:bg-app-hover hover:text-app-text'
             "
             @click="viewMode = 'table'"
@@ -160,7 +132,7 @@
             class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
             :class="
               viewMode === 'kanban'
-                ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/30'
+                ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-500'
                 : 'text-app-muted hover:bg-app-hover hover:text-app-text'
             "
             @click="viewMode = 'kanban'"

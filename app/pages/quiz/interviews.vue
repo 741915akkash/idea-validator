@@ -486,7 +486,9 @@
       v-if="showStartInterviewModal"
       class="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 p-4"
     >
-      <div class="w-full max-w-2xl bg-app-card rounded-xl border border-app-border p-5 text-app-text shadow-xl">
+      <div
+        class="w-full max-w-2xl rounded-xl border border-app-border bg-app-card p-5 text-app-text shadow-xl"
+      >
         <div class="mb-4 flex items-center justify-between">
           <h3 class="text-lg font-semibold text-app-text">Start Interview</h3>
           <button
@@ -502,7 +504,7 @@
             v-model="templateSearchQuery"
             type="text"
             placeholder="Search interview templates..."
-            class="w-full rounded-md bg-app-panel border border-app-border px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            class="w-full rounded-md border border-app-border bg-app-panel px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
 
@@ -528,7 +530,7 @@
         <div v-if="modalFilteredTemplates.length === 0" class="mt-3 text-sm text-app-muted">
           No templates found.
         </div>
-        <div v-if="startModalError" class="mt-3 text-sm text-red-600">
+        <div v-if="startModalError" class="mt-3 text-sm text-red-500">
           {{ startModalError }}
         </div>
 
@@ -633,7 +635,7 @@
       <div v-if="loading" class="text-base text-app-muted">Loading interviews...</div>
 
       <div v-else>
-        <div v-if="actionError" class="mb-4 text-sm text-red-600">
+        <div v-if="actionError" class="mb-4 text-sm text-red-500">
           {{ actionError }}
         </div>
 
@@ -699,7 +701,7 @@
               >
                 <div class="mb-2 flex justify-end">
                   <button
-                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    class="hover:bg-red-500/100/5 inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-500/20 text-red-500 transition disabled:cursor-not-allowed disabled:opacity-60"
                     aria-label="Delete quick interview"
                     title="Delete"
                     :disabled="deletingInterviewId === interview.id"
@@ -866,7 +868,7 @@
             >
               <div class="mb-2 flex justify-end">
                 <button
-                  class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  class="hover:bg-red-500/100/5 inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-500/20 text-red-500 transition disabled:cursor-not-allowed disabled:opacity-60"
                   aria-label="Delete quick interview"
                   title="Delete"
                   :disabled="deletingInterviewId === interview.id"

@@ -48,7 +48,7 @@
       </h4>
       <div
         v-if="owner"
-        class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-app-border bg-gray-100 text-[8px] font-bold text-app-muted"
+        class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-app-border bg-app-panel text-[8px] font-bold text-app-muted"
         :title="owner.name"
       >
         {{ initials }}

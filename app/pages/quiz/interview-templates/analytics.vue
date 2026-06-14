@@ -37,7 +37,7 @@
 
     <div
       v-else-if="error"
-      class="rounded-2xl border border-red-500/20 bg-red-500/5 p-10 text-center text-sm text-red-500"
+      class="bg-red-500/100/5/5 border-red-500/20/20 rounded-2xl border p-10 text-center text-sm text-red-500"
     >
       {{ error }}
     </div>
