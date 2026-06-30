@@ -39,3 +39,56 @@ saveAgentOutput()
     ▼
 
 Database
+
+==============================================================================
+                    Long-Term Architecture
+
+
+                        Startup Workspace
+                               │
+                               ▼
+                    buildWorkspaceContext()
+                               │
+                               ▼
+                        Workspace Context
+                               │
+                               ▼
+                         Agent Runtime
+                               │
+          ┌────────────────────┼────────────────────┐
+          │                    │                    │
+          ▼                    ▼                    ▼
+     Research Agent      Planning Agent     Positioning Agent
+          │                    │                    │
+          └────────────────────┼────────────────────┘
+                               ▼
+                         Prompt Builder
+                               │
+                               ▼
+                        Artifact Registry
+                               │
+          ┌────────────────────┼────────────────────┐
+          │                    │                    │
+          ▼                    ▼                    ▼
+   market-analysis     competitor-analysis      insight
+          │                    │                    │
+          └────────────────────┼────────────────────┘
+                               ▼
+                     Output Schema Builder
+                               │
+                               ▼
+                           LLM Provider
+                               │
+          ┌────────────────────┼────────────────────┐
+          │                    │                    │
+          ▼                    ▼                    ▼
+         Ollama             OpenAI             Anthropic
+                               │
+                               ▼
+                         parseOutput()
+                               │
+                               ▼
+                     saveAgentOutput()
+                               │
+                               ▼
+                           PostgreSQL
