@@ -1,0 +1,41 @@
+API
+    │
+    ▼
+
+runAgent()
+
+    │
+    ▼
+
+buildWorkspaceContext()
+
+    │
+    ▼
+
+Research Agent
+
+buildContext()
+
+    ▼
+
+compressContext()
+
+    ▼
+
+buildPrompt()
+
+    ▼
+
+LLM
+
+    ▼
+
+parseOutput()
+
+    ▼
+
+saveAgentOutput()
+
+    ▼
+
+Database
