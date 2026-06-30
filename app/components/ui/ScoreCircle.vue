@@ -20,7 +20,7 @@
     <svg viewBox="0 0 36 36" class="h-28 w-28">
       <!-- Track -->
       <path
-        class="text-app-muted"
+        class="text-white dark:text-app-muted"
         stroke-width="3"
         fill="none"
         stroke="currentColor"
