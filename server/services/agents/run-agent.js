@@ -1,22 +1,28 @@
 import registry from '../../agents/registry.js'
 import { buildWorkspaceContext } from '../workspaces/build-workspace-context.js'
 import { saveAgentOutput } from './save-agent-output.js'
+import { buildAgentContext } from './build-agent-context.js'
 
-export async function runAgent({ workspaceId, agent }) {
+export async function runAgent({ workspaceId, workspaceContext, agent }) {
   const agentDefinition = registry[agent]
 
   if (!agentDefinition) {
     throw new Error(`Unknown agent: ${agent}`)
   }
 
-  const workspaceContext = await buildWorkspaceContext({
+  workspaceContext ??= await buildWorkspaceContext({
     workspaceId
+  })
+
+  const agentContext = buildAgentContext({
+    workspaceContext,
+    agent: agentDefinition
   })
 
   const startedAt = new Date()
 
   try {
-    const result = await agentDefinition.execute(workspaceContext)
+    const result = await agentDefinition.execute(agentContext)
 
     result.run ??= {}
     result.run.success ??= true

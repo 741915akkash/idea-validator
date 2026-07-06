@@ -1,13 +1,14 @@
 import { buildContext } from './build-context.js'
 import { compressContext } from './compress-context.js'
 import { buildPrompt } from './build-prompt.js'
-import { parseOutput } from './parse-output.js'
+import { parseAgentOutput } from '../shared/parse-agent-output.js'
 import { generate } from '../../services/llm/generate.js'
+import { buildPrompt as buildSharedPrompt } from '../shared/build-agent-prompt.js'
 
-async function execute(workspaceContext) {
+async function execute({ workspaceContext, agent }) {
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.log('🚀 Research Agent Started')
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━══')
 
   console.log('1️⃣ Building context...')
   const context = await buildContext(workspaceContext)
@@ -24,7 +25,13 @@ async function execute(workspaceContext) {
   console.log('Context compressed')
 
   console.log('3️⃣ Building prompt...')
-  const prompt = await buildPrompt(compressedContext)
+  const promptData = await buildPrompt(compressedContext)
+
+  const prompt = buildSharedPrompt({
+    system: promptData.system,
+    user: promptData.user,
+    allowedArtifacts: agent.capabilities.producesArtifacts
+  })
 
   console.log('Prompt built')
   console.log({
@@ -51,7 +58,7 @@ async function execute(workspaceContext) {
   console.log(response.run)
 
   console.log('5️⃣ Parsing output...')
-  const result = parseOutput(response)
+  const result = parseAgentOutput(response)
 
   console.log('Output parsed')
   console.log({
@@ -74,6 +81,30 @@ export default {
   name: 'Research Agent',
 
   description: 'Analyze markets, competitors and startup opportunities.',
+
+  capabilities: {
+    requiresContext: ['workspace', 'quiz'],
+
+    requiresArtifacts: [
+      'market-analysis',
+      'competitor-analysis',
+      'customer-persona',
+      'customer-pain',
+      'market-opportunity',
+      'major-risk',
+      'insight'
+    ],
+
+    producesArtifacts: [
+      'market-analysis',
+      'competitor-analysis',
+      'customer-persona',
+      'customer-pain',
+      'market-opportunity',
+      'major-risk',
+      'insight'
+    ]
+  },
 
   execute
 }

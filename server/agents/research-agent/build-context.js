@@ -1,10 +1,4 @@
 export async function buildContext(workspaceContext) {
-  const existingResearch = workspaceContext.artifacts.filter((artifact) =>
-    ['market-analysis', 'competitor-analysis', 'competitor', 'market', 'insight'].includes(
-      artifact.type
-    )
-  )
-
   return {
     workspace: workspaceContext.workspace,
 
@@ -14,6 +8,6 @@ export async function buildContext(workspaceContext) {
       results: workspaceContext.quiz.results
     },
 
-    existingResearch
+    existingResearch: workspaceContext.artifacts.required
   }
 }

@@ -23,9 +23,8 @@ export async function buildWorkspaceContext({ workspaceId }) {
     }
 
     if (currentQuiz) {
-       const quizAnswers = await loadQuizAnswers(client, currentQuiz.id)
-       const results = await loadQuizResults(client, currentQuiz.id)
-
+      const quizAnswers = await loadQuizAnswers(client, currentQuiz.id)
+      const results = await loadQuizResults(client, currentQuiz.id)
 
       quiz = {
         current: currentQuiz,
@@ -199,6 +198,11 @@ async function loadArtifacts(client, workspaceId) {
       summary,
       content_json,
       source_agent,
+      status,
+      revision_number,
+      superseded_by,
+      approved_by,
+      approved_at,
       created_at
     FROM artifacts
     WHERE workspace_id = $1
@@ -214,6 +218,13 @@ async function loadArtifacts(client, workspaceId) {
     summary: row.summary,
     content: row.content_json,
     sourceAgent: row.source_agent,
+
+    status: row.status,
+    revisionNumber: row.revision_number,
+    supersededBy: row.superseded_by,
+    approvedBy: row.approved_by,
+    approvedAt: row.approved_at,
+
     createdAt: row.created_at
   }))
 }
@@ -325,4 +336,3 @@ async function loadInterviewSessions(client, workspaceId) {
     sessions: Array.from(sessions.values())
   }
 }
-
