@@ -1,7 +1,7 @@
 import { pool } from '../../db/index.js'
 
 export async function approveArtifact({ artifactId, approvedBy = null }) {
-  await pool.query(
+  const { rows } = await pool.query(
     `
     UPDATE artifacts
     SET
@@ -9,10 +9,17 @@ export async function approveArtifact({ artifactId, approvedBy = null }) {
       approved_by = $2,
       approved_at = NOW(),
       updated_at = NOW()
-    WHERE id = $1
+    WHERE
+      id = $1
+      AND status = 'draft'
+    RETURNING id
     `,
     [artifactId, approvedBy]
   )
+
+  if (rows.length === 0) {
+    throw new Error('Artifact has already been reviewed.')
+  }
 }
 
 export async function archiveArtifact(artifactId) {

@@ -1,5 +1,6 @@
 import { getNextRevisionNumber } from './versioning.js'
-import { supersedePreviousVersion } from './supersede-previous-version.js'
+import { ArtifactService } from '../../services/artifacts/artifact-service.js'
+import { ARTIFACT_LIFECYCLE } from '../../artifacts/constants.js'
 
 export async function createArtifact({ client, workspaceContext, agent, artifact }) {
   const workspaceId = workspaceContext.workspace.id
@@ -10,11 +11,11 @@ export async function createArtifact({ client, workspaceContext, agent, artifact
   let revisionNumber
 
   switch (lifecycle) {
-    case 'immutable':
+    case ARTIFACT_LIFECYCLE.IMMUTABLE:
       revisionNumber = 1
       break
 
-    case 'versioned':
+    case ARTIFACT_LIFECYCLE.VERSIONED:
       revisionNumber = await getNextRevisionNumber({
         client,
         workspaceId,
@@ -74,15 +75,6 @@ export async function createArtifact({ client, workspaceContext, agent, artifact
   )
 
   const row = rows[0]
-
-  if (lifecycle === 'versioned') {
-    await supersedePreviousVersion({
-      client,
-      workspaceId,
-      artifactType: artifact.type,
-      newArtifactId: row.id,
-    })
-  }
 
   return {
     id: row.id,
