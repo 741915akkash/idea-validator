@@ -2,9 +2,9 @@ import { createArtifact } from './create-artifact.js'
 import { ARTIFACT_LIFECYCLE } from './constants.js'
 
 export default createArtifact({
-  id: 'competitor-analysis',
+  id: 'customer-pain',
 
   lifecycle: ARTIFACT_LIFECYCLE.VERSIONED,
 
-  description: 'Analysis of competitors, substitutes and competitive positioning.'
+  description: 'A customer pain point, including severity, frequency, current alternatives and evidence.'
 })

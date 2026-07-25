@@ -2,9 +2,9 @@ import { createArtifact } from './create-artifact.js'
 import { ARTIFACT_LIFECYCLE } from './constants.js'
 
 export default createArtifact({
-  id: 'competitor-analysis',
+  id: 'customer-persona',
 
   lifecycle: ARTIFACT_LIFECYCLE.VERSIONED,
 
-  description: 'Analysis of competitors, substitutes and competitive positioning.'
+  description: 'A target customer segment or persona, including needs, context and buying behavior.'
 })

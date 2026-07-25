@@ -1,5 +1,8 @@
 import registry from './registry.js'
 
+import { ARTIFACT_LIFECYCLE } from './constants.js'
+import { isDraft, isApproved, isArchived, isSuperseded, isUsable } from './lifecycle.js'
+
 import { getParents } from '../services/artifacts/get-parents.js'
 import { getChildren } from '../services/artifacts/get-children.js'
 import { getAncestors } from '../services/artifacts/get-ancestors.js'
@@ -43,7 +46,7 @@ function validateAndNormalize(artifact) {
   if (!definition) {
     return {
       success: false,
-      warning: {
+      error: {
         code: 'UNKNOWN_ARTIFACT_TYPE',
         message: `Unknown artifact type "${artifact.type}".`
       }
@@ -53,7 +56,7 @@ function validateAndNormalize(artifact) {
   if (!definition.validate(artifact)) {
     return {
       success: false,
-      warning: {
+      error: {
         code: 'INVALID_ARTIFACT',
         message: `Artifact "${artifact.type}" failed validation.`
       }
@@ -110,26 +113,6 @@ async function descendants(artifactId) {
   return getDescendants(artifactId)
 }
 
-function isDraft(artifact) {
-  return artifact?.status === 'draft'
-}
-
-function isApproved(artifact) {
-  return artifact?.status === 'approved'
-}
-
-function isArchived(artifact) {
-  return artifact?.status === 'archived'
-}
-
-function isSuperseded(artifact) {
-  return artifact?.status === 'superseded'
-}
-
-function isUsable(artifact) {
-  return artifact && !isArchived(artifact) && !isSuperseded(artifact)
-}
-
 function latest(artifacts = []) {
   if (!artifacts.length) {
     return null
@@ -139,23 +122,23 @@ function latest(artifacts = []) {
 }
 
 function latestApproved(artifacts = []) {
-  return latest(artifacts.filter(isApproved))
+  return latest(artifacts.filter((artifact) => isApproved(artifact.status)))
 }
 
 function latestUsable(artifacts = []) {
-  return latest(artifacts.filter(isUsable))
+  return latest(artifacts.filter((artifact) => isUsable(artifact.status)))
 }
 
 function getLifecycle(id) {
-  return get(id)?.lifecycle ?? 'immutable'
+  return get(id)?.lifecycle ?? ARTIFACT_LIFECYCLE.IMMUTABLE
 }
 
 function isVersioned(id) {
-  return getLifecycle(id) === 'versioned'
+  return getLifecycle(id) === ARTIFACT_LIFECYCLE.VERSIONED
 }
 
 function isImmutable(id) {
-  return getLifecycle(id) === 'immutable'
+  return getLifecycle(id) === ARTIFACT_LIFECYCLE.IMMUTABLE
 }
 
 export default {
