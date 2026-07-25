@@ -1,6 +1,6 @@
 import { pool } from '../../db/index.js'
 
-export async function buildWorkspaceContext({ workspaceId }) {
+export async function buildWorkspaceContext({ workspaceId, context={} }) {
   if (!workspaceId) {
     throw new Error('workspaceId is required')
   }
@@ -42,7 +42,8 @@ export async function buildWorkspaceContext({ workspaceId }) {
       quiz,
       artifacts,
       interviews,
-      tasks
+      tasks,
+      context
     }
   } finally {
     client.release()
@@ -206,27 +207,78 @@ async function loadArtifacts(client, workspaceId) {
       created_at
     FROM artifacts
     WHERE workspace_id = $1
-    ORDER BY created_at DESC
+    ORDER BY
+      type ASC,
+      revision_number DESC,
+      created_at DESC
     `,
     [workspaceId]
   )
 
-  return rows.map((row) => ({
-    id: row.id,
-    type: row.type,
-    title: row.title,
-    summary: row.summary,
-    content: row.content_json,
-    sourceAgent: row.source_agent,
+  // Group all revisions by artifact type.
+  //
+  // Example:
+  //
+  // market_analysis
+  //   Rev 3 Draft
+  //   Rev 2 Approved
+  //
+  // customer_persona
+  //   Rev 2 Approved
+  //   Rev 1 Draft
+  //
+  const grouped = new Map()
 
-    status: row.status,
-    revisionNumber: row.revision_number,
-    supersededBy: row.superseded_by,
-    approvedBy: row.approved_by,
-    approvedAt: row.approved_at,
+  for (const row of rows) {
+    if (!grouped.has(row.type)) {
+      grouped.set(row.type, [])
+    }
 
-    createdAt: row.created_at
-  }))
+    grouped.get(row.type).push(row)
+  }
+
+  const artifacts = []
+
+  // Resolve one artifact per type.
+  //
+  // Resolution policy:
+  //
+  // 1. Use the latest approved revision.
+  // 2. If none exists, use the latest draft.
+  //
+  // This allows new workspaces (which only have drafts)
+  // to continue functioning while ensuring approved
+  // knowledge always takes precedence.
+  for (const revisions of grouped.values()) {
+    const approved = revisions.find((artifact) => artifact.status === 'approved')
+
+    const draft = revisions.find((artifact) => artifact.status === 'draft')
+
+    const row = approved ?? draft
+
+    if (!row) {
+      continue
+    }
+
+    artifacts.push({
+      id: row.id,
+      type: row.type,
+      title: row.title,
+      summary: row.summary,
+      content: row.content_json,
+      sourceAgent: row.source_agent,
+
+      status: row.status,
+      revisionNumber: row.revision_number,
+      supersededBy: row.superseded_by,
+      approvedBy: row.approved_by,
+      approvedAt: row.approved_at,
+
+      createdAt: row.created_at
+    })
+  }
+
+  return artifacts
 }
 
 async function loadTasks(client, workspaceId) {

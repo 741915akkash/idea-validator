@@ -1,0 +1,499 @@
+## Current Architecture
+
+```text
+┌───────────┐
+│ Workspace │
+└─────┬─────┘
+      │ contains startup state
+      │
+      ├── quiz + answers
+      ├── quiz results
+      ├── artifacts
+      ├── tasks
+      └── interviews
+             │
+             ▼
+┌───────────────────────┐
+│ Workspace Context     │
+│ buildWorkspaceContext │
+└───────────┬───────────┘
+            │
+            ▼
+┌──────┐    │    ┌──────────────┐
+│ Goal │───►│───►│ Orchestrator │
+└──────┘         └───────┬──────┘
+                         │ builds execution plan
+                         ▼
+                  ┌─────────────┐
+                  │ Agent Plan  │
+                  └──────┬──────┘
+                         │ runs agents sequentially
+                         ▼
+                  ┌─────────────┐
+                  │   Agents    │
+                  └──────┬──────┘
+                         │ reads existing artifacts
+                         │ produces artifacts + tasks
+                         ▼
+                  ┌─────────────┐
+                  │ Persistence │
+                  └──────┬──────┘
+                         │
+                  ┌──────┴──────┐
+                  ▼             ▼
+             Artifacts        Tasks
+```
+
+## 1. Workspace
+
+The workspace is the shared state passed through the system.
+
+```text
+Workspace
+├── workspace details
+├── current quiz
+├── quiz answers
+├── quiz results
+├── artifacts
+├── tasks
+└── interviews
+```
+
+`buildWorkspaceContext(workspaceId)` loads all of this data:
+
+[build-workspace-context.js](/home/akash/projects/idea-validator/server/services/workspaces/build-workspace-context.js:3)
+
+The resulting object is consumed by both the orchestrator and individual agents.
+
+```text
+workspaceId
+    │
+    ▼
+buildWorkspaceContext()
+    │
+    ▼
+{
+  workspace,
+  quiz,
+  answers,
+  results,
+  artifacts,
+  tasks,
+  interviews
+}
+```
+
+## 2. Goals
+
+A goal declares the artifacts that must exist for the goal to be considered fulfilled.
+
+The goal registry currently contains one goal:
+
+[registry.js](/home/akash/projects/idea-validator/server/goals/registry.js:1)
+
+```text
+validate-startup
+├── market-analysis
+├── competitor-analysis
+├── customer-pain
+├── market-opportunity
+└── major-risk
+```
+
+Definition:
+
+[validate-startup.js](/home/akash/projects/idea-validator/server/goals/validate-startup.js:1)
+
+Registry access is wrapped by:
+
+[goals/service.js](/home/akash/projects/idea-validator/server/goals/service.js:1)
+
+A goal does not run code itself. It gives the orchestrator a desired artifact state.
+
+```text
+Goal
+  "I need these artifact types"
+                │
+                ▼
+Orchestrator
+  "Which ones already exist?"
+  "Which agents can create the missing ones?"
+```
+
+## 3. Orchestrator
+
+The orchestrator converts a goal into agent executions.
+
+Main entry point:
+
+[orchestrate-goal.js](/home/akash/projects/idea-validator/server/services/orchestrator/orchestrate-goal.js:9)
+
+```text
+orchestrateGoal(workspaceId, goalName)
+    │
+    ├── getGoal(goalName)
+    │
+    ├── buildWorkspaceContext(workspaceId)
+    │
+    ├── buildExecutionPlan(goal, workspaceContext)
+    │
+    ├── runAgent(...) for each planned agent
+    │
+    └── return
+         ├── goal
+         ├── plan
+         ├── knowledge
+         └── results
+```
+
+Execution planning happens here:
+
+[build-execution-plan.js](/home/akash/projects/idea-validator/server/services/orchestrator/build-execution-plan.js:4)
+
+```text
+Goal requirements
+        +
+Workspace artifacts
+        │
+        ▼
+resolveWorkspaceKnowledge()
+        │
+        ├── existing artifact types
+        └── missing artifact types
+                    │
+                    ▼
+             resolveAgentPlan()
+                    │
+                    ▼
+          ordered list of agents
+```
+
+Workspace artifact resolution:
+
+[resolve-workspace-knowledge.js](/home/akash/projects/idea-validator/server/services/orchestrator/resolve-workspace-knowledge.js:3)
+
+Agent dependency resolution:
+
+[resolve-agent-plan.js](/home/akash/projects/idea-validator/server/services/orchestrator/resolve-agent-plan.js:6)
+
+The planner recursively asks:
+
+```text
+Missing artifact
+      │
+      ▼
+Find agent that produces it
+      │
+      ▼
+Does that agent require other artifacts?
+      │
+      ├── yes → resolve those first
+      └── no  → add agent to execution plan
+```
+
+If multiple agents produce an artifact, `chooseBestProducer()` currently selects the first one. There is no scoring or routing logic yet.
+
+## 4. Agents
+
+The agent registry currently exposes only the research agent:
+
+[agents/registry.js](/home/akash/projects/idea-validator/server/agents/registry.js:1)
+
+```text
+Agent Registry
+└── research
+```
+
+Its declared capabilities are in:
+
+[research-agent/execute.js](/home/akash/projects/idea-validator/server/agents/research-agent/execute.js:8)
+
+```text
+Research Agent
+├── context
+│   ├── workspace
+│   └── quiz
+├── artifact requirements
+│   ├── market-analysis
+│   ├── competitor-analysis
+│   ├── customer-persona
+│   ├── customer-pain
+│   ├── market-opportunity
+│   ├── major-risk
+│   └── insight
+├── artifact outputs
+│   └── same artifact types
+└── declared tools
+    ├── google-search
+    ├── browser
+    └── rss
+```
+
+Agent runtime:
+
+[run-agent.js](/home/akash/projects/idea-validator/server/services/agents/run-agent.js:6)
+
+```text
+runAgent(agentName, workspaceContext)
+    │
+    ├── load agent definition
+    ├── build agent-specific context
+    ├── execute agent
+    ├── measure duration
+    └── save output
+```
+
+Agent-specific context filters the workspace artifacts to only the types required by that agent:
+
+[build-agent-context.js](/home/akash/projects/idea-validator/server/services/agents/build-agent-context.js:1)
+
+The research execution itself is:
+
+```text
+Workspace context
+      │
+      ▼
+buildContext()
+      │
+      ▼
+compressContext()
+      │
+      ▼
+buildPrompt()
+      │
+      ▼
+append artifact/output contract
+      │
+      ▼
+LLM generation
+      │
+      ▼
+parseAgentOutput()
+      │
+      ▼
+artifacts + tasks + warnings
+```
+
+Relevant files:
+
+- [build-prompt.js](/home/akash/projects/idea-validator/server/agents/research-agent/build-prompt.js:1)
+- [build-agent-prompt.js](/home/akash/projects/idea-validator/server/agents/shared/build-agent-prompt.js:1)
+- [build-artifact-section.js](/home/akash/projects/idea-validator/server/agents/shared/build-artifact-section.js:1)
+- [build-output-contract.js](/home/akash/projects/idea-validator/server/agents/shared/build-output-contract.js:1)
+- [parse-agent-output.js](/home/akash/projects/idea-validator/server/agents/shared/parse-agent-output.js:5)
+
+## 5. Artifacts
+
+Artifacts are the main knowledge units exchanged between goals, agents, and workspaces.
+
+```text
+Agent A
+   │ produces
+   ▼
+Artifact
+   │ stored in workspace
+   │ consumed by
+   ▼
+Agent B / Goal planner
+```
+
+The artifact registry currently defines only:
+
+```text
+Artifact Registry
+├── market-analysis
+├── competitor-analysis
+└── insight
+```
+
+Registry:
+
+[artifacts/registry.js](/home/akash/projects/idea-validator/server/artifacts/registry.js:1)
+
+Definitions:
+
+- [market-analysis.js](/home/akash/projects/idea-validator/server/artifacts/market-analysis.js:1)
+- [competitor-analysis.js](/home/akash/projects/idea-validator/server/artifacts/competitor-analysis.js:1)
+- [insight.js](/home/akash/projects/idea-validator/server/artifacts/insight.js:1)
+
+The artifact service handles validation, normalization, lifecycle rules, and retrieval:
+
+[artifacts/service.js](/home/akash/projects/idea-validator/server/artifacts/service.js:1)
+
+All three registered types are versioned:
+
+```text
+Revision 1: draft
+      │
+      ▼ new version created
+Revision 1: superseded
+Revision 2: draft
+```
+
+Creation and versioning:
+
+- [create-artifact.js](/home/akash/projects/idea-validator/server/services/artifacts/create-artifact.js:4)
+- [versioning.js](/home/akash/projects/idea-validator/server/services/artifacts/versioning.js:1)
+- [supersede-previous-version.js](/home/akash/projects/idea-validator/server/services/artifacts/supersede-previous-version.js:1)
+- [lifecycle.js](/home/akash/projects/idea-validator/server/services/artifacts/lifecycle.js:1)
+
+Artifacts can also record dependencies:
+
+```text
+market-analysis
+        │ parent of
+        ▼
+market-opportunity
+        │ parent of
+        ▼
+major-risk
+```
+
+Dependency persistence:
+
+[save-artifact-dependencies.js](/home/akash/projects/idea-validator/server/services/agents/save-artifact-dependencies.js:1)
+
+Traversal is supported through `getParents`, `getChildren`, `getAncestors`, and `getDescendants`.
+
+## 6. Tools
+
+The intended tool relationship is:
+
+```text
+Agent
+  │ declares allowed tools
+  ▼
+Tool Registry
+  │ resolves tool
+  ▼
+Tool Service
+  │ validates input
+  │ executes implementation
+  ▼
+Tool result
+  │
+  ▼
+Agent reasoning
+```
+
+Generic tool service:
+
+[tools/service.js](/home/akash/projects/idea-validator/server/tools/service.js:1)
+
+Execution wrapper:
+
+[execute-tool.js](/home/akash/projects/idea-validator/server/services/tools/execute-tool.js:1)
+
+The active tool registry currently exposes only:
+
+```text
+Tool Registry
+└── calculator
+```
+
+Files:
+
+- [tools/registry.js](/home/akash/projects/idea-validator/server/tools/registry.js:1)
+- [calculator/index.js](/home/akash/projects/idea-validator/server/tools/calculator/index.js:1)
+
+Other tool implementations exist in `server/tools`, including browser, Google Search, RSS, YouTube, Reddit, LinkedIn, files, email and messaging tools. They are not currently registered through the active registry.
+
+More importantly, the research agent declares `google-search`, `browser`, and `rss`, but its execution function does not invoke the tool service. Tools are therefore scaffolded, but not connected to the current LLM agent loop.
+
+## Complete Goal Run
+
+```text
+validate-startup goal
+        │
+        ▼
+orchestrateGoal()
+        │
+        ├── load goal definition
+        ├── load workspace context
+        │
+        ▼
+resolveWorkspaceKnowledge()
+        │
+        ├── existing artifacts
+        └── missing artifacts
+                 │
+                 ▼
+          resolveAgentPlan()
+                 │
+                 ▼
+           research agent
+                 │
+        ┌────────┴────────┐
+        ▼                 ▼
+ existing artifacts   quiz/workspace
+        └────────┬────────┘
+                 ▼
+             LLM prompt
+                 │
+                 ▼
+       artifacts + tasks
+                 │
+                 ▼
+         saveAgentOutput()
+                 │
+        ┌────────┼─────────┐
+        ▼        ▼         ▼
+    artifacts  tasks   agent run
+```
+
+Persistence is transactional:
+
+[save-agent-output.js](/home/akash/projects/idea-validator/server/services/agents/save-agent-output.js:8)
+
+```text
+Database transaction
+├── insert artifacts
+├── save artifact dependencies
+├── insert tasks
+└── insert agent-run record
+```
+
+## Current Gaps
+
+The architecture is present, but the registries do not yet agree with each other:
+
+```text
+Goal requires
+├── customer-pain          missing definition
+├── market-opportunity     missing definition
+└── major-risk             missing definition
+
+Research agent requires
+└── customer-persona       missing definition and producer
+```
+
+This causes `validate-startup` planning to fail around `resolveAgentPlan()`: the only available agent requires `customer-persona`, but no registered agent can produce it.
+
+Tools have a similar gap:
+
+```text
+Research agent declares:
+google-search + browser + rss
+
+Active tool registry contains:
+calculator
+
+Agent execution tool loop:
+not implemented
+```
+
+So the current repo has a solid architecture skeleton:
+
+```text
+Goal → Orchestrator → Agent → Artifacts → Workspace
+                         │
+                         └── Tools (planned, not wired)
+```
+
+But the immediate runnable state is closer to:
+
+```text
+Direct research agent run → LLM → validated artifacts/tasks → database
+```
+
+The goal-driven, dependency-planned, tool-using multi-agent system is only partially connected.
