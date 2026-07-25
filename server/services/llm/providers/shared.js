@@ -1,6 +1,18 @@
 export function normalizeResponse(response, provider, model, costUsd = null) {
+  const message = response?.choices?.[0]?.message ?? {}
+
+  if (!message) {
+    throw new Error('LLM response did not contain choices[0].message')
+  }
+
+  const promptTokens = response?.usage?.prompt_tokens ?? 0
+  const completionTokens = response?.usage?.completion_tokens ?? 0
+  const totalTokens = response?.usage?.total_tokens ?? promptTokens + completionTokens
+
   return {
-    text: response.choices[0].message.content ?? '',
+    text: message.content ?? '',
+
+    reasoning: message.reasoning ?? null,
 
     run: {
       success: true,
@@ -9,11 +21,11 @@ export function normalizeResponse(response, provider, model, costUsd = null) {
 
       model,
 
-      promptTokens: response.usage?.prompt_tokens ?? 0,
+      promptTokens,
 
-      completionTokens: response.usage?.completion_tokens ?? 0,
+      completionTokens,
 
-      totalTokens: response.usage?.total_tokens ?? 0,
+      totalTokens,
 
       costUsd,
 
