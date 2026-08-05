@@ -1,0 +1,340 @@
+============================================================
+FILE: server/services/orchestrator/orchestrate-goal.js
+============================================================
+
+import GoalService from '../../goals/service.js'
+
+import { buildWorkspaceContext } from '../workspaces/build-workspace-context.js'
+
+import { buildExecutionPlan } from './build-execution-plan.js'
+
+import { runAgent } from '../agents/run-agent.js'
+
+export async function orchestrateGoal({ workspaceId, goal }) {
+  const goalDefinition = GoalService.get(goal)
+
+  if (!goalDefinition) {
+    throw new Error(`Unknown goal "${goal}".`)
+  }
+
+  const workspaceContext = await buildWorkspaceContext({
+    workspaceId
+  })
+
+  const executionPlan = buildExecutionPlan({
+    workspaceContext,
+    requiredArtifacts: goalDefinition.requiredArtifacts
+  })
+
+  const results = []
+
+  for (const agent of executionPlan.agents) {
+    const result = await runAgent({
+      workspaceContext,
+      agent: agent.id
+    })
+
+    results.push({
+      agent: agent.id,
+      result
+    })
+  }
+
+  return {
+    goal: goalDefinition.id,
+
+    plan: executionPlan.plan,
+
+    knowledge: executionPlan.knowledge,
+
+    results
+  }
+}
+
+
+============================================================
+FILE: server/services/orchestrator/resolve-workspace-knowledge.js
+============================================================
+
+import ArtifactService from '../../artifacts/service.js'
+
+export function resolveWorkspaceKnowledge({ workspaceContext, requiredArtifacts = [] }) {
+  const existingArtifacts = workspaceContext.artifacts.all
+
+  const artifactsByType = new Map()
+
+  for (const artifact of existingArtifacts) {
+    if (!ArtifactService.isUsable(artifact)) {
+      continue
+    }
+
+    if (!artifactsByType.has(artifact.type)) {
+      artifactsByType.set(artifact.type, [])
+    }
+
+    artifactsByType.get(artifact.type).push(artifact)
+  }
+
+  const existing = []
+  const missing = []
+
+  for (const artifactType of requiredArtifacts) {
+    const artifacts = artifactsByType.get(artifactType) ?? []
+
+    if (artifacts.length) {
+      existing.push({
+        type: artifactType,
+        artifacts,
+        latest: ArtifactService.latestUsable(artifacts)
+      })
+    } else {
+      missing.push(artifactType)
+    }
+  }
+
+  return {
+    existing,
+    missing,
+    artifactsByType
+  }
+}
+
+
+============================================================
+FILE: server/services/workflows/index.js
+============================================================
+
+export { runWorkflow } from './run-workflow.js'
+
+
+============================================================
+FILE: server/services/workflows/run-workflow.js
+============================================================
+
+import workflowService from '../../workflows/service.js'
+import artifactService from '../../artifacts/service.js'
+import agentService from '../../agents/service.js'
+import { runAgent } from '../agents/run-agent.js'
+
+export async function runWorkflow({ workflowId, workspaceContext }) {
+  const workflow = workflowService.get(workflowId)
+
+  const producedArtifacts = []
+
+  for (const artifactType of workflow.artifacts) {
+    const existingArtifact = artifactService.latestApproved(
+      workspaceContext.artifacts,
+      artifactType
+    )
+
+    if (existingArtifact) {
+      producedArtifacts.push(existingArtifact)
+      continue
+    }
+
+    const producer = agentService.getProducer(artifactType)
+
+    const result = await runAgent({
+      workspaceContext,
+      agent: producer
+    })
+
+    producedArtifacts.push(...result.artifacts)
+
+    workspaceContext.artifacts.push(...result.artifacts)
+  }
+
+  return {
+    workflow,
+    artifacts: producedArtifacts
+  }
+}
+
+
+============================================================
+FILE: server/workflows/ascii.md
+============================================================
+
+Goal
+    │
+    ▼
+Find Workflow
+    │
+    ▼
+Run Workflow
+    │
+    ▼
+Load Workflow
+    │
+    ▼
+Build Workspace Context
+    │
+    ▼
+For Each Artifact
+    │
+    ├───────────────► Already Approved?
+    │                     │
+    │                 Yes │ No
+    │                     │
+    │                     ▼
+    │             Find Producer Agent
+    │                     │
+    │                     ▼
+    │              Build Agent Context
+    │                     │
+    │                     ▼
+    │                 Run Agent
+    │                     │
+    │                     ▼
+    │            Validate & Save Artifact
+    │                     │
+    └─────────────────────┘
+    │
+    ▼
+Next Artifact
+    │
+    ▼
+Workflow Complete
+
+============================================================
+FILE: server/workflows/create-workflow.js
+============================================================
+
+import { validateWorkflow } from './validate-workflow.js'
+
+export function createWorkflow(workflow) {
+  validateWorkflow(workflow)
+
+  return Object.freeze(workflow)
+}
+
+
+============================================================
+FILE: server/workflows/index.js
+============================================================
+
+export { createWorkflow } from './create-workflow.js'
+
+export { registerWorkflow, getWorkflow, getAllWorkflows, hasWorkflow } from './registry.js'
+
+export { default as workflowService } from './service.js'
+
+
+============================================================
+FILE: server/workflows/registry.js
+============================================================
+
+import validateStartup from './validate-startup/index.js'
+
+const registry = new Map()
+
+registerWorkflow(validateStartup)
+
+export function registerWorkflow(workflow) {
+  if (registry.has(workflow.id)) {
+    throw new Error(`Workflow "${workflow.id}" is already registered.`)
+  }
+
+  registry.set(workflow.id, workflow)
+
+  return workflow
+}
+
+export function getWorkflow(id) {
+  return registry.get(id) ?? null
+}
+
+export function getAllWorkflows() {
+  return [...registry.values()]
+}
+
+export function hasWorkflow(id) {
+  return registry.has(id)
+}
+
+export default registry
+
+
+============================================================
+FILE: server/workflows/service.js
+============================================================
+
+import registry, { getWorkflow, getAllWorkflows, hasWorkflow } from './registry.js'
+
+function get(id) {
+  const workflow = getWorkflow(id)
+
+  if (!workflow) {
+    throw new Error(`Unknown workflow "${id}".`)
+  }
+
+  return workflow
+}
+
+function getMany(ids = []) {
+  return ids.map(get)
+}
+
+function exists(id) {
+  return hasWorkflow(id)
+}
+
+function list() {
+  return getAllWorkflows()
+}
+
+export default {
+  get,
+  getMany,
+  exists,
+  list
+}
+
+
+============================================================
+FILE: server/workflows/validate-startup/index.js
+============================================================
+
+import { createWorkflow } from '../create-workflow.js'
+
+export default createWorkflow({
+  id: 'validate-startup',
+  version: 1,
+
+  name: 'Validate Startup',
+
+  description: 'Research and validate a startup idea.',
+
+  artifacts: ['market-research']
+})
+
+
+============================================================
+FILE: server/workflows/validate-workflow.js
+============================================================
+
+import artifactService from '../artifacts/service.js'
+
+export function validateWorkflow(workflow) {
+  const requiredFields = ['id', 'version', 'name', 'description', 'artifacts']
+
+  for (const field of requiredFields) {
+    if (!(field in workflow)) {
+      throw new Error(`Workflow "${workflow.id ?? 'unknown'}" is missing "${field}".`)
+    }
+  }
+
+  if (!Array.isArray(workflow.artifacts)) {
+    throw new Error(`Workflow "${workflow.id}" artifacts must be an array.`)
+  }
+
+  for (const artifactType of workflow.artifacts) {
+    if (!artifactService.exists(artifactType)) {
+      throw new Error(`Workflow "${workflow.id}" requires unknown artifact "${artifactType}".`)
+    }
+  }
+
+  return workflow
+}
+
+

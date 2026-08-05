@@ -1,14 +1,14 @@
-import ArtifactService from '../../artifacts/service.js'
+import ArtifactService from './../../artifacts/service.js'
 
 export function validateAndNormalizeArtifacts(artifacts = []) {
   const validArtifacts = []
-  const warnings = []
+  const errors = []
 
   for (const artifact of artifacts) {
     const result = ArtifactService.validateAndNormalize(artifact)
 
     if (!result.success) {
-      warnings.push(result.warning)
+      errors.push(result.error)
       continue
     }
 
@@ -17,6 +17,6 @@ export function validateAndNormalizeArtifacts(artifacts = []) {
 
   return {
     artifacts: validArtifacts,
-    warnings
+    errors
   }
 }

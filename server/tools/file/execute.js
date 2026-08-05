@@ -1,5 +1,9 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import {
+  unknownAction,
+  fileFailed
+} from '../tool-errors.js'
 
 export default async function execute({ input, context }) {
   try {
@@ -32,22 +36,10 @@ export default async function execute({ input, context }) {
         return await list(input.input)
 
       default:
-        return {
-          success: false,
-          warning: {
-            code: 'UNKNOWN_ACTION',
-            message: `Unknown File action "${input.action}".`
-          }
-        }
+        return unknownAction(input.action)
     }
   } catch (error) {
-    return {
-      success: false,
-      warning: {
-        code: 'FILE_FAILED',
-        message: error.message
-      }
-    }
+    return fileFailed(error.message)
   }
 }
 

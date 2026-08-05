@@ -25,7 +25,7 @@ export async function executeToolRequests(state, toolRequests) {
 
     // Track total API cost for the runtime
     if (result.success) {
-      state.run.totalCostUsd += result.metadata?.cost?.amount ?? 0
+      state.run.tools.costUsd += result.metadata?.cost?.amount ?? 0
     }
 
     state.toolHistory.push({

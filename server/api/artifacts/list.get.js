@@ -1,5 +1,4 @@
-import { pool } from '../../../db/index.js'
-import { buildWorkspaceContext } from '../../../services/workspaces/build-workspace-context.js'
+import { buildWorkspaceContext } from '../../services/workspaces/build-workspace-context.js'
 
 export default defineEventHandler(async (event) => {
   const { workspaceId } = getQuery(event)

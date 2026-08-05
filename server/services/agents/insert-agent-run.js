@@ -4,7 +4,7 @@ export async function insertAgentRun(
 ) {
   const inputSummary = {
     quizRevision: workspaceContext.quiz.current?.revisionNumber ?? null,
-    artifactCount: workspaceContext.artifacts.all.length,
+    artifactCount: workspaceContext.artifacts.length,
     interviewCount: workspaceContext.interviews.sessions.length,
     taskCount: workspaceContext.tasks.length
   }
@@ -14,14 +14,19 @@ export async function insertAgentRun(
     tasksCreated: result.tasks.length,
     warnings: result.warnings?.length ?? 0,
 
-    provider: result.run.provider,
-    model: result.run.model,
+    provider: result.run.llm.provider,
+    model: result.run.llm.model,
 
-    promptTokens: result.run.promptTokens,
-    completionTokens: result.run.completionTokens,
-    totalTokens: result.run.totalTokens,
+    llmCalls: result.run.llm.calls,
+    toolCalls: result.run.tools.calls,
 
-    costUsd: result.run.costUsd
+    promptTokens: result.run.llm.promptTokens,
+    completionTokens: result.run.llm.completionTokens,
+    totalTokens: result.run.llm.totalTokens,
+
+    latencyMs: result.run.llm.latencyMs,
+
+    costUsd: result.run.llm.costUsd
   }
 
   await client.query(

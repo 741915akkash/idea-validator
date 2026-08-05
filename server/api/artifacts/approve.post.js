@@ -1,6 +1,6 @@
-import { pool } from '../../../../db/index.js'
+import { pool } from '../../db/index.js'
 
-import { approveArtifact } from '../../../../services/artifact-reviews/approve-artifact.js'
+import { approveArtifact } from '../../services/artifact-reviews/approve-artifact.js'
 
 export default defineEventHandler(async (event) => {
   const { artifactId } = event.context.params

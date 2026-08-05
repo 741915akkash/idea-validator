@@ -5,7 +5,14 @@ import { insertTasks } from './insert-tasks.js'
 import { insertAgentRun } from './insert-agent-run.js'
 import { saveArtifactDependencies } from './save-artifact-dependencies.js'
 
-export async function saveAgentOutput({ workspaceContext, agent, result, startedAt, completedAt }) {
+export async function saveAgentOutput({
+  workspaceContext,
+  requiredArtifacts = [],
+  agent,
+  result,
+  startedAt,
+  completedAt
+}) {
   const client = await pool.connect()
 
   try {
@@ -18,7 +25,7 @@ export async function saveAgentOutput({ workspaceContext, agent, result, started
     })
 
     await saveArtifactDependencies(client, {
-      parentArtifacts: workspaceContext.artifacts.required,
+      parentArtifacts: requiredArtifacts,
       childArtifacts: insertedArtifacts
     })
 
@@ -37,6 +44,10 @@ export async function saveAgentOutput({ workspaceContext, agent, result, started
     })
 
     await client.query('COMMIT')
+
+    return {
+      artifacts: insertedArtifacts
+    }
   } catch (error) {
     await client.query('ROLLBACK')
     throw error

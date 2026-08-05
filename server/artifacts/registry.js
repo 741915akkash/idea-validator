@@ -5,6 +5,7 @@ import customerPersona from './customer-persona.js'
 import customerPain from './customer-pain.js'
 import marketOpportunity from './market-opportunity.js'
 import majorRisk from './major-risk.js'
+import marketResearch from './market-research.js'
 
 const registry = {
   [marketAnalysis.id]: marketAnalysis,
@@ -19,7 +20,9 @@ const registry = {
 
   [marketOpportunity.id]: marketOpportunity,
 
-  [majorRisk.id]: majorRisk
+  [majorRisk.id]: majorRisk,
+
+  [marketResearch.id]: marketResearch
 }
 
 export default registry

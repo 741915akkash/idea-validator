@@ -1,10 +1,10 @@
 export function validateTasks(tasks = []) {
   const validTasks = []
-  const warnings = []
+  const errors = []
 
   for (const task of tasks) {
     if (!task.title) {
-      warnings.push({
+      errors.push({
         code: 'INVALID_TASK',
         message: 'Task is missing title.'
       })
@@ -13,7 +13,7 @@ export function validateTasks(tasks = []) {
     }
 
     if (!task.taskType) {
-      warnings.push({
+      errors.push({
         code: 'INVALID_TASK',
         message: `Task "${task.title}" is missing taskType.`
       })
@@ -42,6 +42,6 @@ export function validateTasks(tasks = []) {
 
   return {
     tasks: validTasks,
-    warnings
+    errors
   }
 }

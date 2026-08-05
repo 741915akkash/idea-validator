@@ -1,7 +1,7 @@
-export const EMPTY_AGENT_RESULT = {
+export const DEFAULT_AGENT_RESULT = {
   artifacts: [],
   tasks: [],
-  warnings: [],
+  errors: [],
 
   run: {
     success: true,

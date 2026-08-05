@@ -1,9 +1,9 @@
-import { pool } from '../../../../db/index.js'
+import { pool } from '../../db/index.js'
 
-import { loadArtifact } from '../../../../services/artifacts/load-artifact.js'
-import { loadReviews } from '../../../../services/artifact-reviews/load-reviews.js'
-import { getParents } from '../../../../services/artifacts/get-parents.js'
-import { getChildren } from '../../../../services/artifacts/get-children.js'
+import { loadArtifact } from '../../services/artifacts/load-artifact.js'
+import { loadReviews } from '../../services/artifact-reviews/load-reviews.js'
+import { getParents } from '../../services/artifacts/get-parents.js'
+import { getChildren } from '../../services/artifacts/get-children.js'
 
 export default defineEventHandler(async (event) => {
   const { artifactId } = event.context.params

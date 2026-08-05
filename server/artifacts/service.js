@@ -12,6 +12,26 @@ function get(id) {
   return registry[id] ?? null
 }
 
+function getSchema(id) {
+  return get(id)?.schema ?? null
+}
+
+function describe(id) {
+  const artifact = get(id)
+
+  if (!artifact) {
+    return null
+  }
+
+  return {
+    id: artifact.id,
+    version: artifact.version,
+    lifecycle: artifact.lifecycle,
+    description: artifact.description,
+    schema: artifact.schema
+  }
+}
+
 function getMany(ids = []) {
   return ids.map((id) => registry[id]).filter(Boolean)
 }
@@ -143,6 +163,8 @@ function isImmutable(id) {
 
 export default {
   get,
+  getSchema,
+  describe,
   getMany,
   exists,
   validate,

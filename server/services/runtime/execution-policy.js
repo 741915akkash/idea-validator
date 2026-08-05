@@ -63,7 +63,7 @@ function assertToolLimit(state, toolRequests, policy) {
 }
 
 function assertAllowedTools(agent, toolRequests) {
-  const allowedTools = new Set(agent.capabilities.tools)
+  const allowedTools = new Set(agent.contract.tools)
 
   for (const request of toolRequests) {
     if (!allowedTools.has(request.tool)) {

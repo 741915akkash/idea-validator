@@ -1,5 +1,5 @@
 import { getNextRevisionNumber } from './versioning.js'
-import { ArtifactService } from '../../services/artifacts/artifact-service.js'
+import ArtifactService from '../../artifacts/service.js'
 import { ARTIFACT_LIFECYCLE } from '../../artifacts/constants.js'
 
 export async function createArtifact({ client, workspaceContext, agent, artifact }) {

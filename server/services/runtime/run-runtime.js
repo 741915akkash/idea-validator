@@ -5,7 +5,7 @@ import { runLlmStep } from './run-llm-step.js'
 import { executeToolRequests } from './execute-tool-requests.js'
 import { RUNTIME_STATUS } from './runtime-status.js'
 
-export async function runRuntime({ agent, messages, parseResponse, policy }) {
+export async function runRuntime({ agent, messages, policy }) {
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.log('⚙️ Runtime Started')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
@@ -52,13 +52,6 @@ export async function runRuntime({ agent, messages, parseResponse, policy }) {
         state.run.status = RUNTIME_STATUS.FINISHED
         state.run.finishedAt = new Date()
 
-        const result = parseResponse(runtimeResponse)
-
-        result.run = {
-          success: true,
-          ...state.run
-        }
-
         console.log({
           iterations: state.iteration,
           llmCalls: state.run.llm.calls,
@@ -69,7 +62,14 @@ export async function runRuntime({ agent, messages, parseResponse, policy }) {
 
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 
-        return result
+        return {
+          ...runtimeResponse,
+
+          run: {
+            success: true,
+            ...state.run
+          }
+        }
       }
     }
   } catch (error) {

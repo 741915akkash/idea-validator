@@ -1,0 +1,1625 @@
+# Review Files
+
+============================================================
+FILE: 4.
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: Runtime
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: Engine
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: server/services/runtime/run-runtime.js
+============================================================
+
+import { ACTIONS } from './protocol.js'
+import { createRuntimeState } from './runtime-state.js'
+import { getExecutionPolicy } from './execution-policy.js'
+import { runLlmStep } from './run-llm-step.js'
+import { executeToolRequests } from './execute-tool-requests.js'
+import { RUNTIME_STATUS } from './runtime-status.js'
+
+export async function runRuntime({ agent, messages, parseResponse, policy }) {
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+  console.log('⚙️ Runtime Started')
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+
+  const state = createRuntimeState({
+    agent,
+    messages
+  })
+
+  const executionPolicy = getExecutionPolicy(policy)
+
+  state.run.status = RUNTIME_STATUS.RUNNING
+  state.run.startedAt = new Date()
+
+  try {
+    while (true) {
+      state.iteration += 1
+
+      console.log('')
+      console.log(`🔄 Iteration ${state.iteration}`)
+
+      executionPolicy.beforeIteration(state)
+
+      const runtimeResponse = await runLlmStep(state)
+
+      console.log('Runtime Action')
+      console.log(runtimeResponse.action)
+
+      if (runtimeResponse.action === ACTIONS.TOOL) {
+        console.log(`🛠 Executing ${runtimeResponse.tools.length} tool(s)`)
+
+        executionPolicy.beforeToolExecution(state, agent, runtimeResponse.tools)
+
+        await executeToolRequests(state, runtimeResponse.tools)
+
+        continue
+      }
+
+      if (runtimeResponse.action === ACTIONS.FINISH) {
+        executionPolicy.beforeFinish(state, runtimeResponse)
+
+        console.log('🏁 Runtime Finished')
+
+        state.run.status = RUNTIME_STATUS.FINISHED
+        state.run.finishedAt = new Date()
+
+        const result = parseResponse(runtimeResponse)
+
+        result.run = {
+          success: true,
+          ...state.run
+        }
+
+        console.log({
+          iterations: state.iteration,
+          llmCalls: state.run.llm.calls,
+          toolCalls: state.run.tools.calls,
+          latencyMs: state.run.llm.latencyMs,
+          totalTokens: state.run.llm.totalTokens
+        })
+
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+
+        return result
+      }
+    }
+  } catch (error) {
+    state.run.status = RUNTIME_STATUS.FAILED
+    state.run.finishedAt = new Date()
+
+    throw error
+  }
+}
+
+
+============================================================
+FILE: server/services/runtime/runtime-state.js
+============================================================
+
+import { RUNTIME_PROTOCOL_VERSION } from './protocol.js'
+import { RUNTIME_STATUS } from './runtime-status.js'
+
+export function createRuntimeState({ agent, messages = [] }) {
+  return {
+    protocolVersion: RUNTIME_PROTOCOL_VERSION,
+
+    runId: null,
+
+    agent,
+
+    messages: [...messages],
+
+    toolHistory: [],
+
+    iteration: 0,
+
+    run: {
+      status: RUNTIME_STATUS.PENDING,
+
+      startedAt: null,
+      finishedAt: null,
+
+      llm: {
+        calls: 0,
+
+        provider: null,
+        model: null,
+
+        promptTokens: 0,
+        completionTokens: 0,
+        totalTokens: 0,
+
+        costUsd: 0,
+
+        latencyMs: 0,
+
+        rawResponses: []
+      },
+
+      tools: {
+        calls: 0,
+
+        // Total cost of all tool executions for this runtime.
+        costUsd: 0
+      }
+    }
+  }
+}
+
+
+============================================================
+FILE: server/services/runtime/protocol.js
+============================================================
+
+export const RUNTIME_PROTOCOL_VERSION = 1
+
+export const ACTIONS = {
+  TOOL: 'tool',
+  FINISH: 'finish'
+}
+
+
+============================================================
+FILE: server/services/runtime/run-llm-step.js
+============================================================
+
+import { generate } from '../llm/generate.js'
+import { validateRuntimeResponse } from './validate-runtime-response.js'
+
+export async function runLlmStep(state) {
+  console.log('🤖 Calling LLM...')
+  console.log({
+    provider: state.run.llm.provider,
+    model: state.run.llm.model,
+    messages: state.messages.length
+  })
+
+  const startedAt = performance.now()
+
+  const response = await generate({
+    messages: state.messages
+  })
+
+  state.run.llm.rawResponses.push(response.text)
+
+  const latencyMs = performance.now() - startedAt
+
+  state.run.llm.calls += 1
+
+  state.run.llm.provider = response.run.provider
+  state.run.llm.model = response.run.model
+
+  state.run.llm.promptTokens += response.run.promptTokens
+  state.run.llm.completionTokens += response.run.completionTokens
+  state.run.llm.totalTokens += response.run.totalTokens
+  state.run.llm.costUsd += response.run.costUsd ?? 0
+  state.run.llm.latencyMs += latencyMs
+
+  console.log('✅ LLM Complete')
+  console.log({
+    latencyMs: Math.round(latencyMs),
+    promptTokens: response.run.promptTokens,
+    completionTokens: response.run.completionTokens,
+    totalTokens: response.run.totalTokens
+  })
+
+  console.log('================ RAW LLM RESPONSE ================')
+  console.log(response.text)
+  console.log('==================================================')
+
+  const runtimeResponse = validateRuntimeResponse(response.text)
+
+  console.log('LLM Action')
+  console.log(runtimeResponse.action)
+
+  state.messages.push({
+    role: 'assistant',
+    content: JSON.stringify(runtimeResponse)
+  })
+
+  return runtimeResponse
+}
+
+
+============================================================
+FILE: server/services/runtime/validate-runtime-response.js
+============================================================
+
+import { ACTIONS, RUNTIME_PROTOCOL_VERSION } from './protocol.js'
+import { normalizeToolRequests } from './tool-request-schema.js'
+import { validateFinishResponse } from './finish-schema.js'
+import {
+  invalidRuntimeResponse,
+  invalidProtocolVersion,
+  invalidRuntimeAction
+} from './runtime-errors.js'
+
+export function validateRuntimeResponse(response) {
+  return validateProtocol(parseResponse(response))
+}
+
+function cleanResponse(text) {
+  return text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```$/, '')
+    .trim()
+}
+
+export function parseResponse(response) {
+  if (typeof response !== 'string') {
+    return response
+  }
+
+  const cleaned = cleanResponse(response)
+
+  try {
+    return JSON.parse(cleaned)
+  } catch (error) {
+    throw invalidRuntimeResponse(`Invalid runtime JSON: ${error.message}`)
+  }
+}
+
+function validateProtocol(response) {
+  if (!response || typeof response !== 'object') {
+    throw invalidRuntimeResponse('Runtime response must be an object.')
+  }
+
+  if (response.protocolVersion !== RUNTIME_PROTOCOL_VERSION) {
+    throw invalidProtocolVersion(response.protocolVersion)
+  }
+
+  switch (response.action) {
+    case ACTIONS.TOOL:
+      return {
+        protocolVersion: response.protocolVersion,
+        action: ACTIONS.TOOL,
+        tools: normalizeToolRequests(response.tools)
+      }
+
+    case ACTIONS.FINISH:
+      return {
+        protocolVersion: response.protocolVersion,
+        action: ACTIONS.FINISH,
+        ...validateFinishResponse(response)
+      }
+
+    default:
+      throw invalidRuntimeAction(response.action)
+  }
+}
+
+
+============================================================
+FILE: server/services/runtime/execute-tool-requests.js
+============================================================
+
+import executeTool from '../tools/execute-tool.js'
+import providers from '../llm/providers/registry.js'
+import { LLM_CONFIG } from '../../config/llm.js'
+
+export async function executeToolRequests(state, toolRequests) {
+  const provider = providers[LLM_CONFIG.provider]
+
+  const results = []
+
+  for (const request of toolRequests) {
+    console.log('')
+    console.log(`🔧 Tool: ${request.tool}`)
+    console.log('Input')
+    console.log(request.input)
+
+    const result = await executeTool({
+      toolId: request.tool,
+      input: request.input,
+      context: {
+        agent: state.agent
+      }
+    })
+
+    state.run.tools.calls += 1
+
+    // Track total API cost for the runtime
+    if (result.success) {
+      state.run.tools.costUsd += result.metadata?.cost?.amount ?? 0
+    }
+
+    state.toolHistory.push({
+      request,
+      result
+    })
+
+    provider.conversation.appendToolResult({
+      state,
+      request,
+      result
+    })
+
+    console.log('✅ Tool Complete')
+    console.log(result.output ?? result)
+
+    results.push({
+      request,
+      result
+    })
+  }
+
+  return results
+}
+
+
+============================================================
+FILE: server/services/runtime/runtime-instructions.js
+============================================================
+
+import { RUNTIME_PROTOCOL_VERSION } from '../../services/runtime/protocol.js'
+
+export function buildRuntimeInstructions({ allowedTools = [] }) {
+  return `
+You are communicating with the GoLaunchScall Runtime.
+
+Protocol Version
+
+${RUNTIME_PROTOCOL_VERSION}
+
+You may return only ONE of the following actions:
+
+1. "tool"
+
+Use this when you need additional information.
+
+Return:
+
+{
+  "protocolVersion": ${RUNTIME_PROTOCOL_VERSION},
+  "action": "tool",
+  "tools": [
+    {
+      "tool": "<tool-id>",
+      "input": {}
+    }
+  ]
+}
+
+2. "finish"
+
+Use this only when you have enough evidence to confidently complete your task.
+
+Return:
+
+{
+  "protocolVersion": ${RUNTIME_PROTOCOL_VERSION},
+  "action": "finish",
+  "artifacts": [],
+  "tasks": []
+}
+
+Rules
+
+- Never invent tool results.
+- Never pretend a tool executed.
+- Never execute tools yourself.
+- Only request tools from the allowed list.
+- Requests for tools outside the allowed list will be rejected by the runtime.
+- You may request multiple independent tools in one response.
+- Continue requesting tools until your stopping criteria have been satisfied.
+- When sufficient evidence has been gathered, return "finish".
+
+Allowed Tools
+
+${allowedTools.map((tool) => `- ${tool}`).join('\n')}
+`.trim()
+}
+
+
+============================================================
+FILE: server/services/runtime/execution-policy.js
+============================================================
+
+import {
+  maxIterationsExceeded,
+  runtimeTimedOut,
+  maxToolCallsExceeded,
+  toolNotAllowed
+} from './runtime-errors.js'
+
+const DEFAULT_POLICY = {
+  maxIterations: 8,
+  maxToolCalls: 16,
+  timeoutMs: 60_000
+}
+
+export function getExecutionPolicy(overrides = {}) {
+  const policy = {
+    ...DEFAULT_POLICY,
+    ...overrides
+  }
+
+  return {
+    beforeIteration(state) {
+      assertIterations(state, policy)
+      assertTimeout(state, policy)
+    },
+
+    beforeToolExecution(state, agent, toolRequests) {
+      assertToolLimit(state, toolRequests, policy)
+      assertAllowedTools(agent, toolRequests)
+    },
+
+    beforeFinish(state, runtimeResponse) {
+      // Reserved for future execution rules.
+      //
+      // Examples:
+      // - approval required
+      // - artifact count limits
+      // - credit validation
+      // - workspace quota
+    }
+  }
+}
+
+function assertIterations(state, policy) {
+  if (state.iteration > policy.maxIterations) {
+    throw maxIterationsExceeded()
+  }
+}
+
+function assertTimeout(state, policy) {
+  const elapsedMs = Date.now() - state.run.startedAt.getTime()
+
+  if (elapsedMs >= policy.timeoutMs) {
+    throw runtimeTimedOut()
+  }
+}
+
+function assertToolLimit(state, toolRequests, policy) {
+  const requestedToolCalls = toolRequests.length
+
+  if (state.run.tools.calls + requestedToolCalls > policy.maxToolCalls) {
+    throw maxToolCallsExceeded()
+  }
+}
+
+function assertAllowedTools(agent, toolRequests) {
+  const allowedTools = new Set(agent.contract.tools)
+
+  for (const request of toolRequests) {
+    if (!allowedTools.has(request.tool)) {
+      throw toolNotAllowed(agent.id, request.tool)
+    }
+  }
+}
+
+
+============================================================
+FILE: server/services/runtime/finish-schema.js
+============================================================
+
+import { invalidFinishResponse } from './runtime-errors.js'
+
+export function validateFinishResponse(response) {
+  if (!Array.isArray(response.artifacts)) {
+    throw invalidFinishResponse('"artifacts" must be an array.')
+  }
+
+  if (!Array.isArray(response.tasks)) {
+    throw invalidFinishResponse('"tasks" must be an array.')
+  }
+
+  if (typeof response.summary !== 'string') {
+    throw invalidFinishResponse('"summary" must be a string.')
+  }
+
+  return {
+    summary: response.summary,
+    artifacts: response.artifacts,
+    tasks: response.tasks
+  }
+}
+
+
+============================================================
+FILE: server/services/runtime/tool-request-schema.js
+============================================================
+
+import { invalidToolRequest } from './runtime-errors.js'
+
+export function validateToolRequest(request) {
+  if (!request || typeof request !== 'object') {
+    throw invalidToolRequest('Tool request must be an object.')
+  }
+
+  if (!request.tool) {
+    throw invalidToolRequest('Tool request is missing "tool".')
+  }
+
+  if (typeof request.tool !== 'string') {
+    throw invalidToolRequest('"tool" must be a string.')
+  }
+
+  if ('reasoning' in request && typeof request.reasoning !== 'string') {
+    throw invalidToolRequest('"reasoning" must be a string.')
+  }
+
+  if (!('input' in request)) {
+    throw invalidToolRequest(`Tool "${request.tool}" is missing "input".`)
+  }
+
+  if (request.input === null || typeof request.input !== 'object' || Array.isArray(request.input)) {
+    throw invalidToolRequest(`Tool "${request.tool}" input must be an object.`)
+  }
+
+  return {
+    tool: request.tool,
+    reasoning: request.reasoning,
+    input: request.input
+  }
+}
+
+export function normalizeToolRequests(requests) {
+  if (!Array.isArray(requests)) {
+    throw invalidToolRequest('"tools" must be an array.')
+  }
+
+  return requests.map(validateToolRequest)
+}
+
+
+============================================================
+FILE: 5.
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: Artifact
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: System
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: server/artifacts/registry.js
+============================================================
+
+import marketAnalysis from './market-analysis.js'
+import competitorAnalysis from './competitor-analysis.js'
+import insight from './insight.js'
+import customerPersona from './customer-persona.js'
+import customerPain from './customer-pain.js'
+import marketOpportunity from './market-opportunity.js'
+import majorRisk from './major-risk.js'
+
+const registry = {
+  [marketAnalysis.id]: marketAnalysis,
+
+  [competitorAnalysis.id]: competitorAnalysis,
+
+  [insight.id]: insight,
+
+  [customerPersona.id]: customerPersona,
+
+  [customerPain.id]: customerPain,
+
+  [marketOpportunity.id]: marketOpportunity,
+
+  [majorRisk.id]: majorRisk
+}
+
+export default registry
+
+
+============================================================
+FILE: server/artifacts/create-artifact.js
+============================================================
+
+import { ARTIFACT_LIFECYCLE } from './constants.js'
+
+const DEFAULT_SCHEMA = {
+  title: {
+    type: 'string',
+    required: true
+  },
+
+  summary: {
+    type: 'string',
+    required: true
+  },
+
+  content: {
+    type: 'object',
+    required: true
+  }
+}
+
+function validate(artifact) {
+  return (
+    typeof artifact?.title === 'string' &&
+    typeof artifact?.summary === 'string' &&
+    artifact?.content &&
+    typeof artifact.content === 'object'
+  )
+}
+
+function normalize(artifact) {
+  return {
+    type: this.id,
+
+    title: artifact.title ?? '',
+
+    summary: artifact.summary ?? '',
+
+    content: artifact.content ?? {}
+  }
+}
+
+export function createArtifact({
+  id,
+  version = 1,
+  lifecycle = ARTIFACT_LIFECYCLE.IMMUTABLE,
+  description
+}) {
+  return {
+    id,
+    version,
+    lifecycle,
+    description,
+
+    schema: DEFAULT_SCHEMA,
+
+    validate,
+
+    normalize
+  }
+}
+
+
+============================================================
+FILE: server/artifacts/service.js
+============================================================
+
+import registry from './registry.js'
+
+import { ARTIFACT_LIFECYCLE } from './constants.js'
+import { isDraft, isApproved, isArchived, isSuperseded, isUsable } from './lifecycle.js'
+
+import { getParents } from '../services/artifacts/get-parents.js'
+import { getChildren } from '../services/artifacts/get-children.js'
+import { getAncestors } from '../services/artifacts/get-ancestors.js'
+import { getDescendants } from '../services/artifacts/get-descendants.js'
+
+function get(id) {
+  return registry[id] ?? null
+}
+
+function getMany(ids = []) {
+  return ids.map((id) => registry[id]).filter(Boolean)
+}
+
+function exists(id) {
+  return id in registry
+}
+
+function validate(artifact) {
+  const definition = get(artifact.type)
+
+  if (!definition) {
+    return false
+  }
+
+  return definition.validate(artifact)
+}
+
+function normalize(artifact) {
+  const definition = get(artifact.type)
+
+  if (!definition) {
+    return null
+  }
+
+  return definition.normalize(artifact)
+}
+
+function validateAndNormalize(artifact) {
+  const definition = get(artifact.type)
+
+  if (!definition) {
+    return {
+      success: false,
+      error: {
+        code: 'UNKNOWN_ARTIFACT_TYPE',
+        message: `Unknown artifact type "${artifact.type}".`
+      }
+    }
+  }
+
+  if (!definition.validate(artifact)) {
+    return {
+      success: false,
+      error: {
+        code: 'INVALID_ARTIFACT',
+        message: `Artifact "${artifact.type}" failed validation.`
+      }
+    }
+  }
+
+  return {
+    success: true,
+    artifact: definition.normalize(artifact)
+  }
+}
+
+function buildPromptSection(ids = []) {
+  const artifacts = getMany(ids)
+
+  const allowedTypes = artifacts.map((artifact) => `- ${artifact.id}`).join('\n')
+
+  const descriptions = artifacts
+    .map(
+      (artifact) => `
+### ${artifact.id}
+
+${artifact.description}
+`
+    )
+    .join('\n')
+
+  return `
+# Allowed Artifact Types
+
+You may ONLY create these artifact types.
+
+${allowedTypes}
+
+# Artifact Descriptions
+
+${descriptions}
+`
+}
+
+async function parents(artifactId) {
+  return getParents(artifactId)
+}
+
+async function children(artifactId) {
+  return getChildren(artifactId)
+}
+
+async function ancestors(artifactId) {
+  return getAncestors(artifactId)
+}
+
+async function descendants(artifactId) {
+  return getDescendants(artifactId)
+}
+
+function latest(artifacts = []) {
+  if (!artifacts.length) {
+    return null
+  }
+
+  return [...artifacts].sort((a, b) => b.revisionNumber - a.revisionNumber)[0]
+}
+
+function latestApproved(artifacts = []) {
+  return latest(artifacts.filter((artifact) => isApproved(artifact.status)))
+}
+
+function latestUsable(artifacts = []) {
+  return latest(artifacts.filter((artifact) => isUsable(artifact.status)))
+}
+
+function getLifecycle(id) {
+  return get(id)?.lifecycle ?? ARTIFACT_LIFECYCLE.IMMUTABLE
+}
+
+function isVersioned(id) {
+  return getLifecycle(id) === ARTIFACT_LIFECYCLE.VERSIONED
+}
+
+function isImmutable(id) {
+  return getLifecycle(id) === ARTIFACT_LIFECYCLE.IMMUTABLE
+}
+
+export default {
+  get,
+  getMany,
+  exists,
+  validate,
+  normalize,
+  validateAndNormalize,
+  buildPromptSection,
+
+  parents,
+  children,
+  ancestors,
+  descendants,
+
+  isDraft,
+  isApproved,
+  isArchived,
+  isSuperseded,
+  isUsable,
+
+  latest,
+  latestApproved,
+  latestUsable,
+
+  getLifecycle,
+  isVersioned,
+  isImmutable
+}
+
+
+============================================================
+FILE: server/artifacts/lifecycle.js
+============================================================
+
+const USABLE_STATUSES = ['draft', 'approved']
+
+export function isUsable(status) {
+  return USABLE_STATUSES.includes(status)
+}
+
+export function isDraft(status) {
+  return status === 'draft'
+}
+
+export function isApproved(status) {
+  return status === 'approved'
+}
+
+export function isSuperseded(status) {
+  return status === 'superseded'
+}
+
+export function isArchived(status) {
+  return status === 'archived'
+}
+
+export function isGenerating(status) {
+  return status === 'generating'
+}
+
+export function isFailed(status) {
+  return status === 'failed'
+}
+
+
+============================================================
+FILE: 6.
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: Tool
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: System
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: server/tools/registry.js
+============================================================
+
+import calculator from './calculator/index.js'
+import googleSearch from './google-search/index.js'
+import browser from './browser/index.js'
+import rss from './rss-fetcher/index.js'
+import { validateTool } from './tool-contract.js'
+
+const registry = {
+  [calculator.id]: calculator,
+
+  [googleSearch.id]: googleSearch,
+
+  [browser.id]: browser,
+
+  [rss.id]: rss
+}
+
+for (const tool of Object.values(registry)) {
+  validateTool(tool)
+}
+
+export default registry
+
+
+============================================================
+FILE: server/tools/service.js
+============================================================
+
+import registry from './registry.js'
+import {
+  unknownTool,
+  invalidToolInput,
+  invalidToolOutput
+} from './tool-errors.js'
+
+function get(id) {
+  return registry[id] ?? null
+}
+
+function getMany(ids = []) {
+  return ids.map((id) => registry[id]).filter(Boolean)
+}
+
+function exists(id) {
+  return id in registry
+}
+
+function validateInput(toolId, input) {
+  const tool = get(toolId)
+
+  if (!tool) {
+    return false
+  }
+
+  return tool.validateInput(input)
+}
+
+function normalizeInput(toolId, input) {
+  const tool = get(toolId)
+
+  if (!tool) {
+    return null
+  }
+
+  return tool.normalizeInput(input)
+}
+
+function validateAndNormalizeInput(toolId, input) {
+  const tool = get(toolId)
+
+  if (!tool) {
+    return unknownTool(toolId)
+  }
+
+  if (!tool.validateInput(input)) {
+    return invalidToolInput(toolId)
+  }
+
+  return {
+    success: true,
+    input: tool.normalizeInput(input)
+  }
+}
+
+function validateOutput(toolId, output) {
+  const tool = get(toolId)
+
+  if (!tool) {
+    return false
+  }
+
+  return tool.validateOutput(output)
+}
+
+function normalizeOutput(toolId, output) {
+  const tool = get(toolId)
+
+  if (!tool) {
+    return null
+  }
+
+  return tool.normalizeOutput(output)
+}
+
+function validateAndNormalizeOutput(toolId, output) {
+  const tool = get(toolId)
+
+  if (!tool) {
+    return unknownTool(toolId)
+  }
+
+  if (!tool.validateOutput(output)) {
+    return invalidToolOutput(toolId)
+  }
+
+  return {
+    success: true,
+    output: tool.normalizeOutput(output)
+  }
+}
+
+export default {
+  get,
+  getMany,
+  exists,
+
+  validateInput,
+  normalizeInput,
+  validateAndNormalizeInput,
+
+  validateOutput,
+  normalizeOutput,
+  validateAndNormalizeOutput
+}
+
+
+============================================================
+FILE: server/tools/tool-contract.js
+============================================================
+
+export function validateTool(tool) {
+  const requiredFields = [
+    'id',
+    'version',
+
+    'name',
+    'description',
+
+    'inputSchema',
+    'outputSchema',
+
+    'validateInput',
+    'normalizeInput',
+
+    'validateOutput',
+    'normalizeOutput',
+
+    'execute'
+  ]
+
+  for (const field of requiredFields) {
+    if (!(field in tool)) {
+      throw new Error(`Tool "${tool.id ?? 'unknown'}" is missing "${field}".`)
+    }
+  }
+
+  return tool
+}
+
+
+============================================================
+FILE: 7.
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: Goal
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: System
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: server/goals/registry.js
+============================================================
+
+import validateStartup from './validate-startup.js'
+
+const registry = {
+  [validateStartup.id]: validateStartup
+}
+
+export default registry
+
+
+============================================================
+FILE: server/goals/service.js
+============================================================
+
+import registry from './registry.js'
+
+function get(id) {
+  return registry[id] ?? null
+}
+
+function getMany(ids = []) {
+  return ids.map((id) => registry[id]).filter(Boolean)
+}
+
+function exists(id) {
+  return id in registry
+}
+
+function getRequiredArtifacts(id) {
+  return get(id)?.requiredArtifacts ?? []
+}
+
+export default {
+  get,
+  getMany,
+  exists,
+  getRequiredArtifacts
+}
+
+
+============================================================
+FILE: 8.
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: Workspace
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: server/services/workspaces/build-workspace-context.js
+============================================================
+
+import { pool } from '../../db/index.js'
+
+export async function buildWorkspaceContext({ workspaceId, context={} }) {
+  if (!workspaceId) {
+    throw new Error('workspaceId is required')
+  }
+
+  const client = await pool.connect()
+
+  try {
+    const workspace = await loadWorkspace(client, workspaceId)
+
+    if (!workspace) {
+      throw new Error(`Workspace not found: ${workspaceId}`)
+    }
+
+    const currentQuiz = await loadCurrentQuiz(client, workspaceId)
+
+    let quiz = {
+      current: null,
+      quizAnswers: [],
+      results: null
+    }
+
+    if (currentQuiz) {
+      const quizAnswers = await loadQuizAnswers(client, currentQuiz.id)
+      const results = await loadQuizResults(client, currentQuiz.id)
+
+      quiz = {
+        current: currentQuiz,
+        quizAnswers,
+        results
+      }
+    }
+
+    const artifacts = await loadArtifacts(client, workspaceId)
+    const tasks = await loadTasks(client, workspaceId)
+    const interviews = await loadInterviewSessions(client, workspaceId)
+
+    return {
+      workspace,
+      quiz,
+      artifacts,
+      interviews,
+      tasks,
+      context
+    }
+  } finally {
+    client.release()
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                  LOADERS                                   */
+/* -------------------------------------------------------------------------- */
+
+async function loadWorkspace(client, workspaceId) {
+  const { rows } = await client.query(
+    `
+    SELECT
+      id,
+      name,
+      description,
+      status,
+      created_at,
+      updated_at
+    FROM workspaces
+    WHERE id = $1
+    LIMIT 1
+    `,
+    [workspaceId]
+  )
+
+  if (rows.length === 0) {
+    return null
+  }
+
+  const row = rows[0]
+
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description,
+    status: row.status,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  }
+}
+
+async function loadCurrentQuiz(client, workspaceId) {
+  const { rows } = await client.query(
+    `
+    SELECT
+      id,
+      name,
+      revision_number,
+      status,
+      started_at,
+      completed_at
+    FROM quizzes
+    WHERE workspace_id = $1
+      AND archived_at IS NULL
+    ORDER BY
+      revision_number DESC,
+      started_at DESC
+    LIMIT 1
+    `,
+    [workspaceId]
+  )
+
+  if (rows.length === 0) {
+    return null
+  }
+
+  const row = rows[0]
+
+  return {
+    id: row.id,
+    name: row.name,
+    revisionNumber: row.revision_number,
+    status: row.status,
+    startedAt: row.started_at,
+    completedAt: row.completed_at
+  }
+}
+
+async function loadQuizResults(client, quizId) {
+  const { rows } = await client.query(
+    `
+    SELECT
+      market_score,
+      confidence_score,
+      decision,
+      summary
+    FROM quiz_results
+    WHERE quiz_id = $1
+    LIMIT 1
+    `,
+    [quizId]
+  )
+
+  if (rows.length === 0) {
+    return null
+  }
+
+  const row = rows[0]
+
+  return {
+    marketScore: row.market_score,
+    confidenceScore: row.confidence_score,
+    decision: row.decision,
+    summary: row.summary
+  }
+}
+
+async function loadQuizAnswers(client, quizId) {
+  const { rows } = await client.query(
+    `
+    SELECT
+      q.id,
+      q.checkpoint,
+      q.question_order,
+      q.question_text,
+      q.option_map,
+      q.critical,
+      a.selected_option
+    FROM answers a
+    INNER JOIN questions q
+      ON q.id = a.question_id
+    WHERE a.quiz_id = $1
+    ORDER BY
+      q.checkpoint,
+      q.question_order
+    `,
+    [quizId]
+  )
+
+  return rows.map((row) => {
+    const option = row.option_map[row.selected_option]
+
+    return {
+      questionId: row.id,
+      checkpoint: row.checkpoint,
+      order: row.question_order,
+      question: row.question_text,
+      answer: option?.label ?? row.selected_option,
+      critical: row.critical
+    }
+  })
+}
+
+async function loadArtifacts(client, workspaceId) {
+  const { rows } = await client.query(
+    `
+    SELECT
+      id,
+      type,
+      title,
+      summary,
+      content_json,
+      source_agent,
+      status,
+      revision_number,
+      superseded_by,
+      approved_by,
+      approved_at,
+      created_at
+    FROM artifacts
+    WHERE workspace_id = $1
+    ORDER BY
+      type ASC,
+      revision_number DESC,
+      created_at DESC
+    `,
+    [workspaceId]
+  )
+
+  // Group all revisions by artifact type.
+  //
+  // Example:
+  //
+  // market_analysis
+  //   Rev 3 Draft
+  //   Rev 2 Approved
+  //
+  // customer_persona
+  //   Rev 2 Approved
+  //   Rev 1 Draft
+  //
+  const grouped = new Map()
+
+  for (const row of rows) {
+    if (!grouped.has(row.type)) {
+      grouped.set(row.type, [])
+    }
+
+    grouped.get(row.type).push(row)
+  }
+
+  const artifacts = []
+
+  // Resolve one artifact per type.
+  //
+  // Resolution policy:
+  //
+  // 1. Use the latest approved revision.
+  // 2. If none exists, use the latest draft.
+  //
+  // This allows new workspaces (which only have drafts)
+  // to continue functioning while ensuring approved
+  // knowledge always takes precedence.
+  for (const revisions of grouped.values()) {
+    const approved = revisions.find((artifact) => artifact.status === 'approved')
+
+    const draft = revisions.find((artifact) => artifact.status === 'draft')
+
+    const row = approved ?? draft
+
+    if (!row) {
+      continue
+    }
+
+    artifacts.push({
+      id: row.id,
+      type: row.type,
+      title: row.title,
+      summary: row.summary,
+      content: row.content_json,
+      sourceAgent: row.source_agent,
+
+      status: row.status,
+      revisionNumber: row.revision_number,
+      supersededBy: row.superseded_by,
+      approvedBy: row.approved_by,
+      approvedAt: row.approved_at,
+
+      createdAt: row.created_at
+    })
+  }
+
+  return artifacts
+}
+
+async function loadTasks(client, workspaceId) {
+  const { rows } = await client.query(
+    `
+    SELECT
+      id,
+      parent_task_id,
+      title,
+      description,
+      status,
+      priority,
+      task_type,
+      owner_type,
+      owner_id,
+      source_agent,
+      created_at
+    FROM tasks
+    WHERE workspace_id = $1
+    ORDER BY created_at DESC
+    `,
+    [workspaceId]
+  )
+
+  return rows.map((row) => ({
+    id: row.id,
+    parentTaskId: row.parent_task_id,
+    title: row.title,
+    description: row.description,
+    status: row.status,
+    priority: row.priority,
+    taskType: row.task_type,
+    ownerType: row.owner_type,
+    ownerId: row.owner_id,
+    sourceAgent: row.source_agent,
+    createdAt: row.created_at
+  }))
+}
+
+async function loadInterviewSessions(client, workspaceId) {
+  const { rows } = await client.query(
+    `
+    SELECT
+      i.id,
+      i.name,
+      i.respondent_info,
+      i.status,
+      i.started_at,
+      i.finished_at,
+      i.confidence_before,
+      i.confidence_after,
+
+      e.id AS evidence_id,
+      e.respondent_name,
+      e.notes,
+      e.structured_responses,
+      e.evidence_log,
+      e.created_at AS evidence_created_at
+
+    FROM interviews i
+
+    INNER JOIN quizzes q
+      ON q.id = i.quiz_id
+
+    LEFT JOIN evidence_entries e
+      ON e.interview_id = i.id
+
+    WHERE q.workspace_id = $1
+
+    ORDER BY
+      i.started_at DESC,
+      e.created_at ASC
+    `,
+    [workspaceId]
+  )
+
+  const sessions = new Map()
+
+  for (const row of rows) {
+    if (!sessions.has(row.id)) {
+      sessions.set(row.id, {
+        id: row.id,
+        name: row.name,
+        respondentInfo: row.respondent_info,
+        status: row.status,
+        startedAt: row.started_at,
+        finishedAt: row.finished_at,
+        confidenceBefore: row.confidence_before,
+        confidenceAfter: row.confidence_after,
+        evidence: []
+      })
+    }
+
+    if (row.evidence_id) {
+      sessions.get(row.id).evidence.push({
+        id: row.evidence_id,
+        respondentName: row.respondent_name,
+        notes: row.notes,
+        structuredResponses: row.structured_responses,
+        evidenceLog: row.evidence_log,
+        createdAt: row.evidence_created_at
+      })
+    }
+  }
+
+  return {
+    sessions: Array.from(sessions.values())
+  }
+}
+
+
+============================================================
+FILE: 9.
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: API
+============================================================
+
+FILE NOT FOUND
+
+
+============================================================
+FILE: server/api/agents/run.post.js
+============================================================
+
+import { readBody, createError } from 'h3'
+import { runAgent } from '../../services/agents/run-agent.js'
+
+export default defineEventHandler(async (event) => {
+  const { workspaceId, agent } = await readBody(event)
+
+  if (!workspaceId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'workspaceId is required.'
+    })
+  }
+
+  if (!agent) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'agent is required.'
+    })
+  }
+
+  return runAgent({
+    workspaceId,
+    agent
+  })
+})
+
+

@@ -1,13 +1,13 @@
-export async function buildContext(workspaceContext) {
+export async function buildContext(agentContext) {
   return {
-    workspace: workspaceContext.workspace,
+    workspace: agentContext.workspace,
 
     quiz: {
-      current: workspaceContext.quiz.current,
-      quizAnswers: workspaceContext.quiz.quizAnswers,
-      results: workspaceContext.quiz.results
+      current: agentContext.quiz.current,
+      quizAnswers: agentContext.quiz.quizAnswers,
+      results: agentContext.quiz.results
     },
 
-    existingResearch: workspaceContext.artifacts.required
+    existingResearch: agentContext.requiredArtifacts
   }
 }

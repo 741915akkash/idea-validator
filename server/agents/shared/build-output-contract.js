@@ -1,10 +1,14 @@
+import { RUNTIME_PROTOCOL_VERSION } from '../../services/runtime/protocol.js'
+
 export function buildOutputContract() {
   return `
 # Output Format
 
-Return ONLY valid JSON.
+When finishing, return ONLY valid JSON using the runtime finish protocol.
 
 {
+  "protocolVersion": ${RUNTIME_PROTOCOL_VERSION},
+  "action": "finish",
   "artifacts": [
     {
       "type": "",
@@ -26,7 +30,7 @@ Return ONLY valid JSON.
 
 Rules
 
-- Return ONLY valid JSON.
+- Return ONLY valid JSON using the runtime finish protocol.
 - Do NOT include markdown.
 - Do NOT include code fences.
 - Do NOT include explanations.

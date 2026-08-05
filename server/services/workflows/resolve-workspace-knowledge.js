@@ -1,7 +1,7 @@
 import ArtifactService from '../../artifacts/service.js'
 
 export function resolveWorkspaceKnowledge({ workspaceContext, requiredArtifacts = [] }) {
-  const existingArtifacts = workspaceContext.artifacts.all
+  const existingArtifacts = workspaceContext.artifacts ?? []
 
   const artifactsByType = new Map()
 
