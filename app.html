@@ -2,10 +2,10 @@
 <html {{ HTML_ATTRS }}>
 
 <head {{ HEAD_ATTRS }}>
-  <script>
+  <!-- <script>
     (() => {
       try {
-        const theme = localStorage.getItem('theme') || 'system'
+        const theme = localStorage.getItem('theme') || 'light'
 
         if (
           theme === 'dark' ||
@@ -16,7 +16,16 @@
         }
       } catch { }
     })()
-  </script>
+  </script> -->
+
+<script>
+  (() => {
+    try {
+      document.documentElement.classList.remove('dark')
+    } catch { }
+  })()
+</script>
+
 
   {{ HEAD }}
 </head>

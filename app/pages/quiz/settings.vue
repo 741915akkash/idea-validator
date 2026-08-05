@@ -394,7 +394,7 @@
       </SettingsBar>
 
       <!-- Theme -->
-      <SettingsBar title="Theme" :subtitle="themeLabel">
+      <!-- <SettingsBar title="Theme" :subtitle="themeLabel">
         <select
           v-model="theme"
           class="rounded-lg border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text focus:outline-none"
@@ -404,7 +404,7 @@
           <option value="light">Light</option>
           <option value="dark">Dark</option>
         </select>
-      </SettingsBar>
+      </SettingsBar> -->
 
       <!-- Pricing -->
       <SettingsBar title="Pricing">
