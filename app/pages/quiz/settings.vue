@@ -1,7 +1,6 @@
 <script setup>
   import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import { applyThemeMode, getStoredTheme } from '~/composables/useTheme'
   import { useQuizSessionStore } from '~/stores/quizSession'
   import { useSourcesStore } from '~/stores/sources'
   import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
@@ -341,31 +340,7 @@
   function contactSupport() {
     window.location.href = 'mailto:support@golaunchscall.com'
   }
-  const theme = ref('system')
-
-  const themeLabel = computed(() => {
-    switch (theme.value) {
-      case 'light':
-        return 'Light theme'
-      case 'dark':
-        return 'Dark theme'
-      default:
-        return 'Follow system preference'
-    }
-  })
-
-  onMounted(() => {
-    theme.value = getStoredTheme()
-    applyTheme()
-  })
-
-  function applyTheme() {
-    if (import.meta.client) {
-      localStorage.setItem('theme', theme.value)
-    }
-
-    applyThemeMode(theme.value)
-  }
+  
 </script>
 
 <template>
