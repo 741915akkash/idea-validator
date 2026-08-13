@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
   await requireQuizAccess(pool, event, quizId)
 
   const normalizedEmail = String(body.email || '').trim()
-  if (!EMAIL_REGEX.test(normalizedEmail)) {
+  if (normalizedEmail && !EMAIL_REGEX.test(normalizedEmail)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid email' })
   }
 
