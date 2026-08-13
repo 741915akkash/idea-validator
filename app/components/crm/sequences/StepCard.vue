@@ -89,6 +89,7 @@
                     <option :value="1">After 1 Day</option>
                     <option :value="3">After 3 Days</option>
                     <option :value="7">After 1 Week</option>
+                    <option :value="30">After 1 Month</option>
                     <option value="custom">Custom Delay...</option>
                   </select>
 
