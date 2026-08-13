@@ -1,141 +1,212 @@
 <script setup>
-  import { onMounted, ref, watch } from 'vue'
-  import { useLeadsStore } from '~/stores/leads'
-  import { usePipelinesStore } from '~/stores/pipelines'
-  import { useUsersStore } from '~/stores/users'
-  import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
-  import TopAlert from '~/components/ui/TopAlert.vue'
+import { onMounted, ref, watch } from 'vue'
+import { useLeadsStore } from '~/stores/leads'
+import { usePipelinesStore } from '~/stores/pipelines'
+import { useUsersStore } from '~/stores/users'
+import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
+import TopAlert from '~/components/ui/TopAlert.vue'
 
-  const emit = defineEmits(['close'])
-  const pipelinesStore = usePipelinesStore()
-  const usersStore = useUsersStore()
-  const leadsStore = useLeadsStore()
+const emit = defineEmits(['close'])
 
-  const name = ref('')
-  const company = ref('')
-  const email = ref('')
-  const phone = ref('')
-  const stageId = ref(null)
-  const userId = ref(null)
-  const sequenceId = ref('')
-  const sequences = ref([])
-  const emailError = ref('')
-  const phoneError = ref('')
-  const showContactsLimitAlert = ref(false)
+const pipelinesStore = usePipelinesStore()
+const usersStore = useUsersStore()
+const leadsStore = useLeadsStore()
 
-  function isValidEmail(value) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim())
+const name = ref('')
+const company = ref('')
+const email = ref('')
+const phone = ref('')
+
+const pipelineId = ref(null)
+const stageId = ref(null)
+const pipelineStages = ref([])
+
+const userId = ref(null)
+const sequenceId = ref('')
+const sequences = ref([])
+
+const emailError = ref('')
+const phoneError = ref('')
+const showContactsLimitAlert = ref(false)
+const isLoadingStages = ref(false)
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim())
+}
+
+function normalizePhone(value) {
+  const raw = String(value || '').trim()
+  if (!raw) return ''
+
+  const hasPlusPrefix = raw.startsWith('+')
+  const digitsOnly = raw.replace(/\D/g, '')
+
+  return hasPlusPrefix ? `+${digitsOnly}` : digitsOnly
+}
+
+function isValidPhone(value) {
+  if (!value) return true
+  return /^\+?[1-9]\d{7,14}$/.test(value)
+}
+
+watch(email, (value) => {
+  const normalized = String(value || '').trim()
+
+  if (!normalized) {
+    emailError.value = ''
+    return
   }
 
-  function normalizePhone(value) {
-    const raw = String(value || '').trim()
-    if (!raw) return ''
+  emailError.value = isValidEmail(normalized)
+    ? ''
+    : 'Enter a valid email address'
+})
 
-    const hasPlusPrefix = raw.startsWith('+')
-    const digitsOnly = raw.replace(/\D/g, '')
-    return hasPlusPrefix ? `+${digitsOnly}` : digitsOnly
+watch(phone, (value) => {
+  const normalized = normalizePhone(value)
+
+  if (!normalized) {
+    phoneError.value = ''
+    return
   }
 
-  function isValidPhone(value) {
-    if (!value) return true
-    return /^\+?[1-9]\d{7,14}$/.test(value)
+  phoneError.value = isValidPhone(normalized)
+    ? ''
+    : 'Enter a valid phone number'
+})
+
+async function loadPipelineStages(id) {
+  if (!id) {
+    pipelineStages.value = []
+    stageId.value = null
+    return
   }
 
-  watch(email, (value) => {
-    const normalized = String(value || '').trim()
-    if (!normalized) {
-      emailError.value = ''
-      return
+  isLoadingStages.value = true
+  pipelineStages.value = []
+  stageId.value = null
+
+  try {
+    const stages = await crmGlobalFetch(
+      `/api/crm/pipelines/stages?pipelineId=${id}`
+    )
+
+    pipelineStages.value = Array.isArray(stages) ? stages : []
+
+    if (pipelineStages.value.length > 0) {
+      stageId.value = pipelineStages.value[0].id
     }
-    emailError.value = isValidEmail(normalized) ? '' : 'Enter a valid email address'
-  })
+  } catch (error) {
+    console.error('Failed to load pipeline stages', error)
+    pipelineStages.value = []
+    stageId.value = null
+  } finally {
+    isLoadingStages.value = false
+  }
+}
 
-  watch(phone, (value) => {
-    const normalized = normalizePhone(value)
-    if (!normalized) {
-      phoneError.value = ''
-      return
-    }
-    phoneError.value = isValidPhone(normalized) ? '' : 'Enter a valid phone number'
-  })
+watch(pipelineId, async (id, oldId) => {
+  if (id === oldId) return
 
-  watch(
-    () => pipelinesStore.stages,
-    (stages) => {
-      if (!stageId.value && stages.length > 0) {
-        stageId.value = stages[0].id
-      }
-    },
-    { immediate: true }
-  )
+  await loadPipelineStages(id)
+})
 
-  watch(
-    () => usersStore.users,
-    (users) => {
-      if (!userId.value && users.length > 0) {
-        userId.value = users[0].id
-      }
-    },
-    { immediate: true }
-  )
+onMounted(async () => {
+  try {
+    sequences.value = await crmGlobalFetch('/api/crm/sequences')
+  } catch {
+    sequences.value = []
+  }
 
-  onMounted(async () => {
-    try {
-      sequences.value = await crmGlobalFetch('/api/crm/sequences')
-    } catch {
-      sequences.value = []
-    }
-
-    if (usersStore.users.length > 0) return
-
+  if (usersStore.users.length === 0) {
     try {
       const users = await crmGlobalFetch('/api/crm/users')
       usersStore.setUsers(users)
     } catch {
       usersStore.setUsers([])
     }
-  })
-
-  async function createLead() {
-    const normalizedEmail = String(email.value || '').trim()
-    const normalizedPhone = normalizePhone(phone.value)
-    if (!isValidEmail(normalizedEmail)) {
-      emailError.value = 'Enter a valid email address'
-      return
-    }
-    if (!isValidPhone(normalizedPhone)) {
-      phoneError.value = 'Enter a valid phone number'
-      return
-    }
-
-    showContactsLimitAlert.value = false
-    try {
-      const lead = await crmQuizFetch('/api/crm/leads/create', {
-        method: 'POST',
-        body: {
-          name: name.value,
-          company: company.value,
-          email: normalizedEmail,
-          phone: normalizedPhone || null,
-          stage_id: stageId.value,
-          user_id: userId.value,
-          sequence_id: sequenceId.value || null
-        }
-      })
-
-      leadsStore.addLead(lead)
-      // console.log('STORE LEADS:', leadsStore.leads)
-      emit('close')
-    } catch (error) {
-      const statusCode = Number(error?.statusCode || error?.data?.statusCode || 0)
-      const statusMessage = String(error?.statusMessage || error?.data?.statusMessage || '')
-      if (statusCode === 403 && statusMessage.includes('Contacts limit reached')) {
-        showContactsLimitAlert.value = true
-        return
-      }
-      console.error('Failed to create lead', error)
-    }
   }
+
+  // Use the currently active pipeline as the default.
+  // Fall back to the first pipeline if no active pipeline is set.
+  if (pipelinesStore.activePipelineId) {
+    pipelineId.value = pipelinesStore.activePipelineId
+  } else if (pipelinesStore.pipelines.length > 0) {
+    pipelineId.value = pipelinesStore.pipelines[0].id
+  }
+
+  if (pipelineId.value) {
+    await loadPipelineStages(pipelineId.value)
+  }
+})
+
+async function createLead() {
+  const normalizedEmail = String(email.value || '').trim()
+  const normalizedPhone = normalizePhone(phone.value)
+
+  if (!isValidEmail(normalizedEmail)) {
+    emailError.value = 'Enter a valid email address'
+    return
+  }
+
+  if (!isValidPhone(normalizedPhone)) {
+    phoneError.value = 'Enter a valid phone number'
+    return
+  }
+
+  if (!pipelineId.value) {
+    console.error('Cannot create lead without a pipeline')
+    return
+  }
+
+  if (!stageId.value) {
+    console.error('Cannot create lead without a stage')
+    return
+  }
+
+  showContactsLimitAlert.value = false
+
+  try {
+    const lead = await crmQuizFetch('/api/crm/leads/create', {
+      method: 'POST',
+      body: {
+        name: name.value,
+        company: company.value,
+        email: normalizedEmail,
+        phone: normalizedPhone || null,
+        pipeline_id: pipelineId.value,
+        stage_id: stageId.value,
+        user_id: userId.value,
+        sequence_id: sequenceId.value || null
+      }
+    })
+
+    leadsStore.addLead(lead)
+    emit('close')
+  } catch (error) {
+    const statusCode = Number(
+      error?.statusCode ||
+      error?.data?.statusCode ||
+      0
+    )
+
+    const statusMessage = String(
+      error?.statusMessage ||
+      error?.data?.statusMessage ||
+      ''
+    )
+
+    if (
+      statusCode === 403 &&
+      statusMessage.includes('Contacts limit reached')
+    ) {
+      showContactsLimitAlert.value = true
+      return
+    }
+
+    console.error('Failed to create lead', error)
+  }
+}
 </script>
 
 <template>
@@ -146,16 +217,27 @@
     message="Upgrade your plan to add more contacts, or archive/delete existing leads to free up capacity."
     @close="showContactsLimitAlert = false"
   />
-  <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-    <div class="w-96 rounded-xl border border-app-border bg-app-panel p-6 text-app-text shadow-2xl">
-      <h2 class="mb-6 text-xl font-bold text-app-text">Add Lead</h2>
+
+  <div
+    class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm"
+  >
+    <div
+      class="w-96 rounded-xl border border-app-border bg-app-panel p-6 text-app-text shadow-2xl"
+      @click.stop
+    >
+      <h2 class="mb-6 text-xl font-bold text-app-text">
+        Add Lead
+      </h2>
 
       <div class="space-y-4">
         <!-- Name -->
         <div>
-          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
+          <label
+            class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted"
+          >
             Full Name
           </label>
+
           <input
             v-model="name"
             placeholder="John Doe"
@@ -165,9 +247,12 @@
 
         <!-- Company -->
         <div>
-          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
+          <label
+            class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted"
+          >
             Company
           </label>
+
           <input
             v-model="company"
             placeholder="Acme Inc."
@@ -177,9 +262,12 @@
 
         <!-- Email -->
         <div>
-          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
+          <label
+            class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted"
+          >
             Email Address
           </label>
+
           <input
             v-model="email"
             placeholder="john@example.com"
@@ -190,16 +278,23 @@
                 : 'border-app-border focus:border-emerald-500 focus:ring-emerald-500/20'
             "
           />
-          <p v-if="emailError" class="mt-1 text-xs font-medium text-red-500">
+
+          <p
+            v-if="emailError"
+            class="mt-1 text-xs font-medium text-red-500"
+          >
             {{ emailError }}
           </p>
         </div>
 
         <!-- Phone -->
         <div>
-          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
+          <label
+            class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted"
+          >
             Phone Number
           </label>
+
           <input
             v-model="phone"
             placeholder="+14155552671"
@@ -210,36 +305,94 @@
                 : 'border-app-border focus:border-emerald-500 focus:ring-emerald-500/20'
             "
           />
-          <p v-if="phoneError" class="mt-1 text-xs font-medium text-red-500">
+
+          <p
+            v-if="phoneError"
+            class="mt-1 text-xs font-medium text-red-500"
+          >
             {{ phoneError }}
           </p>
         </div>
 
+        <!-- Pipeline -->
+        <div>
+          <label
+            class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted"
+          >
+            Pipeline
+          </label>
+
+          <select
+            v-model="pipelineId"
+            class="w-full rounded-lg border border-app-border bg-app-card p-2.5 text-app-text outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+          >
+            <option
+              v-for="pipeline in pipelinesStore.pipelines"
+              :key="pipeline.id"
+              :value="pipeline.id"
+            >
+              {{ pipeline.name }}
+            </option>
+          </select>
+        </div>
+
         <!-- Stage + Owner -->
         <div class="grid grid-cols-2 gap-4">
+          <!-- Stage -->
           <div>
-            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
+            <label
+              class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted"
+            >
               Stage
             </label>
+
             <select
               v-model="stageId"
-              class="w-full rounded-lg border border-app-border bg-app-card p-2.5 text-app-text outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+              :disabled="isLoadingStages || !pipelineId"
+              class="w-full rounded-lg border border-app-border bg-app-card p-2.5 text-app-text outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <option v-for="stage in pipelinesStore.stages" :key="stage.id" :value="stage.id">
+              <option
+                v-if="isLoadingStages"
+                :value="null"
+              >
+                Loading...
+              </option>
+
+              <option
+                v-else-if="!pipelineStages.length"
+                :value="null"
+              >
+                No stages
+              </option>
+
+              <option
+                v-for="stage in pipelineStages"
+                v-else
+                :key="stage.id"
+                :value="stage.id"
+              >
                 {{ stage.name }}
               </option>
             </select>
           </div>
 
+          <!-- Owner -->
           <div>
-            <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
+            <label
+              class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted"
+            >
               Owner
             </label>
+
             <select
               v-model="userId"
               class="w-full rounded-lg border border-app-border bg-app-card p-2.5 text-app-text outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
             >
-              <option v-for="user in usersStore.users" :key="user.id" :value="user.id">
+              <option
+                v-for="user in usersStore.users"
+                :key="user.id"
+                :value="user.id"
+              >
                 {{ user.name || user.email }}
               </option>
             </select>
@@ -248,15 +401,25 @@
 
         <!-- Sequence -->
         <div>
-          <label class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted">
+          <label
+            class="mb-1 block text-xs font-semibold uppercase tracking-wider text-app-muted"
+          >
             Sequence
           </label>
+
           <select
             v-model="sequenceId"
             class="w-full rounded-lg border border-app-border bg-app-card p-2.5 text-app-text outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
           >
-            <option value="">None</option>
-            <option v-for="sequence in sequences" :key="sequence.id" :value="sequence.id">
+            <option value="">
+              None
+            </option>
+
+            <option
+              v-for="sequence in sequences"
+              :key="sequence.id"
+              :value="sequence.id"
+            >
               {{ sequence.title }}
             </option>
           </select>
@@ -273,7 +436,8 @@
         </button>
 
         <button
-          class="rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white transition-all hover:bg-emerald-700"
+          class="rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white transition-all hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+          :disabled="isLoadingStages || !pipelineId || !stageId"
           @click="createLead"
         >
           Create Lead
