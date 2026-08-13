@@ -76,7 +76,7 @@
     class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm"
     @click="$emit('close')"
   >
-    <div class="w-96 rounded-xl border border-app-border p-6 text-app-text shadow-2xl" @click.stop>
+    <div class="w-96 rounded-xl border border-app-border p-6 text-app-text bg-app-panel shadow-2xl" @click.stop>
       <h2 class="mb-6 text-xl font-bold text-app-text">Edit Stage</h2>
 
       <div class="space-y-4">
