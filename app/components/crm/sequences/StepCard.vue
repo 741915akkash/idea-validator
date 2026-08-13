@@ -52,7 +52,7 @@
           <div class="flex flex-wrap items-center gap-3">
             <!-- DAY -->
             <div class="flex shrink-0 items-center rounded-xl bg-app-panel px-4 py-2 shadow-sm">
-              <span class="text-[11px] font-black uppercase tracking-widest text-white">
+              <span class="text-[11px] font-black uppercase tracking-widest text-app-text">
                 Day {{ cumulativeDay }}
               </span>
             </div>
