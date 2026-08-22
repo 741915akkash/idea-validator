@@ -1,5 +1,6 @@
 <script setup>
   import { computed, onMounted, ref, watch } from 'vue'
+  import { useRoute } from 'vue-router'
   import { useLeadsStore } from '~/stores/leads'
   import {
     FlexRender,
@@ -14,11 +15,13 @@
   import LeadDetailPanel from '../lead-detail/LeadDetailPanel.vue'
 
   const store = useLeadsStore()
+  const route = useRoute()
+
   const columnVisibility = ref({
     user_id: false
   })
   const sorting = ref([])
-  const searchQuery = ref('')
+  const searchQuery = ref(String(route.query.search || ''))
   const columnSizing = ref({})
   const EMPTY_ROW_COUNT = 30
 
@@ -62,6 +65,13 @@
       }
     }
   })
+
+  watch(
+    () => route.query.search,
+    (value) => {
+      searchQuery.value = String(value || '')
+    }
+  )
 
   watch(
     columnVisibility,
