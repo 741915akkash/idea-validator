@@ -114,10 +114,10 @@
 
         <!-- CENTER -->
         <div
-          class="inline-flex items-center rounded-lg border border-app-border bg-app-panel p-1 text-app-text"
+          class="grid w-full grid-cols-2 gap-1 rounded-lg border border-app-border bg-app-panel p-1 text-app-text sm:flex sm:w-fit sm:items-center sm:gap-0"
         >
           <button
-            class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+            class="rounded-md px-2 py-2 text-sm font-medium transition-colors sm:px-3 sm:py-1.5"
             :class="
               viewMode === 'table'
                 ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-500'
@@ -129,7 +129,7 @@
           </button>
 
           <button
-            class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+            class="rounded-md px-2 py-2 text-sm font-medium transition-colors sm:px-3 sm:py-1.5"
             :class="
               viewMode === 'kanban'
                 ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-500'
@@ -141,16 +141,14 @@
           </button>
 
           <button
-            class="rounded-md px-3 py-1.5 text-sm font-medium text-app-muted transition-colors hover:bg-app-hover hover:text-app-text"
+            class="rounded-md px-2 py-2 text-sm font-medium text-app-muted transition-colors hover:bg-app-hover hover:text-app-text sm:px-3 sm:py-1.5"
             @click="$router.push('/crm/pipelines')"
           >
             Pipelines
           </button>
 
-          <div class="mx-1 h-5 w-px bg-app-border"></div>
-
           <button
-            class="inline-flex items-center text-app-muted transition hover:text-app-text"
+            class="rounded-md px-2 py-2 text-sm font-medium text-app-muted transition-colors hover:bg-app-hover hover:text-app-text sm:px-3 sm:py-1.5"
             @click="$router.push('/crm/sequences')"
           >
             Sequences

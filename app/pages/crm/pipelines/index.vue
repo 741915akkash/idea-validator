@@ -26,21 +26,15 @@
 
     pipelines.value.unshift({
       id: 'new',
-
       name: '',
       stages: [],
-
       open: true,
       isNew: true,
-
       isAddingStage: false,
       newStageName: '',
-
       editingStageIndex: null,
       editingStageValue: '',
-
       deletingStageIndex: null,
-
       confirmingDeletePipeline: false
     })
   }
@@ -68,19 +62,13 @@
         return {
           ...pipeline,
           stages,
-
           open: false,
-
           isNew: false,
-
           isAddingStage: false,
           newStageName: '',
-
           editingStageIndex: null,
           editingStageValue: '',
-
           deletingStageIndex: null,
-
           confirmingDeletePipeline: false
         }
       })
@@ -313,7 +301,7 @@
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-4xl space-y-6 px-6 py-6">
+  <div class="mx-auto w-full max-w-4xl space-y-6 px-4 py-5 sm:px-6 sm:py-6">
     <TopAlert
       :open="showPipelinesLimitAlert"
       title="Pipelines limit reached"
@@ -321,23 +309,27 @@
       message="Upgrade your plan to create more pipelines."
       @close="showPipelinesLimitAlert = false"
     />
+
     <!-- Header -->
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 class="text-2xl font-semibold text-app-text">Pipeline Management</h2>
+        <h2 class="text-2xl font-semibold leading-tight text-app-text sm:text-2xl">
+          Pipeline Management
+        </h2>
 
         <p class="mt-1 text-sm text-app-muted">Manage pipelines and their stages.</p>
       </div>
     </div>
 
     <!-- Cards -->
-    <div class="grid gap-6" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr))">
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
+      <!-- NEW PIPELINE -->
       <div
         v-if="!pipelines.some((p) => p.isNew)"
-        class="rounded-xl border border-app-border bg-app-panel text-app-text shadow-sm"
+        class="w-full overflow-hidden rounded-xl border border-app-border bg-app-panel text-app-text shadow-sm"
       >
         <button
-          class="flex min-h-[260px] w-full flex-col items-center justify-center gap-3 p-5 transition hover:bg-app-card"
+          class="flex min-h-[220px] w-full flex-col items-center justify-center gap-3 p-5 transition hover:bg-app-card sm:min-h-[260px]"
           @click="createEmptyPipeline"
         >
           <div
@@ -350,18 +342,22 @@
         </button>
       </div>
 
+      <!-- PIPELINE -->
       <div
         v-for="pipeline in pipelines"
         :key="pipeline.id"
-        class="rounded-xl border border-app-border bg-app-panel text-app-text shadow-sm"
+        class="w-full min-w-0 overflow-hidden rounded-xl border border-app-border bg-app-panel text-app-text shadow-sm"
       >
-        <div class="p-5">
-          <h3 class="text-lg font-semibold text-app-text">
-            {{ pipeline.name }}
-          </h3>
+        <div class="p-4 sm:p-5">
+          <!-- PIPELINE HEADER -->
+          <div class="min-w-0">
+            <h3 class="truncate text-lg font-semibold text-app-text">
+              {{ pipeline.name }}
+            </h3>
 
-          <div class="mt-4 flex gap-4 text-sm text-app-muted">
-            <span>{{ pipeline.stages.length }} Stages</span>
+            <div class="mt-3 flex gap-4 text-sm text-app-muted">
+              <span>{{ pipeline.stages.length }} Stages</span>
+            </div>
           </div>
 
           <!-- COLLAPSED VIEW -->
@@ -370,14 +366,16 @@
               <div
                 v-for="stage in pipeline.stages"
                 :key="stage.id"
-                class="rounded-md border border-app-border bg-app-card px-3 py-2 text-sm text-app-text"
+                class="min-w-0 rounded-md border border-app-border bg-app-card px-3 py-2 text-sm text-app-text"
               >
-                {{ stage.name }}
+                <span class="block truncate">
+                  {{ stage.name }}
+                </span>
               </div>
             </div>
 
             <button
-              class="mt-5 w-full rounded-lg border border-app-border px-3 py-2 text-sm font-medium text-app-text transition hover:bg-app-card"
+              class="mt-5 w-full rounded-lg border border-app-border px-3 py-2.5 text-sm font-medium text-app-text transition hover:bg-app-card"
               @click="pipeline.isNew ? cancelNewPipeline() : togglePipeline(pipeline.id)"
             >
               Manage Pipeline
@@ -386,6 +384,7 @@
 
           <!-- EXPANDED VIEW -->
           <template v-else>
+            <!-- PIPELINE NAME -->
             <div class="mt-5">
               <label class="mb-1 block text-xs font-medium uppercase tracking-wide text-app-muted">
                 Pipeline Name
@@ -394,10 +393,11 @@
               <input
                 v-model="pipeline.name"
                 type="text"
-                class="w-full rounded-lg border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                class="w-full min-w-0 rounded-lg border border-app-border bg-app-panel px-3 py-2.5 text-sm text-app-text outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               />
             </div>
 
+            <!-- STAGES -->
             <div class="mt-5">
               <h4 class="mb-3 text-sm font-semibold text-app-text">Stages</h4>
 
@@ -405,24 +405,25 @@
                 <div
                   v-for="(stage, index) in pipeline.stages"
                   :key="stage.id"
-                  class="rounded-lg border border-app-border bg-app-card px-3 py-2 text-app-text"
+                  class="min-w-0 rounded-lg border border-app-border bg-app-card px-3 py-2.5 text-app-text"
                 >
+                  <!-- EDITING STAGE -->
                   <template v-if="pipeline.editingStageIndex === index">
                     <input
                       v-model="pipeline.editingStageValue"
-                      class="w-full rounded border border-app-border bg-app-panel px-2 py-1 text-sm text-app-text outline-none focus:border-emerald-500"
+                      class="w-full min-w-0 rounded border border-app-border bg-app-panel px-2 py-1.5 text-sm text-app-text outline-none focus:border-emerald-500"
                     />
 
                     <div class="mt-2 flex gap-2">
                       <button
-                        class="rounded bg-emerald-600 px-2 py-1 text-xs text-white"
+                        class="rounded bg-emerald-600 px-2.5 py-1.5 text-xs text-white"
                         @click="saveRenameStage(pipeline.id)"
                       >
                         Save
                       </button>
 
                       <button
-                        class="rounded border border-app-border bg-app-panel px-2 py-1 text-xs text-app-text hover:bg-app-card"
+                        class="rounded border border-app-border bg-app-panel px-2.5 py-1.5 text-xs text-app-text hover:bg-app-card"
                         @click="cancelRenameStage(pipeline.id)"
                       >
                         Cancel
@@ -430,11 +431,14 @@
                     </div>
                   </template>
 
+                  <!-- NORMAL STAGE -->
                   <template v-else>
-                    <div class="flex items-center justify-between">
-                      <span class="text-sm text-app-text"> {{ index + 1 }}. {{ stage.name }} </span>
+                    <div class="flex min-w-0 items-center justify-between gap-3">
+                      <span class="min-w-0 truncate text-sm text-app-text">
+                        {{ index + 1 }}. {{ stage.name }}
+                      </span>
 
-                      <div class="flex gap-3">
+                      <div class="flex shrink-0 gap-3">
                         <button
                           class="text-xs text-app-muted hover:text-app-text"
                           @click="startRenameStage(pipeline.id, index)"
@@ -455,24 +459,25 @@
                 </div>
               </div>
 
+              <!-- ADD STAGE -->
               <div class="mt-4">
                 <template v-if="pipeline.isAddingStage">
                   <input
                     v-model="pipeline.newStageName"
                     placeholder="Stage name"
-                    class="w-full rounded-lg border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text outline-none focus:border-emerald-500"
+                    class="w-full min-w-0 rounded-lg border border-app-border bg-app-panel px-3 py-2.5 text-sm text-app-text outline-none focus:border-emerald-500"
                   />
 
                   <div class="mt-2 flex gap-2">
                     <button
-                      class="flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-sm text-white"
+                      class="flex-1 rounded-lg bg-emerald-600 px-3 py-2.5 text-sm text-white"
                       @click="addStage(pipeline.id)"
                     >
                       Create
                     </button>
 
                     <button
-                      class="rounded-lg border border-app-border bg-app-panel px-3 py-2 text-sm text-app-text hover:bg-app-card"
+                      class="rounded-lg border border-app-border bg-app-panel px-3 py-2.5 text-sm text-app-text hover:bg-app-card"
                       @click="cancelAddStage(pipeline.id)"
                     >
                       Cancel
@@ -482,7 +487,7 @@
 
                 <button
                   v-else
-                  class="w-full rounded-lg border border-dashed border-app-border bg-app-panel px-3 py-2 text-sm text-app-muted transition hover:bg-app-card"
+                  class="w-full rounded-lg border border-dashed border-app-border bg-app-panel px-3 py-2.5 text-sm text-app-muted transition hover:bg-app-card"
                   @click="startAddStage(pipeline.id)"
                 >
                   + Add Stage
@@ -490,23 +495,24 @@
               </div>
             </div>
 
-            <div class="mt-5 flex gap-2">
+            <!-- ACTIONS -->
+            <div class="mt-5 flex flex-wrap gap-2">
               <button
-                class="flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+                class="min-w-0 flex-1 rounded-lg bg-emerald-600 px-3 py-2.5 text-sm font-medium text-white hover:bg-emerald-700"
                 @click="savePipeline(pipeline)"
               >
                 Save
               </button>
 
               <button
-                class="rounded-lg border border-app-border bg-app-panel px-3 py-2 text-sm font-medium text-app-text transition hover:bg-app-card"
+                class="rounded-lg border border-app-border bg-app-panel px-3 py-2.5 text-sm font-medium text-app-text transition hover:bg-app-card"
                 @click="pipeline.isNew ? cancelNewPipeline() : togglePipeline(pipeline.id)"
               >
                 Close
               </button>
 
               <button
-                class="hover:bg-red-500/100/5/10 rounded-lg border border-red-500/20 px-3 py-2 text-sm font-medium text-red-500 transition"
+                class="rounded-lg border border-red-500/20 px-3 py-2.5 text-sm font-medium text-red-500 transition hover:bg-red-500/5"
                 @click="deletePipeline(pipeline.id)"
               >
                 Delete
