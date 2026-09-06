@@ -70,12 +70,12 @@ export default defineEventHandler(async (event) => {
 
     const leadResult = await client.query(
       `
-      SELECT id, user_id, sequence_id, current_step, next_follow_up_at
-      FROM leads
-      WHERE id = $1
-        AND user_id = $2
-        AND quiz_id = $3
-      FOR UPDATE
+        SELECT id, user_id, sequence_id, current_step, next_follow_up_at
+        FROM leads
+        WHERE id = $1
+          AND user_id = $2
+          AND quiz_id = $3
+        FOR UPDATE
       `,
       [leadId, userId, quizId]
     )
@@ -90,28 +90,30 @@ export default defineEventHandler(async (event) => {
     let completedStep = null
     let sequenceCompleted = false
     let sequenceTitle = null
+    let businessDaysOnly = false
 
     if (lead.sequence_id && lead.current_step) {
       const sequenceResult = await client.query(
         `
-        SELECT title
-        FROM sequences
-        WHERE id = $1
-          AND user_id = $2
-        LIMIT 1
+          SELECT title, business_days_only
+          FROM sequences
+          WHERE id = $1
+            AND user_id = $2
+          LIMIT 1
         `,
         [lead.sequence_id, userId]
       )
 
       sequenceTitle = sequenceResult.rows[0]?.title || null
+      businessDaysOnly = Boolean(sequenceResult.rows[0]?.business_days_only)
 
       const currentStepResult = await client.query(
         `
-        SELECT id, step_number, offset_days, type, title
-        FROM sequence_steps
-        WHERE sequence_id = $1
-          AND step_number = $2
-        LIMIT 1
+          SELECT id, step_number, offset_days, type, title
+          FROM sequence_steps
+          WHERE sequence_id = $1
+            AND step_number = $2
+          LIMIT 1
         `,
         [lead.sequence_id, lead.current_step]
       )
@@ -121,11 +123,11 @@ export default defineEventHandler(async (event) => {
 
         const nextStepResult = await client.query(
           `
-          SELECT id, step_number, offset_days, type, title
-          FROM sequence_steps
-          WHERE sequence_id = $1
-            AND step_number = $2
-          LIMIT 1
+            SELECT id, step_number, offset_days, type, title
+            FROM sequence_steps
+            WHERE sequence_id = $1
+              AND step_number = $2
+            LIMIT 1
           `,
           [lead.sequence_id, lead.current_step + 1]
         )
@@ -139,7 +141,14 @@ export default defineEventHandler(async (event) => {
 
           const baseDate = lead.next_follow_up_at ? new Date(lead.next_follow_up_at) : new Date()
 
-          const shiftedDate = addBusinessDays(baseDate, offsetDiff)
+          let shiftedDate
+
+          if (businessDaysOnly) {
+            shiftedDate = addBusinessDays(baseDate, offsetDiff)
+          } else {
+            shiftedDate = new Date(baseDate)
+            shiftedDate.setUTCDate(shiftedDate.getUTCDate() + offsetDiff)
+          }
 
           nextStepNumber = nextStep.step_number
           nextFollowUpAt = shiftedDate.toISOString()
@@ -151,14 +160,14 @@ export default defineEventHandler(async (event) => {
 
     await client.query(
       `
-      UPDATE leads
-      SET sequence_id = CASE WHEN $6 THEN NULL ELSE sequence_id END,
-          current_step = $1,
-          next_follow_up_at = $2,
-          updated_at = NOW()
-      WHERE id = $3
-        AND user_id = $4
-        AND quiz_id = $5
+        UPDATE leads
+        SET sequence_id = CASE WHEN $6 THEN NULL ELSE sequence_id END,
+            current_step = $1,
+            next_follow_up_at = $2,
+            updated_at = NOW()
+        WHERE id = $3
+          AND user_id = $4
+          AND quiz_id = $5
       `,
       [nextStepNumber, nextFollowUpAt, leadId, userId, quizId, sequenceCompleted]
     )
@@ -173,16 +182,16 @@ export default defineEventHandler(async (event) => {
 
       await client.query(
         `
-        INSERT INTO lead_activities (lead_id, type, text, sequence_step_id, quiz_id)
-        VALUES ($1, $2, $3, $4, $5)
+          INSERT INTO lead_activities (lead_id, type, text, sequence_step_id, quiz_id)
+          VALUES ($1, $2, $3, $4, $5)
         `,
         [leadId, safeType, activityText, completedStep.id, quizId]
       )
     } else {
       await client.query(
         `
-        INSERT INTO lead_activities (lead_id, type, text, quiz_id)
-        VALUES ($1, 'note', 'Follow-up marked done', $2)
+          INSERT INTO lead_activities (lead_id, type, text, quiz_id)
+          VALUES ($1, 'note', 'Follow-up marked done', $2)
         `,
         [leadId, quizId]
       )
@@ -195,8 +204,8 @@ export default defineEventHandler(async (event) => {
 
       await client.query(
         `
-        INSERT INTO lead_activities (lead_id, type, text, quiz_id)
-        VALUES ($1, 'note', $2, $3)
+          INSERT INTO lead_activities (lead_id, type, text, quiz_id)
+          VALUES ($1, 'note', $2, $3)
         `,
         [leadId, completionText, quizId]
       )

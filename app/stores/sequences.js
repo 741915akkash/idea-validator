@@ -41,6 +41,7 @@ function normalizeSequence(sequence) {
   return {
     id: sequence?.id ?? null,
     title: sequence?.title ?? '',
+    business_days_only: Boolean(sequence?.business_days_only),
     created_at: sequence?.created_at ?? null,
     updated_at: sequence?.updated_at ?? null,
     steps
@@ -51,6 +52,7 @@ function normalizePayload(sequence) {
   return {
     id: sequence?.id,
     title: String(sequence?.title || '').trim(),
+    business_days_only: Boolean(sequence?.business_days_only),
     steps: Array.isArray(sequence?.steps)
       ? sequence.steps.map((step) => ({
           type: step?.type || 'call',
@@ -107,6 +109,7 @@ export const useSequencesStore = defineStore('sequences', {
         ...sequence,
         id: tempId
       })
+
       this.sequences = [optimistic, ...this.sequences]
 
       try {
@@ -146,13 +149,16 @@ export const useSequencesStore = defineStore('sequences', {
         if (existingIndex !== -1 && previous) {
           const rollback = [...this.sequences]
           const currentIndex = rollback.findIndex((item) => item.id === sequence?.id)
+
           if (currentIndex !== -1) {
             rollback[currentIndex] = previous
           } else {
             rollback.splice(existingIndex, 0, previous)
           }
+
           this.sequences = rollback
         }
+
         throw error
       }
     },

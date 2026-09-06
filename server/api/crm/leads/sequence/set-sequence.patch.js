@@ -1,6 +1,7 @@
 import { pool } from '../../../../db/index.js'
 import { requireCrmEnabled } from '../../../../utils/crm/crmAccess.js'
 import { requireQuizAccess } from '../../../../utils/quizAccess.js'
+import { addBusinessDays, isBusinessDay } from '../../../../utils/business-days.js'
 
 export default defineEventHandler(async (event) => {
   const { userId } = await requireCrmEnabled(event)
@@ -38,6 +39,74 @@ export default defineEventHandler(async (event) => {
 
   await requireQuizAccess(pool, event, quizId)
 
+  const sequenceResult =
+    sequenceId === null
+      ? { rows: [] }
+      : await pool.query(
+          `
+        SELECT
+          id,
+          business_days_only
+        FROM sequences
+        WHERE id = $1
+          AND user_id = $2
+        LIMIT 1
+        `,
+          [sequenceId, userId]
+        )
+
+  if (sequenceId !== null && !sequenceResult.rows.length) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Lead or sequence not found'
+    })
+  }
+
+  let firstStep = null
+  let businessDaysOnly = false
+
+  if (sequenceId !== null) {
+    businessDaysOnly = Boolean(sequenceResult.rows[0].business_days_only)
+
+    const firstStepResult = await pool.query(
+      `
+      SELECT step_number, offset_days
+      FROM sequence_steps
+      WHERE sequence_id = $1
+      ORDER BY step_number ASC
+      LIMIT 1
+      `,
+      [sequenceId]
+    )
+
+    firstStep = firstStepResult.rows[0] || null
+  }
+
+  let nextFollowUpAt = null
+
+  if (sequenceId !== null) {
+    const offsetDays = Number(firstStep?.offset_days ?? 0)
+    const now = new Date()
+
+    if (businessDaysOnly) {
+      let baseDate = new Date(now)
+
+      // Step 1 must never be scheduled on Saturday or Sunday.
+      if (!isBusinessDay(baseDate)) {
+        while (!isBusinessDay(baseDate)) {
+          baseDate.setUTCDate(baseDate.getUTCDate() + 1)
+        }
+      }
+
+      nextFollowUpAt = addBusinessDays(baseDate, offsetDays).toISOString()
+    } else {
+      const followUpDate = new Date(now)
+      followUpDate.setUTCDate(followUpDate.getUTCDate() + offsetDays)
+
+      nextFollowUpAt = followUpDate.toISOString()
+    }
+  }
+
   const result = await pool.query(
     `
     WITH selected_sequence AS (
@@ -72,17 +141,7 @@ export default defineEventHandler(async (event) => {
           )
         END,
 
-        next_follow_up_at = CASE
-          WHEN $1 IS NULL THEN NULL
-          ELSE NOW() + (
-            (
-              COALESCE(
-                (SELECT offset_days FROM first_sequence_step),
-                0
-              )
-            )::text || ' days'
-          )::interval
-        END,
+        next_follow_up_at = $6,
 
         updated_at = NOW()
 
@@ -144,7 +203,7 @@ export default defineEventHandler(async (event) => {
     LEFT JOIN sequences
       ON updated.sequence_id = sequences.id
     `,
-    [sequenceId, leadId, userId, userId, quizId]
+    [sequenceId, leadId, userId, userId, quizId, nextFollowUpAt]
   )
 
   if (!result.rows.length) {

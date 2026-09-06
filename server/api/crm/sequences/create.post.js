@@ -30,6 +30,7 @@ export default defineEventHandler(async (event) => {
   const { userId } = await requireCrmEnabled(event)
   const body = await readBody(event)
   const title = typeof body?.title === 'string' ? body.title.trim() : ''
+  const businessDaysOnly = Boolean(body?.business_days_only)
   const steps = normalizeSteps(body?.steps)
 
   if (!title) {
@@ -43,11 +44,11 @@ export default defineEventHandler(async (event) => {
 
     const sequenceInsert = await client.query(
       `
-      INSERT INTO sequences (user_id, title)
-      VALUES ($1, $2)
-      RETURNING id, user_id, title, created_at, updated_at
+        INSERT INTO sequences (user_id, title, business_days_only)
+        VALUES ($1, $2, $3)
+        RETURNING id, user_id, title, business_days_only, created_at, updated_at
       `,
-      [userId, title]
+      [userId, title, businessDaysOnly]
     )
 
     const sequence = sequenceInsert.rows[0]
@@ -55,8 +56,8 @@ export default defineEventHandler(async (event) => {
     for (const step of steps) {
       await client.query(
         `
-        INSERT INTO sequence_steps (sequence_id, step_number, offset_days, type, title, description)
-        VALUES ($1, $2, $3, $4, $5, $6)
+          INSERT INTO sequence_steps (sequence_id, step_number, offset_days, type, title, description)
+          VALUES ($1, $2, $3, $4, $5, $6)
         `,
         [sequence.id, step.stepNumber, step.offsetDays, step.type, step.title, step.description]
       )
@@ -64,31 +65,32 @@ export default defineEventHandler(async (event) => {
 
     const hydrated = await client.query(
       `
-      SELECT
-        sequences.id,
-        sequences.title,
-        sequences.created_at,
-        sequences.updated_at,
-        COALESCE(
-          json_agg(
-            json_build_object(
-              'id', sequence_steps.id,
-              'step_number', sequence_steps.step_number,
-              'offset', sequence_steps.offset_days,
-              'type', sequence_steps.type,
-              'title', sequence_steps.title,
-              'description', sequence_steps.description
-            )
-            ORDER BY sequence_steps.step_number
-          ) FILTER (WHERE sequence_steps.id IS NOT NULL),
-          '[]'::json
-        ) AS steps
-      FROM sequences
-      LEFT JOIN sequence_steps
-        ON sequence_steps.sequence_id = sequences.id
-      WHERE sequences.id = $1
-        AND sequences.user_id = $2
-      GROUP BY sequences.id
+        SELECT
+          sequences.id,
+          sequences.title,
+          sequences.business_days_only,
+          sequences.created_at,
+          sequences.updated_at,
+          COALESCE(
+            json_agg(
+              json_build_object(
+                'id', sequence_steps.id,
+                'step_number', sequence_steps.step_number,
+                'offset', sequence_steps.offset_days,
+                'type', sequence_steps.type,
+                'title', sequence_steps.title,
+                'description', sequence_steps.description
+              )
+              ORDER BY sequence_steps.step_number
+            ) FILTER (WHERE sequence_steps.id IS NOT NULL),
+            '[]'::json
+          ) AS steps
+        FROM sequences
+        LEFT JOIN sequence_steps
+          ON sequence_steps.sequence_id = sequences.id
+        WHERE sequences.id = $1
+          AND sequences.user_id = $2
+        GROUP BY sequences.id
       `,
       [sequence.id, userId]
     )

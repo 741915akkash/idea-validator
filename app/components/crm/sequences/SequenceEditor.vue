@@ -17,6 +17,7 @@
   const form = ref({
     id: null,
     title: '',
+    business_days_only: false,
     steps: []
   })
 
@@ -116,6 +117,24 @@
           class="w-full border-none p-0 text-3xl font-black tracking-tight text-app-text placeholder-gray-200 outline-none focus:ring-0"
           placeholder="e.g. Cold Lead Outreach"
         />
+      </div>
+
+      <!-- Business Day Scheduling -->
+      <div class="rounded-[24px] border border-app-border p-6 text-app-text shadow-sm">
+        <label class="flex cursor-pointer items-start gap-4">
+          <input
+            v-model="form.business_days_only"
+            type="checkbox"
+            class="mt-1 h-4 w-4 rounded border-app-border text-emerald-500 focus:ring-emerald-500"
+          />
+
+          <div>
+            <div class="text-sm font-black text-app-text">Business days only</div>
+            <div class="mt-1 text-xs text-app-muted">
+              Skip Saturday and Sunday when scheduling follow-ups.
+            </div>
+          </div>
+        </label>
       </div>
 
       <!-- 2. Enhanced Flow Preview Summary -->
