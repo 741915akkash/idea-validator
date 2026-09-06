@@ -21,10 +21,12 @@
   })
 
   const cumulativeDays = computed(() => {
-    let total = 0
+    let total = 1
+
     return form.value.steps.map((s) => {
+      const day = total
       total += Number(s.offset) || 0
-      return total
+      return day
     })
   })
 
