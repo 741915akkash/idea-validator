@@ -34,7 +34,7 @@
   }
 
   function getCumulativeDay(steps, index) {
-    let total = 0
+    let total = 1
     for (let i = 0; i <= index; i++) {
       total += Number(steps[i].offset) || 0
     }
