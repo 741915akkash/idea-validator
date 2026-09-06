@@ -1,6 +1,7 @@
 import { pool } from '../../../../db/index.js'
 import { requireCrmEnabled } from '../../../../utils/crm/crmAccess.js'
 import { requireQuizAccess } from '../../../../utils/quizAccess.js'
+import { addBusinessDays } from '../../../../utils/business-days.js'
 
 const HYDRATED_LEAD_SELECT = `
   SELECT
@@ -135,10 +136,10 @@ export default defineEventHandler(async (event) => {
             0,
             Number(nextStep.offset_days) - Number(completedStep.offset_days)
           )
-          const baseDate = lead.next_follow_up_at ? new Date(lead.next_follow_up_at) : new Date()
-          const shiftedDate = new Date(baseDate)
 
-          shiftedDate.setUTCDate(shiftedDate.getUTCDate() + offsetDiff)
+          const baseDate = lead.next_follow_up_at ? new Date(lead.next_follow_up_at) : new Date()
+
+          const shiftedDate = addBusinessDays(baseDate, offsetDiff)
 
           nextStepNumber = nextStep.step_number
           nextFollowUpAt = shiftedDate.toISOString()
