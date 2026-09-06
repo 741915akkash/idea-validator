@@ -163,7 +163,7 @@ export default defineEventHandler(async (event) => {
     )
 
     if (completedStep) {
-      const safeType = ['call', 'email', 'note'].includes(completedStep.type)
+      const safeType = ['call', 'email', 'x', 'linkedin', 'note'].includes(completedStep.type)
         ? completedStep.type
         : 'note'
       const activityText = completedStep.title

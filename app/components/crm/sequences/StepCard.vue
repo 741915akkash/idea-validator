@@ -99,8 +99,10 @@
                 class="w-full cursor-pointer appearance-none rounded-xl border border-app-border bg-app-panel px-3 py-2.5 pr-10 text-sm font-semibold text-app-muted shadow-sm transition-all hover:text-app-text focus:border-emerald-300 focus:text-app-text focus:outline-none focus:ring-4 focus:ring-emerald-500/10 sm:px-4"
               >
                 <option value="call">📞 Call</option>
-                <option value="email">📧 Email</option>
-                <option value="note">📝 Note</option>
+                <option value="email">✉ Email</option>
+                <option value="x">𝕏 X</option>
+                <option value="linkedin">in LinkedIn</option>
+                <option value="note">✏️ Note</option>
               </select>
 
               <ChevronDown

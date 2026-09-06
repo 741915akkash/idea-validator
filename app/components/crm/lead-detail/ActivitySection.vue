@@ -3,7 +3,7 @@
   import { MessageSquare, Phone, Mail, ChevronDown, X, Send, Mic } from 'lucide-vue-next'
   import { useLeadsStore } from '~/stores/leads'
   import { useRouter } from 'vue-router'
-  import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
+  import { crmQuizFetch } from '~/composables/useCrmRequest'
   import TopAlert from '~/components/ui/TopAlert.vue'
 
   const props = defineProps({
@@ -17,7 +17,7 @@
 
   // Modal State
   const isModalOpen = ref(false)
-  const activeType = ref('note') // 'note', 'call', 'email'
+  const activeType = ref('note') // 'note', 'call', 'email', 'x', 'linkedin'
   const text = ref('')
   const callOutcome = ref('Connected')
   const modalInput = ref(null)
@@ -46,7 +46,15 @@
 
     if (!text.value.trim()) return
 
-    let typeLabel = activeType.value.charAt(0).toUpperCase() + activeType.value.slice(1)
+    const typeLabels = {
+      note: 'Note',
+      call: 'Call',
+      email: 'Email',
+      x: 'X',
+      linkedin: 'LinkedIn'
+    }
+
+    const typeLabel = typeLabels[activeType.value] || 'Activity'
     let activityText = text.value.trim()
 
     if (activeType.value === 'call') {
@@ -75,7 +83,7 @@
 
       leadsStore.addActivity(props.leadId, activity)
 
-      closeModal() // ✅ AFTER success
+      closeModal()
     } catch (e) {
       console.error('Failed to save activity', e)
     }
@@ -122,10 +130,12 @@
     } catch (e) {
       const statusCode = Number(e?.statusCode || e?.data?.statusCode || 0)
       const statusMessage = String(e?.statusMessage || e?.data?.statusMessage || '')
+
       if (statusCode === 403 && statusMessage.includes('Freeform interview limit reached')) {
         showFreeformLimitAlert.value = true
         return
       }
+
       console.error('Failed to start quick interview', e)
     }
   }
@@ -140,6 +150,7 @@
       message="Upgrade your plan to run more quick interviews for this idea in the current period."
       @close="showFreeformLimitAlert = false"
     />
+
     <div class="border-t border-app-border p-6 text-app-text">
       <h3
         class="mb-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-app-muted"
@@ -147,7 +158,9 @@
         ⚡️ QUICK ACTIONS
       </h3>
 
-      <div class="grid grid-cols-3 gap-3">
+      <!-- QUICK ACTIONS -->
+      <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <!-- NOTE -->
         <button
           @click="openModal('note')"
           class="bg-app-panel/50 group flex flex-col items-center justify-center gap-2 rounded-2xl border border-app-border p-4 transition-all hover:border-emerald-200 hover:bg-emerald-500/10"
@@ -157,44 +170,89 @@
           >
             <MessageSquare class="h-4 w-4" />
           </div>
+
           <span
             class="text-[10px] font-bold uppercase tracking-wider text-app-muted group-hover:text-emerald-500"
-            >Note</span
           >
+            Note
+          </span>
         </button>
 
+        <!-- CALL -->
         <button
           @click="openModal('call')"
-          class="bg-app-panel/50 hover:bg-blue-500/100/10 group flex flex-col items-center justify-center gap-2 rounded-2xl border border-app-border p-4 transition-all hover:border-blue-500/20"
+          class="bg-app-panel/50 group flex flex-col items-center justify-center gap-2 rounded-2xl border border-app-border p-4 transition-all hover:border-blue-500/20 hover:bg-blue-500/5"
         >
           <div
             class="rounded-lg p-2 text-app-text shadow-sm transition-colors group-hover:text-blue-600"
           >
             <Phone class="h-4 w-4" />
           </div>
+
           <span
             class="text-[10px] font-bold uppercase tracking-wider text-app-muted group-hover:text-blue-700"
-            >Log Call</span
           >
+            Log Call
+          </span>
         </button>
 
+        <!-- EMAIL -->
         <button
           @click="openModal('email')"
-          class="bg-app-panel/50 hover:bg-orange-500/100/10 group flex flex-col items-center justify-center gap-2 rounded-2xl border border-app-border p-4 transition-all hover:border-orange-500/30"
+          class="bg-app-panel/50 group flex flex-col items-center justify-center gap-2 rounded-2xl border border-app-border p-4 transition-all hover:border-orange-500/30 hover:bg-orange-500/5"
         >
           <div
             class="rounded-lg p-2 text-app-text shadow-sm transition-colors group-hover:text-orange-600"
           >
             <Mail class="h-4 w-4" />
           </div>
+
           <span
             class="text-[10px] font-bold uppercase tracking-wider text-app-muted group-hover:text-orange-700"
-            >Email</span
           >
+            Email
+          </span>
+        </button>
+
+        <!-- X -->
+        <button
+          @click="openModal('x')"
+          class="bg-app-panel/50 group flex flex-col items-center justify-center gap-2 rounded-2xl border border-app-border p-4 transition-all hover:border-emerald-500/30 hover:bg-emerald-500/5"
+        >
+          <div
+            class="rounded-lg p-2 text-app-text shadow-sm transition-colors group-hover:text-emerald-600"
+          >
+            <span class="text-sm font-bold">𝕏</span>
+          </div>
+
+          <span
+            class="text-[10px] font-bold uppercase tracking-wider text-app-muted group-hover:text-emerald-700"
+          >
+            X
+          </span>
+        </button>
+
+        <!-- LINKEDIN -->
+        <button
+          @click="openModal('linkedin')"
+          class="bg-app-panel/50 group flex flex-col items-center justify-center gap-2 rounded-2xl border border-app-border p-4 transition-all hover:border-emerald-500/30 hover:bg-emerald-500/5"
+        >
+          <div
+            class="rounded-lg p-2 text-app-text shadow-sm transition-colors group-hover:text-emerald-600"
+          >
+            <span class="text-sm font-bold">in</span>
+          </div>
+
+          <span
+            class="text-[10px] font-bold uppercase tracking-wider text-app-muted group-hover:text-emerald-700"
+          >
+            LinkedIn
+          </span>
         </button>
       </div>
 
-      <div class="mt-3 grid grid-cols-3 gap-3">
+      <!-- INTERVIEW -->
+      <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <button
           @click="startInterviewFromLead"
           :disabled="!quizId"
@@ -205,50 +263,67 @@
           >
             <Mic class="h-4 w-4" />
           </div>
+
           <span
             class="text-[10px] font-bold uppercase tracking-wider text-app-muted group-hover:text-violet-700"
-            >Interview</span
           >
+            Interview
+          </span>
         </button>
       </div>
 
-      <!-- Activity Modal -->
+      <!-- ACTIVITY MODAL -->
       <Teleport to="body">
         <div
           v-if="isModalOpen"
           class="fixed inset-0 z-[300] flex items-center justify-center p-4 sm:p-6"
         >
-          <!-- Backdrop -->
+          <!-- BACKDROP -->
           <div
             @click="closeModal"
             class="animate-in fade-in bg-app-panel/40 absolute inset-0 backdrop-blur-sm duration-200"
           ></div>
 
-          <!-- Modal Content -->
+          <!-- MODAL -->
           <div
             class="animate-in zoom-in-95 slide-in-from-bottom-4 relative w-full max-w-lg overflow-hidden rounded-3xl bg-app-panel text-app-text shadow-2xl duration-300"
           >
+            <!-- HEADER -->
             <header
               class="bg-app-panel/30 flex items-center justify-between border-b border-app-border px-6 py-4"
             >
               <div class="flex items-center gap-3">
+                <!-- ICON -->
                 <div
                   :class="[
-                    'rounded-xl p-2 text-app-text shadow-sm',
+                    'flex h-9 w-9 items-center justify-center rounded-xl text-app-text shadow-sm',
                     activeType === 'note'
                       ? 'bg-emerald-500/10'
                       : activeType === 'call'
-                        ? 'bg-blue-500/100'
-                        : 'bg-orange-500/100'
+                        ? 'bg-blue-500/10'
+                        : activeType === 'email'
+                          ? 'bg-orange-500/10'
+                          : 'bg-violet-500/10'
                   ]"
                 >
+                  <template v-if="activeType === 'x'">
+                    <span class="text-sm font-bold">𝕏</span>
+                  </template>
+
+                  <template v-else-if="activeType === 'linkedin'">
+                    <span class="text-sm font-bold">in</span>
+                  </template>
+
                   <component
+                    v-else
                     :is="
                       activeType === 'note' ? MessageSquare : activeType === 'call' ? Phone : Mail
                     "
                     class="h-4 w-4"
                   />
                 </div>
+
+                <!-- TITLE -->
                 <div>
                   <h2 class="text-sm font-bold uppercase tracking-widest text-app-text">
                     {{
@@ -256,14 +331,21 @@
                         ? 'Add internal note'
                         : activeType === 'call'
                           ? 'Log phone call'
-                          : 'Log email sent'
+                          : activeType === 'email'
+                            ? 'Log email sent'
+                            : activeType === 'x'
+                              ? 'Log X activity'
+                              : 'Log LinkedIn activity'
                     }}
                   </h2>
+
                   <p class="text-[10px] font-bold uppercase tracking-wider text-app-muted">
                     Recording activity for lead
                   </p>
                 </div>
               </div>
+
+              <!-- CLOSE -->
               <button
                 @click="closeModal"
                 class="rounded-full p-2 text-app-muted transition-colors hover:bg-app-hover"
@@ -272,15 +354,17 @@
               </button>
             </header>
 
+            <!-- BODY -->
             <div class="p-6">
-              <!-- Specific Fields -->
+              <!-- CALL OUTCOME -->
               <div
                 v-if="activeType === 'call'"
-                class="bg-blue-500/100/50 mb-6 flex items-center justify-between rounded-2xl border border-blue-500/20 p-4"
+                class="mb-6 flex items-center justify-between rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4"
               >
-                <span class="text-[11px] font-bold uppercase tracking-wider text-blue-500"
-                  >Call Outcome</span
-                >
+                <span class="text-[11px] font-bold uppercase tracking-wider text-blue-500">
+                  Call Outcome
+                </span>
+
                 <div class="relative min-w-[160px]">
                   <select
                     v-model="callOutcome"
@@ -292,12 +376,14 @@
                     <option>Left Voicemail</option>
                     <option>Wrong Number</option>
                   </select>
+
                   <ChevronDown
                     class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-500"
                   />
                 </div>
               </div>
 
+              <!-- ACTIVITY TEXT -->
               <textarea
                 ref="modalInput"
                 v-model="text"
@@ -306,11 +392,16 @@
                     ? 'Write your internal updates here...'
                     : activeType === 'call'
                       ? 'What was discussed during the call?'
-                      : 'Summarize the email content...'
+                      : activeType === 'email'
+                        ? 'Summarize the email content...'
+                        : activeType === 'x'
+                          ? 'What happened on X? Reply, DM, post, interaction, etc.'
+                          : 'What happened on LinkedIn? Message, connection, comment, etc.'
                 "
                 class="min-h-[160px] w-full resize-none rounded-2xl border border-app-border bg-app-card p-4 text-base font-medium text-app-text outline-none transition-all placeholder:text-app-muted focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10"
               ></textarea>
 
+              <!-- ACTIONS -->
               <div class="mt-6 flex items-center justify-end gap-3">
                 <button
                   @click="closeModal"
@@ -318,6 +409,7 @@
                 >
                   Cancel
                 </button>
+
                 <button
                   @click="saveActivity"
                   :disabled="!text.trim()"
@@ -329,7 +421,9 @@
                         ? 'bg-emerald-600 text-app-text shadow-emerald-500/20 hover:bg-emerald-700'
                         : activeType === 'call'
                           ? 'bg-blue-600 text-app-text shadow-blue-500/20 hover:bg-blue-700'
-                          : 'bg-orange-600 text-app-text shadow-orange-500/20 hover:bg-orange-700'
+                          : activeType === 'email'
+                            ? 'bg-orange-600 text-app-text shadow-orange-500/20 hover:bg-orange-700'
+                            : 'bg-violet-600 text-app-text shadow-violet-500/20 hover:bg-violet-700'
                   ]"
                 >
                   <Send class="h-3.5 w-3.5" />

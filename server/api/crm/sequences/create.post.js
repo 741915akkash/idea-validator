@@ -1,7 +1,7 @@
 import { pool } from '../../../db/index.js'
 import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js'
 
-const ALLOWED_STEP_TYPES = new Set(['call', 'email', 'note'])
+const ALLOWED_STEP_TYPES = new Set(['call', 'email', 'x', 'linkedin', 'note'])
 
 function normalizeSteps(input) {
   if (!Array.isArray(input)) return []

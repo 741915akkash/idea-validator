@@ -137,7 +137,7 @@
               ><Circle class="h-2.5 w-2.5 fill-current text-orange-500" /> Email</span
             >
             <span class="flex items-center gap-1.5"
-              ><Circle class="h-2.5 w-2.5 fill-current text-emerald-500" /> Note</span
+              ><Circle class="h-2.5 w-2.5 fill-current text-emerald-500" /> Other</span
             >
           </div>
         </div>

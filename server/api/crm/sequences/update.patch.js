@@ -1,7 +1,7 @@
 import { pool } from '../../../db/index.js'
 import { requireCrmEnabled } from '../../../utils/crm/crmAccess.js'
 
-const ALLOWED_STEP_TYPES = new Set(['call', 'email', 'note'])
+const ALLOWED_STEP_TYPES = new Set(['call', 'email', 'x', 'linkedin', 'note'])
 
 function normalizeSteps(input) {
   if (!Array.isArray(input)) return []
@@ -9,10 +9,12 @@ function normalizeSteps(input) {
   return input.map((step, index) => {
     const fallbackTitle = `Step ${index + 1}`
     const stepType = ALLOWED_STEP_TYPES.has(step?.type) ? step.type : 'call'
-    const title = typeof step?.title === 'string' && step.title.trim() ? step.title.trim() : fallbackTitle
-    const description = typeof step?.description === 'string' && step.description.trim()
-      ? step.description.trim()
-      : null
+    const title =
+      typeof step?.title === 'string' && step.title.trim() ? step.title.trim() : fallbackTitle
+    const description =
+      typeof step?.description === 'string' && step.description.trim()
+        ? step.description.trim()
+        : null
 
     return {
       stepNumber: index + 1,

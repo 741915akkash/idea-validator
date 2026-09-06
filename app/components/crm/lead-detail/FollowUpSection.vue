@@ -31,6 +31,8 @@
     if (type === 'email') return '✉️ Email'
     if (type === 'note') return '📝 Note'
     if (type === 'call') return '📞 Call'
+    if (type === 'x') return '𝕏 X'
+    if (type === 'linkedin') return 'in LinkedIn'
 
     return ''
   })
