@@ -17,6 +17,13 @@
   const store = useLeadsStore()
   const route = useRoute()
 
+  const props = defineProps({
+    todayOnly: {
+      type: Boolean,
+      default: false
+    }
+  })
+
   const columnVisibility = ref({
     user_id: false
   })
@@ -25,7 +32,27 @@
   const columnSizing = ref({})
   const EMPTY_ROW_COUNT = 30
 
-  const data = computed(() => store.leads)
+  const data = computed(() => {
+    if (!props.todayOnly) {
+      return store.leads
+    }
+
+    const now = new Date()
+
+    return store.leads.filter((lead) => {
+      if (!lead.follow_up) return false
+
+      const followUp = new Date(lead.follow_up)
+
+      if (Number.isNaN(followUp.getTime())) return false
+
+      return (
+        followUp.getFullYear() === now.getFullYear() &&
+        followUp.getMonth() === now.getMonth() &&
+        followUp.getDate() === now.getDate()
+      )
+    })
+  })
   const emptyRowCount = computed(() =>
     Math.max(0, EMPTY_ROW_COUNT - table.getRowModel().rows.length)
   )
@@ -91,7 +118,7 @@
 
   const table = useVueTable({
     get data() {
-      return store.leads
+      return data.value
     },
     columns,
     defaultColumn: {

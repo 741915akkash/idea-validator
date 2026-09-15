@@ -11,7 +11,7 @@
   import { useQuizSessionStore } from '~/stores/quizSession'
   import { crmGlobalFetch, crmQuizFetch } from '~/composables/useCrmRequest'
   import { useHelpContent } from '~/composables/useHelpContent'
-  import { onMounted, ref, watch } from 'vue'
+  import { onMounted, ref, watch, computed } from 'vue'
 
   const leadsStore = useLeadsStore()
   const sourcesStore = useSourcesStore()
@@ -21,6 +21,26 @@
 
   const viewMode = ref('table')
   const showHelpDrawer = ref(false)
+
+  const showTodayFollowUps = ref(false)
+
+  const todayFollowUpCount = computed(() => {
+    const now = new Date()
+
+    return leadsStore.leads.filter((lead) => {
+      if (!lead.follow_up) return false
+
+      const followUp = new Date(lead.follow_up)
+
+      if (Number.isNaN(followUp.getTime())) return false
+
+      return (
+        followUp.getFullYear() === now.getFullYear() &&
+        followUp.getMonth() === now.getMonth() &&
+        followUp.getDate() === now.getDate()
+      )
+    }).length
+  })
 
   const help = useHelpContent('leads-page-content')
 
@@ -156,12 +176,30 @@
         </div>
 
         <!-- RIGHT SPACER -->
-        <div></div>
+        <!-- RIGHT ACTIONS -->
+        <div class="flex justify-start lg:justify-end">
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors"
+            :class="
+              showTodayFollowUps
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500'
+                : 'border-app-border text-app-muted bg-app-panel hover:border-emerald-500/30 hover:bg-app-hover hover:text-app-text'
+            "
+            @click="showTodayFollowUps = !showTodayFollowUps"
+          >
+            <span>Today Follow-ups</span>
+          </button>
+        </div>
       </div>
     </div>
 
     <ClientOnly>
-      <LeadsTable v-if="viewMode === 'table'" class="min-h-0 flex-1" />
+      <LeadsTable
+        v-if="viewMode === 'table'"
+        :today-only="showTodayFollowUps"
+        class="min-h-0 flex-1"
+      />
       <KanbanBoard v-else class="min-h-0 flex-1" />
     </ClientOnly>
 
