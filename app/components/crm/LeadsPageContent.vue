@@ -188,7 +188,7 @@
             "
             @click="showTodayFollowUps = !showTodayFollowUps"
           >
-            <span>Today Follow-ups</span>
+            <span>Today Follow-Ups</span>
           </button>
         </div>
       </div>
