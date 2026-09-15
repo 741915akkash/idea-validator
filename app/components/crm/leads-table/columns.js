@@ -14,6 +14,21 @@ function toDateKey(value) {
 
 export const columns = [
   {
+    id: 'row_number',
+    meta: {
+      label: '#'
+    },
+    header: () =>
+      h('span', { class: 'text-xs font-semibold text-app-muted uppercase tracking-wider' }, '#'),
+    enableHiding: true,
+    enableSorting: false,
+    enableResizing: false,
+    size: 60,
+    minSize: 60,
+    maxSize: 60,
+    cell: (info) => info.row.index + 1
+  },
+  {
     accessorKey: 'name',
     meta: {
       label: 'Name'

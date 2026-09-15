@@ -25,7 +25,8 @@
   })
 
   const columnVisibility = ref({
-    user_id: false
+    user_id: false,
+    row_number: false
   })
   const sorting = ref([])
   const searchQuery = ref(String(route.query.search || ''))
