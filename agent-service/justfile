@@ -1,0 +1,8 @@
+
+# List available commands by default
+default:
+    @just --list
+
+# Start FastAPI development server
+dev:
+    uv run fastapi dev src/agent_service/main.py --host 127.0.0.1 --port 7000

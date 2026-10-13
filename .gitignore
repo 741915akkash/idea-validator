@@ -12,8 +12,43 @@ supabase/snippets/
 # Node dependencies
 node_modules
 
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python build and packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+wheels/
+*.egg-info/
+*.egg
+
+# Python testing and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Python type checking and linting
+.mypy_cache/
+.pyright/
+.ruff_cache/
+
 # Logs
-logs
+logs/
 *.log
 
 # Misc
@@ -26,6 +61,7 @@ logs
 .env.*
 !.env.example
 
+# Local project rules
 rules_json/
 
 .codex

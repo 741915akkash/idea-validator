@@ -1,0 +1,22 @@
+[project]
+name = "agent-service"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Akash Saini", email = "cheetah74191915@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.143.0",
+    "langchain>=1.4.5",
+    "langchain-ollama>=1.1.0",
+    "pydantic-settings>=2.15.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.13,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.agent.service.scripts]
+dev = "uv run uvicorn agent_service.main:app --reload --port 7000"
